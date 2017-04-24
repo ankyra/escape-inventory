@@ -3,28 +3,28 @@ package main
 import (
 	"encoding/json"
 	"io/ioutil"
-    "os"
+	"os"
 )
 
 type Config struct {
-    Secret string `json:"secret"`
-    configPath string `json:"-"`
+	Secret     string `json:"secret"`
+	configPath string `json:"-"`
 }
 
 func NewConfig(file string) *Config {
-    return &Config{
-        Secret: "waddup",
-        configPath: file,
-    }
+	return &Config{
+		Secret:     "waddup",
+		configPath: file,
+	}
 
 }
 
 func loadConfig(file string) (*Config, error) {
 	var config Config
 
-    if !PathExists(file) {
-        return NewConfig(file), nil
-    }
+	if !PathExists(file) {
+		return NewConfig(file), nil
+	}
 
 	b, err := ioutil.ReadFile(file)
 	if err != nil {

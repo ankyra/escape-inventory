@@ -5,5 +5,4 @@ import (
 )
 
 func DownloadHandler(w http.ResponseWriter, r *http.Request) {
-
 }
