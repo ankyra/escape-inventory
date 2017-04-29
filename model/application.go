@@ -48,5 +48,3 @@ func getMaxFromVersions(versions []string, prefix string) *SemanticVersion {
     }
     return current
 }
-
-

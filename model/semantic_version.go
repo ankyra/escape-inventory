@@ -35,7 +35,7 @@ func (s *SemanticVersion) LessOrEqual(o *SemanticVersion) bool {
     ix := 0
     for true {
         if len(s.versionParts) == ix {
-            return len(o.versionParts) != ix
+            return len(o.versionParts) >= ix
         }
         if len(o.versionParts) == ix {
             return false

@@ -43,12 +43,22 @@ func (a *mem_dao) GetRelease(releaseId string) (ReleaseDAO, error) {
     return release, nil
 }
 
-func (a *mem_dao) AddRelease(release Metadata) error {
+func getOrAddApplication(name, typ string) *mem_application {
+    for _, a := range applications {
+        if a.GetType() == typ && a.GetName() == name {
+            return a.(*mem_application)
+        }
+    }
     app := &mem_application{
-        name: release.GetName(),
-        typ: release.GetType(),
+        name: name,
+        typ: typ,
     }
     applications = append(applications, app)
+    return app
+}
+
+func (a *mem_dao) AddRelease(release Metadata) error {
+    app := getOrAddApplication(release.GetName(), release.GetType())
     result := &mem_release{
         application: app,
         version: release.GetVersion(),
