@@ -27,8 +27,6 @@ func main() {
 
 	store = sessions.NewCookieStore([]byte(cfg.Secret))
 
-	middleware := negroni.Classic()
-
 	r := mux.NewRouter()
 	r.HandleFunc("/", HomeHandler)
 	r.Handle("/r/", negroni.New(
@@ -42,6 +40,7 @@ func main() {
 	r.Handle("/r/{release}/next-version", negroni.New(
 		negroni.Wrap(http.HandlerFunc(handlers.NextVersionHandler))))
 
+	middleware := negroni.Classic()
 	middleware.UseHandler(r)
 	http.Handle("/", middleware)
 

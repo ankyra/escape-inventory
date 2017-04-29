@@ -1,0 +1,52 @@
+package model
+
+import (
+    "strings"
+    "github.com/ankyra/escape-registry/dao"
+    "github.com/ankyra/escape-client/model/parsers"
+)
+
+func GetNextVersion(releaseIdString, prefix string) (string, error) {
+    latest, err := getLastVersionForPrefix(releaseIdString, prefix)
+    if err != nil {
+        if dao.IsNotFound(err) {
+            return "0", nil
+        }
+        return "", err
+    }
+    latest.IncrementSmallest()
+    return prefix + latest.ToString(), nil
+
+}
+
+func getLastVersionForPrefix(releaseIdString, prefix string) (*SemanticVersion, error) {
+    releaseId, err := parsers.ParseReleaseId(releaseIdString)
+    if err != nil {
+        return nil, err
+    }
+    app, err := dao.GetApplication(releaseId.Type, releaseId.Build)
+    if err != nil {
+        return nil, err
+    }
+    versions, err := app.FindAllVersions()
+    if err != nil {
+        return nil, err
+    }
+    return getMaxFromVersions(versions, prefix), nil
+}
+
+func getMaxFromVersions(versions []string, prefix string) *SemanticVersion {
+    current := NewSemanticVersion("-1")
+    for _, v := range versions {
+        if strings.HasPrefix(v, prefix) {
+            release_version := v[len(prefix):]
+            newver := NewSemanticVersion(release_version)
+            if current.LessOrEqual(newver) {
+                current = newver
+            }
+        }
+    }
+    return current
+}
+
+
