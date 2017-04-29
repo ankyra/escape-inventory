@@ -14,7 +14,9 @@ func GetNextVersion(releaseIdString, prefix string) (string, error) {
         }
         return "", err
     }
-    latest.IncrementSmallest()
+    if err := latest.IncrementSmallest(); err != nil {
+        return "", err
+    }
     return prefix + latest.ToString(), nil
 
 }

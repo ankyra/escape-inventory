@@ -6,6 +6,7 @@ import (
 
 var applications = []ApplicationDAO{}
 var releases = map[string]ReleaseDAO{}
+var packages = map[string][]string{}
 
 type mem_dao struct { }
 type mem_application struct {
@@ -94,4 +95,11 @@ func (r *mem_release) GetVersion() string {
 }
 func (r *mem_release) GetMetadata() Metadata {
     return r.metadata
+}
+
+func (r *mem_release) GetPackageURIs() ([]string, error) {
+    return packages[r.metadata.GetReleaseId()], nil
+}
+func (r *mem_release) AddPackageURI(uri string) error {
+    return nil
 }

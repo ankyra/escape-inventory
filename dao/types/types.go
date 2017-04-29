@@ -17,6 +17,7 @@ type DAO interface {
 type ApplicationDAO interface {
     GetType() string
     GetName() string
+
     FindAllVersions() ([]string, error)
 }
 
@@ -24,6 +25,9 @@ type ReleaseDAO interface {
     GetApplication() ApplicationDAO
     GetVersion() string
     GetMetadata() Metadata
+
+    GetPackageURIs() ([]string, error)
+    AddPackageURI(uri string) error
 }
 
 type PackageDAO interface {
