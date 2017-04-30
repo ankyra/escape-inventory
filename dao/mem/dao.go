@@ -29,17 +29,6 @@ func (a *mem_dao) GetApplication(typ, name string) (ApplicationDAO, error) {
     return nil, NotFound
 }
 
-func (a *mem_dao) NewApplication(typ, name string) (ApplicationDAO, error) {
-    for _, app := range a.applications {
-        if app.GetType() == typ && app.GetName() == name {
-            return nil, AlreadyExists
-        }
-    }
-    result := newApplication(typ, name, a)
-    a.applications = append(a.applications, result)
-    return result, nil
-}
-
 func (a *mem_dao) GetRelease(releaseId string) (ReleaseDAO, error) {
     release, ok := a.releases[releaseId]
     if !ok {
@@ -54,4 +43,27 @@ func (a *mem_dao) GetAllReleases() ([]ReleaseDAO, error) {
         result = append(result, rel)
     }
     return result, nil
+}
+
+func (a *mem_dao) AddRelease(release Metadata) (ReleaseDAO, error) {
+    key := release.GetReleaseId()
+    _, alreadyExists := a.releases[key]
+    if alreadyExists {
+        return nil, AlreadyExists
+    }
+    var application *mem_application
+    typ := release.GetType()
+    name := release.GetName()
+    for _, app := range a.applications {
+        if app.GetName() == name && app.GetType() == typ {
+            application = app.(*mem_application)
+        }
+    }
+    if application == nil {
+        application = newApplication(typ, name, a)
+        a.applications = append(a.applications, application)
+    }
+    a.releases[key] = newRelease(release, application)
+    application.releases[key] = a.releases[key]
+    return a.releases[key], nil
 }

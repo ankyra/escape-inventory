@@ -8,19 +8,17 @@ import (
 type Metadata interfaces.ReleaseMetadata
 
 type DAO interface {
-    NewApplication(typ, name string) (ApplicationDAO, error)
     GetApplication(typ, name string) (ApplicationDAO, error)
     GetApplications() ([]ApplicationDAO, error)
     GetRelease(releaseId string) (ReleaseDAO, error)
     GetAllReleases() ([]ReleaseDAO, error)
+    AddRelease(metadata Metadata) (ReleaseDAO, error)
 }
 
 type ApplicationDAO interface {
     GetType() string
     GetName() string
-
     FindAllVersions() ([]string, error)
-    AddRelease(metadata Metadata) (ReleaseDAO, error)
 }
 
 type ReleaseDAO interface {

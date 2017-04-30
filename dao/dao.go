@@ -24,16 +24,7 @@ func GetAllReleases() ([]ReleaseDAO, error) {
 }
 
 func AddRelease(metadata Metadata) (ReleaseDAO, error) {
-    app, err := globalDAO.GetApplication(metadata.GetType(), metadata.GetName())
-    if IsNotFound(err) {
-        app, err = globalDAO.NewApplication(metadata.GetType(), metadata.GetName())
-        if err != nil {
-            return nil, err
-        }
-    } else if err != nil {
-        return nil, err
-    }
-    return app.AddRelease(metadata)
+    return globalDAO.AddRelease(metadata)
 }
 
 func IsNotFound(err error) bool {

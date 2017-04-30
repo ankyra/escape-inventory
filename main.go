@@ -3,7 +3,6 @@ package main
 import (
 	"github.com/ankyra/escape-registry/handlers"
 	"github.com/gorilla/mux"
-	"github.com/gorilla/sessions"
 	"github.com/urfave/negroni"
 	"log"
 	"net/http"
@@ -15,7 +14,6 @@ const (
 
 var (
 	cfg   *Config
-	store *sessions.CookieStore
 )
 
 func main() {
@@ -24,8 +22,6 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-
-	store = sessions.NewCookieStore([]byte(cfg.Secret))
 
 	r := mux.NewRouter()
 	r.HandleFunc("/", HomeHandler)
@@ -54,5 +50,5 @@ func main() {
 }
 
 func HomeHandler(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("test"))
+	w.Write([]byte("Escape Release Registry"))
 }
