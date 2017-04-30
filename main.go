@@ -45,10 +45,10 @@ func main() {
 	http.Handle("/", middleware)
 
 	port := "3000"
-	log.Printf("Starting the Escape registry on port %s\n", port)
+	log.Printf("Starting Escape Registry v%s on port %s\n", registryVersion, port)
 	log.Fatalln(http.ListenAndServe(":"+port, nil))
 }
 
 func HomeHandler(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Escape Release Registry"))
+	w.Write([]byte("Escape Release Registry v" + registryVersion))
 }

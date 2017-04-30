@@ -20,4 +20,5 @@ func (s *sqliteSuite) Test_DAO(c *C) {
         c.Assert(err, IsNil)
         return dao
     }, c)
+    os.RemoveAll("./test.db")
 }
