@@ -8,10 +8,10 @@ import (
 type Metadata interfaces.ReleaseMetadata
 
 type DAO interface {
-    GetApplications() ([]ApplicationDAO, error)
+    NewApplication(typ, name string) (ApplicationDAO, error)
     GetApplication(typ, name string) (ApplicationDAO, error)
+    GetApplications() ([]ApplicationDAO, error)
     GetRelease(releaseId string) (ReleaseDAO, error)
-    AddRelease(metadata Metadata) error
 }
 
 type ApplicationDAO interface {
@@ -19,6 +19,7 @@ type ApplicationDAO interface {
     GetName() string
 
     FindAllVersions() ([]string, error)
+    AddRelease(metadata Metadata) error
 }
 
 type ReleaseDAO interface {
@@ -30,10 +31,5 @@ type ReleaseDAO interface {
     AddPackageURI(uri string) error
 }
 
-type PackageDAO interface {
-    GetRelease() ReleaseDAO
-    GetURI() string
-}
-
 var NotFound = fmt.Errorf("Not found")
-
+var AlreadyExists = fmt.Errorf("Already exists")
