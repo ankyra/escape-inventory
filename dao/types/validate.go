@@ -87,8 +87,18 @@ func Validate_FindAllVersions(dao DAO, c *C) {
     versions, err := app.FindAllVersions()
     c.Assert(err, IsNil)
     c.Assert(len(versions), Equals, 2)
-    c.Assert(versions[0], Equals, "0.0.1")
-    c.Assert(versions[1], Equals, "0.0.2")
+    var firstFound, secondFound bool
+    for _, v := range versions {
+        if v == "0.0.1" {
+            firstFound = true
+        } else if v == "0.0.2" {
+            secondFound = true
+        } else {
+            c.Fail()
+        }
+    }
+    c.Assert(firstFound, Equals, true)
+    c.Assert(secondFound, Equals, true)
 }
 
 func Validate_FindAllVersions_Empty(dao DAO, c *C) {

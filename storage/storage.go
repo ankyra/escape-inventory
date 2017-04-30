@@ -6,10 +6,11 @@ import (
     "net/url"
     "github.com/ankyra/escape-registry/storage/local"
     "github.com/ankyra/escape-registry/storage/gcs"
+    "github.com/ankyra/escape-registry/shared"
 )
 
 type StorageBackend interface {
-    Upload(releaseId string, pkg io.ReadSeeker) (string, error)
+    Upload(releaseId *shared.ReleaseId, pkg io.ReadSeeker) (string, error)
     Download(uri string) (io.ReadSeeker, error)
 }
 
@@ -25,7 +26,11 @@ func Upload(releaseId string, pkg io.ReadSeeker) (string, error) {
     if !ok {
         return "", fmt.Errorf("Unknown scheme")
     }
-    return backend.Upload(releaseId, pkg)
+    parsedReleaseId, err := shared.ParseReleaseId(releaseId)
+    if err != nil {
+        return "", err
+    }
+    return backend.Upload(parsedReleaseId, pkg)
 }
 
 func Download(uri string) (io.ReadSeeker, error) {

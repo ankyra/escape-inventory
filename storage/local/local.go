@@ -3,22 +3,52 @@ package local
 import (
     "io"
     "os"
+    "fmt"
+    "path/filepath"
+    "github.com/ankyra/escape-registry/shared"
 )
 
-type LocalStorageBackend struct {}
+type LocalStorageBackend struct {
+    localStoragePath string
+}
 
 func NewLocalStorageBackend() *LocalStorageBackend {
     return &LocalStorageBackend{}
 }
 
-func (ls *LocalStorageBackend) Upload(releaseId string, pkg io.ReadSeeker) (string, error) {
-//        target_dir = os.path.join(local_storage_path, release.releasetype.name, release.application.name)
-//        if not os.path.exists(target_dir):
-//            os.makedirs(target_dir)
-//        p = os.path.join(target_dir, release.get_release_id() + ".tgz")
-//        file.save(p)
-//        return 'File saved', 200
-    return "", nil
+func NewLocalStorageBackendWithStoragePath(localStoragePath string) *LocalStorageBackend {
+    return &LocalStorageBackend{
+        localStoragePath: localStoragePath,
+    }
+}
+
+func (ls *LocalStorageBackend) getStoragePath() (string, error) {
+    return filepath.Abs(ls.localStoragePath)
+}
+
+func (ls *LocalStorageBackend) Upload(releaseId *shared.ReleaseId, pkg io.ReadSeeker) (string, error) {
+    storage, err := ls.getStoragePath()
+    if err != nil {
+        return "", err
+    }
+    typ := releaseId.Type
+    name := releaseId.Name
+    targetDir := filepath.Join(storage, typ, name)
+    if !PathExists(targetDir) {
+        os.MkdirAll(targetDir, 0755)
+    }
+    if !IsDir(targetDir) {
+        return "", fmt.Errorf("Path %s exists, but is not a directory", targetDir)
+    }
+    target := filepath.Join(targetDir, releaseId.ToString() + ".tgz")
+    dst, err := os.Create(target)
+    if err != nil {
+        return "", err
+    }
+    if _, err := io.Copy(dst, pkg); err != nil {
+        return "", err
+    }
+    return "file://" + target, nil
 }
 
 func (ls *LocalStorageBackend) Download(uri string) (io.ReadSeeker, error) {
@@ -27,5 +57,18 @@ func (ls *LocalStorageBackend) Download(uri string) (io.ReadSeeker, error) {
         return nil, err
     }
     return file, nil
+}
+
+func PathExists(path string) bool {
+	_, err := os.Stat(path)
+	return !os.IsNotExist(err)
+}
+
+func IsDir(path string) bool {
+	st, err := os.Stat(path)
+	if err != nil {
+		return false
+	}
+	return st.IsDir()
 }
 

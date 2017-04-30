@@ -3,7 +3,7 @@ package model
 import (
     "strings"
     "github.com/ankyra/escape-registry/dao"
-    "github.com/ankyra/escape-client/model/parsers"
+    "github.com/ankyra/escape-registry/shared"
 )
 
 func GetNextVersion(releaseIdString, prefix string) (string, error) {
@@ -22,11 +22,11 @@ func GetNextVersion(releaseIdString, prefix string) (string, error) {
 }
 
 func getLastVersionForPrefix(releaseIdString, prefix string) (*SemanticVersion, error) {
-    releaseId, err := parsers.ParseReleaseId(releaseIdString)
+    releaseId, err := shared.ParseReleaseId(releaseIdString)
     if err != nil {
         return nil, err
     }
-    app, err := dao.GetApplication(releaseId.Type, releaseId.Build)
+    app, err := dao.GetApplication(releaseId.Type, releaseId.Name)
     if err != nil {
         return nil, err
     }

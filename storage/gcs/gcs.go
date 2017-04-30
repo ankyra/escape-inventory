@@ -2,6 +2,7 @@ package gcs
 
 import (
     "io"
+    "github.com/ankyra/escape-registry/shared"
 )
 
 type GoogleCloudStorageBackend struct {}
@@ -10,7 +11,7 @@ func NewGoogleCloudStorageBackend() *GoogleCloudStorageBackend {
     return &GoogleCloudStorageBackend{}
 }
 
-func (ls *GoogleCloudStorageBackend) Upload(releaseId string, pkg io.ReadSeeker) (string, error) {
+func (ls *GoogleCloudStorageBackend) Upload(releaseId *shared.ReleaseId, pkg io.ReadSeeker) (string, error) {
 //    def _store_file_in_gcs(self, gcs_credentials, gcs_storage_bucket, file, release):
 //        if gcs_storage_bucket is None:
 //            return "Undefined bucket for GCS storage backend", 500
