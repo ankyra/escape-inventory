@@ -12,6 +12,7 @@ type DAO interface {
     GetApplication(typ, name string) (ApplicationDAO, error)
     GetApplications() ([]ApplicationDAO, error)
     GetRelease(releaseId string) (ReleaseDAO, error)
+    GetAllReleases() ([]ReleaseDAO, error)
 }
 
 type ApplicationDAO interface {

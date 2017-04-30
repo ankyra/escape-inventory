@@ -17,6 +17,7 @@ func ValidateDAO(dao func() DAO, c *C) {
     Validate_GetRelease(dao(), c)
     Validate_GetRelease_NotFound(dao(), c)
     Validate_GetPackageURIs(dao(), c)
+    Validate_GetAllReleases(dao(), c)
     Validate_AddPackageURI_Unique(dao(), c)
 }
 
@@ -186,4 +187,17 @@ func Validate_AddPackageURI_Unique(dao DAO, c *C) {
     c.Assert(err, IsNil)
     err = release.AddPackageURI("file:///test.txt")
     c.Assert(err, Equals, AlreadyExists)
+}
+
+func Validate_GetAllReleases(dao DAO, c *C) {
+    app, err := dao.NewApplication("archive", "dao-val")
+    c.Assert(err, IsNil)
+    metadataJson := `{"name": "dao-val", "type": "archive", "version": "1"}`
+    metadata, err := release.NewReleaseMetadataFromJsonString(metadataJson)
+    c.Assert(err, IsNil)
+    err = app.AddRelease(metadata)
+    c.Assert(err, IsNil)
+    releases, err := dao.GetAllReleases()
+    c.Assert(err, IsNil)
+    c.Assert(releases, HasLen, 1)
 }

@@ -47,3 +47,11 @@ func (a *mem_dao) GetRelease(releaseId string) (ReleaseDAO, error) {
     }
     return release, nil
 }
+
+func (a *mem_dao) GetAllReleases() ([]ReleaseDAO, error) {
+    result := []ReleaseDAO{}
+    for _, rel := range a.releases {
+        result = append(result, rel)
+    }
+    return result, nil
+}

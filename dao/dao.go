@@ -19,6 +19,9 @@ func GetApplication(typ, name string) (ApplicationDAO, error) {
 func GetRelease(releaseId string) (ReleaseDAO, error) {
     return globalDAO.GetRelease(releaseId)
 }
+func GetAllReleases() ([]ReleaseDAO, error) {
+    return globalDAO.GetAllReleases()
+}
 
 func AddRelease(metadata Metadata) error {
     app, err := globalDAO.GetApplication(metadata.GetType(), metadata.GetName())

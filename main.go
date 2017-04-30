@@ -39,6 +39,10 @@ func main() {
 		negroni.Wrap(http.HandlerFunc(handlers.UploadHandler))))
 	r.Handle("/r/{release}/next-version", negroni.New(
 		negroni.Wrap(http.HandlerFunc(handlers.NextVersionHandler))))
+	r.Handle("/export-releases", negroni.New(
+		negroni.Wrap(http.HandlerFunc(handlers.ExportReleasesHandler))))
+	r.Handle("/import-releases", negroni.New(
+		negroni.Wrap(http.HandlerFunc(handlers.ImportReleasesHandler))))
 
 	middleware := negroni.Classic()
 	middleware.UseHandler(r)
