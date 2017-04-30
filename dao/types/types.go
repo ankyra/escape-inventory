@@ -20,7 +20,7 @@ type ApplicationDAO interface {
     GetName() string
 
     FindAllVersions() ([]string, error)
-    AddRelease(metadata Metadata) error
+    AddRelease(metadata Metadata) (ReleaseDAO, error)
 }
 
 type ReleaseDAO interface {

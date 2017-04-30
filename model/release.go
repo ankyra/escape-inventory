@@ -20,7 +20,8 @@ func AddRelease(metadataJson string) error {
     if release != nil {
         return fmt.Errorf("Release %s already exists", releaseId)
     }
-    return dao.AddRelease(metadata)
+    _, err = dao.AddRelease(metadata)
+    return err
 }
 
 func GetReleaseMetadata(releaseId string) (Metadata, error) {

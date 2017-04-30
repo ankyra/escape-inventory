@@ -76,13 +76,13 @@ func Validate_FindAllVersions(dao DAO, c *C) {
     metadataJson := `{"name": "dao-val", "type": "archive", "version": "0.0.1"}`
     metadata, err := release.NewReleaseMetadataFromJsonString(metadataJson)
     c.Assert(err, IsNil)
-    err = app.AddRelease(metadata)
+    _, err = app.AddRelease(metadata)
     c.Assert(err, IsNil)
 
     metadataJson = `{"name": "dao-val", "type": "archive", "version": "0.0.2"}`
     metadata, err = release.NewReleaseMetadataFromJsonString(metadataJson)
     c.Assert(err, IsNil)
-    err = app.AddRelease(metadata)
+    _, err = app.AddRelease(metadata)
     c.Assert(err, IsNil)
 
     versions, err := app.FindAllVersions()
@@ -116,9 +116,9 @@ func Validate_AddRelease_Unique(dao DAO, c *C) {
     metadataJson := `{"name": "dao-val", "type": "archive", "version": "1"}`
     metadata, err := release.NewReleaseMetadataFromJsonString(metadataJson)
     c.Assert(err, IsNil)
-    err = app.AddRelease(metadata)
+    _, err = app.AddRelease(metadata)
     c.Assert(err, IsNil)
-    err = app.AddRelease(metadata)
+    _, err = app.AddRelease(metadata)
     c.Assert(err, Equals, AlreadyExists)
 }
 
@@ -128,7 +128,7 @@ func Validate_GetRelease(dao DAO, c *C) {
     metadataJson := `{"name": "dao-val", "type": "archive", "version": "1"}`
     metadata, err := release.NewReleaseMetadataFromJsonString(metadataJson)
     c.Assert(err, IsNil)
-    err = app.AddRelease(metadata)
+    _, err = app.AddRelease(metadata)
     c.Assert(err, IsNil)
     release, err := dao.GetRelease("archive-dao-val-v1")
     c.Assert(err, IsNil)
@@ -150,9 +150,7 @@ func Validate_GetPackageURIs(dao DAO, c *C) {
     metadataJson := `{"name": "dao-val", "type": "archive", "version": "1"}`
     metadata, err := release.NewReleaseMetadataFromJsonString(metadataJson)
     c.Assert(err, IsNil)
-    err = app.AddRelease(metadata)
-    c.Assert(err, IsNil)
-    release, err := dao.GetRelease("archive-dao-val-v1")
+    release, err := app.AddRelease(metadata)
     c.Assert(err, IsNil)
     err = release.AddPackageURI("file:///test.txt")
     c.Assert(err, IsNil)
@@ -179,9 +177,7 @@ func Validate_AddPackageURI_Unique(dao DAO, c *C) {
     metadataJson := `{"name": "dao-val", "type": "archive", "version": "1"}`
     metadata, err := release.NewReleaseMetadataFromJsonString(metadataJson)
     c.Assert(err, IsNil)
-    err = app.AddRelease(metadata)
-    c.Assert(err, IsNil)
-    release, err := dao.GetRelease("archive-dao-val-v1")
+    release, err := app.AddRelease(metadata)
     c.Assert(err, IsNil)
     err = release.AddPackageURI("file:///test.txt")
     c.Assert(err, IsNil)
@@ -195,7 +191,7 @@ func Validate_GetAllReleases(dao DAO, c *C) {
     metadataJson := `{"name": "dao-val", "type": "archive", "version": "1"}`
     metadata, err := release.NewReleaseMetadataFromJsonString(metadataJson)
     c.Assert(err, IsNil)
-    err = app.AddRelease(metadata)
+    _, err = app.AddRelease(metadata)
     c.Assert(err, IsNil)
     releases, err := dao.GetAllReleases()
     c.Assert(err, IsNil)

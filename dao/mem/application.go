@@ -38,13 +38,13 @@ func (a *mem_application) FindAllVersions() ([]string, error) {
     return versions, nil
 }
 
-func (a *mem_application) AddRelease(release Metadata) error {
+func (a *mem_application) AddRelease(release Metadata) (ReleaseDAO, error) {
     key := release.GetReleaseId()
     _, alreadyExists := a.releases[key]
     if alreadyExists {
-        return AlreadyExists
+        return nil, AlreadyExists
     }
     a.releases[key] = newRelease(release, a)
     a.dao.releases[key] = a.releases[key]
-    return nil
+    return a.releases[key], nil
 }
