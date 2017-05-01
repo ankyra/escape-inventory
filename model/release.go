@@ -1,10 +1,11 @@
 package model
 
 import (
+    "strings"
+    "fmt"
     "github.com/ankyra/escape-registry/shared"
     "github.com/ankyra/escape-registry/dao"
     . "github.com/ankyra/escape-registry/dao/types"
-    "fmt"
 )
 
 func AddRelease(metadataJson string) error {
@@ -24,10 +25,32 @@ func AddRelease(metadataJson string) error {
     return err
 }
 
-func GetReleaseMetadata(releaseId string) (Metadata, error) {
-    release, err := dao.GetRelease(releaseId)
+func GetReleaseMetadata(releaseIdString string) (Metadata, error) {
+    release, err := ResolveReleaseId(releaseIdString)
+    if err != nil {
+        return nil, err
+    }
+    return release.GetMetadata(), nil
+}
+
+func ResolveReleaseId(releaseIdString string) (ReleaseDAO, error) {
+    releaseId, err := shared.ParseReleaseId(releaseIdString)
     if err != nil {
         return nil, NewUserError(err)
     }
-    return release.GetMetadata(), nil
+    if releaseId.Version == "latest" {
+        version, err := getLastVersionForPrefix(releaseIdString, "")
+        if err != nil {
+            return nil, NewUserError(err)
+        }
+        releaseId.Version = version.ToString()
+    } else if strings.HasSuffix(releaseId.Version, ".@") {
+        prefix := releaseId.Version[:len(releaseId.Version) - 1]
+        version, err := getLastVersionForPrefix(releaseIdString, prefix)
+        if err != nil {
+            return nil, NewUserError(err)
+        }
+        releaseId.Version = prefix + version.ToString()
+    }
+    return dao.GetRelease(releaseId.ToString())
 }

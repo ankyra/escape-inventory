@@ -2,9 +2,9 @@ package model
 
 import (
     "io"
-    "fmt"
     "log"
     "github.com/ankyra/escape-registry/dao"
+    "github.com/ankyra/escape-registry/dao/types"
     "github.com/ankyra/escape-registry/storage"
 )
 
@@ -22,9 +22,9 @@ func UploadPackage(releaseId string, pkg io.ReadSeeker) error {
 
 
 func GetDownloadReadSeeker(releaseId string) (io.Reader, error) {
-    release, err := dao.GetRelease(releaseId)
+    release, err := ResolveReleaseId(releaseId)
     if err != nil {
-        return nil, NewUserError(err)
+        return nil, err
     }
     uris, err := release.GetPackageURIs()
     if err != nil {
@@ -37,5 +37,5 @@ func GetDownloadReadSeeker(releaseId string) (io.Reader, error) {
         }
         log.Printf("Warn: %s\n", err.Error())
     }
-    return nil, fmt.Errorf("No valid URI found")
+    return nil, types.NotFound
 }
