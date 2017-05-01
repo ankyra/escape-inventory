@@ -42,10 +42,10 @@ func activateConfig(conf *config.Config) error {
 func main() {
     conf, err := loadConfig(defaultConfigFile)
 	if err != nil {
-		panic(err)
+        log.Fatalln("Error:", err.Error())
 	}
     if err := activateConfig(conf); err != nil {
-		panic(err)
+        log.Fatalln("Error:", err.Error())
 	}
 
 	r := mux.NewRouter()
