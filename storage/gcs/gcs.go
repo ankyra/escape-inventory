@@ -13,6 +13,7 @@ import (
 type GoogleCloudStorageBackend struct {
     BucketString string
     Bucket *storage.BucketHandle
+    Client *storage.Client
     Context context.Context
 }
 
@@ -30,6 +31,7 @@ func (ls *GoogleCloudStorageBackend) Init(settings config.StorageSettings) error
     if err != nil {
         return err
     }
+    ls.Client = client
     ls.Bucket = client.Bucket(ls.BucketString)
     return nil
 }
@@ -43,10 +45,13 @@ func (ls *GoogleCloudStorageBackend) Upload(releaseId *shared.ReleaseId, pkg io.
     if err := writer.Close(); err != nil {
         return "", err
     }
-    return "gs://" + ls.BucketString + "/" + archive, nil
+    return "gcs://" + ls.BucketString + "/" + archive, nil
 }
 
-func (ls *GoogleCloudStorageBackend) Download(uri string) (io.ReadSeeker, error) {
-    return nil, nil
+func (ls *GoogleCloudStorageBackend) Download(uri string) (io.Reader, error) {
+    path := uri[len("gcs://"):]
+    parts := strings.SplitN(path, "/", 2)
+    bucket := ls.Client.Bucket(parts[0])
+    return bucket.Object(parts[1]).NewReader(ls.Context)
 }
 

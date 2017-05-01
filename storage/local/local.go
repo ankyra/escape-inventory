@@ -63,7 +63,7 @@ func (ls *LocalStorageBackend) Upload(releaseId *shared.ReleaseId, pkg io.ReadSe
     return "file://" + target, nil
 }
 
-func (ls *LocalStorageBackend) Download(uri string) (io.ReadSeeker, error) {
+func (ls *LocalStorageBackend) Download(uri string) (io.Reader, error) {
     file, err := os.Open(uri[len("file://"):])
     if err != nil {
         return nil, err

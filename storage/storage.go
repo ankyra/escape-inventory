@@ -13,7 +13,7 @@ import (
 type StorageBackend interface {
     Init(settings config.StorageSettings) error
     Upload(releaseId *shared.ReleaseId, pkg io.ReadSeeker) (string, error)
-    Download(uri string) (io.ReadSeeker, error)
+    Download(uri string) (io.Reader, error)
 }
 
 var storageBackends = map[string]StorageBackend{
@@ -51,7 +51,7 @@ func Upload(releaseId string, pkg io.ReadSeeker) (string, error) {
     return backend.Upload(parsedReleaseId, pkg)
 }
 
-func Download(uri string) (io.ReadSeeker, error) {
+func Download(uri string) (io.Reader, error) {
     u, err := url.Parse(uri)
     if err != nil {
         return nil, err
