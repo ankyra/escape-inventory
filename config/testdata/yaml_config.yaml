@@ -1,0 +1,8 @@
+database: sqlite
+database_settings:
+  path: /var/lib/escape/registry.db
+storage_backend: gcs
+storage_settings:
+  bucket: "gs://escape-releases/"
+  credentials:
+    "project-id": "test"

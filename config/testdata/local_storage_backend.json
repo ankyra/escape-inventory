@@ -1,0 +1,6 @@
+{
+    "storage_backend": "local",
+    "storage_settings": {
+        "path": "/var/lib/escape/releases"
+    }
+}
