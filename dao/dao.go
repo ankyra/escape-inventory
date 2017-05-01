@@ -45,6 +45,9 @@ func GetAllReleases() ([]ReleaseDAO, error) {
 func AddRelease(metadata Metadata) (ReleaseDAO, error) {
     return globalDAO.AddRelease(metadata)
 }
+func GetReleaseTypes() ([]string, error) {
+    return globalDAO.GetReleaseTypes()
+}
 
 func IsNotFound(err error) bool {
     return err == NotFound

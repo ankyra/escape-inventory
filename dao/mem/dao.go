@@ -20,6 +20,18 @@ func (a *mem_dao) GetApplications() ([]ApplicationDAO, error) {
     return a.applications, nil
 }
 
+func (a *mem_dao) GetReleaseTypes() ([]string, error) {
+    types := map[string]bool{}
+    for _, app := range a.applications {
+        types[app.GetType()] = true
+    }
+    result := []string{}
+    for typ, _ := range types {
+        result = append(result, typ)
+    }
+    return result, nil
+}
+
 func (a *mem_dao) GetApplication(typ, name string) (ApplicationDAO, error) {
     for _, app := range a.applications {
         if app.GetType() == typ && app.GetName() == name {

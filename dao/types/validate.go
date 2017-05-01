@@ -17,6 +17,7 @@ func ValidateDAO(dao func() DAO, c *C) {
     Validate_GetPackageURIs(dao(), c)
     Validate_AddPackageURI_Unique(dao(), c)
     Validate_GetAllReleases(dao(), c)
+    Validate_GetReleaseTypes(dao(), c)
 }
 
 func addRelease(dao DAO, c *C, typ, name, version string) ReleaseDAO {
@@ -168,12 +169,32 @@ func Validate_AddPackageURI_Unique(dao DAO, c *C) {
 }
 
 func Validate_GetAllReleases(dao DAO, c *C) {
-    metadataJson := `{"name": "dao-val", "type": "archive", "version": "1"}`
-    metadata, err := shared.NewReleaseMetadataFromJsonString(metadataJson)
-    c.Assert(err, IsNil)
-    _, err = dao.AddRelease(metadata)
-    c.Assert(err, IsNil)
+    addRelease(dao, c, "archive", "dao-val", "0.1")
+    addRelease(dao, c, "archive", "dao-val", "0.2")
     releases, err := dao.GetAllReleases()
     c.Assert(err, IsNil)
-    c.Assert(releases, HasLen, 1)
+    c.Assert(releases, HasLen, 2)
+}
+
+func Validate_GetReleaseTypes(dao DAO, c *C) {
+    types, err := dao.GetReleaseTypes()
+    c.Assert(err, IsNil)
+    c.Assert(types, HasLen, 0)
+    addRelease(dao, c, "archive", "dao-val", "0.1")
+    addRelease(dao, c, "ansible", "dao-val", "0.1")
+    addRelease(dao, c, "ansible", "dao-val", "0.2")
+    types, err = dao.GetReleaseTypes()
+    c.Assert(err, IsNil)
+    c.Assert(types, HasLen, 2)
+    var foundArchive, foundAnsible bool
+    for _, t := range types {
+        if t == "archive" {
+            foundArchive = true
+        }
+        if t == "ansible" {
+            foundAnsible = true
+        }
+    }
+    c.Assert(foundArchive, Equals, true)
+    c.Assert(foundAnsible, Equals, true)
 }

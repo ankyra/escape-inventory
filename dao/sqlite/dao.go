@@ -65,6 +65,27 @@ func (a *sql_dao) GetApplications() ([]ApplicationDAO, error) {
     return result, nil
 }
 
+func (a *sql_dao) GetReleaseTypes() ([]string, error) {
+    stmt, err := a.db.Prepare("SELECT DISTINCT(typ) FROM release")
+    if err != nil {
+        return nil, err
+    }
+    rows, err := stmt.Query()
+    if err != nil {
+        return nil, err
+    }
+    defer rows.Close()
+    result := []string{}
+    for rows.Next() {
+        var typ string
+        if err := rows.Scan(&typ); err != nil {
+            return nil, err
+        }
+        result = append(result, typ)
+    }
+    return result, nil
+}
+
 func (a *sql_dao) GetApplication(typ, name string) (ApplicationDAO, error) {
     stmt, err := a.db.Prepare("SELECT name FROM release WHERE typ = ? AND name = ?")
     if err != nil {
