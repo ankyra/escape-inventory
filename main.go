@@ -51,12 +51,16 @@ func main() {
 	r := mux.NewRouter()
     getRouter := r.Methods("GET").Subrouter()
 	getRouter.HandleFunc("/", HomeHandler)
-	getRouter.Handle("/registry/", negroni.New(
+
+	getRouter.Handle("/types/", negroni.New(
 		negroni.Wrap(http.HandlerFunc(handlers.RegistryHandler))))
-	getRouter.Handle("/registry/{type}/", negroni.New(
+	getRouter.Handle("/types/{type}/", negroni.New(
 		negroni.Wrap(http.HandlerFunc(handlers.RegistryHandler))))
-	getRouter.Handle("/registry/{type}/{name}/", negroni.New(
+	getRouter.Handle("/types/{type}/{name}/", negroni.New(
 		negroni.Wrap(http.HandlerFunc(handlers.RegistryHandler))))
+	getRouter.Handle("/types/{type}/{name}/{version}/", negroni.New(
+		negroni.Wrap(http.HandlerFunc(handlers.RegistryHandler))))
+
 	getRouter.Handle("/r/{release}/", negroni.New(
 		negroni.Wrap(http.HandlerFunc(handlers.GetMetadataHandler))))
 	getRouter.Handle("/r/{release}/download", negroni.New(

@@ -18,6 +18,7 @@ func ValidateDAO(dao func() DAO, c *C) {
     Validate_AddPackageURI_Unique(dao(), c)
     Validate_GetAllReleases(dao(), c)
     Validate_GetReleaseTypes(dao(), c)
+    Validate_GetApplicationsByReleaseType(dao(), c)
 }
 
 func addRelease(dao DAO, c *C, typ, name, version string) ReleaseDAO {
@@ -197,4 +198,26 @@ func Validate_GetReleaseTypes(dao DAO, c *C) {
     }
     c.Assert(foundArchive, Equals, true)
     c.Assert(foundAnsible, Equals, true)
+}
+
+func Validate_GetApplicationsByReleaseType(dao DAO, c *C) {
+    types, err := dao.GetApplicationsByType("archive")
+    c.Assert(err, IsNil)
+    c.Assert(types, HasLen, 0)
+    addRelease(dao, c, "archive", "dao-val", "0.1")
+    addRelease(dao, c, "archive", "test-val", "0.1")
+    types, err = dao.GetApplicationsByType("archive")
+    c.Assert(err, IsNil)
+    c.Assert(types, HasLen, 2)
+    var foundDao, foundTest bool
+    for _, t := range types {
+        if t == "dao-val" {
+            foundDao = true
+        }
+        if t == "test-val" {
+            foundTest = true
+        }
+    }
+    c.Assert(foundDao, Equals, true)
+    c.Assert(foundTest, Equals, true)
 }

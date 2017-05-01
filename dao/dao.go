@@ -4,6 +4,7 @@ import (
     . "github.com/ankyra/escape-registry/dao/types"
     "github.com/ankyra/escape-registry/dao/mem"
     "github.com/ankyra/escape-registry/dao/sqlite"
+    "github.com/ankyra/escape-registry/dao/postgres"
     "github.com/ankyra/escape-registry/config"
     "fmt"
 )
@@ -18,6 +19,13 @@ func LoadFromConfig(conf *config.Config) (error) {
         return nil
     } else if conf.Database == "sqlite" {
         dao, err := sqlite.NewSQLiteDAO(conf.DatabaseSettings.Path)
+        if err != nil {
+            return err
+        }
+        globalDAO = dao
+        return nil
+    } else if conf.Database == "postgres" {
+        dao, err := postgres.NewPostgresDAO(conf.DatabaseSettings.PostgresUrl)
         if err != nil {
             return err
         }
@@ -47,6 +55,9 @@ func AddRelease(metadata Metadata) (ReleaseDAO, error) {
 }
 func GetReleaseTypes() ([]string, error) {
     return globalDAO.GetReleaseTypes()
+}
+func GetApplicationsByType(typ string) ([]string, error) {
+    return globalDAO.GetApplicationsByType(typ)
 }
 
 func IsNotFound(err error) bool {

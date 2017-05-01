@@ -15,5 +15,6 @@ func GetMetadataHandler(w http.ResponseWriter, r *http.Request) {
     }
     output := metadata.ToJson()
     w.Header().Set("Content-Type", "application/json")
+    w.WriteHeader(200)
     w.Write([]byte(output))
 }

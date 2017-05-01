@@ -11,6 +11,7 @@ import (
 
 type DatabaseSettings struct {
     Path string `json:"path" yaml:"path"`
+    PostgresUrl string `json:"postgres_url" yaml:"postgres_url"`
 }
 
 type StorageSettings struct {

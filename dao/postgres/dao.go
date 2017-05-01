@@ -1,50 +1,50 @@
-package sqlite
+package postgres
 
 import (
     "fmt"
     "database/sql"
-    _ "github.com/mattn/go-sqlite3"
+    _ "github.com/lib/pq"
     . "github.com/ankyra/escape-registry/dao/types"
     "github.com/ankyra/escape-registry/shared"
 )
 
-type sql_dao struct {
+type postgres_dao struct {
     db *sql.DB
 }
 
-func NewSQLiteDAO(path string) (DAO, error) {
-    db, err := sql.Open("sqlite3", path)
+func NewPostgresDAO(url string) (DAO, error) {
+    db, err := sql.Open("postgres", url)
     if err != nil {
-        return nil, fmt.Errorf("Couldn't open SQLite storage backend '%s': %s", path, err.Error())
+        return nil, fmt.Errorf("Couldn't open Postgres storage backend '%s': %s", url, err.Error())
     }
     _, err = db.Exec(`
         CREATE TABLE IF NOT EXISTS release (
-            typ string, 
-            name string, 
-            release_id string,
-            version string,
-            metadata string,
-            project string,
+            typ varchar(32), 
+            name varchar(128), 
+            release_id varchar(256),
+            version varchar(32),
+            metadata text,
+            project varchar(32),
             PRIMARY KEY(typ, name, version, project)
         )`)
     if err != nil {
-        return nil, fmt.Errorf("Couldn't initialise SQLite storage backend '%s' [1]: %s", path, err.Error())
+        return nil, fmt.Errorf("Couldn't initialise Postgres storage backend '%s' [1]: %s", url, err.Error())
     }
     _, err = db.Exec(`
         CREATE TABLE IF NOT EXISTS package (
-            release_id string, 
-            uri string, 
+            release_id varchar(256), 
+            uri varchar(256), 
             PRIMARY KEY(release_id, uri)
         )`)
     if err != nil {
-        return nil, fmt.Errorf("Couldn't initialise SQLite storage backend '%s' [2]: %s", path, err.Error())
+        return nil, fmt.Errorf("Couldn't initialise Postgres storage backend '%s' [2]: %s", url, err.Error())
     }
-    return &sql_dao{
+    return &postgres_dao{
         db: db,
     }, nil
 }
 
-func (a *sql_dao) GetApplications() ([]ApplicationDAO, error) {
+func (a *postgres_dao) GetApplications() ([]ApplicationDAO, error) {
     stmt, err := a.db.Prepare("SELECT DISTINCT(typ), name FROM release")
     if err != nil {
         return nil, err
@@ -65,7 +65,7 @@ func (a *sql_dao) GetApplications() ([]ApplicationDAO, error) {
     return result, nil
 }
 
-func (a *sql_dao) GetReleaseTypes() ([]string, error) {
+func (a *postgres_dao) GetReleaseTypes() ([]string, error) {
     stmt, err := a.db.Prepare("SELECT DISTINCT(typ) FROM release")
     if err != nil {
         return nil, err
@@ -86,8 +86,8 @@ func (a *sql_dao) GetReleaseTypes() ([]string, error) {
     return result, nil
 }
 
-func (a *sql_dao) GetApplicationsByType(typ string) ([]string, error) {
-    stmt, err := a.db.Prepare("SELECT DISTINCT(name) FROM release WHERE typ = ?")
+func (a *postgres_dao) GetApplicationsByType(typ string) ([]string, error) {
+    stmt, err := a.db.Prepare("SELECT DISTINCT(name) FROM release WHERE typ = $1")
     if err != nil {
         return nil, err
     }
@@ -107,8 +107,8 @@ func (a *sql_dao) GetApplicationsByType(typ string) ([]string, error) {
     return result, nil
 }
 
-func (a *sql_dao) GetApplication(typ, name string) (ApplicationDAO, error) {
-    stmt, err := a.db.Prepare("SELECT name FROM release WHERE typ = ? AND name = ?")
+func (a *postgres_dao) GetApplication(typ, name string) (ApplicationDAO, error) {
+    stmt, err := a.db.Prepare("SELECT name FROM release WHERE typ = $1 AND name = $2")
     if err != nil {
         return nil, err
     }
@@ -123,8 +123,8 @@ func (a *sql_dao) GetApplication(typ, name string) (ApplicationDAO, error) {
     return nil, NotFound
 }
 
-func (a *sql_dao) GetRelease(releaseId string) (ReleaseDAO, error) {
-    stmt, err := a.db.Prepare("SELECT metadata FROM release WHERE release_id = ?")
+func (a *postgres_dao) GetRelease(releaseId string) (ReleaseDAO, error) {
+    stmt, err := a.db.Prepare("SELECT metadata FROM release WHERE release_id = $1")
     if err != nil {
         return nil, err
     }
@@ -147,7 +147,7 @@ func (a *sql_dao) GetRelease(releaseId string) (ReleaseDAO, error) {
     return nil, NotFound
 }
 
-func (a *sql_dao) GetAllReleases() ([]ReleaseDAO, error) {
+func (a *postgres_dao) GetAllReleases() ([]ReleaseDAO, error) {
     result := []ReleaseDAO{}
     stmt, err := a.db.Prepare("SELECT metadata FROM release")
     if err != nil {
@@ -172,7 +172,7 @@ func (a *sql_dao) GetAllReleases() ([]ReleaseDAO, error) {
     return result, nil
 }
 
-func (a *sql_dao) AddRelease(release Metadata) (ReleaseDAO, error) {
+func (a *postgres_dao) AddRelease(release Metadata) (ReleaseDAO, error) {
     releaseDao := newRelease(release, a)
     return releaseDao.Save()
 }

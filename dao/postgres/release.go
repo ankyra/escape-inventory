@@ -1,19 +1,18 @@
-package sqlite
+package postgres
 
 import (
-    sqlite3 "github.com/mattn/go-sqlite3"
     . "github.com/ankyra/escape-registry/dao/types"
+    "github.com/lib/pq"
 )
 
-
 type release_dao struct {
-    dao *sql_dao
+    dao *postgres_dao
     releaseId string
     version string
     metadata Metadata
 }
 
-func newRelease(release Metadata, dao *sql_dao) *release_dao {
+func newRelease(release Metadata, dao *postgres_dao) *release_dao {
     return &release_dao{
         dao: dao,
         releaseId: release.GetReleaseId(),
@@ -39,7 +38,7 @@ func (r *release_dao) GetMetadata() Metadata {
 }
 
 func (r *release_dao) GetPackageURIs() ([]string, error) {
-    stmt, err := r.dao.db.Prepare("SELECT uri FROM package WHERE release_id = ?")
+    stmt, err := r.dao.db.Prepare("SELECT uri FROM package WHERE release_id = $1")
     if err != nil {
         return nil, err
     }
@@ -60,13 +59,13 @@ func (r *release_dao) GetPackageURIs() ([]string, error) {
 }
 
 func (r *release_dao) AddPackageURI(uri string) error {
-    stmt, err := r.dao.db.Prepare("INSERT INTO package (release_id, uri) VALUES (?, ?)")
+    stmt, err := r.dao.db.Prepare("INSERT INTO package (release_id, uri) VALUES ($1, $2)")
     if err != nil {
         return err
     }
     _, err = stmt.Exec(r.releaseId, uri)
     if err != nil {
-        if err.(sqlite3.Error).Code == sqlite3.ErrConstraint {
+        if err.(*pq.Error).Code.Name() == "unique_violation" {
             return AlreadyExists
         }
         return err
@@ -76,7 +75,7 @@ func (r *release_dao) AddPackageURI(uri string) error {
 
 func (r *release_dao) Save() (ReleaseDAO, error) {
     stmt, err := r.dao.db.Prepare(`
-        INSERT INTO release(project, typ, name, release_id, version, metadata) VALUES(?, ?, ?, ?, ?, ?)`)
+        INSERT INTO release(project, typ, name, release_id, version, metadata) VALUES($1, $2, $3, $4, $5, $6)`)
     if err != nil {
         return nil, err
     }
@@ -85,7 +84,7 @@ func (r *release_dao) Save() (ReleaseDAO, error) {
     name := r.metadata.GetName()
     _, err = stmt.Exec(project, typ, name, r.releaseId, r.version, r.metadata.ToJson())
     if err != nil {
-        if err.(sqlite3.Error).Code == sqlite3.ErrConstraint {
+        if err.(*pq.Error).Code.Name() == "unique_violation" {
             return nil, AlreadyExists
         }
         return nil, err

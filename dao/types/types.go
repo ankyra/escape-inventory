@@ -13,6 +13,7 @@ type DAO interface {
     GetRelease(releaseId string) (ReleaseDAO, error)
     GetAllReleases() ([]ReleaseDAO, error)
     AddRelease(metadata Metadata) (ReleaseDAO, error)
+    GetApplicationsByType(typ string) ([]string, error)
     GetReleaseTypes() ([]string, error)
 }
 
