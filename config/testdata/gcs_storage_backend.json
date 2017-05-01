@@ -2,8 +2,6 @@
     "storage_backend": "gcs",
     "storage_settings": {
         "bucket": "gs://escape-releases/",
-        "credentials": {
-            "project-id": "test"
-        }
+        "credentials": "test"
     }
 }

@@ -31,7 +31,6 @@ func GetDownloadReadSeeker(releaseId string) (io.Reader, error) {
         return nil, err
     }
     for _, uri := range uris {
-        log.Println(uri)
         reader, err := storage.Download(uri)
         if err == nil {
             return reader, nil

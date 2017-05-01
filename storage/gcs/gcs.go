@@ -4,10 +4,11 @@ import (
     "io"
     "fmt"
     "strings"
+    "cloud.google.com/go/storage"
+    "google.golang.org/api/option"
+    "golang.org/x/net/context"
     "github.com/ankyra/escape-registry/shared"
     "github.com/ankyra/escape-registry/config"
-    "cloud.google.com/go/storage"
-    "golang.org/x/net/context"
 )
 
 type GoogleCloudStorageBackend struct {
@@ -27,7 +28,13 @@ func (ls *GoogleCloudStorageBackend) Init(settings config.StorageSettings) error
     }
     ls.BucketString = settings.Bucket
     ls.Context = context.Background()
-    client, err := storage.NewClient(ls.Context)
+    var client *storage.Client
+    var err error
+    if settings.Credentials == "" {
+        client, err = storage.NewClient(ls.Context)
+    } else {
+        client, err = storage.NewClient(ls.Context, option.WithServiceAccountFile(settings.Credentials))
+    }
     if err != nil {
         return err
     }

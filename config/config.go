@@ -16,7 +16,7 @@ type DatabaseSettings struct {
 type StorageSettings struct {
     Path string `json:"path" yaml:"path"`
     Bucket string `json:"bucket" yaml:"bucket"`
-    Credentials map[string]string `json:"credentials" yaml:"credentials"`
+    Credentials string `json:"credentials" yaml:"credentials"`
 }
 
 type Config struct {
@@ -37,7 +37,7 @@ func NewConfig(env []string) (*Config, error) {
             Path: "/var/lib/escape/releases",
         },
 	}
-    return processEnvironmentOverrides(result, env)
+    return processEnvironmentOverrides(result, env), nil
 }
 
 func LoadConfig(file string, env []string) (*Config, error) {
@@ -61,10 +61,10 @@ func LoadConfig(file string, env []string) (*Config, error) {
             return nil, fmt.Errorf("Could not parse JSON in configuration file '%s': %s", file, err.Error())
         }
     }
-    return processEnvironmentOverrides(&config, env)
+    return processEnvironmentOverrides(&config, env), nil
 }
 
-func processEnvironmentOverrides(config *Config, env []string) (*Config, error) {
+func processEnvironmentOverrides(config *Config, env []string) *Config {
     for _, e := range env {
         parts := strings.SplitN(e, "=", 2)
         key := parts[0]
@@ -80,19 +80,10 @@ func processEnvironmentOverrides(config *Config, env []string) (*Config, error) 
         } else if key == "STORAGE_SETTINGS_BUCKET" {
             config.StorageSettings.Bucket = value
         } else if key == "STORAGE_SETTINGS_CREDENTIALS" {
-            if value == "" {
-                config.StorageSettings.Credentials = map[string]string{}
-            } else {
-                credentials := map[string]string{}
-                err := json.Unmarshal([]byte(value), &credentials)
-                if err != nil {
-                    return nil, fmt.Errorf("Couldn't parse JSON in STORAGE_SETTINGS_CREDENTIALS environment variable: %s", err.Error())
-                }
-                config.StorageSettings.Credentials = credentials
-            }
+            config.StorageSettings.Credentials = value
         }
     }
-    return config, nil
+    return config
 }
 
 func PathExists(path string) bool {

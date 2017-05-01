@@ -51,7 +51,7 @@ func (s *configSuite) Test_LoadConfig_GCS(c *C) {
     c.Assert(conf.StorageBackend, Equals, "gcs")
     c.Assert(conf.StorageSettings.Path, Equals, "")
     c.Assert(conf.StorageSettings.Bucket, Equals, "gs://escape-releases/")
-    c.Assert(conf.StorageSettings.Credentials["project-id"], Equals, "test")
+    c.Assert(conf.StorageSettings.Credentials, Equals, "test")
 }
 
 func (s *configSuite) Test_LoadConfig_fails_if_not_exists(c *C) {
@@ -78,7 +78,7 @@ func (s *configSuite) Test_LoadConfig_Parses_Yaml(c *C) {
     c.Assert(conf.StorageBackend, Equals, "gcs")
     c.Assert(conf.StorageSettings.Path, Equals, "")
     c.Assert(conf.StorageSettings.Bucket, Equals, "gs://escape-releases/")
-    c.Assert(conf.StorageSettings.Credentials["project-id"], Equals, "test")
+    c.Assert(conf.StorageSettings.Credentials, Equals, "test")
 }
 
 func (s *configSuite) Test_LoadConfig_Parses_Yml(c *C) {
@@ -90,7 +90,7 @@ func (s *configSuite) Test_LoadConfig_Parses_Yml(c *C) {
     c.Assert(conf.StorageBackend, Equals, "gcs")
     c.Assert(conf.StorageSettings.Path, Equals, "")
     c.Assert(conf.StorageSettings.Bucket, Equals, "gs://escape-releases/")
-    c.Assert(conf.StorageSettings.Credentials["project-id"], Equals, "test")
+    c.Assert(conf.StorageSettings.Credentials, Equals, "test")
 }
 
 func (s *configSuite) Test_LoadConfig_fails_if_yaml_malformed(c *C) {
@@ -107,7 +107,7 @@ func (s *configSuite) Test_NewConfig_Uses_EnvironmentVariables(c *C) {
         "STORAGE_BACKEND=gcs",
         "STORAGE_SETTINGS_PATH=",
         "STORAGE_SETTINGS_BUCKET=gs://escape-releases/",
-        "STORAGE_SETTINGS_CREDENTIALS={\"project-id\": \"test\"}",
+        "STORAGE_SETTINGS_CREDENTIALS=test",
     }
     conf, err := NewConfig(env)
     c.Assert(err, IsNil)
@@ -116,16 +116,7 @@ func (s *configSuite) Test_NewConfig_Uses_EnvironmentVariables(c *C) {
     c.Assert(conf.StorageBackend, Equals, "gcs")
     c.Assert(conf.StorageSettings.Path, Equals, "")
     c.Assert(conf.StorageSettings.Bucket, Equals, "gs://escape-releases/")
-    c.Assert(conf.StorageSettings.Credentials["project-id"], Equals, "test")
-}
-
-func (s *configSuite) Test_NewConfig_Fails_If_Credentials_Malformed(c *C) {
-    env := []string{
-        "STORAGE_SETTINGS_CREDENTIALS={\"project-id\": \"t",
-    }
-    conf, err := NewConfig(env)
-    c.Assert(conf, IsNil)
-    c.Assert(err, Not(IsNil))
+    c.Assert(conf.StorageSettings.Credentials, Equals, "test")
 }
 
 func (s *configSuite) Test_LoadConfig_Uses_EnvironmentVariables(c *C) {
@@ -144,5 +135,5 @@ func (s *configSuite) Test_LoadConfig_Uses_EnvironmentVariables(c *C) {
     c.Assert(conf.StorageBackend, Equals, "local")
     c.Assert(conf.StorageSettings.Path, Equals, "/test/")
     c.Assert(conf.StorageSettings.Bucket, Equals, "")
-    c.Assert(conf.StorageSettings.Credentials["project-id"], Equals, "")
+    c.Assert(conf.StorageSettings.Credentials, Equals, "")
 }
