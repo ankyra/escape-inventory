@@ -80,12 +80,16 @@ func processEnvironmentOverrides(config *Config, env []string) (*Config, error) 
         } else if key == "STORAGE_SETTINGS_BUCKET" {
             config.StorageSettings.Bucket = value
         } else if key == "STORAGE_SETTINGS_CREDENTIALS" {
-            credentials := map[string]string{}
-            err := json.Unmarshal([]byte(value), &credentials)
-            if err != nil {
-                return nil, fmt.Errorf("Couldn't parse JSON in STORAGE_SETTINGS_CREDENTIALS environment variable: %s", err.Error())
+            if value == "" {
+                config.StorageSettings.Credentials = map[string]string{}
+            } else {
+                credentials := map[string]string{}
+                err := json.Unmarshal([]byte(value), &credentials)
+                if err != nil {
+                    return nil, fmt.Errorf("Couldn't parse JSON in STORAGE_SETTINGS_CREDENTIALS environment variable: %s", err.Error())
+                }
+                config.StorageSettings.Credentials = credentials
             }
-            config.StorageSettings.Credentials = credentials
         }
     }
     return config, nil

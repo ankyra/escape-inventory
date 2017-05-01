@@ -3,12 +3,17 @@ package gcs
 import (
     "io"
     "github.com/ankyra/escape-registry/shared"
+    "github.com/ankyra/escape-registry/config"
 )
 
 type GoogleCloudStorageBackend struct {}
 
 func NewGoogleCloudStorageBackend() *GoogleCloudStorageBackend {
     return &GoogleCloudStorageBackend{}
+}
+
+func (ls *GoogleCloudStorageBackend) Init(settings config.StorageSettings) error {
+    return nil
 }
 
 func (ls *GoogleCloudStorageBackend) Upload(releaseId *shared.ReleaseId, pkg io.ReadSeeker) (string, error) {

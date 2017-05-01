@@ -1,25 +1,51 @@
 package main
 
 import (
-	"github.com/ankyra/escape-registry/handlers"
-	"github.com/gorilla/mux"
-	"github.com/urfave/negroni"
+    "fmt"
+    "os"
 	"log"
 	"net/http"
+	"github.com/ankyra/escape-registry/config"
+	"github.com/ankyra/escape-registry/handlers"
+	"github.com/ankyra/escape-registry/dao"
+	"github.com/ankyra/escape-registry/storage"
+	"github.com/gorilla/mux"
+	"github.com/urfave/negroni"
 )
 
 const (
 	defaultConfigFile = "config.json"
 )
 
-var (
-	cfg   *Config
-)
+func loadConfig(configFile string) (*config.Config, error) {
+    env := os.Environ()
+    if !config.PathExists(configFile) {
+        fmt.Println("Using default configuration")
+        return config.NewConfig(env)
+    } else {
+        fmt.Printf("Loading configuration file '%s\n", configFile)
+        return config.LoadConfig(configFile, env)
+    }
+}
+
+func activateConfig(conf *config.Config) error {
+    fmt.Printf("Activating '%s' database\n", conf.Database)
+    if err := dao.LoadFromConfig(conf); err != nil {
+        return err
+    }
+    fmt.Printf("Activating '%s' storage backend\n", conf.StorageBackend)
+    if err := storage.LoadFromConfig(conf); err != nil {
+        return err
+    }
+    return nil
+}
 
 func main() {
-	var err error
-	cfg, err = loadConfig(defaultConfigFile)
+    conf, err := loadConfig(defaultConfigFile)
 	if err != nil {
+		panic(err)
+	}
+    if err := activateConfig(conf); err != nil {
 		panic(err)
 	}
 

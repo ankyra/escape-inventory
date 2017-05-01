@@ -127,3 +127,22 @@ func (s *configSuite) Test_NewConfig_Fails_If_Credentials_Malformed(c *C) {
     c.Assert(conf, IsNil)
     c.Assert(err, Not(IsNil))
 }
+
+func (s *configSuite) Test_LoadConfig_Uses_EnvironmentVariables(c *C) {
+    env := []string{
+        "DATABASE=memory",
+        "DATABASE_SETTINGS_PATH=",
+        "STORAGE_BACKEND=local",
+        "STORAGE_SETTINGS_PATH=/test/",
+        "STORAGE_SETTINGS_BUCKET=",
+        "STORAGE_SETTINGS_CREDENTIALS=",
+    }
+    conf, err := LoadConfig("testdata/yml_config.yml", env)
+    c.Assert(err, IsNil)
+    c.Assert(conf.Database, Equals, "memory")
+    c.Assert(conf.DatabaseSettings.Path, Equals, "")
+    c.Assert(conf.StorageBackend, Equals, "local")
+    c.Assert(conf.StorageSettings.Path, Equals, "/test/")
+    c.Assert(conf.StorageSettings.Bucket, Equals, "")
+    c.Assert(conf.StorageSettings.Credentials["project-id"], Equals, "")
+}

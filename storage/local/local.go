@@ -6,6 +6,7 @@ import (
     "fmt"
     "path/filepath"
     "github.com/ankyra/escape-registry/shared"
+    "github.com/ankyra/escape-registry/config"
 )
 
 type LocalStorageBackend struct {
@@ -20,6 +21,17 @@ func NewLocalStorageBackendWithStoragePath(localStoragePath string) *LocalStorag
     return &LocalStorageBackend{
         localStoragePath: localStoragePath,
     }
+}
+
+func (ls *LocalStorageBackend) Init(settings config.StorageSettings) error {
+    if settings.Path == "" {
+        return fmt.Errorf("Missing storage_settings.path variable")
+    }
+    if !config.PathExists(settings.Path) {
+        return fmt.Errorf("Local file storage path '%s' does not exist", settings.Path)
+    }
+    ls.localStoragePath = settings.Path
+    return nil
 }
 
 func (ls *LocalStorageBackend) getStoragePath() (string, error) {

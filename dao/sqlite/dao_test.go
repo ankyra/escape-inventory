@@ -16,7 +16,7 @@ var _ = Suite(&sqliteSuite{})
 func (s *sqliteSuite) Test_DAO(c *C) {
     types.ValidateDAO(func() types.DAO {
         os.RemoveAll("./test.db")
-        dao, err := NewSQLiteDAO()
+        dao, err := NewSQLiteDAO("./test.db")
         c.Assert(err, IsNil)
         return dao
     }, c)

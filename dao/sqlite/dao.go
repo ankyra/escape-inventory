@@ -1,6 +1,7 @@
 package sqlite
 
 import (
+    "fmt"
     "database/sql"
     "github.com/ankyra/escape-client/model/release"
     _ "github.com/mattn/go-sqlite3"
@@ -11,10 +12,10 @@ type sql_dao struct {
     db *sql.DB
 }
 
-func NewSQLiteDAO() (DAO, error) {
-    db, err := sql.Open("sqlite3", "./test.db")
+func NewSQLiteDAO(path string) (DAO, error) {
+    db, err := sql.Open("sqlite3", path)
     if err != nil {
-        return nil, err
+        return nil, fmt.Errorf("Couldn't open SQLite storage backend '%s': %s", path, err.Error())
     }
     _, err = db.Exec(`
         CREATE TABLE IF NOT EXISTS release (
@@ -27,7 +28,7 @@ func NewSQLiteDAO() (DAO, error) {
             PRIMARY KEY(typ, name, version, project)
         )`)
     if err != nil {
-        return nil, err
+        return nil, fmt.Errorf("Couldn't initialise SQLite storage backend '%s' [1]: %s", path, err.Error())
     }
     _, err = db.Exec(`
         CREATE TABLE IF NOT EXISTS package (
@@ -36,7 +37,7 @@ func NewSQLiteDAO() (DAO, error) {
             PRIMARY KEY(release_id, uri)
         )`)
     if err != nil {
-        return nil, err
+        return nil, fmt.Errorf("Couldn't initialise SQLite storage backend '%s' [2]: %s", path, err.Error())
     }
     return &sql_dao{
         db: db,
