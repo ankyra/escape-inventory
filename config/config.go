@@ -26,8 +26,8 @@ type Config struct {
     StorageSettings StorageSettings `json:"storage_settings" yaml:"storage_settings"`
 }
 
-func NewConfig() *Config {
-	return &Config{
+func NewConfig(env []string) (*Config, error) {
+    result := &Config{
         Database: "sqlite",
         DatabaseSettings: DatabaseSettings {
             Path: "/var/lib/escape/registry.db",
@@ -37,10 +37,10 @@ func NewConfig() *Config {
             Path: "/var/lib/escape/releases",
         },
 	}
-
+    return processEnvironmentOverrides(result, env)
 }
 
-func LoadConfig(file string) (*Config, error) {
+func LoadConfig(file string, env []string) (*Config, error) {
 	var config Config
 
 	if !PathExists(file) {
@@ -52,8 +52,7 @@ func LoadConfig(file string) (*Config, error) {
         return nil, fmt.Errorf("Error reading configuration file '%s': %s", file, err.Error())
 	}
 
-    if strings.HasSuffix(file, ".yaml") {
-
+    if strings.HasSuffix(file, ".yaml") || strings.HasSuffix(file, ".yml") {
         if err = yaml.Unmarshal(b, &config); err != nil {
             return nil, fmt.Errorf("Could not parse YAML in configuration file '%s': %s", file, err.Error())
         }
@@ -62,8 +61,34 @@ func LoadConfig(file string) (*Config, error) {
             return nil, fmt.Errorf("Could not parse JSON in configuration file '%s': %s", file, err.Error())
         }
     }
+    return processEnvironmentOverrides(&config, env)
+}
 
-	return &config, nil
+func processEnvironmentOverrides(config *Config, env []string) (*Config, error) {
+    for _, e := range env {
+        parts := strings.SplitN(e, "=", 2)
+        key := parts[0]
+        value := parts[1]
+        if key == "DATABASE" {
+            config.Database = value
+        } else if key == "DATABASE_SETTINGS_PATH" {
+            config.DatabaseSettings.Path = value
+        } else if key == "STORAGE_BACKEND" {
+            config.StorageBackend = value
+        } else if key == "STORAGE_SETTINGS_PATH" {
+            config.StorageSettings.Path = value
+        } else if key == "STORAGE_SETTINGS_BUCKET" {
+            config.StorageSettings.Bucket = value
+        } else if key == "STORAGE_SETTINGS_CREDENTIALS" {
+            credentials := map[string]string{}
+            err := json.Unmarshal([]byte(value), &credentials)
+            if err != nil {
+                return nil, fmt.Errorf("Couldn't parse JSON in STORAGE_SETTINGS_CREDENTIALS environment variable: %s", err.Error())
+            }
+            config.StorageSettings.Credentials = credentials
+        }
+    }
+    return config, nil
 }
 
 func PathExists(path string) bool {
