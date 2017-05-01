@@ -49,3 +49,6 @@ func AddRelease(metadata Metadata) (ReleaseDAO, error) {
 func IsNotFound(err error) bool {
     return err == NotFound
 }
+func IsAlreadyExists(err error) bool {
+    return err == AlreadyExists
+}
