@@ -10,7 +10,7 @@ import (
 func UploadPackage(releaseId string, pkg io.ReadSeeker) error {
     release, err := dao.GetRelease(releaseId)
     if err != nil {
-        return err
+        return NewUserError(err)
     }
     uri, err := storage.Upload(releaseId, pkg)
     if err != nil {
@@ -23,7 +23,7 @@ func UploadPackage(releaseId string, pkg io.ReadSeeker) error {
 func GetDownloadReadSeeker(releaseId string) (io.ReadSeeker, error) {
     release, err := dao.GetRelease(releaseId)
     if err != nil {
-        return nil, err
+        return nil, NewUserError(err)
     }
     uris, err := release.GetPackageURIs()
     if err != nil {

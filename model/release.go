@@ -10,7 +10,7 @@ import (
 func AddRelease(metadataJson string) error {
     metadata, err := release.NewReleaseMetadataFromJsonString(metadataJson)
     if err != nil {
-        return err
+        return NewUserError(err)
     }
     releaseId := metadata.GetReleaseId()
     release, err := dao.GetRelease(releaseId)
@@ -18,7 +18,7 @@ func AddRelease(metadataJson string) error {
         return err
     }
     if release != nil {
-        return fmt.Errorf("Release %s already exists", releaseId)
+        return NewUserError(fmt.Errorf("Release %s already exists", releaseId))
     }
     _, err = dao.AddRelease(metadata)
     return err
@@ -27,7 +27,7 @@ func AddRelease(metadataJson string) error {
 func GetReleaseMetadata(releaseId string) (Metadata, error) {
     release, err := dao.GetRelease(releaseId)
     if err != nil {
-        return nil, err
+        return nil, NewUserError(err)
     }
     return release.GetMetadata(), nil
 }

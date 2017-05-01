@@ -9,9 +9,11 @@ import (
 func RegisterHandler(w http.ResponseWriter, r *http.Request) {
     metadata, err := ioutil.ReadAll(r.Body)
     if err != nil {
-        panic(err)
+        HandleError(w, r, err)
+        return
     }
     if err := model.AddRelease(string(metadata)); err != nil {
-        panic(err)
+        HandleError(w, r, err)
+        return
     }
 }

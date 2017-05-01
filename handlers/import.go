@@ -10,13 +10,16 @@ import (
 func ImportReleasesHandler(w http.ResponseWriter, r *http.Request) {
     releases, err := ioutil.ReadAll(r.Body)
     if err != nil {
-        panic(err)
+        HandleError(w, r, err)
+        return
     }
     releasesList := []map[string]interface{}{}
     if err := json.Unmarshal(releases, &releasesList); err != nil {
-        panic(err)
+        HandleError(w, r, err)
+        return
     }
     if err := model.Import(releasesList); err != nil {
-        panic(err)
+        HandleError(w, r, err)
+        return
     }
 }

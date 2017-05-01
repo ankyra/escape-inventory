@@ -12,10 +12,10 @@ func GetNextVersion(releaseIdString, prefix string) (string, error) {
         if dao.IsNotFound(err) {
             return "0", nil
         }
-        return "", err
+        return "", NewUserError(err)
     }
     if err := latest.IncrementSmallest(); err != nil {
-        return "", err
+        return "", NewUserError(err)
     }
     return prefix + latest.ToString(), nil
 
@@ -24,11 +24,11 @@ func GetNextVersion(releaseIdString, prefix string) (string, error) {
 func getLastVersionForPrefix(releaseIdString, prefix string) (*SemanticVersion, error) {
     releaseId, err := shared.ParseReleaseId(releaseIdString)
     if err != nil {
-        return nil, err
+        return nil, NewUserError(err)
     }
     app, err := dao.GetApplication(releaseId.Type, releaseId.Name)
     if err != nil {
-        return nil, err
+        return nil, NewUserError(err)
     }
     versions, err := app.FindAllVersions()
     if err != nil {

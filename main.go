@@ -1,7 +1,6 @@
 package main
 
 import (
-    "fmt"
     "os"
 	"log"
 	"net/http"
@@ -20,20 +19,20 @@ const (
 func loadConfig(configFile string) (*config.Config, error) {
     env := os.Environ()
     if !config.PathExists(configFile) {
-        fmt.Println("Using default configuration")
+        log.Println("Using default configuration")
         return config.NewConfig(env)
     } else {
-        fmt.Printf("Loading configuration file '%s\n", configFile)
+        log.Printf("Loading configuration file '%s\n", configFile)
         return config.LoadConfig(configFile, env)
     }
 }
 
 func activateConfig(conf *config.Config) error {
-    fmt.Printf("Activating '%s' database\n", conf.Database)
+    log.Printf("Activating '%s' database\n", conf.Database)
     if err := dao.LoadFromConfig(conf); err != nil {
         return err
     }
-    fmt.Printf("Activating '%s' storage backend\n", conf.StorageBackend)
+    log.Printf("Activating '%s' storage backend\n", conf.StorageBackend)
     if err := storage.LoadFromConfig(conf); err != nil {
         return err
     }
@@ -69,7 +68,11 @@ func main() {
 	postRouter.Handle("/import-releases", negroni.New(
 		negroni.Wrap(http.HandlerFunc(handlers.ImportReleasesHandler))))
 
-	middleware := negroni.Classic()
+	middleware := negroni.New()
+    recovery := negroni.NewRecovery()
+    recovery.PrintStack = false
+    middleware.Use(recovery)
+    middleware.Use(negroni.NewLogger())
 	middleware.UseHandler(r)
 	http.Handle("/", middleware)
 

@@ -11,7 +11,8 @@ func NextVersionHandler(w http.ResponseWriter, r *http.Request) {
     prefix := r.URL.Query().Get("prefix")
     version , err := model.GetNextVersion(releaseId, prefix)
     if err != nil {
-        panic(err)
+        HandleError(w, r, err)
+        return
     }
     w.Write([]byte(version))
 }

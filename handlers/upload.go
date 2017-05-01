@@ -13,6 +13,7 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
         panic(err) // todo check return errors
     }
     if err := model.UploadPackage(releaseId, f); err != nil {
-        panic(err)
+        HandleError(w, r, err)
+        return
     }
 }

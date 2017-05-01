@@ -1,6 +1,7 @@
 package model
 
 import (
+    "fmt"
     "encoding/json"
     "github.com/ankyra/escape-registry/dao"
     "github.com/ankyra/escape-client/model/release"
@@ -11,11 +12,11 @@ func Import(releases []map[string]interface{}) error {
     for _, rel := range releases {
         metadataJson, err := json.Marshal(rel)
         if err != nil {
-            return err
+            return NewUserError(fmt.Errorf("Could not parse JSON: %s", err.Error()))
         }
         metadata, err := release.NewReleaseMetadataFromJsonString(string(metadataJson))
         if err != nil {
-            return err
+            return NewUserError(fmt.Errorf("Could not get metadata from JSON: %s", err.Error()))
         }
         releaseDAO, err := dao.AddRelease(metadata)
         if err != nil {
