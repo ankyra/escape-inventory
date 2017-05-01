@@ -53,6 +53,7 @@ func (a *sql_dao) GetApplications() ([]ApplicationDAO, error) {
     if err != nil {
         return nil, err
     }
+    defer rows.Close()
     result := []ApplicationDAO{}
     for rows.Next() {
         var typ, name string
@@ -73,6 +74,7 @@ func (a *sql_dao) GetApplication(typ, name string) (ApplicationDAO, error) {
     if err != nil {
         return nil, err
     }
+    defer rows.Close()
     for rows.Next() {
         return newApplicationDAO(typ, name, a), nil
     }
@@ -88,6 +90,7 @@ func (a *sql_dao) GetRelease(releaseId string) (ReleaseDAO, error) {
     if err != nil {
         return nil, err
     }
+    defer rows.Close()
     for rows.Next() {
         var metadataJson string
         if err := rows.Scan(&metadataJson); err != nil {
@@ -112,6 +115,7 @@ func (a *sql_dao) GetAllReleases() ([]ReleaseDAO, error) {
     if err != nil {
         return nil, err
     }
+    defer rows.Close()
     for rows.Next() {
         var metadataJson string
         if err := rows.Scan(&metadataJson); err != nil {

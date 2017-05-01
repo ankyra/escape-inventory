@@ -34,6 +34,7 @@ func (a *application_dao) FindAllVersions() ([]string, error) {
     if err != nil {
         return nil, err
     }
+    defer rows.Close()
     result := []string{}
     for rows.Next() {
         var version string

@@ -47,6 +47,7 @@ func (r *release_dao) GetPackageURIs() ([]string, error) {
     if err != nil {
         return nil, err
     }
+    defer rows.Close()
     result := []string{}
     for rows.Next() {
         var uri string
