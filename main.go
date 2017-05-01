@@ -50,20 +50,23 @@ func main() {
 	}
 
 	r := mux.NewRouter()
-	r.HandleFunc("/", HomeHandler)
-	r.Handle("/r/", negroni.New(
-		negroni.Wrap(http.HandlerFunc(handlers.RegisterHandler))))
-	r.Handle("/r/{release}/", negroni.New(
+    getRouter := r.Methods("GET").Subrouter()
+	getRouter.HandleFunc("/", HomeHandler)
+	getRouter.Handle("/r/{release}/", negroni.New(
 		negroni.Wrap(http.HandlerFunc(handlers.GetMetadataHandler))))
-	r.Handle("/r/{release}/download", negroni.New(
+	getRouter.Handle("/r/{release}/download", negroni.New(
 		negroni.Wrap(http.HandlerFunc(handlers.DownloadHandler))))
-	r.Handle("/r/{release}/upload", negroni.New(
-		negroni.Wrap(http.HandlerFunc(handlers.UploadHandler))))
-	r.Handle("/r/{release}/next-version", negroni.New(
+	getRouter.Handle("/r/{release}/next-version", negroni.New(
 		negroni.Wrap(http.HandlerFunc(handlers.NextVersionHandler))))
-	r.Handle("/export-releases", negroni.New(
+	getRouter.Handle("/export-releases", negroni.New(
 		negroni.Wrap(http.HandlerFunc(handlers.ExportReleasesHandler))))
-	r.Handle("/import-releases", negroni.New(
+
+    postRouter := r.Methods("POST").Subrouter()
+	postRouter.Handle("/r/", negroni.New(
+		negroni.Wrap(http.HandlerFunc(handlers.RegisterHandler)))).Methods("POST")
+	postRouter.Handle("/r/{release}/upload", negroni.New(
+		negroni.Wrap(http.HandlerFunc(handlers.UploadHandler))))
+	postRouter.Handle("/import-releases", negroni.New(
 		negroni.Wrap(http.HandlerFunc(handlers.ImportReleasesHandler))))
 
 	middleware := negroni.Classic()
