@@ -2,6 +2,7 @@ package gcs
 
 import (
     "io"
+    "fmt"
     "github.com/ankyra/escape-registry/shared"
     "github.com/ankyra/escape-registry/config"
 )
@@ -13,13 +14,14 @@ func NewGoogleCloudStorageBackend() *GoogleCloudStorageBackend {
 }
 
 func (ls *GoogleCloudStorageBackend) Init(settings config.StorageSettings) error {
+    if settings.Bucket == "" {
+        return fmt.Errorf("Missing storage_settings.bucket configuration variable")
+    }
     return nil
 }
 
 func (ls *GoogleCloudStorageBackend) Upload(releaseId *shared.ReleaseId, pkg io.ReadSeeker) (string, error) {
 //    def _store_file_in_gcs(self, gcs_credentials, gcs_storage_bucket, file, release):
-//        if gcs_storage_bucket is None:
-//            return "Undefined bucket for GCS storage backend", 500
 //        if gcs_credentials is None:
 //            return "Undefined credentials for GCS storage backend", 500
 //

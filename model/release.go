@@ -1,14 +1,14 @@
 package model
 
 import (
-    "github.com/ankyra/escape-client/model/release"
+    "github.com/ankyra/escape-registry/shared"
     "github.com/ankyra/escape-registry/dao"
     . "github.com/ankyra/escape-registry/dao/types"
     "fmt"
 )
 
 func AddRelease(metadataJson string) error {
-    metadata, err := release.NewReleaseMetadataFromJsonString(metadataJson)
+    metadata, err := shared.NewReleaseMetadataFromJsonString(metadataJson)
     if err != nil {
         return NewUserError(err)
     }

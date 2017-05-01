@@ -3,9 +3,9 @@ package sqlite
 import (
     "fmt"
     "database/sql"
-    "github.com/ankyra/escape-client/model/release"
     _ "github.com/mattn/go-sqlite3"
     . "github.com/ankyra/escape-registry/dao/types"
+    "github.com/ankyra/escape-registry/shared"
 )
 
 type sql_dao struct {
@@ -93,7 +93,7 @@ func (a *sql_dao) GetRelease(releaseId string) (ReleaseDAO, error) {
         if err := rows.Scan(&metadataJson); err != nil {
             return nil, err
         }
-        metadata, err := release.NewReleaseMetadataFromJsonString(metadataJson)
+        metadata, err := shared.NewReleaseMetadataFromJsonString(metadataJson)
         if err != nil {
             return nil, err
         }
@@ -117,7 +117,7 @@ func (a *sql_dao) GetAllReleases() ([]ReleaseDAO, error) {
         if err := rows.Scan(&metadataJson); err != nil {
             return nil, err
         }
-        metadata, err := release.NewReleaseMetadataFromJsonString(metadataJson)
+        metadata, err := shared.NewReleaseMetadataFromJsonString(metadataJson)
         if err != nil {
             return nil, err
         }

@@ -1,11 +1,11 @@
 package types
 
 import (
-    "github.com/ankyra/escape-client/model/interfaces"
+    "github.com/ankyra/escape-registry/shared"
     "fmt"
 )
 
-type Metadata interfaces.ReleaseMetadata
+type Metadata shared.ReleaseMetadata
 
 type DAO interface {
     GetApplication(typ, name string) (ApplicationDAO, error)

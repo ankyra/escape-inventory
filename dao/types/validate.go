@@ -2,7 +2,7 @@ package types
 
 import (
 	. "gopkg.in/check.v1"
-    "github.com/ankyra/escape-client/model/release"
+    "github.com/ankyra/escape-registry/shared"
 )
 
 
@@ -21,7 +21,7 @@ func ValidateDAO(dao func() DAO, c *C) {
 
 func addRelease(dao DAO, c *C, typ, name, version string) ReleaseDAO {
     metadataJson := `{"name": "` + name + `", "type": "` + typ + `", "version": "` + version + `"}`
-    metadata, err := release.NewReleaseMetadataFromJsonString(metadataJson)
+    metadata, err := shared.NewReleaseMetadataFromJsonString(metadataJson)
     c.Assert(err, IsNil)
     result, err := dao.AddRelease(metadata)
     c.Assert(err, IsNil)
@@ -30,7 +30,7 @@ func addRelease(dao DAO, c *C, typ, name, version string) ReleaseDAO {
 
 func Validate_AddRelease_Unique(dao DAO, c *C) {
     metadataJson := `{"name": "dao-val", "type": "archive", "version": "1"}`
-    metadata, err := release.NewReleaseMetadataFromJsonString(metadataJson)
+    metadata, err := shared.NewReleaseMetadataFromJsonString(metadataJson)
     c.Assert(err, IsNil)
     _, err = dao.AddRelease(metadata)
     c.Assert(err, IsNil)
@@ -40,7 +40,7 @@ func Validate_AddRelease_Unique(dao DAO, c *C) {
 
 func Validate_GetRelease(dao DAO, c *C) {
     metadataJson := `{"name": "dao-val", "type": "archive", "version": "1"}`
-    metadata, err := release.NewReleaseMetadataFromJsonString(metadataJson)
+    metadata, err := shared.NewReleaseMetadataFromJsonString(metadataJson)
     c.Assert(err, IsNil)
     _, err = dao.AddRelease(metadata)
     c.Assert(err, IsNil)
@@ -92,13 +92,13 @@ func Validate_GetApplications(dao DAO, c *C) {
 
 func Validate_FindAllVersions(dao DAO, c *C) {
     metadataJson := `{"name": "dao-val", "type": "archive", "version": "0.0.1"}`
-    metadata, err := release.NewReleaseMetadataFromJsonString(metadataJson)
+    metadata, err := shared.NewReleaseMetadataFromJsonString(metadataJson)
     c.Assert(err, IsNil)
     _, err = dao.AddRelease(metadata)
     c.Assert(err, IsNil)
 
     metadataJson = `{"name": "dao-val", "type": "archive", "version": "0.0.2"}`
-    metadata, err = release.NewReleaseMetadataFromJsonString(metadataJson)
+    metadata, err = shared.NewReleaseMetadataFromJsonString(metadataJson)
     c.Assert(err, IsNil)
     _, err = dao.AddRelease(metadata)
     c.Assert(err, IsNil)
@@ -132,7 +132,7 @@ func Validate_FindAllVersions_Empty(dao DAO, c *C) {
 }
 func Validate_GetPackageURIs(dao DAO, c *C) {
     metadataJson := `{"name": "dao-val", "type": "archive", "version": "1"}`
-    metadata, err := release.NewReleaseMetadataFromJsonString(metadataJson)
+    metadata, err := shared.NewReleaseMetadataFromJsonString(metadataJson)
     c.Assert(err, IsNil)
     release, err := dao.AddRelease(metadata)
     c.Assert(err, IsNil)
@@ -157,7 +157,7 @@ func Validate_GetPackageURIs(dao DAO, c *C) {
 
 func Validate_AddPackageURI_Unique(dao DAO, c *C) {
     metadataJson := `{"name": "dao-val", "type": "archive", "version": "1"}`
-    metadata, err := release.NewReleaseMetadataFromJsonString(metadataJson)
+    metadata, err := shared.NewReleaseMetadataFromJsonString(metadataJson)
     c.Assert(err, IsNil)
     release, err := dao.AddRelease(metadata)
     c.Assert(err, IsNil)
@@ -169,7 +169,7 @@ func Validate_AddPackageURI_Unique(dao DAO, c *C) {
 
 func Validate_GetAllReleases(dao DAO, c *C) {
     metadataJson := `{"name": "dao-val", "type": "archive", "version": "1"}`
-    metadata, err := release.NewReleaseMetadataFromJsonString(metadataJson)
+    metadata, err := shared.NewReleaseMetadataFromJsonString(metadataJson)
     c.Assert(err, IsNil)
     _, err = dao.AddRelease(metadata)
     c.Assert(err, IsNil)
