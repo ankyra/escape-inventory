@@ -1,0 +1,6 @@
+{
+    "database": "postgres",
+    "database_settings": {
+        "postgres_url": "postgres://"
+    }
+}

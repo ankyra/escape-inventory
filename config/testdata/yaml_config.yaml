@@ -1,3 +1,4 @@
+port: 9876
 database: sqlite
 database_settings:
   path: /var/lib/escape/registry.db

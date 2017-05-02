@@ -21,6 +21,7 @@ type StorageSettings struct {
 }
 
 type Config struct {
+    Port string `json:"port" yaml:"port"`
     Database string `json:"database" yaml:"database"`
     DatabaseSettings DatabaseSettings `json:"database_settings" yaml:"database_settings"`
     StorageBackend string `json:"storage_backend" yaml:"storage_backend"`
@@ -28,17 +29,27 @@ type Config struct {
 }
 
 func NewConfig(env []string) (*Config, error) {
-    result := &Config{
-        Database: "sqlite",
-        DatabaseSettings: DatabaseSettings {
-            Path: "/var/lib/escape/registry.db",
-        },
-        StorageBackend: "local",
-        StorageSettings: StorageSettings {
-            Path: "/var/lib/escape/releases",
-        },
-	}
+    result := &Config{ }
+    replaceMissingValuesWithDefaults(result)
     return processEnvironmentOverrides(result, env), nil
+}
+
+func replaceMissingValuesWithDefaults(config *Config) {
+    if config.Port == "" {
+        config.Port = "7770"
+    }
+    if config.Database == "" {
+        config.Database = "sqlite"
+    }
+    if config.DatabaseSettings.Path == "" && config.Database == "sqlite" {
+        config.DatabaseSettings.Path = "/var/lib/escape/registry.db"
+    }
+    if config.StorageBackend == "" {
+        config.StorageBackend = "local"
+    }
+    if config.StorageSettings.Path == "" && config.StorageBackend == "local" {
+        config.StorageSettings.Path = "/var/lib/escape/releases"
+    }
 }
 
 func LoadConfig(file string, env []string) (*Config, error) {
@@ -62,6 +73,7 @@ func LoadConfig(file string, env []string) (*Config, error) {
             return nil, fmt.Errorf("Could not parse JSON in configuration file '%s': %s", file, err.Error())
         }
     }
+    replaceMissingValuesWithDefaults(&config)
     return processEnvironmentOverrides(&config, env), nil
 }
 
@@ -70,10 +82,14 @@ func processEnvironmentOverrides(config *Config, env []string) *Config {
         parts := strings.SplitN(e, "=", 2)
         key := parts[0]
         value := parts[1]
-        if key == "DATABASE" {
+        if key == "PORT" {
+            config.Port = value
+        } else if key == "DATABASE" {
             config.Database = value
         } else if key == "DATABASE_SETTINGS_PATH" {
             config.DatabaseSettings.Path = value
+        } else if key == "DATABASE_SETTINGS_POSTGRES_URL" {
+            config.DatabaseSettings.PostgresUrl = value
         } else if key == "STORAGE_BACKEND" {
             config.StorageBackend = value
         } else if key == "STORAGE_SETTINGS_PATH" {
