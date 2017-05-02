@@ -3,12 +3,21 @@ package model
 import (
     "io"
     "log"
+    "fmt"
+    "github.com/ankyra/escape-registry/shared"
     "github.com/ankyra/escape-registry/dao"
     "github.com/ankyra/escape-registry/dao/types"
     "github.com/ankyra/escape-registry/storage"
 )
 
 func UploadPackage(releaseId string, pkg io.ReadSeeker) error {
+    parsed, err := shared.ParseReleaseId(releaseId)
+    if err != nil {
+        return NewUserError(err)
+    }
+    if parsed.NeedsResolving() {
+        return NewUserError(fmt.Errorf("Can't upload package against unresolved version"))
+    }
     release, err := dao.GetRelease(releaseId)
     if err != nil {
         return NewUserError(err)

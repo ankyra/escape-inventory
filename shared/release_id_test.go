@@ -64,7 +64,7 @@ func (s *releaseIdSuite) Test_ReleaseId_Missing_Version(c *C) {
 }
 func (s *releaseIdSuite) Test_ReleaseId_Invalid_Version(c *C) {
     _, err := ParseReleaseId("type-name-vnope")
-    c.Assert(err.Error(), Equals, "Invalid version string in release ID 'type-name-vnope': vnope")
+    c.Assert(err.Error(), Equals, "Invalid release ID 'type-name-vnope': Invalid version format: nope")
 }
 
 func (s *releaseIdSuite) Test_ValidateVersion(c *C) {

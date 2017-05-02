@@ -14,6 +14,13 @@ func AddRelease(metadataJson string) error {
         return NewUserError(err)
     }
     releaseId := metadata.GetReleaseId()
+    parsed, err := shared.ParseReleaseId(releaseId)
+    if err != nil {
+        return NewUserError(err)
+    }
+    if parsed.NeedsResolving() {
+        return NewUserError(fmt.Errorf("Can't add release with unresolved version"))
+    }
     release, err := dao.GetRelease(releaseId)
     if err != nil && !dao.IsNotFound(err) {
         return err
