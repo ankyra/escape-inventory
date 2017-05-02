@@ -1,0 +1,82 @@
+# This is an Escape Plan for <no value>
+
+# The build name.  Together with the release type makes up the build
+# identifier. Format: /[a-zA-Z]+[a-zA-Z0-9-]*/
+
+build: escape-registry
+
+
+# The release type. One of: ansible, archive, docker, kubespec, docker,
+# terraform
+
+type: archive
+
+
+
+# The version. Either specify the full version or use the '@' symbol to 
+# let Escape pick the next version at build time. Format: /[0-9]+(.[0-9]+)*/
+# 
+# Examples:
+#
+# Build version 1.5:
+#   version: 1.5
+#
+# Build the next minor release in the 1.* series:
+#   version: 1.@
+#
+# Build the next path release in the 1.1.* series:
+#   version: 1.1.@
+#
+version: '0.4.@'
+
+ 
+# An (optional) description for this release.
+
+description: "A Go build for the Escape Registry"
+
+
+# Dependencies. Reference dependencies by their full release ID or use
+# the '@' symbol to resolve versions at build time.
+#
+# Examples:
+#
+# Reference the full release ID to pin to a particular version:
+#   depends: [archive-example-v0.1]
+#
+# To always get the latest version of a particular release:
+#   depends: [archive-example-latest]
+#
+# Or:
+#   depends: [archive-example-@]
+#
+# To resolve the latest minor release:
+#   depends: [archive-example-v0.@]
+#
+# To resolve the latest path release:
+#   depends: [archive-example-v0.1.@]
+
+depends: []
+
+# The files to includes in this release. The files don't have to exist at 
+# build time. Globbing patterns are supported.
+
+includes: 
+- escape-registry
+- LICENSE
+- Makefile
+- README.md
+- "*.go"
+- config/
+- dao/
+- handlers/
+- model/
+- shared/
+- storage/
+- vendor/
+
+inputs:
+- version
+
+pre_build: scripts/pre-build.sh
+post_build: scripts/build.sh
+test: scripts/test.sh
