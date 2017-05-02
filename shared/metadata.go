@@ -3,25 +3,25 @@ package shared
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io/ioutil"
+	"os"
 	"path/filepath"
 	"strings"
-    "fmt"
-    "os"
 )
 
 type ReleaseMetadata interface {
 	ToJson() string
-    ToDict() (map[string]interface{}, error)
+	ToDict() (map[string]interface{}, error)
 	WriteJsonFile(string) error
 	GetDirectories() []string
 	GetVersionlessReleaseId() string
 	GetReleaseId() string
-	AddInputVariable(* variable)
-	AddOutputVariable(* variable)
-    SetVariableInContext(string, string)
-    AddFileWithDigest(string, string)
-    SetConsumes([]string)
+	AddInputVariable(*variable)
+	AddOutputVariable(*variable)
+	SetVariableInContext(string, string)
+	AddFileWithDigest(string, string)
+	SetConsumes([]string)
 
 	GetApiVersion() string
 	GetBranch() string
@@ -45,7 +45,7 @@ type ReleaseMetadata interface {
 	GetTest() string
 	GetType() string
 	GetVersion() string
-    GetVariableContext() map[string]string
+	GetVariableContext() map[string]string
 }
 
 type variable struct {
@@ -90,31 +90,31 @@ type releaseMetadata struct {
 	Provides    []string           `json:"provides"`
 	Test        string             `json:"test"`
 	Type        string             `json:"type"`
-    VariableCtx map[string]string  `json:"variable_context"`
+	VariableCtx map[string]string  `json:"variable_context"`
 	Version     string             `json:"version"`
 }
 
 func NewEmptyReleaseMetadata() *releaseMetadata {
 	return &releaseMetadata{
-		ApiVersion: "1",
-		Consumes:   []string{},
-		Provides:   []string{},
-		Depends:    []string{},
-		Files:      map[string]string{},
-		Metadata:   map[string]string{},
-		Errands:    map[string]*errand{},
-		Inputs:     []*variable{},
-		Outputs:    []*variable{},
-        VariableCtx: map[string]string{},
+		ApiVersion:  "1",
+		Consumes:    []string{},
+		Provides:    []string{},
+		Depends:     []string{},
+		Files:       map[string]string{},
+		Metadata:    map[string]string{},
+		Errands:     map[string]*errand{},
+		Inputs:      []*variable{},
+		Outputs:     []*variable{},
+		VariableCtx: map[string]string{},
 	}
 }
 
 func NewReleaseMetadata(typ, name, version string) *releaseMetadata {
-    m := NewEmptyReleaseMetadata()
-    m.Type = typ
-    m.Name = name
-    m.Version = version
-    return m
+	m := NewEmptyReleaseMetadata()
+	m.Type = typ
+	m.Name = name
+	m.Version = version
+	return m
 }
 
 func NewReleaseMetadataFromJsonString(content string) (*releaseMetadata, error) {
@@ -122,9 +122,9 @@ func NewReleaseMetadataFromJsonString(content string) (*releaseMetadata, error) 
 	if err := json.Unmarshal([]byte(content), &result); err != nil {
 		return nil, err
 	}
-    if err := validate(result) ; err != nil {
-        return nil, err
-    }
+	if err := validate(result); err != nil {
+		return nil, err
+	}
 	return result, nil
 }
 
@@ -136,20 +136,20 @@ func NewReleaseMetadataFromFile(metadataFile string) (*releaseMetadata, error) {
 	if err != nil {
 		return nil, err
 	}
-    return NewReleaseMetadataFromJsonString(string(content))
+	return NewReleaseMetadataFromJsonString(string(content))
 }
 
 func validate(m *releaseMetadata) error {
-    if m.Type == "" {
-        return fmt.Errorf("Missing type field in release metadata")
-    }
-    if m.Name == "" {
-        return fmt.Errorf("Missing name field in release metadata")
-    }
-    if m.Version == "" {
-        return fmt.Errorf("Missing version field in release metadata")
-    }
-    return nil
+	if m.Type == "" {
+		return fmt.Errorf("Missing type field in release metadata")
+	}
+	if m.Name == "" {
+		return fmt.Errorf("Missing name field in release metadata")
+	}
+	if m.Version == "" {
+		return fmt.Errorf("Missing version field in release metadata")
+	}
+	return nil
 }
 
 func (m *releaseMetadata) GetApiVersion() string {
@@ -234,15 +234,15 @@ func (m *releaseMetadata) GetDependencies() []string {
 	return m.Depends
 }
 func (m *releaseMetadata) GetVariableContext() map[string]string {
-    if m.VariableCtx == nil {
-        return map[string]string{}
-    }
+	if m.VariableCtx == nil {
+		return map[string]string{}
+	}
 	return m.VariableCtx
 }
 func (m *releaseMetadata) SetVariableInContext(v string, ref string) {
-    ctx := m.GetVariableContext()
-    ctx[v] = ref
-    m.VariableCtx = ctx
+	ctx := m.GetVariableContext()
+	ctx[v] = ref
+	m.VariableCtx = ctx
 }
 func (m *releaseMetadata) GetReleaseId() string {
 	return m.Type + "-" + m.Name + "-v" + m.Version
@@ -268,12 +268,12 @@ func (m *releaseMetadata) ToJson() string {
 }
 
 func (m *releaseMetadata) ToDict() (map[string]interface{}, error) {
-    asJson := []byte(m.ToJson())
-    result := map[string]interface{}{}
-    if err := json.Unmarshal(asJson, &result); err != nil {
-        return nil, err
-    }
-    return result, nil
+	asJson := []byte(m.ToJson())
+	result := map[string]interface{}{}
+	if err := json.Unmarshal(asJson, &result); err != nil {
+		return nil, err
+	}
+	return result, nil
 }
 
 func (m *releaseMetadata) WriteJsonFile(path string) error {
@@ -285,7 +285,6 @@ func (m *releaseMetadata) AddFileWithDigest(path, hexDigest string) {
 	m.Files[path] = hexDigest
 }
 
-
 func (m *releaseMetadata) GetDirectories() []string {
 	dirs := map[string]bool{}
 	for file := range m.Files {
@@ -294,8 +293,8 @@ func (m *releaseMetadata) GetDirectories() []string {
 		root := ""
 		for _, d := range strings.Split(dir, "/") {
 			if d != "" {
-                root += d + "/"
-                dirs[root] = true
+				root += d + "/"
+				dirs[root] = true
 			}
 		}
 	}

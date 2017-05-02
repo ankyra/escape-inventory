@@ -2,8 +2,8 @@ package shared
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
-    "regexp"
 )
 
 type ReleaseId struct {
@@ -30,36 +30,36 @@ func ParseReleaseId(releaseId string) (*ReleaseId, error) {
 		return nil, fmt.Errorf("Invalid version string in release ID '%s': %s", releaseId, version)
 	}
 
-    if err := result.Validate(); err != nil {
+	if err := result.Validate(); err != nil {
 		return nil, fmt.Errorf("Invalid release ID '%s': %s", releaseId, err.Error())
-    }
+	}
 	return result, nil
 }
 
 func (r *ReleaseId) Validate() error {
-    return validateVersion(r.Version)
+	return validateVersion(r.Version)
 }
 
 func validateVersion(version string) error {
-    if version == "latest" {
-        return nil
-    }
-    re := regexp.MustCompile(`^[0-9]+(\.[0-9]+)*(\.@)?$`)
-    matches := re.Match([]byte(version))
-    if !matches {
-        return fmt.Errorf("Invalid version format: %s", version)
-    }
-    return nil
+	if version == "latest" {
+		return nil
+	}
+	re := regexp.MustCompile(`^[0-9]+(\.[0-9]+)*(\.@)?$`)
+	matches := re.Match([]byte(version))
+	if !matches {
+		return fmt.Errorf("Invalid version format: %s", version)
+	}
+	return nil
 }
 
 func (r *ReleaseId) ToString() string {
-    version := r.Version
-    if version != "latest" {
-        version = "v" + version
-    }
-    return r.Type + "-" + r.Name + "-" + version
+	version := r.Version
+	if version != "latest" {
+		version = "v" + version
+	}
+	return r.Type + "-" + r.Name + "-" + version
 }
 
 func (r *ReleaseId) NeedsResolving() bool {
-    return r.Version == "latest" || strings.HasSuffix(r.Version, ".@")
+	return r.Version == "latest" || strings.HasSuffix(r.Version, ".@")
 }

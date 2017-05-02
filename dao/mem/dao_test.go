@@ -1,9 +1,9 @@
 package mem
 
 import (
-	"testing"
+	"github.com/ankyra/escape-registry/dao/types"
 	. "gopkg.in/check.v1"
-    "github.com/ankyra/escape-registry/dao/types"
+	"testing"
 )
 
 func Test(t *testing.T) { TestingT(t) }
@@ -13,5 +13,5 @@ type memSuite struct{}
 var _ = Suite(&memSuite{})
 
 func (s *memSuite) Test_DAO(c *C) {
-    types.ValidateDAO(NewInMemoryDAO, c)
+	types.ValidateDAO(NewInMemoryDAO, c)
 }
