@@ -2,29 +2,43 @@
 
 Please see http://escape.ankyra.io for full documentation.
 
+## Features
+
+* Centralized release metadata
+  * Postgres database
+  * SQLite database
+* Upload and download packages
+  * Google Cloud Storage back-end
+  * Local file-system storage back-end
+* Importing and Exporting
+
 ## Usage
 
 ```
 escape-registry [CONFIG_FILE]
-
-CONFIG_FILE is the location of the configuration file. 
-Default: /etc/escape-registry/config.json
 ```
 
-The Escape Registry can be configured using a json or yaml file, and/or
-environment variables. If the provided configuration file does not exist, 
-the program falls back to the following default configuration:
+The Escape Registry can be configured using a simple JSON or YAML file (default
+`/etc/escape-registry/config.json`), and/or environment variables. If the
+provided configuration file does not exist the program falls back to the
+following default configuration: 
 
 ```
-port: 7770
-database: sqlite
-database_settings:
-  path: /var/lib/escape/registry.db
-storage_backend: local
-storage_settings:
-  path: /var/lib/escape/releases
-
+{
+  "port": "7770",
+  "database": "sqlite",
+  "database_settings": {
+    "path": "/var/lib/escape/registry.db"
+  },
+  "storage_backend": "local"
+  "storage_settings": {
+    "path": "/var/lib/escape/releases"
+  }
+}
 ```
+
+This configures the Registry with an SQLite database and a local file system
+storage backend.
 
 ### Environment Variables
 
@@ -48,9 +62,11 @@ The storage backends are used to store and retrieve uploaded packages.
 ### Local file storage
 
 ```
-"storage_backend": "local",
-"storage_settings": {
-  "path": "/var/lib/escape/releases"
+{
+  "storage_backend": "local",
+  "storage_settings": {
+    "path": "/var/lib/escape/releases"
+  }
 }
 ```
 
@@ -60,10 +76,12 @@ The `path` variable points to a directory in which the releases will be stored.
 ### Google Cloud Storage
 
 ```
-"storage_backend": "gcs",
-"storage_settings": {
-  "bucket": "my-bucket",
-  "credentials": "/my/secret/service/credentials.json",
+{
+  "storage_backend": "gcs",
+  "storage_settings": {
+    "bucket": "my-bucket",
+    "credentials": "/my/secret/service/credentials.json",
+  }
 }
 ```
 
@@ -76,11 +94,12 @@ account json file if provided.
 ### SQLite
 
 ```
-"database": "sqlite",
-"database_settings": {
-  "path": "/var/lib/escape/registry.db"
+{
+  "database": "sqlite",
+  "database_settings": {
+    "path": "/var/lib/escape/registry.db"
+  }
 }
-
 ```
 
 This is the default database, which will work out of the box (provided the path
@@ -90,9 +109,11 @@ is accessible).
 ### Postgresql
 
 ```
-"database": "postgres",
-"database_settings": {
-  "postgres_url": "postgres://user:pass@localhost/database?sslmode=disable"
+{
+  "database": "postgres",
+  "database_settings": {
+    "postgres_url": "postgres://user:pass@localhost/database?sslmode=disable"
+  }
 }
 ```
 
@@ -101,7 +122,11 @@ https://godoc.org/github.com/lib/pq for the full connection string parameters.
 
 ### In Memory 
 
-`"database": "memory"`
+```
+{
+  "database": "memory"
+}
+```
 
 This database is only provided for testing purposes and shouldn't be used,
 ever.
