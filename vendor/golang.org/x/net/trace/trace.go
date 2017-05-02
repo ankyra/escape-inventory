@@ -3,12 +3,14 @@
 // license that can be found in the LICENSE file.
 
 /*
-Package trace implements tracing of requests.
-It exports an HTTP interface on /debug/requests.
+Package trace implements tracing of requests and long-lived objects.
+It exports HTTP interfaces on /debug/requests and /debug/events.
 
+A trace.Trace provides tracing for short-lived objects, usually requests.
 A request handler might be implemented like this:
-	func myHandler(w http.ResponseWriter, req *http.Request) {
-		tr := trace.New("Received", req.URL.Path)
+
+	func fooHandler(w http.ResponseWriter, req *http.Request) {
+		tr := trace.New("mypkg.Foo", req.URL.Path)
 		defer tr.Finish()
 		...
 		tr.LazyPrintf("some event %q happened", str)
@@ -18,6 +20,45 @@ A request handler might be implemented like this:
 			tr.SetError()
 		}
 	}
+
+The /debug/requests HTTP endpoint organizes the traces by family,
+errors, and duration.  It also provides histogram of request duration
+for each family.
+
+A trace.EventLog provides tracing for long-lived objects, such as RPC
+connections.
+
+	// A Fetcher fetches URL paths for a single domain.
+	type Fetcher struct {
+		domain string
+		events trace.EventLog
+	}
+
+	func NewFetcher(domain string) *Fetcher {
+		return &Fetcher{
+			domain,
+			trace.NewEventLog("mypkg.Fetcher", domain),
+		}
+	}
+
+	func (f *Fetcher) Fetch(path string) (string, error) {
+		resp, err := http.Get("http://" + f.domain + "/" + path)
+		if err != nil {
+			f.events.Errorf("Get(%q) = %v", path, err)
+			return "", err
+		}
+		f.events.Printf("Get(%q) = %s", path, resp.Status)
+		...
+	}
+
+	func (f *Fetcher) Close() error {
+		f.events.Finish()
+		return nil
+	}
+
+The /debug/events HTTP endpoint organizes the event logs by family and
+by time since the last error.  The expanded view displays recent log
+entries and the log's call stack.
 */
 package trace // import "golang.org/x/net/trace"
 
@@ -36,7 +77,6 @@ import (
 	"sync/atomic"
 	"time"
 
-	"golang.org/x/net/context"
 	"golang.org/x/net/internal/timeseries"
 )
 
@@ -44,19 +84,25 @@ import (
 // FOR DEBUGGING ONLY. This will slow down the program.
 var DebugUseAfterFinish = false
 
-// AuthRequest determines whether a specific request is permitted to load the /debug/requests page.
+// AuthRequest determines whether a specific request is permitted to load the
+// /debug/requests or /debug/events pages.
+//
 // It returns two bools; the first indicates whether the page may be viewed at all,
 // and the second indicates whether sensitive events will be shown.
 //
-// AuthRequest may be replaced by a program to customise its authorisation requirements.
+// AuthRequest may be replaced by a program to customize its authorization requirements.
 //
-// The default AuthRequest function returns (true, true) iff the request comes from localhost/127.0.0.1/[::1].
+// The default AuthRequest function returns (true, true) if and only if the request
+// comes from localhost/127.0.0.1/[::1].
 var AuthRequest = func(req *http.Request) (any, sensitive bool) {
+	// RemoteAddr is commonly in the form "IP" or "IP:port".
+	// If it is in the form "IP:port", split off the port.
 	host, _, err := net.SplitHostPort(req.RemoteAddr)
-	switch {
-	case err != nil: // Badly formed address; fail closed.
-		return false, false
-	case host == "localhost" || host == "127.0.0.1" || host == "::1":
+	if err != nil {
+		host = req.RemoteAddr
+	}
+	switch host {
+	case "localhost", "127.0.0.1", "::1":
 		return true, true
 	default:
 		return false, false
@@ -70,13 +116,25 @@ func init() {
 			http.Error(w, "not allowed", http.StatusUnauthorized)
 			return
 		}
-		render(w, req, sensitive)
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		Render(w, req, sensitive)
+	})
+	http.HandleFunc("/debug/events", func(w http.ResponseWriter, req *http.Request) {
+		any, sensitive := AuthRequest(req)
+		if !any {
+			http.Error(w, "not allowed", http.StatusUnauthorized)
+			return
+		}
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		RenderEvents(w, req, sensitive)
 	})
 }
 
-// render renders the HTML page.
+// Render renders the HTML page typically served at /debug/requests.
+// It does not do any auth checking; see AuthRequest for the default auth check
+// used by the handler registered on http.DefaultServeMux.
 // req may be nil.
-func render(w io.Writer, req *http.Request, sensitive bool) {
+func Render(w io.Writer, req *http.Request, sensitive bool) {
 	data := &struct {
 		Families         []string
 		ActiveTraceCount map[string]int
@@ -119,7 +177,7 @@ func render(w io.Writer, req *http.Request, sensitive bool) {
 
 	completedMu.RLock()
 	data.Families = make([]string, 0, len(completedTraces))
-	for fam, _ := range completedTraces {
+	for fam := range completedTraces {
 		data.Families = append(data.Families, fam)
 	}
 	completedMu.RUnlock()
@@ -179,7 +237,7 @@ func render(w io.Writer, req *http.Request, sensitive bool) {
 
 	completedMu.RLock()
 	defer completedMu.RUnlock()
-	if err := pageTmpl.ExecuteTemplate(w, "Page", data); err != nil {
+	if err := pageTmpl().ExecuteTemplate(w, "Page", data); err != nil {
 		log.Printf("net/trace: Failed executing template: %v", err)
 	}
 }
@@ -211,18 +269,6 @@ func lookupBucket(fam string, b int) *traceBucket {
 type contextKeyT string
 
 var contextKey = contextKeyT("golang.org/x/net/trace.Trace")
-
-// NewContext returns a copy of the parent context
-// and associates it with a Trace.
-func NewContext(ctx context.Context, tr Trace) context.Context {
-	return context.WithValue(ctx, contextKey, tr)
-}
-
-// FromContext returns the Trace bound to the context, if any.
-func FromContext(ctx context.Context) (tr Trace, ok bool) {
-	tr, ok = ctx.Value(contextKey).(Trace)
-	return
-}
 
 // Trace represents an active request.
 type Trace interface {
@@ -274,7 +320,8 @@ func New(family, title string) Trace {
 	tr.ref()
 	tr.Family, tr.Title = family, title
 	tr.Start = time.Now()
-	tr.events = make([]event, 0, maxEventsPerTrace)
+	tr.maxEvents = maxEventsPerTrace
+	tr.events = tr.eventsBuf[:0]
 
 	activeMu.RLock()
 	s := activeTraces[tr.Family]
@@ -591,8 +638,8 @@ type event struct {
 	Elapsed    time.Duration // since previous event in trace
 	NewDay     bool          // whether this event is on a different day to the previous event
 	Recyclable bool          // whether this event was passed via LazyLog
-	What       interface{}   // string or fmt.Stringer
 	Sensitive  bool          // whether this event contains sensitive information
+	What       interface{}   // string or fmt.Stringer
 }
 
 // WhenString returns a string representation of the elapsed time of the event.
@@ -633,14 +680,17 @@ type trace struct {
 	IsError bool
 
 	// Append-only sequence of events (modulo discards).
-	mu     sync.RWMutex
-	events []event
+	mu        sync.RWMutex
+	events    []event
+	maxEvents int
 
 	refs     int32 // how many buckets this is in
 	recycler func(interface{})
 	disc     discarded // scratch space to avoid allocation
 
 	finishStack []byte // where finish was called, if DebugUseAfterFinish is set
+
+	eventsBuf [4]event // preallocated buffer in case we only log a few events
 }
 
 func (tr *trace) reset() {
@@ -652,11 +702,15 @@ func (tr *trace) reset() {
 	tr.traceID = 0
 	tr.spanID = 0
 	tr.IsError = false
+	tr.maxEvents = 0
 	tr.events = nil
 	tr.refs = 0
 	tr.recycler = nil
 	tr.disc = 0
 	tr.finishStack = nil
+	for i := range tr.eventsBuf {
+		tr.eventsBuf[i] = event{}
+	}
 }
 
 // delta returns the elapsed time since the last event or the trace start,
@@ -685,7 +739,7 @@ func (tr *trace) addEvent(x interface{}, recyclable, sensitive bool) {
 		and very unlikely to be the fault of this code.
 
 		The most likely scenario is that some code elsewhere is using
-		a requestz.Trace after its Finish method is called.
+		a trace.Trace after its Finish method is called.
 		You can temporarily set the DebugUseAfterFinish var
 		to help discover where that is; do not leave that var set,
 		since it makes this package much less efficient.
@@ -694,11 +748,11 @@ func (tr *trace) addEvent(x interface{}, recyclable, sensitive bool) {
 	e := event{When: time.Now(), What: x, Recyclable: recyclable, Sensitive: sensitive}
 	tr.mu.Lock()
 	e.Elapsed, e.NewDay = tr.delta(e.When)
-	if len(tr.events) < cap(tr.events) {
+	if len(tr.events) < tr.maxEvents {
 		tr.events = append(tr.events, e)
 	} else {
 		// Discard the middle events.
-		di := int((cap(tr.events) - 1) / 2)
+		di := int((tr.maxEvents - 1) / 2)
 		if d, ok := tr.events[di].What.(*discarded); ok {
 			(*d)++
 		} else {
@@ -718,7 +772,7 @@ func (tr *trace) addEvent(x interface{}, recyclable, sensitive bool) {
 			go tr.recycler(tr.events[di+1].What)
 		}
 		copy(tr.events[di+1:], tr.events[di+2:])
-		tr.events[cap(tr.events)-1] = e
+		tr.events[tr.maxEvents-1] = e
 	}
 	tr.mu.Unlock()
 }
@@ -744,7 +798,7 @@ func (tr *trace) SetTraceInfo(traceID, spanID uint64) {
 func (tr *trace) SetMaxEvents(m int) {
 	// Always keep at least three events: first, discarded count, last.
 	if len(tr.events) == 0 && m > 3 {
-		tr.events = make([]event, 0, m)
+		tr.maxEvents = m
 	}
 }
 
@@ -835,10 +889,18 @@ func elapsed(d time.Duration) string {
 	return string(b)
 }
 
-var pageTmpl = template.Must(template.New("Page").Funcs(template.FuncMap{
-	"elapsed": elapsed,
-	"add":     func(a, b int) int { return a + b },
-}).Parse(pageHTML))
+var pageTmplCache *template.Template
+var pageTmplOnce sync.Once
+
+func pageTmpl() *template.Template {
+	pageTmplOnce.Do(func() {
+		pageTmplCache = template.Must(template.New("Page").Funcs(template.FuncMap{
+			"elapsed": elapsed,
+			"add":     func(a, b int) int { return a + b },
+		}).Parse(pageHTML))
+	})
+	return pageTmplCache
+}
 
 const pageHTML = `
 {{template "Prolog" .}}
@@ -903,7 +965,7 @@ const pageHTML = `
 
 		{{$n := index $.ActiveTraceCount $fam}}
 		<td class="active {{if not $n}}empty{{end}}">
-			{{if $n}}<a href="/debug/requests?fam={{$fam}}&b=-1{{if $.Expanded}}&exp=1{{end}}">{{end}}
+			{{if $n}}<a href="?fam={{$fam}}&b=-1{{if $.Expanded}}&exp=1{{end}}">{{end}}
 			[{{$n}} active]
 			{{if $n}}</a>{{end}}
 		</td>
@@ -912,7 +974,7 @@ const pageHTML = `
 		{{range $i, $b := $f.Buckets}}
 		{{$empty := $b.Empty}}
 		<td {{if $empty}}class="empty"{{end}}>
-		{{if not $empty}}<a href="/debug/requests?fam={{$fam}}&b={{$i}}{{if $.Expanded}}&exp=1{{end}}">{{end}}
+		{{if not $empty}}<a href="?fam={{$fam}}&b={{$i}}{{if $.Expanded}}&exp=1{{end}}">{{end}}
 		[{{.Cond}}]
 		{{if not $empty}}</a>{{end}}
 		</td>
@@ -920,13 +982,13 @@ const pageHTML = `
 
 		{{$nb := len $f.Buckets}}
 		<td class="latency-first">
-		<a href="/debug/requests?fam={{$fam}}&b={{$nb}}">[minute]</a>
+		<a href="?fam={{$fam}}&b={{$nb}}">[minute]</a>
 		</td>
 		<td>
-		<a href="/debug/requests?fam={{$fam}}&b={{add $nb 1}}">[hour]</a>
+		<a href="?fam={{$fam}}&b={{add $nb 1}}">[hour]</a>
 		</td>
 		<td>
-		<a href="/debug/requests?fam={{$fam}}&b={{add $nb 2}}">[total]</a>
+		<a href="?fam={{$fam}}&b={{add $nb 2}}">[total]</a>
 		</td>
 
 	</tr>
@@ -940,25 +1002,25 @@ const pageHTML = `
 <h3>Family: {{$.Family}}</h3>
 
 {{if or $.Expanded $.Traced}}
-  <a href="/debug/requests?fam={{$.Family}}&b={{$.Bucket}}">[Normal/Summary]</a>
+  <a href="?fam={{$.Family}}&b={{$.Bucket}}">[Normal/Summary]</a>
 {{else}}
   [Normal/Summary]
 {{end}}
 
 {{if or (not $.Expanded) $.Traced}}
-  <a href="/debug/requests?fam={{$.Family}}&b={{$.Bucket}}&exp=1">[Normal/Expanded]</a>
+  <a href="?fam={{$.Family}}&b={{$.Bucket}}&exp=1">[Normal/Expanded]</a>
 {{else}}
   [Normal/Expanded]
 {{end}}
 
 {{if not $.Active}}
 	{{if or $.Expanded (not $.Traced)}}
-	<a href="/debug/requests?fam={{$.Family}}&b={{$.Bucket}}&rtraced=1">[Traced/Summary]</a>
+	<a href="?fam={{$.Family}}&b={{$.Bucket}}&rtraced=1">[Traced/Summary]</a>
 	{{else}}
 	[Traced/Summary]
 	{{end}}
 	{{if or (not $.Expanded) (not $.Traced)}}
-	<a href="/debug/requests?fam={{$.Family}}&b={{$.Bucket}}&exp=1&rtraced=1">[Traced/Expanded]</a>
+	<a href="?fam={{$.Family}}&b={{$.Bucket}}&exp=1&rtraced=1">[Traced/Expanded]</a>
         {{else}}
 	[Traced/Expanded]
 	{{end}}
