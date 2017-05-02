@@ -62,3 +62,31 @@ func (s *releaseIdSuite) Test_ReleaseId_Missing_Version(c *C) {
     _, err := ParseReleaseId("type-name-nope")
     c.Assert(err.Error(), Equals, "Invalid version string in release ID 'type-name-nope': nope")
 }
+func (s *releaseIdSuite) Test_ReleaseId_Invalid_Version(c *C) {
+    _, err := ParseReleaseId("type-name-vnope")
+    c.Assert(err.Error(), Equals, "Invalid version string in release ID 'type-name-vnope': vnope")
+}
+
+func (s *releaseIdSuite) Test_ValidateVersion(c *C) {
+    c.Assert(validateVersion("latest"), IsNil)
+    c.Assert(validateVersion("0"), IsNil)
+    c.Assert(validateVersion("10"), IsNil)
+    c.Assert(validateVersion("0.0"), IsNil)
+    c.Assert(validateVersion("0.10"), IsNil)
+    c.Assert(validateVersion("0.0.0"), IsNil)
+    c.Assert(validateVersion("0.0.10"), IsNil)
+    c.Assert(validateVersion("0.@"), IsNil)
+    c.Assert(validateVersion("0.0.@"), IsNil)
+}
+
+func (s *releaseIdSuite) Test_ValidateVersion_Error(c *C) {
+    c.Assert(validateVersion("whatsthisnow"), Not(IsNil))
+    c.Assert(validateVersion("nope"), Not(IsNil))
+    c.Assert(validateVersion("0.test"), Not(IsNil))
+    c.Assert(validateVersion("0.0.test"), Not(IsNil))
+    c.Assert(validateVersion("0.0.latest"), Not(IsNil))
+    c.Assert(validateVersion("0-0"), Not(IsNil))
+    c.Assert(validateVersion("0_0"), Not(IsNil))
+    c.Assert(validateVersion("0@"), Not(IsNil))
+    c.Assert(validateVersion("0.0@"), Not(IsNil))
+}

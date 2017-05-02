@@ -1,8 +1,9 @@
 package shared
 
 import (
-	"errors"
+	"fmt"
 	"strings"
+    "regexp"
 )
 
 type ReleaseId struct {
@@ -14,7 +15,7 @@ type ReleaseId struct {
 func ParseReleaseId(releaseId string) (*ReleaseId, error) {
 	split := strings.Split(releaseId, "-")
 	if len(split) < 3 { // type-build-version
-		return nil, errors.New("Invalid release format: " + releaseId)
+		return nil, fmt.Errorf("Invalid release format: %s", releaseId)
 	}
 	result := &ReleaseId{}
 	result.Type = split[0]
@@ -26,9 +27,26 @@ func ParseReleaseId(releaseId string) (*ReleaseId, error) {
 	} else if strings.HasPrefix(version, "v") {
 		result.Version = version[1:]
 	} else {
-		return nil, errors.New("Invalid version string in release ID '" + releaseId + "': " + version)
+		return nil, fmt.Errorf("Invalid version string in release ID '%s': %s", releaseId, version)
 	}
+
+    err := validateVersion(result.Version)
+    if err != nil {
+		return nil, fmt.Errorf("Invalid version string in release ID '%s': %s", releaseId, version)
+    }
 	return result, nil
+}
+
+func validateVersion(version string) error {
+    if version == "latest" {
+        return nil
+    }
+    re := regexp.MustCompile(`^[0-9]+(\.[0-9]+)*(\.@)?$`)
+    matches := re.Match([]byte(version))
+    if !matches {
+        return fmt.Errorf("Invalid version format: %s", version)
+    }
+    return nil
 }
 
 func (r *ReleaseId) ToString() string {
