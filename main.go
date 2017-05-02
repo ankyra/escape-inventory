@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	defaultConfigFile = "config.json"
+	defaultConfigFile = "/etc/escape-registry/config.json"
 )
 
 func getConfigLocation(args []string) string {

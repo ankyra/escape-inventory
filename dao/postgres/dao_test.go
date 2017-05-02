@@ -39,5 +39,7 @@ func (s *memSuite) Test_DAO(c *C) {
             c.Assert(err, IsNil)
             return dao
         }, c)
+    } else {
+        println("Postgres tests have not been enabled. Use ENABLE_POSTGRES_TESTS=1 to do so")
     }
 }

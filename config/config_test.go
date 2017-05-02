@@ -153,6 +153,7 @@ func (s *configSuite) Test_NewConfig_Uses_EnvironmentVariables(c *C) {
 
 func (s *configSuite) Test_LoadConfig_Uses_EnvironmentVariables(c *C) {
     env := []string{
+        "PORT=9876",
         "DATABASE=memory",
         "DATABASE_SETTINGS_PATH=",
         "DATABASE_SETTINGS_POSTGRES_URL=postgres://",
@@ -163,6 +164,7 @@ func (s *configSuite) Test_LoadConfig_Uses_EnvironmentVariables(c *C) {
     }
     conf, err := LoadConfig("testdata/yml_config.yml", env)
     c.Assert(err, IsNil)
+    c.Assert(conf.Port, Equals, "9876")
     c.Assert(conf.Database, Equals, "memory")
     c.Assert(conf.DatabaseSettings.Path, Equals, "")
     c.Assert(conf.DatabaseSettings.PostgresUrl, Equals, "postgres://")
