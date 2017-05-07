@@ -80,3 +80,10 @@ inputs:
 pre_build: scripts/pre-build.sh
 post_build: scripts/build.sh
 test: scripts/test.sh
+
+errands:
+  upload_to_gcs:
+    description: "Upload the produced linux/amd64 binary to a GCS bucket"
+    script: scripts/upload_to_gcs.sh
+    inputs:
+    - bucket
