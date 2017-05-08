@@ -26,7 +26,7 @@ func GetNextVersion(releaseIdString, prefix string) (string, error) {
 	latest, err := getLastVersionForPrefix(releaseIdString, prefix)
 	if err != nil {
 		if dao.IsNotFound(err) {
-			return "0", nil
+			return prefix + "0", nil
 		}
 		return "", NewUserError(err)
 	}
