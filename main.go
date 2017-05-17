@@ -86,13 +86,11 @@ func getMux() *mux.Router {
 	getRouter := r.Methods("GET").Subrouter()
 	getRouter.HandleFunc("/", HomeHandler)
 
-	getRouter.Handle("/types/", negroni.New(
+	getRouter.Handle("/apps/", negroni.New(
 		negroni.Wrap(http.HandlerFunc(handlers.RegistryHandler))))
-	getRouter.Handle("/types/{type}/", negroni.New(
+	getRouter.Handle("/apps/{name}/", negroni.New(
 		negroni.Wrap(http.HandlerFunc(handlers.RegistryHandler))))
-	getRouter.Handle("/types/{type}/{name}/", negroni.New(
-		negroni.Wrap(http.HandlerFunc(handlers.RegistryHandler))))
-	getRouter.Handle("/types/{type}/{name}/{version}/", negroni.New(
+	getRouter.Handle("/apps/{name}/{version}/", negroni.New(
 		negroni.Wrap(http.HandlerFunc(handlers.RegistryHandler))))
 
 	getRouter.Handle("/r/{release}/", negroni.New(

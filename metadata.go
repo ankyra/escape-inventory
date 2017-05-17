@@ -1,3 +1,3 @@
 package main
 
-const registryVersion="0.4.0"
+const registryVersion = "0"

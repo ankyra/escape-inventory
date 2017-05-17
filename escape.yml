@@ -3,15 +3,7 @@
 # The build name.  Together with the release type makes up the build
 # identifier. Format: /[a-zA-Z]+[a-zA-Z0-9-]*/
 
-build: escape-registry
-
-
-# The release type. One of: ansible, archive, docker, kubespec, docker,
-# terraform
-
-type: archive
-
-
+name: escape-registry
 
 # The version. Either specify the full version or use the '@' symbol to 
 # let Escape pick the next version at build time. Format: /[0-9]+(.[0-9]+)*/
@@ -27,7 +19,7 @@ type: archive
 # Build the next path release in the 1.1.* series:
 #   version: 1.1.@
 #
-version: '0.4.@'
+version: '0.5.@'
 
  
 # An (optional) description for this release.
@@ -77,7 +69,6 @@ includes:
 inputs:
 - version
 
-pre_build: scripts/pre-build.sh
 post_build: scripts/build.sh
 test: scripts/test.sh
 
@@ -87,3 +78,8 @@ errands:
     script: scripts/upload_to_gcs.sh
     inputs:
     - bucket
+
+templates:
+- file: metadata.go.tpl
+  mapping:
+    version: $this.version
