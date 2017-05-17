@@ -17,17 +17,18 @@ limitations under the License.
 package mem
 
 import (
+	"github.com/ankyra/escape-core"
 	. "github.com/ankyra/escape-registry/dao/types"
 )
 
 type mem_release struct {
 	application *mem_application
 	version     string
-	metadata    Metadata
+	metadata    *core.ReleaseMetadata
 	packages    []string
 }
 
-func newRelease(release Metadata, app *mem_application) *mem_release {
+func newRelease(release *core.ReleaseMetadata, app *mem_application) *mem_release {
 	return &mem_release{
 		application: app,
 		version:     release.GetVersion(),
@@ -44,7 +45,7 @@ func (r *mem_release) GetVersion() string {
 	return r.version
 }
 
-func (r *mem_release) GetMetadata() Metadata {
+func (r *mem_release) GetMetadata() *core.ReleaseMetadata {
 	return r.metadata
 }
 

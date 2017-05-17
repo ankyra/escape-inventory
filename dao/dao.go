@@ -18,6 +18,7 @@ package dao
 
 import (
 	"fmt"
+	"github.com/ankyra/escape-core"
 	"github.com/ankyra/escape-registry/config"
 	"github.com/ankyra/escape-registry/dao/mem"
 	"github.com/ankyra/escape-registry/dao/postgres"
@@ -55,8 +56,8 @@ func GetApplications() ([]ApplicationDAO, error) {
 	return globalDAO.GetApplications()
 }
 
-func GetApplication(typ, name string) (ApplicationDAO, error) {
-	return globalDAO.GetApplication(typ, name)
+func GetApplication(name string) (ApplicationDAO, error) {
+	return globalDAO.GetApplication(name)
 }
 
 func GetRelease(releaseId string) (ReleaseDAO, error) {
@@ -66,14 +67,8 @@ func GetAllReleases() ([]ReleaseDAO, error) {
 	return globalDAO.GetAllReleases()
 }
 
-func AddRelease(metadata Metadata) (ReleaseDAO, error) {
+func AddRelease(metadata *core.ReleaseMetadata) (ReleaseDAO, error) {
 	return globalDAO.AddRelease(metadata)
-}
-func GetReleaseTypes() ([]string, error) {
-	return globalDAO.GetReleaseTypes()
-}
-func GetApplicationsByType(typ string) ([]string, error) {
-	return globalDAO.GetApplicationsByType(typ)
 }
 
 func IsNotFound(err error) bool {

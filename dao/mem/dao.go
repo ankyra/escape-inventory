@@ -17,6 +17,7 @@ limitations under the License.
 package mem
 
 import (
+	"github.com/ankyra/escape-core"
 	. "github.com/ankyra/escape-registry/dao/types"
 )
 
@@ -36,31 +37,9 @@ func (a *mem_dao) GetApplications() ([]ApplicationDAO, error) {
 	return a.applications, nil
 }
 
-func (a *mem_dao) GetReleaseTypes() ([]string, error) {
-	types := map[string]bool{}
+func (a *mem_dao) GetApplication(name string) (ApplicationDAO, error) {
 	for _, app := range a.applications {
-		types[app.GetType()] = true
-	}
-	result := []string{}
-	for typ, _ := range types {
-		result = append(result, typ)
-	}
-	return result, nil
-}
-
-func (a *mem_dao) GetApplicationsByType(typ string) ([]string, error) {
-	result := []string{}
-	for _, app := range a.applications {
-		if app.GetType() == typ {
-			result = append(result, app.GetName())
-		}
-	}
-	return result, nil
-}
-
-func (a *mem_dao) GetApplication(typ, name string) (ApplicationDAO, error) {
-	for _, app := range a.applications {
-		if app.GetType() == typ && app.GetName() == name {
+		if app.GetName() == name {
 			return app, nil
 		}
 	}
@@ -83,22 +62,21 @@ func (a *mem_dao) GetAllReleases() ([]ReleaseDAO, error) {
 	return result, nil
 }
 
-func (a *mem_dao) AddRelease(release Metadata) (ReleaseDAO, error) {
+func (a *mem_dao) AddRelease(release *core.ReleaseMetadata) (ReleaseDAO, error) {
 	key := release.GetReleaseId()
 	_, alreadyExists := a.releases[key]
 	if alreadyExists {
 		return nil, AlreadyExists
 	}
 	var application *mem_application
-	typ := release.GetType()
 	name := release.GetName()
 	for _, app := range a.applications {
-		if app.GetName() == name && app.GetType() == typ {
+		if app.GetName() == name {
 			application = app.(*mem_application)
 		}
 	}
 	if application == nil {
-		application = newApplication(typ, name, a)
+		application = newApplication(name, a)
 		a.applications = append(a.applications, application)
 	}
 	a.releases[key] = newRelease(release, application)

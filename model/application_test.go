@@ -49,29 +49,29 @@ func (s *appSuite) Test_GetMaxFromVersions_Prefix_Matching(c *C) {
 }
 
 func (s *appSuite) Test_GetNextVersion(c *C) {
-	semver, err := GetNextVersion("archive-semver-test-latest", "")
+	semver, err := GetNextVersion("semver-test-latest", "")
 	c.Assert(err, IsNil)
 	c.Assert(semver, Equals, "0")
 
-	err = AddRelease(`{"name": "semver-test", "type": "archive", "version": "0"}`)
+	err = AddRelease(`{"name": "semver-test", "version": "0"}`)
 	c.Assert(err, IsNil)
-	err = AddRelease(`{"name": "semver-test", "type": "archive", "version": "0.1"}`)
+	err = AddRelease(`{"name": "semver-test", "version": "0.1"}`)
 	c.Assert(err, IsNil)
-	semver, err = GetNextVersion("archive-semver-test-latest", "")
+	semver, err = GetNextVersion("semver-test-latest", "")
 	c.Assert(err, IsNil)
 	c.Assert(semver, Equals, "0.2")
 }
 
 func (s *appSuite) Test_GetNextVersion_With_Prefix(c *C) {
-	semver, err := GetNextVersion("archive-semver2-test-latest", "")
+	semver, err := GetNextVersion("semver2-test-latest", "")
 	c.Assert(err, IsNil)
 	c.Assert(semver, Equals, "0")
 
-	err = AddRelease(`{"name": "semver2-test", "type": "archive", "version": "1"}`)
+	err = AddRelease(`{"name": "semver2-test", "version": "1"}`)
 	c.Assert(err, IsNil)
-	err = AddRelease(`{"name": "semver2-test", "type": "archive", "version": "0.1"}`)
+	err = AddRelease(`{"name": "semver2-test", "version": "0.1"}`)
 	c.Assert(err, IsNil)
-	semver, err = GetNextVersion("archive-semver2-test-latest", "0.")
+	semver, err = GetNextVersion("semver2-test-latest", "0.")
 	c.Assert(err, IsNil)
 	c.Assert(semver, Equals, "0.2")
 }

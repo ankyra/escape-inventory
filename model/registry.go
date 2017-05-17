@@ -18,30 +18,21 @@ package model
 
 import (
 	"github.com/ankyra/escape-registry/dao"
-	. "github.com/ankyra/escape-registry/dao/types"
 )
 
-func Registry(typ, name string) ([]string, error) {
-	types, err := dao.GetReleaseTypes()
-	if err != nil {
-		return nil, err
-	}
-	if typ == "" {
-		return types, nil
-	}
-	typeFound := false
-	for _, t := range types {
-		if t == typ {
-			typeFound = true
-		}
-	}
-	if !typeFound {
-		return nil, NotFound
-	}
+func Registry(name string) ([]string, error) {
 	if name == "" {
-		return dao.GetApplicationsByType(typ)
+		result := []string{}
+		apps, err := dao.GetApplications()
+		if err != nil {
+			return nil, err
+		}
+		for _, app := range apps {
+			result = append(result, app.GetName())
+		}
+		return result, nil
 	}
-	app, err := dao.GetApplication(typ, name)
+	app, err := dao.GetApplication(name)
 	if err != nil {
 		return nil, err
 	}

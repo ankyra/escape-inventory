@@ -19,8 +19,8 @@ package gcs
 import (
 	"cloud.google.com/go/storage"
 	"fmt"
+	"github.com/ankyra/escape-core/parsers"
 	"github.com/ankyra/escape-registry/config"
-	"github.com/ankyra/escape-registry/shared"
 	"golang.org/x/net/context"
 	"google.golang.org/api/option"
 	"io"
@@ -59,8 +59,8 @@ func (ls *GoogleCloudStorageBackend) Init(settings config.StorageSettings) error
 	return nil
 }
 
-func (ls *GoogleCloudStorageBackend) Upload(releaseId *shared.ReleaseId, pkg io.ReadSeeker) (string, error) {
-	archive := strings.Join([]string{releaseId.Type, releaseId.Name, releaseId.ToString() + ".tgz"}, "/")
+func (ls *GoogleCloudStorageBackend) Upload(releaseId *parsers.ReleaseId, pkg io.ReadSeeker) (string, error) {
+	archive := strings.Join([]string{releaseId.Name, releaseId.ToString() + ".tgz"}, "/")
 	writer := ls.Bucket.Object(archive).NewWriter(ls.Context)
 	if _, err := io.Copy(writer, pkg); err != nil {
 		return "", err

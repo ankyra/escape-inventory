@@ -18,8 +18,8 @@ package storage
 
 import (
 	"fmt"
+	"github.com/ankyra/escape-core/parsers"
 	"github.com/ankyra/escape-registry/config"
-	"github.com/ankyra/escape-registry/shared"
 	"github.com/ankyra/escape-registry/storage/gcs"
 	"github.com/ankyra/escape-registry/storage/local"
 	"io"
@@ -28,7 +28,7 @@ import (
 
 type StorageBackend interface {
 	Init(settings config.StorageSettings) error
-	Upload(releaseId *shared.ReleaseId, pkg io.ReadSeeker) (string, error)
+	Upload(releaseId *parsers.ReleaseId, pkg io.ReadSeeker) (string, error)
 	Download(uri string) (io.Reader, error)
 }
 
@@ -60,7 +60,7 @@ func Upload(releaseId string, pkg io.ReadSeeker) (string, error) {
 	if !ok {
 		return "", fmt.Errorf("Unknown scheme")
 	}
-	parsedReleaseId, err := shared.ParseReleaseId(releaseId)
+	parsedReleaseId, err := parsers.ParseReleaseId(releaseId)
 	if err != nil {
 		return "", err
 	}

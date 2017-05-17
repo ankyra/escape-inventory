@@ -19,8 +19,8 @@ package model
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/ankyra/escape-core"
 	"github.com/ankyra/escape-registry/dao"
-	"github.com/ankyra/escape-registry/shared"
 )
 
 func Import(releases []map[string]interface{}) error {
@@ -29,7 +29,7 @@ func Import(releases []map[string]interface{}) error {
 		if err != nil {
 			return NewUserError(fmt.Errorf("Could not parse JSON: %s", err.Error()))
 		}
-		metadata, err := shared.NewReleaseMetadataFromJsonString(string(metadataJson))
+		metadata, err := core.NewReleaseMetadataFromJsonString(string(metadataJson))
 		if err != nil {
 			return NewUserError(fmt.Errorf("Could not get metadata from JSON: %s", err.Error()))
 		}

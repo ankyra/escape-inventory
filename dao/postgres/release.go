@@ -17,6 +17,7 @@ limitations under the License.
 package postgres
 
 import (
+	"github.com/ankyra/escape-core"
 	. "github.com/ankyra/escape-registry/dao/types"
 	"github.com/lib/pq"
 )
@@ -25,10 +26,10 @@ type release_dao struct {
 	dao       *postgres_dao
 	releaseId string
 	version   string
-	metadata  Metadata
+	metadata  *core.ReleaseMetadata
 }
 
-func newRelease(release Metadata, dao *postgres_dao) *release_dao {
+func newRelease(release *core.ReleaseMetadata, dao *postgres_dao) *release_dao {
 	return &release_dao{
 		dao:       dao,
 		releaseId: release.GetReleaseId(),
@@ -39,7 +40,6 @@ func newRelease(release Metadata, dao *postgres_dao) *release_dao {
 
 func (r *release_dao) GetApplication() ApplicationDAO {
 	return newApplicationDAO(
-		r.metadata.GetType(),
 		r.metadata.GetName(),
 		r.dao,
 	)
@@ -49,7 +49,7 @@ func (r *release_dao) GetVersion() string {
 	return r.version
 }
 
-func (r *release_dao) GetMetadata() Metadata {
+func (r *release_dao) GetMetadata() *core.ReleaseMetadata {
 	return r.metadata
 }
 
@@ -91,14 +91,13 @@ func (r *release_dao) AddPackageURI(uri string) error {
 
 func (r *release_dao) Save() (ReleaseDAO, error) {
 	stmt, err := r.dao.db.Prepare(`
-        INSERT INTO release(project, typ, name, release_id, version, metadata) VALUES($1, $2, $3, $4, $5, $6)`)
+        INSERT INTO release(project, name, release_id, version, metadata) VALUES($1, $2, $3, $4, $5)`)
 	if err != nil {
 		return nil, err
 	}
 	project := ""
-	typ := r.metadata.GetType()
 	name := r.metadata.GetName()
-	_, err = stmt.Exec(project, typ, name, r.releaseId, r.version, r.metadata.ToJson())
+	_, err = stmt.Exec(project, name, r.releaseId, r.version, r.metadata.ToJson())
 	if err != nil {
 		if err.(*pq.Error).Code.Name() == "unique_violation" {
 			return nil, AlreadyExists

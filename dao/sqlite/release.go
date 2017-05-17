@@ -17,6 +17,7 @@ limitations under the License.
 package sqlite
 
 import (
+	"github.com/ankyra/escape-core"
 	. "github.com/ankyra/escape-registry/dao/types"
 	sqlite3 "github.com/mattn/go-sqlite3"
 )
@@ -25,10 +26,10 @@ type release_dao struct {
 	dao       *sql_dao
 	releaseId string
 	version   string
-	metadata  Metadata
+	metadata  *core.ReleaseMetadata
 }
 
-func newRelease(release Metadata, dao *sql_dao) *release_dao {
+func newRelease(release *core.ReleaseMetadata, dao *sql_dao) *release_dao {
 	return &release_dao{
 		dao:       dao,
 		releaseId: release.GetReleaseId(),
@@ -39,7 +40,6 @@ func newRelease(release Metadata, dao *sql_dao) *release_dao {
 
 func (r *release_dao) GetApplication() ApplicationDAO {
 	return newApplicationDAO(
-		r.metadata.GetType(),
 		r.metadata.GetName(),
 		r.dao,
 	)
@@ -49,7 +49,7 @@ func (r *release_dao) GetVersion() string {
 	return r.version
 }
 
-func (r *release_dao) GetMetadata() Metadata {
+func (r *release_dao) GetMetadata() *core.ReleaseMetadata {
 	return r.metadata
 }
 
@@ -91,14 +91,13 @@ func (r *release_dao) AddPackageURI(uri string) error {
 
 func (r *release_dao) Save() (ReleaseDAO, error) {
 	stmt, err := r.dao.db.Prepare(`
-        INSERT INTO release(project, typ, name, release_id, version, metadata) VALUES(?, ?, ?, ?, ?, ?)`)
+        INSERT INTO release(project, name, release_id, version, metadata) VALUES(?, ?, ?, ?, ?)`)
 	if err != nil {
 		return nil, err
 	}
 	project := ""
-	typ := r.metadata.GetType()
 	name := r.metadata.GetName()
-	_, err = stmt.Exec(project, typ, name, r.releaseId, r.version, r.metadata.ToJson())
+	_, err = stmt.Exec(project, name, r.releaseId, r.version, r.metadata.ToJson())
 	if err != nil {
 		if err.(sqlite3.Error).Code == sqlite3.ErrConstraint {
 			return nil, AlreadyExists

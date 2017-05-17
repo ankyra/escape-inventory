@@ -17,8 +17,8 @@ limitations under the License.
 package model
 
 import (
+	"github.com/ankyra/escape-core/parsers"
 	"github.com/ankyra/escape-registry/dao"
-	"github.com/ankyra/escape-registry/shared"
 	"strings"
 )
 
@@ -38,11 +38,11 @@ func GetNextVersion(releaseIdString, prefix string) (string, error) {
 }
 
 func getLastVersionForPrefix(releaseIdString, prefix string) (*SemanticVersion, error) {
-	releaseId, err := shared.ParseReleaseId(releaseIdString)
+	releaseId, err := parsers.ParseReleaseId(releaseIdString)
 	if err != nil {
 		return nil, NewUserError(err)
 	}
-	app, err := dao.GetApplication(releaseId.Type, releaseId.Name)
+	app, err := dao.GetApplication(releaseId.Name)
 	if err != nil {
 		return nil, NewUserError(err)
 	}

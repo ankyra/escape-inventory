@@ -18,19 +18,20 @@ package model
 
 import (
 	"fmt"
+	"github.com/ankyra/escape-core"
+	"github.com/ankyra/escape-core/parsers"
 	"github.com/ankyra/escape-registry/dao"
 	. "github.com/ankyra/escape-registry/dao/types"
-	"github.com/ankyra/escape-registry/shared"
 	"strings"
 )
 
 func AddRelease(metadataJson string) error {
-	metadata, err := shared.NewReleaseMetadataFromJsonString(metadataJson)
+	metadata, err := core.NewReleaseMetadataFromJsonString(metadataJson)
 	if err != nil {
 		return NewUserError(err)
 	}
 	releaseId := metadata.GetReleaseId()
-	parsed, err := shared.ParseReleaseId(releaseId)
+	parsed, err := parsers.ParseReleaseId(releaseId)
 	if err != nil {
 		return NewUserError(err)
 	}
@@ -48,7 +49,7 @@ func AddRelease(metadataJson string) error {
 	return err
 }
 
-func GetReleaseMetadata(releaseIdString string) (Metadata, error) {
+func GetReleaseMetadata(releaseIdString string) (*core.ReleaseMetadata, error) {
 	release, err := ResolveReleaseId(releaseIdString)
 	if err != nil {
 		return nil, err
@@ -57,7 +58,7 @@ func GetReleaseMetadata(releaseIdString string) (Metadata, error) {
 }
 
 func ResolveReleaseId(releaseIdString string) (ReleaseDAO, error) {
-	releaseId, err := shared.ParseReleaseId(releaseIdString)
+	releaseId, err := parsers.ParseReleaseId(releaseIdString)
 	if err != nil {
 		return nil, NewUserError(err)
 	}

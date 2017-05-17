@@ -19,21 +19,15 @@ package postgres
 import ()
 
 type application_dao struct {
-	typ  string
 	name string
 	dao  *postgres_dao
 }
 
-func newApplicationDAO(typ, name string, dao *postgres_dao) *application_dao {
+func newApplicationDAO(name string, dao *postgres_dao) *application_dao {
 	return &application_dao{
-		typ:  typ,
 		name: name,
 		dao:  dao,
 	}
-}
-
-func (a *application_dao) GetType() string {
-	return a.typ
 }
 
 func (a *application_dao) GetName() string {
@@ -41,11 +35,11 @@ func (a *application_dao) GetName() string {
 }
 
 func (a *application_dao) FindAllVersions() ([]string, error) {
-	stmt, err := a.dao.db.Prepare("SELECT version FROM release WHERE typ = $1 AND name = $2")
+	stmt, err := a.dao.db.Prepare("SELECT version FROM release WHERE name = $1")
 	if err != nil {
 		return nil, err
 	}
-	rows, err := stmt.Query(a.typ, a.name)
+	rows, err := stmt.Query(a.name)
 	if err != nil {
 		return nil, err
 	}

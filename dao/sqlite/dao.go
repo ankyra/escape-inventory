@@ -19,8 +19,8 @@ package sqlite
 import (
 	"database/sql"
 	"fmt"
+	"github.com/ankyra/escape-core"
 	. "github.com/ankyra/escape-registry/dao/types"
-	"github.com/ankyra/escape-registry/shared"
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -35,13 +35,12 @@ func NewSQLiteDAO(path string) (DAO, error) {
 	}
 	_, err = db.Exec(`
         CREATE TABLE IF NOT EXISTS release (
-            typ string, 
             name string, 
             release_id string,
             version string,
             metadata string,
             project string,
-            PRIMARY KEY(typ, name, version, project)
+            PRIMARY KEY(name, version, project)
         )`)
 	if err != nil {
 		return nil, fmt.Errorf("Couldn't initialise SQLite storage backend '%s' [1]: %s", path, err.Error())
@@ -61,7 +60,7 @@ func NewSQLiteDAO(path string) (DAO, error) {
 }
 
 func (a *sql_dao) GetApplications() ([]ApplicationDAO, error) {
-	stmt, err := a.db.Prepare("SELECT DISTINCT(typ), name FROM release")
+	stmt, err := a.db.Prepare("SELECT name FROM release")
 	if err != nil {
 		return nil, err
 	}
@@ -72,69 +71,27 @@ func (a *sql_dao) GetApplications() ([]ApplicationDAO, error) {
 	defer rows.Close()
 	result := []ApplicationDAO{}
 	for rows.Next() {
-		var typ, name string
-		if err := rows.Scan(&typ, &name); err != nil {
-			return nil, err
-		}
-		result = append(result, newApplicationDAO(typ, name, a))
-	}
-	return result, nil
-}
-
-func (a *sql_dao) GetReleaseTypes() ([]string, error) {
-	stmt, err := a.db.Prepare("SELECT DISTINCT(typ) FROM release")
-	if err != nil {
-		return nil, err
-	}
-	rows, err := stmt.Query()
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	result := []string{}
-	for rows.Next() {
-		var typ string
-		if err := rows.Scan(&typ); err != nil {
-			return nil, err
-		}
-		result = append(result, typ)
-	}
-	return result, nil
-}
-
-func (a *sql_dao) GetApplicationsByType(typ string) ([]string, error) {
-	stmt, err := a.db.Prepare("SELECT DISTINCT(name) FROM release WHERE typ = ?")
-	if err != nil {
-		return nil, err
-	}
-	rows, err := stmt.Query(typ)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	result := []string{}
-	for rows.Next() {
 		var name string
 		if err := rows.Scan(&name); err != nil {
 			return nil, err
 		}
-		result = append(result, name)
+		result = append(result, newApplicationDAO(name, a))
 	}
 	return result, nil
 }
 
-func (a *sql_dao) GetApplication(typ, name string) (ApplicationDAO, error) {
-	stmt, err := a.db.Prepare("SELECT name FROM release WHERE typ = ? AND name = ?")
+func (a *sql_dao) GetApplication(name string) (ApplicationDAO, error) {
+	stmt, err := a.db.Prepare("SELECT name FROM release WHERE name = ?")
 	if err != nil {
 		return nil, err
 	}
-	rows, err := stmt.Query(typ, name)
+	rows, err := stmt.Query(name)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 	for rows.Next() {
-		return newApplicationDAO(typ, name, a), nil
+		return newApplicationDAO(name, a), nil
 	}
 	return nil, NotFound
 }
@@ -154,7 +111,7 @@ func (a *sql_dao) GetRelease(releaseId string) (ReleaseDAO, error) {
 		if err := rows.Scan(&metadataJson); err != nil {
 			return nil, err
 		}
-		metadata, err := shared.NewReleaseMetadataFromJsonString(metadataJson)
+		metadata, err := core.NewReleaseMetadataFromJsonString(metadataJson)
 		if err != nil {
 			return nil, err
 		}
@@ -179,7 +136,7 @@ func (a *sql_dao) GetAllReleases() ([]ReleaseDAO, error) {
 		if err := rows.Scan(&metadataJson); err != nil {
 			return nil, err
 		}
-		metadata, err := shared.NewReleaseMetadataFromJsonString(metadataJson)
+		metadata, err := core.NewReleaseMetadataFromJsonString(metadataJson)
 		if err != nil {
 			return nil, err
 		}
@@ -188,7 +145,7 @@ func (a *sql_dao) GetAllReleases() ([]ReleaseDAO, error) {
 	return result, nil
 }
 
-func (a *sql_dao) AddRelease(release Metadata) (ReleaseDAO, error) {
+func (a *sql_dao) AddRelease(release *core.ReleaseMetadata) (ReleaseDAO, error) {
 	releaseDao := newRelease(release, a)
 	return releaseDao.Save()
 }

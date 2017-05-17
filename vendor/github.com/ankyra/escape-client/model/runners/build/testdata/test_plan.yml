@@ -1,0 +1,5 @@
+name: name
+version: 0.0.1
+test: testdata/test.sh
+inputs:
+- variable 

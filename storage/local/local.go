@@ -18,8 +18,8 @@ package local
 
 import (
 	"fmt"
+	"github.com/ankyra/escape-core/parsers"
 	"github.com/ankyra/escape-registry/config"
-	"github.com/ankyra/escape-registry/shared"
 	"io"
 	"os"
 	"path/filepath"
@@ -54,14 +54,13 @@ func (ls *LocalStorageBackend) getStoragePath() (string, error) {
 	return filepath.Abs(ls.localStoragePath)
 }
 
-func (ls *LocalStorageBackend) Upload(releaseId *shared.ReleaseId, pkg io.ReadSeeker) (string, error) {
+func (ls *LocalStorageBackend) Upload(releaseId *parsers.ReleaseId, pkg io.ReadSeeker) (string, error) {
 	storage, err := ls.getStoragePath()
 	if err != nil {
 		return "", err
 	}
-	typ := releaseId.Type
 	name := releaseId.Name
-	targetDir := filepath.Join(storage, typ, name)
+	targetDir := filepath.Join(storage, name)
 	if !PathExists(targetDir) {
 		os.MkdirAll(targetDir, 0755)
 	}

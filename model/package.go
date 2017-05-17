@@ -18,16 +18,16 @@ package model
 
 import (
 	"fmt"
+	"github.com/ankyra/escape-core/parsers"
 	"github.com/ankyra/escape-registry/dao"
 	"github.com/ankyra/escape-registry/dao/types"
-	"github.com/ankyra/escape-registry/shared"
 	"github.com/ankyra/escape-registry/storage"
 	"io"
 	"log"
 )
 
 func UploadPackage(releaseId string, pkg io.ReadSeeker) error {
-	parsed, err := shared.ParseReleaseId(releaseId)
+	parsed, err := parsers.ParseReleaseId(releaseId)
 	if err != nil {
 		return NewUserError(err)
 	}

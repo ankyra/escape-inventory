@@ -1,0 +1,8 @@
+name: name
+version: 0.0.1
+inputs:
+- input_variable
+outputs:
+- output_variable
+metadata:
+  key: value

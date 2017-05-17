@@ -18,23 +18,18 @@ package types
 
 import (
 	"fmt"
-	"github.com/ankyra/escape-registry/shared"
+	"github.com/ankyra/escape-core"
 )
 
-type Metadata shared.ReleaseMetadata
-
 type DAO interface {
-	GetApplication(typ, name string) (ApplicationDAO, error)
+	GetApplication(name string) (ApplicationDAO, error)
 	GetApplications() ([]ApplicationDAO, error)
 	GetRelease(releaseId string) (ReleaseDAO, error)
 	GetAllReleases() ([]ReleaseDAO, error)
-	AddRelease(metadata Metadata) (ReleaseDAO, error)
-	GetApplicationsByType(typ string) ([]string, error)
-	GetReleaseTypes() ([]string, error)
+	AddRelease(metadata *core.ReleaseMetadata) (ReleaseDAO, error)
 }
 
 type ApplicationDAO interface {
-	GetType() string
 	GetName() string
 	FindAllVersions() ([]string, error)
 }
@@ -42,7 +37,7 @@ type ApplicationDAO interface {
 type ReleaseDAO interface {
 	GetApplication() ApplicationDAO
 	GetVersion() string
-	GetMetadata() Metadata
+	GetMetadata() *core.ReleaseMetadata
 
 	GetPackageURIs() ([]string, error)
 	AddPackageURI(uri string) error
