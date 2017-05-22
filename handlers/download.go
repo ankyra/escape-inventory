@@ -24,8 +24,9 @@ import (
 )
 
 func DownloadHandler(w http.ResponseWriter, r *http.Request) {
+	project := mux.Vars(r)["project"]
 	releaseId := mux.Vars(r)["release"]
-	reader, err := model.GetDownloadReadSeeker(releaseId)
+	reader, err := model.GetDownloadReadSeeker(project, releaseId)
 	if err != nil {
 		HandleError(w, r, err)
 		return

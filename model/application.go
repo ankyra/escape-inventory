@@ -22,8 +22,8 @@ import (
 	"strings"
 )
 
-func GetNextVersion(releaseIdString, prefix string) (string, error) {
-	latest, err := getLastVersionForPrefix(releaseIdString, prefix)
+func GetNextVersion(project, releaseIdString, prefix string) (string, error) {
+	latest, err := getLastVersionForPrefix(project, releaseIdString, prefix)
 	if err != nil {
 		if dao.IsNotFound(err) {
 			return prefix + "0", nil
@@ -37,12 +37,12 @@ func GetNextVersion(releaseIdString, prefix string) (string, error) {
 
 }
 
-func getLastVersionForPrefix(releaseIdString, prefix string) (*SemanticVersion, error) {
+func getLastVersionForPrefix(project, releaseIdString, prefix string) (*SemanticVersion, error) {
 	releaseId, err := parsers.ParseReleaseId(releaseIdString)
 	if err != nil {
 		return nil, NewUserError(err)
 	}
-	app, err := dao.GetApplication(releaseId.Name)
+	app, err := dao.GetApplication(project, releaseId.Name)
 	if err != nil {
 		return nil, NewUserError(err)
 	}

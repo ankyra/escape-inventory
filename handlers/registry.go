@@ -24,11 +24,12 @@ import (
 )
 
 func RegistryHandler(w http.ResponseWriter, r *http.Request) {
+	project := mux.Vars(r)["name"]
 	name := mux.Vars(r)["name"]
 	version := mux.Vars(r)["version"]
 	var bytes []byte
 	if version == "" {
-		result, err := model.Registry(name)
+		result, err := model.Registry(project, name)
 		if err != nil {
 			HandleError(w, r, err)
 			return
@@ -40,7 +41,7 @@ func RegistryHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	} else {
 		releaseId := name + "-v" + version
-		metadata, err := model.GetReleaseMetadata(releaseId)
+		metadata, err := model.GetReleaseMetadata(project, releaseId)
 		if err != nil {
 			HandleError(w, r, err)
 			return

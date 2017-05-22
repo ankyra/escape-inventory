@@ -24,19 +24,19 @@ import (
 )
 
 var ReadRoutes = map[string]http.HandlerFunc{
-	"/":                         HomeHandler,
-	"/apps/":                    handlers.RegistryHandler,
-	"/apps/{name}/":             handlers.RegistryHandler,
-	"/apps/{name}/{version}/":   handlers.RegistryHandler,
-	"/r/{release}/":             handlers.GetMetadataHandler,
-	"/r/{release}/download":     handlers.DownloadHandler,
-	"/r/{release}/next-version": handlers.NextVersionHandler,
-	"/export-releases":          handlers.ExportReleasesHandler,
+	"/":                                   HomeHandler,
+	"/p/{project}/":                       handlers.RegistryHandler,
+	"/p/{project}/{name}/":                handlers.RegistryHandler,
+	"/p/{project}/{name}/{version}/":      handlers.RegistryHandler,
+	"/p/{project}/{release}/next-version": handlers.NextVersionHandler,
+	"/p/{project}/{release}/download":     handlers.DownloadHandler,
+	"/p/{project}/{release}/":             handlers.GetMetadataHandler,
+	"/export-releases":                    handlers.ExportReleasesHandler,
 }
 
 var WriteRoutes = map[string]http.HandlerFunc{
-	"/r/": handlers.RegisterHandler,
-	"/r/{release}/upload": handlers.UploadHandler,
+	"/p/{project}/register": handlers.RegisterHandler,
+	"/p/{project}/{release}/upload": handlers.UploadHandler,
 	"/import-releases":    handlers.ImportReleasesHandler,
 }
 

@@ -26,23 +26,23 @@ type releaseSuite struct{}
 var _ = Suite(&releaseSuite{})
 
 func (s *releaseSuite) Test_AddRelease_Missing_Field_Name(c *C) {
-	err := AddRelease(`{"version": "0"}`)
+	err := AddRelease("_", `{"version": "0"}`)
 	c.Assert(err, Not(IsNil))
 }
 func (s *releaseSuite) Test_AddRelease_Missing_Field_Version(c *C) {
-	err := AddRelease(`{"name": "asdaiasd"}`)
+	err := AddRelease("_", `{"name": "asdaiasd"}`)
 	c.Assert(err, Not(IsNil))
 }
 
 func (s *releaseSuite) Test_AddRelease_GetMetadata(c *C) {
-	err := AddRelease(`{"name": "rel-test", "version": "0"}`)
+	err := AddRelease("_", `{"name": "rel-test", "version": "0"}`)
 	c.Assert(err, IsNil)
-	metadata, err := GetReleaseMetadata("rel-test-v0")
+	metadata, err := GetReleaseMetadata("_", "rel-test-v0")
 	c.Assert(err, IsNil)
 	c.Assert(metadata.GetReleaseId(), Equals, "rel-test-v0")
 }
 
 func (s *releaseSuite) Test_GetMetadataNotFound(c *C) {
-	_, err := GetReleaseMetadata("whatiojasdiofjasd-test-v0")
+	_, err := GetReleaseMetadata("_", "whatiojasdiofjasd-test-v0")
 	c.Assert(dao.IsNotFound(err), Equals, true)
 }

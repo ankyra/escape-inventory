@@ -26,7 +26,7 @@ import (
 	"log"
 )
 
-func UploadPackage(releaseId string, pkg io.ReadSeeker) error {
+func UploadPackage(project, releaseId string, pkg io.ReadSeeker) error {
 	parsed, err := parsers.ParseReleaseId(releaseId)
 	if err != nil {
 		return NewUserError(err)
@@ -34,7 +34,7 @@ func UploadPackage(releaseId string, pkg io.ReadSeeker) error {
 	if parsed.NeedsResolving() {
 		return NewUserError(fmt.Errorf("Can't upload package against unresolved version"))
 	}
-	release, err := dao.GetRelease(releaseId)
+	release, err := dao.GetRelease(project, releaseId)
 	if err != nil {
 		return NewUserError(err)
 	}
@@ -45,8 +45,8 @@ func UploadPackage(releaseId string, pkg io.ReadSeeker) error {
 	return release.AddPackageURI(uri)
 }
 
-func GetDownloadReadSeeker(releaseId string) (io.Reader, error) {
-	release, err := ResolveReleaseId(releaseId)
+func GetDownloadReadSeeker(project, releaseId string) (io.Reader, error) {
+	release, err := ResolveReleaseId(project, releaseId)
 	if err != nil {
 		return nil, err
 	}

@@ -33,7 +33,7 @@ func Import(releases []map[string]interface{}) error {
 		if err != nil {
 			return NewUserError(fmt.Errorf("Could not get metadata from JSON: %s", err.Error()))
 		}
-		releaseDAO, err := dao.AddRelease(metadata)
+		releaseDAO, err := dao.AddRelease("_", metadata)
 		if dao.IsAlreadyExists(err) {
 			continue
 		}

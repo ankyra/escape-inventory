@@ -23,8 +23,9 @@ import (
 )
 
 func GetMetadataHandler(w http.ResponseWriter, r *http.Request) {
+	project := mux.Vars(r)["project"]
 	releaseId := mux.Vars(r)["release"]
-	metadata, err := model.GetReleaseMetadata(releaseId)
+	metadata, err := model.GetReleaseMetadata(project, releaseId)
 	if err != nil {
 		HandleError(w, r, err)
 		return

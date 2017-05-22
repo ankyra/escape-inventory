@@ -18,17 +18,19 @@ package handlers
 
 import (
 	"github.com/ankyra/escape-registry/model"
+	"github.com/gorilla/mux"
 	"io/ioutil"
 	"net/http"
 )
 
 func RegisterHandler(w http.ResponseWriter, r *http.Request) {
+	project := mux.Vars(r)["project"]
 	metadata, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		HandleError(w, r, err)
 		return
 	}
-	if err := model.AddRelease(string(metadata)); err != nil {
+	if err := model.AddRelease(project, string(metadata)); err != nil {
 		HandleError(w, r, err)
 		return
 	}

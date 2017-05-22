@@ -25,7 +25,7 @@ import (
 	"strings"
 )
 
-func AddRelease(metadataJson string) error {
+func AddRelease(project, metadataJson string) error {
 	metadata, err := core.NewReleaseMetadataFromJsonString(metadataJson)
 	if err != nil {
 		return NewUserError(err)
@@ -38,43 +38,43 @@ func AddRelease(metadataJson string) error {
 	if parsed.NeedsResolving() {
 		return NewUserError(fmt.Errorf("Can't add release with unresolved version"))
 	}
-	release, err := dao.GetRelease(releaseId)
+	release, err := dao.GetRelease(project, releaseId)
 	if err != nil && !dao.IsNotFound(err) {
 		return err
 	}
 	if release != nil {
 		return NewUserError(fmt.Errorf("Release %s already exists", releaseId))
 	}
-	_, err = dao.AddRelease(metadata)
+	_, err = dao.AddRelease(project, metadata)
 	return err
 }
 
-func GetReleaseMetadata(releaseIdString string) (*core.ReleaseMetadata, error) {
-	release, err := ResolveReleaseId(releaseIdString)
+func GetReleaseMetadata(project, releaseIdString string) (*core.ReleaseMetadata, error) {
+	release, err := ResolveReleaseId(project, releaseIdString)
 	if err != nil {
 		return nil, err
 	}
 	return release.GetMetadata(), nil
 }
 
-func ResolveReleaseId(releaseIdString string) (ReleaseDAO, error) {
+func ResolveReleaseId(project, releaseIdString string) (ReleaseDAO, error) {
 	releaseId, err := parsers.ParseReleaseId(releaseIdString)
 	if err != nil {
 		return nil, NewUserError(err)
 	}
 	if releaseId.Version == "latest" {
-		version, err := getLastVersionForPrefix(releaseIdString, "")
+		version, err := getLastVersionForPrefix(project, releaseIdString, "")
 		if err != nil {
 			return nil, NewUserError(err)
 		}
 		releaseId.Version = version.ToString()
 	} else if strings.HasSuffix(releaseId.Version, ".@") {
 		prefix := releaseId.Version[:len(releaseId.Version)-1]
-		version, err := getLastVersionForPrefix(releaseIdString, prefix)
+		version, err := getLastVersionForPrefix(project, releaseIdString, prefix)
 		if err != nil {
 			return nil, NewUserError(err)
 		}
 		releaseId.Version = prefix + version.ToString()
 	}
-	return dao.GetRelease(releaseId.ToString())
+	return dao.GetRelease(project, releaseId.ToString())
 }

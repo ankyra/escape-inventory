@@ -23,13 +23,14 @@ import (
 )
 
 func UploadHandler(w http.ResponseWriter, r *http.Request) {
+	project := mux.Vars(r)["project"]
 	releaseId := mux.Vars(r)["release"]
 	f, _, err := r.FormFile("file")
 	if err != nil {
 		HandleError(w, r, model.NewUserError(err))
 		return
 	}
-	if err := model.UploadPackage(releaseId, f); err != nil {
+	if err := model.UploadPackage(project, releaseId, f); err != nil {
 		HandleError(w, r, err)
 		return
 	}

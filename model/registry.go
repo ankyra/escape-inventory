@@ -20,10 +20,10 @@ import (
 	"github.com/ankyra/escape-registry/dao"
 )
 
-func Registry(name string) ([]string, error) {
+func Registry(project, name string) ([]string, error) {
 	if name == "" {
 		result := []string{}
-		apps, err := dao.GetApplications()
+		apps, err := dao.GetApplications(project)
 		if err != nil {
 			return nil, err
 		}
@@ -32,7 +32,7 @@ func Registry(name string) ([]string, error) {
 		}
 		return result, nil
 	}
-	app, err := dao.GetApplication(name)
+	app, err := dao.GetApplication(project, name)
 	if err != nil {
 		return nil, err
 	}

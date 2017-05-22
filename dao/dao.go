@@ -52,23 +52,25 @@ func LoadFromConfig(conf *config.Config) error {
 	return fmt.Errorf("Unknown database backend: %s", conf.Database)
 }
 
-func GetApplications() ([]ApplicationDAO, error) {
+func GetApplications(project string) ([]ApplicationDAO, error) {
 	return globalDAO.GetApplications()
 }
 
-func GetApplication(name string) (ApplicationDAO, error) {
+func GetApplication(project, name string) (ApplicationDAO, error) {
 	return globalDAO.GetApplication(name)
 }
 
-func GetRelease(releaseId string) (ReleaseDAO, error) {
+func GetRelease(project, releaseId string) (ReleaseDAO, error) {
 	return globalDAO.GetRelease(releaseId)
 }
-func GetAllReleases() ([]ReleaseDAO, error) {
-	return globalDAO.GetAllReleases()
+
+func AddRelease(project string, metadata *core.ReleaseMetadata) (ReleaseDAO, error) {
+	return globalDAO.AddRelease(metadata)
 }
 
-func AddRelease(metadata *core.ReleaseMetadata) (ReleaseDAO, error) {
-	return globalDAO.AddRelease(metadata)
+// TODO: Rename to export releases
+func GetAllReleases() ([]ReleaseDAO, error) {
+	return globalDAO.GetAllReleases()
 }
 
 func IsNotFound(err error) bool {

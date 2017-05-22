@@ -23,9 +23,10 @@ import (
 )
 
 func NextVersionHandler(w http.ResponseWriter, r *http.Request) {
+	project := mux.Vars(r)["project"]
 	releaseId := mux.Vars(r)["release"]
 	prefix := r.URL.Query().Get("prefix")
-	version, err := model.GetNextVersion(releaseId, prefix)
+	version, err := model.GetNextVersion(project, releaseId, prefix)
 	if err != nil {
 		HandleError(w, r, err)
 		return
