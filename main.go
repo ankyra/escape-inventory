@@ -23,29 +23,38 @@ import (
 	"net/http"
 )
 
-func getMux() *mux.Router {
-	r := mux.NewRouter()
-	getRouter := r.Methods("GET").Subrouter()
-	getRouter.HandleFunc("/", HomeHandler)
+var ReadRoutes = map[string]http.HandlerFunc{
+	"/":                         HomeHandler,
+	"/apps/":                    handlers.RegistryHandler,
+	"/apps/{name}/":             handlers.RegistryHandler,
+	"/apps/{name}/{version}/":   handlers.RegistryHandler,
+	"/r/{release}/":             handlers.GetMetadataHandler,
+	"/r/{release}/download":     handlers.DownloadHandler,
+	"/r/{release}/next-version": handlers.NextVersionHandler,
+	"/export-releases":          handlers.ExportReleasesHandler,
+}
 
-	getRouter.HandleFunc("/apps/", handlers.RegistryHandler)
-	getRouter.HandleFunc("/apps/{name}/", handlers.RegistryHandler)
-	getRouter.HandleFunc("/apps/{name}/{version}/", handlers.RegistryHandler)
-
-	getRouter.HandleFunc("/r/{release}/", handlers.GetMetadataHandler)
-	getRouter.HandleFunc("/r/{release}/download", handlers.DownloadHandler)
-	getRouter.HandleFunc("/r/{release}/next-version", handlers.NextVersionHandler)
-	getRouter.HandleFunc("/export-releases", handlers.ExportReleasesHandler)
-
-	postRouter := r.Methods("POST").Subrouter()
-	postRouter.HandleFunc("/r/", handlers.RegisterHandler)
-	postRouter.HandleFunc("/r/{release}/upload", handlers.UploadHandler)
-	postRouter.HandleFunc("/import-releases", handlers.ImportReleasesHandler)
-	return r
+var WriteRoutes = map[string]http.HandlerFunc{
+	"/r/": handlers.RegisterHandler,
+	"/r/{release}/upload": handlers.UploadHandler,
+	"/import-releases":    handlers.ImportReleasesHandler,
 }
 
 func HomeHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Escape Release Registry v" + cmd.RegistryVersion))
+}
+
+func getMux() *mux.Router {
+	r := mux.NewRouter()
+	getRouter := r.Methods("GET").Subrouter()
+	for url, handler := range ReadRoutes {
+		getRouter.HandleFunc(url, handler)
+	}
+	postRouter := r.Methods("POST").Subrouter()
+	for url, handler := range WriteRoutes {
+		postRouter.HandleFunc(url, handler)
+	}
+	return r
 }
 
 func main() {
