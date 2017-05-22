@@ -80,6 +80,4 @@ errands:
     - bucket
 
 templates:
-- file: metadata.go.tpl
-  mapping:
-    version: $this.version
+- cmd/metadata.go.tpl
