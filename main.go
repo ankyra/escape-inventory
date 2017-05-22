@@ -20,7 +20,6 @@ import (
 	"github.com/ankyra/escape-registry/cmd"
 	"github.com/ankyra/escape-registry/handlers"
 	"github.com/gorilla/mux"
-	"github.com/urfave/negroni"
 	"net/http"
 )
 
@@ -29,29 +28,19 @@ func getMux() *mux.Router {
 	getRouter := r.Methods("GET").Subrouter()
 	getRouter.HandleFunc("/", HomeHandler)
 
-	getRouter.Handle("/apps/", negroni.New(
-		negroni.Wrap(http.HandlerFunc(handlers.RegistryHandler))))
-	getRouter.Handle("/apps/{name}/", negroni.New(
-		negroni.Wrap(http.HandlerFunc(handlers.RegistryHandler))))
-	getRouter.Handle("/apps/{name}/{version}/", negroni.New(
-		negroni.Wrap(http.HandlerFunc(handlers.RegistryHandler))))
+	getRouter.HandleFunc("/apps/", handlers.RegistryHandler)
+	getRouter.HandleFunc("/apps/{name}/", handlers.RegistryHandler)
+	getRouter.HandleFunc("/apps/{name}/{version}/", handlers.RegistryHandler)
 
-	getRouter.Handle("/r/{release}/", negroni.New(
-		negroni.Wrap(http.HandlerFunc(handlers.GetMetadataHandler))))
-	getRouter.Handle("/r/{release}/download", negroni.New(
-		negroni.Wrap(http.HandlerFunc(handlers.DownloadHandler))))
-	getRouter.Handle("/r/{release}/next-version", negroni.New(
-		negroni.Wrap(http.HandlerFunc(handlers.NextVersionHandler))))
-	getRouter.Handle("/export-releases", negroni.New(
-		negroni.Wrap(http.HandlerFunc(handlers.ExportReleasesHandler))))
+	getRouter.HandleFunc("/r/{release}/", handlers.GetMetadataHandler)
+	getRouter.HandleFunc("/r/{release}/download", handlers.DownloadHandler)
+	getRouter.HandleFunc("/r/{release}/next-version", handlers.NextVersionHandler)
+	getRouter.HandleFunc("/export-releases", handlers.ExportReleasesHandler)
 
 	postRouter := r.Methods("POST").Subrouter()
-	postRouter.Handle("/r/", negroni.New(
-		negroni.Wrap(http.HandlerFunc(handlers.RegisterHandler)))).Methods("POST")
-	postRouter.Handle("/r/{release}/upload", negroni.New(
-		negroni.Wrap(http.HandlerFunc(handlers.UploadHandler))))
-	postRouter.Handle("/import-releases", negroni.New(
-		negroni.Wrap(http.HandlerFunc(handlers.ImportReleasesHandler))))
+	postRouter.HandleFunc("/r/", handlers.RegisterHandler)
+	postRouter.HandleFunc("/r/{release}/upload", handlers.UploadHandler)
+	postRouter.HandleFunc("/import-releases", handlers.ImportReleasesHandler)
 	return r
 }
 
