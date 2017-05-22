@@ -112,8 +112,7 @@ func getMux() *mux.Router {
 	return r
 }
 
-func getHandler() http.Handler {
-	router := getMux()
+func getHandler(router *mux.Router) http.Handler {
 	middleware := negroni.New()
 	recovery := negroni.NewRecovery()
 	recovery.PrintStack = false
@@ -123,16 +122,20 @@ func getHandler() http.Handler {
 	return middleware
 }
 
-func main() {
+func StartRegistry(router *mux.Router) {
 	fmt.Println(shared.EscapeLogo)
 	config := loadAndActivateConfig()
 
-	handler := getHandler()
+	handler := getHandler(router)
 	http.Handle("/", handler)
 
 	port := config.Port
 	log.Printf("INFO: Starting Escape Registry v%s on port %s\n", registryVersion, port)
 	log.Fatalln(http.ListenAndServe(":"+port, nil))
+}
+
+func main() {
+	StartRegistry(getMux())
 }
 
 func HomeHandler(w http.ResponseWriter, r *http.Request) {
