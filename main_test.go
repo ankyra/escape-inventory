@@ -64,6 +64,8 @@ const (
 
 	importEndpoint           = "/import"
 	importGetVersionEndpoint = "/a/_/my-app/v1/"
+	exportProject            = "export-prj"
+	exportEndpoint           = "/export"
 )
 
 func testRequest(c *C, req *http.Request, expectedStatus int) {
@@ -303,4 +305,29 @@ func (s *suite) Test_Import_fails_with_malformed_json(c *C) {
 		testRequest(c, req, 400)
 		rr = httptest.NewRecorder()
 	}
+}
+
+func (s *suite) Test_Export(c *C) {
+	s.addRelease(c, exportProject, "1")
+	s.addRelease(c, exportProject, "2")
+	req, _ := http.NewRequest("GET", exportEndpoint, nil)
+	testRequest(c, req, http.StatusOK)
+	result := []map[string]interface{}{}
+	err := json.Unmarshal([]byte(rr.Body.String()), &result)
+	c.Assert(err, IsNil)
+	c.Assert(result, HasLen, 2)
+	var first, second map[string]interface{}
+	for _, release := range result {
+		if release["version"].(string) == "1" {
+			first = release
+		}
+		if release["version"].(string) == "2" {
+			second = release
+		}
+	}
+	c.Assert(first, Not(IsNil))
+	c.Assert(second, Not(IsNil))
+	c.Assert(first["name"], DeepEquals, "my-app")
+	c.Assert(first["project"], DeepEquals, exportProject)
+	c.Assert(first["URI"], DeepEquals, []interface{}{})
 }
