@@ -24,7 +24,9 @@ import (
 
 func UploadHandler(w http.ResponseWriter, r *http.Request) {
 	project := mux.Vars(r)["project"]
-	releaseId := mux.Vars(r)["release"]
+	name := mux.Vars(r)["name"]
+	version := mux.Vars(r)["version"]
+	releaseId := name + "-" + version
 	f, _, err := r.FormFile("file")
 	if err != nil {
 		HandleError(w, r, model.NewUserError(err))

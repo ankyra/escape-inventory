@@ -25,19 +25,19 @@ import (
 
 var ReadRoutes = map[string]http.HandlerFunc{
 	"/":       HomeHandler,
-	"/export": handlers.ExportReleasesHandler, // untested
+	"/export": handlers.ExportReleasesHandler,
 
 	"/a/{project}/":                          handlers.RegistryHandler,
 	"/a/{project}/{name}/":                   handlers.RegistryHandler,
 	"/a/{project}/{name}/{version}/":         handlers.RegistryHandler,
-	"/a/{project}/{name}/{version}/download": handlers.DownloadHandler, // untested
+	"/a/{project}/{name}/{version}/download": handlers.DownloadHandler,
 	"/a/{project}/{name}/next-version":       handlers.NextVersionHandler,
 }
 
 var WriteRoutes = map[string]http.HandlerFunc{
 	"/a/{project}/register":                handlers.RegisterHandler,
-	"/a/{project}/{name}/{version}/upload": handlers.UploadHandler, // untested
-	"/import": handlers.ImportReleasesHandler, // untested
+	"/a/{project}/{name}/{version}/upload": handlers.UploadHandler,
+	"/import": handlers.ImportReleasesHandler,
 }
 
 func HomeHandler(w http.ResponseWriter, r *http.Request) {
