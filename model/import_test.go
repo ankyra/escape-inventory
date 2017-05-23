@@ -31,6 +31,7 @@ func (s *importSuite) Test_Import_Empty(c *C) {
 }
 
 func (s *importSuite) Test_Import(c *C) {
+	AddProject("_")
 	releases := []map[string]interface{}{
 		map[string]interface{}{
 			"name":    "import-test",
@@ -45,6 +46,7 @@ func (s *importSuite) Test_Import(c *C) {
 }
 
 func (s *importSuite) Test_Import_Ignore_Existing(c *C) {
+	AddProject("_")
 	releases := []map[string]interface{}{
 		map[string]interface{}{
 			"name":    "import-exists-test",

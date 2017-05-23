@@ -96,7 +96,7 @@ func (a *postgres_dao) GetApplication(project, name string) (ApplicationDAO, err
 	return nil, NotFound
 }
 
-func (a *postgres_dao) GetRelease(project, releaseId string) (ReleaseDAO, error) {
+func (a *postgres_dao) GetRelease(project, name, releaseId string) (ReleaseDAO, error) {
 	stmt, err := a.db.Prepare("SELECT metadata FROM release WHERE release_id = $1")
 	if err != nil {
 		return nil, err
@@ -148,4 +148,8 @@ func (a *postgres_dao) GetAllReleases() ([]ReleaseDAO, error) {
 func (a *postgres_dao) AddRelease(project string, release *core.ReleaseMetadata) (ReleaseDAO, error) {
 	releaseDao := newRelease(release, a)
 	return releaseDao.Save()
+}
+
+func (a *postgres_dao) AddProject(project string) error {
+	return nil
 }

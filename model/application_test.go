@@ -49,6 +49,7 @@ func (s *appSuite) Test_GetMaxFromVersions_Prefix_Matching(c *C) {
 }
 
 func (s *appSuite) Test_GetNextVersion(c *C) {
+	AddProject("_")
 	semver, err := GetNextVersion("_", "semver-test-latest", "")
 	c.Assert(err, IsNil)
 	c.Assert(semver, Equals, "0")
@@ -63,6 +64,7 @@ func (s *appSuite) Test_GetNextVersion(c *C) {
 }
 
 func (s *appSuite) Test_GetNextVersion_With_Prefix(c *C) {
+	AddProject("_")
 	semver, err := GetNextVersion("_", "semver2-test-latest", "")
 	c.Assert(err, IsNil)
 	c.Assert(semver, Equals, "0")

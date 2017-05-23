@@ -23,6 +23,7 @@ import (
 
 func ValidateDAO(dao func() DAO, c *C) {
 	Validate_AddRelease_Unique(dao(), c)
+	Validate_AddRelease_Unique_per_project(dao(), c)
 	Validate_GetRelease(dao(), c)
 	Validate_GetRelease_NotFound(dao(), c)
 	Validate_GetApplication(dao(), c)
@@ -34,16 +35,21 @@ func ValidateDAO(dao func() DAO, c *C) {
 	Validate_GetAllReleases(dao(), c)
 }
 
-func addRelease(dao DAO, c *C, name, version string) ReleaseDAO {
+func addReleaseToProject(dao DAO, c *C, name, version, project string) ReleaseDAO {
 	metadataJson := `{"name": "` + name + `", "version": "` + version + `"}`
 	metadata, err := core.NewReleaseMetadataFromJsonString(metadataJson)
 	c.Assert(err, IsNil)
-	result, err := dao.AddRelease("_", metadata)
+	result, err := dao.AddRelease(project, metadata)
 	c.Assert(err, IsNil)
 	return result
 }
 
+func addRelease(dao DAO, c *C, name, version string) ReleaseDAO {
+	return addReleaseToProject(dao, c, name, version, "_")
+}
+
 func Validate_AddRelease_Unique(dao DAO, c *C) {
+	dao.AddProject("_")
 	metadataJson := `{"name": "dao-val", "version": "1"}`
 	metadata, err := core.NewReleaseMetadataFromJsonString(metadataJson)
 	c.Assert(err, IsNil)
@@ -53,25 +59,42 @@ func Validate_AddRelease_Unique(dao DAO, c *C) {
 	c.Assert(err, Equals, AlreadyExists)
 }
 
-func Validate_GetRelease(dao DAO, c *C) {
+func Validate_AddRelease_Unique_per_project(dao DAO, c *C) {
+	dao.AddProject("_")
+	dao.AddProject("my-project")
 	metadataJson := `{"name": "dao-val", "version": "1"}`
 	metadata, err := core.NewReleaseMetadataFromJsonString(metadataJson)
 	c.Assert(err, IsNil)
 	_, err = dao.AddRelease("_", metadata)
 	c.Assert(err, IsNil)
-	release, err := dao.GetRelease("_", "dao-val-v1")
+	_, err = dao.AddRelease("my-project", metadata)
+	c.Assert(err, IsNil)
+}
+
+func Validate_GetRelease(dao DAO, c *C) {
+	dao.AddProject("_")
+	metadataJson := `{"name": "dao-val", "version": "1"}`
+	metadata, err := core.NewReleaseMetadataFromJsonString(metadataJson)
+	c.Assert(err, IsNil)
+	_, err = dao.AddRelease("_", metadata)
+	c.Assert(err, IsNil)
+	release, err := dao.GetRelease("_", "dao-val", "dao-val-v1")
 	c.Assert(err, IsNil)
 	c.Assert(release.GetVersion(), Equals, "1")
 	c.Assert(release.GetApplication().GetName(), Equals, "dao-val")
 	c.Assert(release.GetMetadata().GetVersion(), Equals, "1")
+	_, err = dao.GetRelease("other-project", "dao-val", "dao-val-v1")
+	c.Assert(err, Equals, NotFound)
 }
 
 func Validate_GetRelease_NotFound(dao DAO, c *C) {
-	_, err := dao.GetRelease("_", "archive-dao-val-v1")
+	dao.AddProject("_")
+	_, err := dao.GetRelease("_", "archive-dao-val", "archive-dao-val-v1")
 	c.Assert(err, Equals, NotFound)
 }
 
 func Validate_GetApplication(dao DAO, c *C) {
+	dao.AddProject("_")
 	_, err := dao.GetApplication("_", "dao-val")
 	c.Assert(err, Equals, NotFound)
 	addRelease(dao, c, "dao-val", "0.0.1")
@@ -81,6 +104,7 @@ func Validate_GetApplication(dao DAO, c *C) {
 }
 
 func Validate_GetApplications(dao DAO, c *C) {
+	dao.AddProject("_")
 	addRelease(dao, c, "archive-dao-archive", "0.1")
 	addRelease(dao, c, "ansible-dao-ansible", "0.1")
 	applications, err := dao.GetApplications("_")
@@ -102,6 +126,7 @@ func Validate_GetApplications(dao DAO, c *C) {
 }
 
 func Validate_FindAllVersions(dao DAO, c *C) {
+	dao.AddProject("_")
 	metadataJson := `{"name": "dao-val", "version": "0.0.1"}`
 	metadata, err := core.NewReleaseMetadataFromJsonString(metadataJson)
 	c.Assert(err, IsNil)
@@ -134,6 +159,7 @@ func Validate_FindAllVersions(dao DAO, c *C) {
 }
 
 func Validate_FindAllVersions_Empty(dao DAO, c *C) {
+	dao.AddProject("_")
 	addRelease(dao, c, "dao-val", "0.1")
 	app, err := dao.GetApplication("_", "dao-val")
 	c.Assert(err, IsNil)
@@ -142,6 +168,7 @@ func Validate_FindAllVersions_Empty(dao DAO, c *C) {
 	c.Assert(len(versions), Equals, 1)
 }
 func Validate_GetPackageURIs(dao DAO, c *C) {
+	dao.AddProject("_")
 	metadataJson := `{"name": "dao-val", "version": "1"}`
 	metadata, err := core.NewReleaseMetadataFromJsonString(metadataJson)
 	c.Assert(err, IsNil)
@@ -167,6 +194,7 @@ func Validate_GetPackageURIs(dao DAO, c *C) {
 }
 
 func Validate_AddPackageURI_Unique(dao DAO, c *C) {
+	dao.AddProject("_")
 	metadataJson := `{"name": "dao-val", "version": "1"}`
 	metadata, err := core.NewReleaseMetadataFromJsonString(metadataJson)
 	c.Assert(err, IsNil)
@@ -179,6 +207,7 @@ func Validate_AddPackageURI_Unique(dao DAO, c *C) {
 }
 
 func Validate_GetAllReleases(dao DAO, c *C) {
+	dao.AddProject("_")
 	addRelease(dao, c, "dao-val", "0.1")
 	addRelease(dao, c, "dao-val", "0.2")
 	releases, err := dao.GetAllReleases()

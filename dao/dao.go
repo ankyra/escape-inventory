@@ -60,12 +60,16 @@ func GetApplication(project, name string) (ApplicationDAO, error) {
 	return globalDAO.GetApplication(project, name)
 }
 
-func GetRelease(project, releaseId string) (ReleaseDAO, error) {
-	return globalDAO.GetRelease(project, releaseId)
+func GetRelease(project, name, releaseId string) (ReleaseDAO, error) {
+	return globalDAO.GetRelease(project, name, releaseId)
 }
 
 func AddRelease(project string, metadata *core.ReleaseMetadata) (ReleaseDAO, error) {
 	return globalDAO.AddRelease(project, metadata)
+}
+
+func AddProject(project string) error {
+	return globalDAO.AddProject(project)
 }
 
 // TODO: Rename to export releases

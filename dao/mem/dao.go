@@ -22,32 +22,45 @@ import (
 )
 
 type mem_dao struct {
-	applications []ApplicationDAO
-	releases     map[string]ReleaseDAO
+	projects map[string]map[string]ApplicationDAO
 }
 
 func NewInMemoryDAO() DAO {
 	return &mem_dao{
-		applications: []ApplicationDAO{},
-		releases:     map[string]ReleaseDAO{},
+		projects: map[string]map[string]ApplicationDAO{},
 	}
 }
 
 func (a *mem_dao) GetApplications(project string) ([]ApplicationDAO, error) {
-	return a.applications, nil
+	result := []ApplicationDAO{}
+	for _, app := range a.projects[project] {
+		result = append(result, app)
+	}
+	return result, nil
 }
 
 func (a *mem_dao) GetApplication(project, name string) (ApplicationDAO, error) {
-	for _, app := range a.applications {
-		if app.GetName() == name {
-			return app, nil
-		}
+	prj, ok := a.projects[project]
+	if !ok {
+		return nil, NotFound
 	}
-	return nil, NotFound
+	result, ok := prj[name]
+	if !ok {
+		return nil, NotFound
+	}
+	return result, nil
 }
 
-func (a *mem_dao) GetRelease(project, releaseId string) (ReleaseDAO, error) {
-	release, ok := a.releases[releaseId]
+func (a *mem_dao) GetRelease(project, name, releaseId string) (ReleaseDAO, error) {
+	prj, ok := a.projects[project]
+	if !ok {
+		return nil, NotFound
+	}
+	app, ok := prj[name]
+	if !ok {
+		return nil, NotFound
+	}
+	release, ok := app.(*mem_application).releases[releaseId]
 	if !ok {
 		return nil, NotFound
 	}
@@ -55,31 +68,41 @@ func (a *mem_dao) GetRelease(project, releaseId string) (ReleaseDAO, error) {
 }
 
 func (a *mem_dao) AddRelease(project string, release *core.ReleaseMetadata) (ReleaseDAO, error) {
+	apps, ok := a.projects[project]
+	if !ok {
+		return nil, NotFound
+	}
 	key := release.GetReleaseId()
-	_, alreadyExists := a.releases[key]
+	app, ok := apps[release.GetName()]
+	if !ok {
+		app = newApplication(release.GetName(), a)
+	}
+	application := app.(*mem_application)
+	_, alreadyExists := application.releases[key]
 	if alreadyExists {
 		return nil, AlreadyExists
 	}
-	var application *mem_application
-	name := release.GetName()
-	for _, app := range a.applications {
-		if app.GetName() == name {
-			application = app.(*mem_application)
-		}
-	}
-	if application == nil {
-		application = newApplication(name, a)
-		a.applications = append(a.applications, application)
-	}
-	a.releases[key] = newRelease(release, application)
-	application.releases[key] = a.releases[key]
-	return a.releases[key], nil
+	application.releases[key] = newRelease(release, application)
+	apps[release.GetName()] = app
+	return application.releases[key], nil
 }
 
 func (a *mem_dao) GetAllReleases() ([]ReleaseDAO, error) {
 	result := []ReleaseDAO{}
-	for _, rel := range a.releases {
-		result = append(result, rel)
+	for _, prj := range a.projects {
+		for _, app := range prj {
+			for _, rel := range app.(*mem_application).releases {
+				result = append(result, rel)
+			}
+		}
 	}
 	return result, nil
+}
+
+func (a *mem_dao) AddProject(project string) error {
+	if _, exists := a.projects[project]; exists {
+		return nil
+	}
+	a.projects[project] = map[string]ApplicationDAO{}
+	return nil
 }

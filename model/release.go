@@ -38,7 +38,7 @@ func AddRelease(project, metadataJson string) error {
 	if parsed.NeedsResolving() {
 		return NewUserError(fmt.Errorf("Can't add release with unresolved version"))
 	}
-	release, err := dao.GetRelease(project, releaseId)
+	release, err := dao.GetRelease(project, parsed.Name, releaseId)
 	if err != nil && !dao.IsNotFound(err) {
 		return err
 	}
@@ -76,5 +76,5 @@ func ResolveReleaseId(project, releaseIdString string) (ReleaseDAO, error) {
 		}
 		releaseId.Version = prefix + version.ToString()
 	}
-	return dao.GetRelease(project, releaseId.ToString())
+	return dao.GetRelease(project, releaseId.Name, releaseId.ToString())
 }

@@ -34,7 +34,7 @@ func UploadPackage(project, releaseId string, pkg io.ReadSeeker) error {
 	if parsed.NeedsResolving() {
 		return NewUserError(fmt.Errorf("Can't upload package against unresolved version"))
 	}
-	release, err := dao.GetRelease(project, releaseId)
+	release, err := dao.GetRelease(project, parsed.Name, releaseId)
 	if err != nil {
 		return NewUserError(err)
 	}
