@@ -66,6 +66,9 @@ const (
 	importGetVersionEndpoint = "/a/_/my-app/v1/"
 	exportProject            = "export-prj"
 	exportEndpoint           = "/export"
+
+	metricsEndpoint = "/metrics"
+	healthEndpoint  = "/health"
 )
 
 func testRequest(c *C, req *http.Request, expectedStatus int) {
@@ -330,4 +333,14 @@ func (s *suite) Test_Export(c *C) {
 	c.Assert(first["name"], DeepEquals, "my-app")
 	c.Assert(first["project"], DeepEquals, exportProject)
 	c.Assert(first["URI"], DeepEquals, []interface{}{})
+}
+
+func (s *suite) Test_Metrics(c *C) {
+	req, _ := http.NewRequest("GET", metricsEndpoint, nil)
+	testRequest(c, req, 200)
+}
+
+func (s *suite) Test_HealthCheck(c *C) {
+	req, _ := http.NewRequest("GET", healthEndpoint, nil)
+	testRequest(c, req, 200)
 }

@@ -20,12 +20,14 @@ import (
 	"github.com/ankyra/escape-registry/cmd"
 	"github.com/ankyra/escape-registry/handlers"
 	"github.com/gorilla/mux"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"net/http"
 )
 
 var ReadRoutes = map[string]http.HandlerFunc{
 	"/":       HomeHandler,
 	"/export": handlers.ExportReleasesHandler,
+	"/health": handlers.HealthCheckHandler,
 
 	"/a/{project}/":                          handlers.RegistryHandler,
 	"/a/{project}/{name}/":                   handlers.RegistryHandler,
@@ -54,6 +56,7 @@ func getMux() *mux.Router {
 	for url, handler := range WriteRoutes {
 		postRouter.HandleFunc(url, handler)
 	}
+	r.Handle("/metrics", promhttp.Handler())
 	return r
 }
 
