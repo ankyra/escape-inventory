@@ -56,6 +56,11 @@ const (
 
 	nextVersionProject  = "next-version-prj"
 	nextVersionEndpoint = "/a/" + nextVersionProject + "/my-app/next-version"
+
+	getVersionProject        = "get-version-prj"
+	getVersionEndpoint       = "/a/" + getVersionProject + "/my-app/v1/"
+	getLatestVersionEndpoint = "/a/" + getVersionProject + "/my-app/latest/"
+	getAutoVersionEndpoint   = "/a/" + getVersionProject + "/my-app/v0.0.@/"
 )
 
 func testRequest(c *C, req *http.Request, expectedStatus int) {
@@ -64,6 +69,7 @@ func testRequest(c *C, req *http.Request, expectedStatus int) {
 }
 
 func (s *suite) addRelease(c *C, project, version string) {
+	rr = httptest.NewRecorder()
 	body := bytes.NewReader([]byte(`{"name": "my-app", "version": "` + version + `"}`))
 	req, _ := http.NewRequest("POST", "/a/"+project+"/register", body)
 	testRequest(c, req, 200)
@@ -195,4 +201,75 @@ func (s *suite) Test_NextVersion_with_prefix(c *C) {
 	req, _ = http.NewRequest("GET", nextVersionEndpoint+"?prefix=0.0.", nil)
 	testRequest(c, req, http.StatusOK)
 	c.Assert(rr.Body.String(), Equals, `0.0.1`)
+}
+
+func (s *suite) Test_GetVersion(c *C) {
+	s.addRelease(c, getVersionProject, "1")
+	req, _ := http.NewRequest("GET", getVersionEndpoint, nil)
+	testRequest(c, req, http.StatusOK)
+	result := map[string]interface{}{}
+	err := json.Unmarshal([]byte(rr.Body.String()), &result)
+	c.Assert(err, IsNil)
+	c.Assert(result["name"], Equals, "my-app")
+	c.Assert(result["version"], Equals, "1")
+}
+
+func (s *suite) Test_GetVersion_Resolves_latest(c *C) {
+	s.addRelease(c, getVersionProject, "0.0.1")
+	s.addRelease(c, getVersionProject, "0.0.2")
+	req, _ := http.NewRequest("GET", getLatestVersionEndpoint, nil)
+	testRequest(c, req, http.StatusOK)
+	result := map[string]interface{}{}
+	err := json.Unmarshal([]byte(rr.Body.String()), &result)
+	c.Assert(err, IsNil)
+	c.Assert(result["name"], Equals, "my-app")
+	c.Assert(result["version"], Equals, "0.0.2")
+}
+
+func (s *suite) Test_GetVersion_Resolves_auto_version(c *C) {
+	s.addRelease(c, getVersionProject, "0.0.1")
+	s.addRelease(c, getVersionProject, "0.0.2")
+	req, _ := http.NewRequest("GET", getAutoVersionEndpoint, nil)
+	testRequest(c, req, http.StatusOK)
+	result := map[string]interface{}{}
+	err := json.Unmarshal([]byte(rr.Body.String()), &result)
+	c.Assert(err, IsNil)
+	c.Assert(result["name"], Equals, "my-app")
+	c.Assert(result["version"], Equals, "0.0.2")
+}
+
+func (s *suite) Test_GetVersion_fails_if_app_doesnt_exist(c *C) {
+	req, _ := http.NewRequest("GET", getVersionEndpoint, nil)
+	testRequest(c, req, 404)
+}
+
+func (s *suite) Test_GetVersion_fails_if_version_doesnt_exist(c *C) {
+	versions := []string{
+		"v1",
+		"v1.0",
+		"v100.100.100",
+		"latest",
+		"@",
+		"v@",
+		"v0.0.@",
+	}
+	for _, v := range versions {
+		req, _ := http.NewRequest("GET", "/a/"+getVersionProject+"/my-app/"+v+"/", nil)
+		testRequest(c, req, 404)
+		rr = httptest.NewRecorder()
+	}
+}
+
+func (s *suite) Test_GetVersion_fails_if_version_format_invalid(c *C) {
+	versions := []string{
+		"1",
+		"v12asdpokasdk",
+		"null",
+		"1.0",
+	}
+	for _, v := range versions {
+		req, _ := http.NewRequest("GET", "/a/"+getVersionProject+"/my-app/"+v+"/", nil)
+		testRequest(c, req, 400)
+		rr = httptest.NewRecorder()
+	}
 }

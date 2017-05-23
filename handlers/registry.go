@@ -40,7 +40,7 @@ func RegistryHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	} else {
-		releaseId := name + "-v" + version
+		releaseId := name + "-" + version
 		metadata, err := model.GetReleaseMetadata(project, releaseId)
 		if err != nil {
 			HandleError(w, r, err)
