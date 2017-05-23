@@ -24,7 +24,7 @@ import (
 )
 
 func RegistryHandler(w http.ResponseWriter, r *http.Request) {
-	project := mux.Vars(r)["name"]
+	project := mux.Vars(r)["project"]
 	name := mux.Vars(r)["name"]
 	version := mux.Vars(r)["version"]
 	var bytes []byte

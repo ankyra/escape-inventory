@@ -102,6 +102,7 @@ func Validate_GetApplications(dao DAO, c *C) {
 	addRelease(dao, c, "archive-dao-archive", "0.2")
 	addRelease(dao, c, "ansible-dao-ansible", "0.1")
 	addRelease(dao, c, "ansible-dao-ansible", "0.2")
+	addReleaseToProject(dao, c, "other-project", "0.3", "other-rpoject")
 	applications, err := dao.GetApplications("_")
 	c.Assert(err, IsNil)
 	var archive, ansible ApplicationDAO

@@ -17,6 +17,7 @@ limitations under the License.
 package handlers
 
 import (
+	"fmt"
 	"github.com/ankyra/escape-registry/model"
 	"github.com/gorilla/mux"
 	"io/ioutil"
@@ -25,6 +26,10 @@ import (
 
 func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	project := mux.Vars(r)["project"]
+	if r.Body == nil {
+		HandleError(w, r, model.NewUserError(fmt.Errorf("Empty body")))
+		return
+	}
 	metadata, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		HandleError(w, r, err)
@@ -34,4 +39,5 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		HandleError(w, r, err)
 		return
 	}
+	w.WriteHeader(200)
 }

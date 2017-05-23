@@ -80,7 +80,7 @@ func loadAndActivateConfig() *config.Config {
 	return conf
 }
 
-func getHandler(router *mux.Router) http.Handler {
+func GetHandler(router *mux.Router) http.Handler {
 	middleware := negroni.New()
 	recovery := negroni.NewRecovery()
 	recovery.PrintStack = false
@@ -94,7 +94,7 @@ func StartRegistry(router *mux.Router) {
 	fmt.Println(shared.EscapeLogo)
 	config := loadAndActivateConfig()
 
-	handler := getHandler(router)
+	handler := GetHandler(router)
 	http.Handle("/", handler)
 
 	port := config.Port

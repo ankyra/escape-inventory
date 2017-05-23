@@ -49,7 +49,6 @@ func (s *appSuite) Test_GetMaxFromVersions_Prefix_Matching(c *C) {
 }
 
 func (s *appSuite) Test_GetNextVersion(c *C) {
-	AddProject("_")
 	semver, err := GetNextVersion("_", "semver-test-latest", "")
 	c.Assert(err, IsNil)
 	c.Assert(semver, Equals, "0")
@@ -64,16 +63,36 @@ func (s *appSuite) Test_GetNextVersion(c *C) {
 }
 
 func (s *appSuite) Test_GetNextVersion_With_Prefix(c *C) {
-	AddProject("_")
 	semver, err := GetNextVersion("_", "semver2-test-latest", "")
 	c.Assert(err, IsNil)
 	c.Assert(semver, Equals, "0")
 
 	err = AddRelease("_", `{"name": "semver2-test", "version": "1"}`)
 	c.Assert(err, IsNil)
+	semver, err = GetNextVersion("_", "semver2-test-latest", "")
+	c.Assert(err, IsNil)
+	c.Assert(semver, Equals, "2")
 	err = AddRelease("_", `{"name": "semver2-test", "version": "0.1"}`)
 	c.Assert(err, IsNil)
 	semver, err = GetNextVersion("_", "semver2-test-latest", "0.")
 	c.Assert(err, IsNil)
 	c.Assert(semver, Equals, "0.2")
+}
+
+func (s *appSuite) Test_GetNextVersion_ignores_other_projects(c *C) {
+	semver, err := GetNextVersion("_", "semver3-test-latest", "")
+	c.Assert(err, IsNil)
+	c.Assert(semver, Equals, "0")
+
+	err = AddRelease("other-project", `{"name": "semver3-test", "version": "1"}`)
+	c.Assert(err, IsNil)
+	semver, err = GetNextVersion("_", "semver3-test-latest", "")
+	c.Assert(err, IsNil)
+	c.Assert(semver, Equals, "0")
+
+	err = AddRelease("_", `{"name": "semver3-test", "version": "1"}`)
+	c.Assert(err, IsNil)
+	semver, err = GetNextVersion("_", "semver3-test-latest", "")
+	c.Assert(err, IsNil)
+	c.Assert(semver, Equals, "2")
 }

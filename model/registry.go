@@ -18,6 +18,7 @@ package model
 
 import (
 	"github.com/ankyra/escape-registry/dao"
+	"github.com/ankyra/escape-registry/dao/types"
 )
 
 func Registry(project, name string) ([]string, error) {
@@ -30,11 +31,21 @@ func Registry(project, name string) ([]string, error) {
 		for _, app := range apps {
 			result = append(result, app.GetName())
 		}
+		if len(result) == 0 {
+			return nil, types.NotFound
+		}
 		return result, nil
 	}
 	app, err := dao.GetApplication(project, name)
 	if err != nil {
 		return nil, err
 	}
-	return app.FindAllVersions()
+	result, err := app.FindAllVersions()
+	if err != nil {
+		return nil, err
+	}
+	if len(result) == 0 {
+		return nil, types.NotFound
+	}
+	return result, nil
 }

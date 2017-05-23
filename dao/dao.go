@@ -51,6 +51,9 @@ func LoadFromConfig(conf *config.Config) error {
 	}
 	return fmt.Errorf("Unknown database backend: %s", conf.Database)
 }
+func TestSetup() {
+	globalDAO = mem.NewInMemoryDAO()
+}
 
 func GetApplications(project string) ([]ApplicationDAO, error) {
 	return globalDAO.GetApplications(project)
