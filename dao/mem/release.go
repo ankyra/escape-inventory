@@ -45,6 +45,10 @@ func (r *mem_release) GetVersion() string {
 	return r.version
 }
 
+func (r *mem_release) GetProject() string {
+	return r.application.project
+}
+
 func (r *mem_release) GetMetadata() *core.ReleaseMetadata {
 	return r.metadata
 }

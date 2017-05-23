@@ -31,7 +31,7 @@ func ImportReleasesHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	releasesList := []map[string]interface{}{}
 	if err := json.Unmarshal(releases, &releasesList); err != nil {
-		HandleError(w, r, err)
+		HandleError(w, r, model.NewUserError(err))
 		return
 	}
 	if err := model.Import(releasesList); err != nil {

@@ -37,6 +37,7 @@ type ApplicationDAO interface {
 type ReleaseDAO interface {
 	GetApplication() ApplicationDAO
 	GetVersion() string
+	GetProject() string
 	GetMetadata() *core.ReleaseMetadata
 
 	GetPackageURIs() ([]string, error)

@@ -61,6 +61,9 @@ const (
 	getVersionEndpoint       = "/a/" + getVersionProject + "/my-app/v1/"
 	getLatestVersionEndpoint = "/a/" + getVersionProject + "/my-app/latest/"
 	getAutoVersionEndpoint   = "/a/" + getVersionProject + "/my-app/v0.0.@/"
+
+	importEndpoint           = "/import"
+	importGetVersionEndpoint = "/a/_/my-app/v1/"
 )
 
 func testRequest(c *C, req *http.Request, expectedStatus int) {
@@ -269,6 +272,34 @@ func (s *suite) Test_GetVersion_fails_if_version_format_invalid(c *C) {
 	}
 	for _, v := range versions {
 		req, _ := http.NewRequest("GET", "/a/"+getVersionProject+"/my-app/"+v+"/", nil)
+		testRequest(c, req, 400)
+		rr = httptest.NewRecorder()
+	}
+}
+
+func (s *suite) Test_Import(c *C) {
+	body := bytes.NewReader([]byte(`[
+        {"name": "my-app", "version": "1", "project": "_"},
+        {"name": "my-app", "version": "1", "project": "ankyra"},
+        {"name": "my-app", "version": "2", "project": "ankyra"}
+    ]
+    `))
+	req, _ := http.NewRequest("POST", importEndpoint, body)
+	testRequest(c, req, 200)
+	rr = httptest.NewRecorder()
+	req, _ = http.NewRequest("GET", importGetVersionEndpoint, nil)
+	testRequest(c, req, http.StatusOK)
+}
+
+func (s *suite) Test_Import_fails_with_malformed_json(c *C) {
+	body := []string{
+		"{}",
+		"[{}]",
+		"12",
+		`"string"`,
+	}
+	for _, b := range body {
+		req, _ := http.NewRequest("POST", importEndpoint, bytes.NewReader([]byte(b)))
 		testRequest(c, req, 400)
 		rr = httptest.NewRecorder()
 	}

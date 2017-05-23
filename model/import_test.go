@@ -35,6 +35,7 @@ func (s *importSuite) Test_Import(c *C) {
 		map[string]interface{}{
 			"name":    "import-test",
 			"version": "1",
+			"project": "_",
 		},
 	}
 	err := Import(releases)
@@ -49,10 +50,12 @@ func (s *importSuite) Test_Import_Ignore_Existing(c *C) {
 		map[string]interface{}{
 			"name":    "import-exists-test",
 			"version": "1",
+			"project": "_",
 		},
 		map[string]interface{}{
 			"name":    "import-exists-test",
 			"version": "1",
+			"project": "_",
 		},
 	}
 	err := Import(releases)
@@ -60,4 +63,16 @@ func (s *importSuite) Test_Import_Ignore_Existing(c *C) {
 	metadata, err := GetReleaseMetadata("_", "import-exists-test-v1")
 	c.Assert(err, IsNil)
 	c.Assert(metadata.GetName(), Equals, "import-exists-test")
+}
+
+func (s *importSuite) Test_Import_fails_if_project_field_is_invalid(c *C) {
+	releases := []map[string]interface{}{
+		map[string]interface{}{
+			"name":    "import-test",
+			"version": "1",
+			"project": 12,
+		},
+	}
+	err := Import(releases)
+	c.Assert(err, Not(IsNil))
 }

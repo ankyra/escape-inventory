@@ -56,6 +56,10 @@ func (r *release_dao) GetMetadata() *core.ReleaseMetadata {
 	return r.metadata
 }
 
+func (r *release_dao) GetProject() string {
+	return r.project
+}
+
 func (r *release_dao) GetPackageURIs() ([]string, error) {
 	stmt, err := r.dao.db.Prepare("SELECT uri FROM package WHERE project = ? AND release_id = ?")
 	if err != nil {

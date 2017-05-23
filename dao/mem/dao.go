@@ -75,7 +75,7 @@ func (a *mem_dao) AddRelease(project string, release *core.ReleaseMetadata) (Rel
 	key := release.GetReleaseId()
 	app, ok := apps[release.GetName()]
 	if !ok {
-		app = newApplication(release.GetName(), a)
+		app = newApplication(project, release.GetName(), a)
 	}
 	application := app.(*mem_application)
 	_, alreadyExists := application.releases[key]

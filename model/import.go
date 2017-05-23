@@ -25,6 +25,14 @@ import (
 
 func Import(releases []map[string]interface{}) error {
 	for _, rel := range releases {
+		project_, ok := rel["project"]
+		if !ok {
+			return NewUserError(fmt.Errorf("Missing 'project' field in %v", rel))
+		}
+		project, ok := project_.(string)
+		if !ok {
+			return NewUserError(fmt.Errorf("Invalid 'project' field in %v", rel))
+		}
 		metadataJson, err := json.Marshal(rel)
 		if err != nil {
 			return NewUserError(fmt.Errorf("Could not parse JSON: %s", err.Error()))
@@ -33,7 +41,7 @@ func Import(releases []map[string]interface{}) error {
 		if err != nil {
 			return NewUserError(fmt.Errorf("Could not get metadata from JSON: %s", err.Error()))
 		}
-		releaseDAO, err := dao.AddRelease("_", metadata)
+		releaseDAO, err := dao.AddRelease(project, metadata)
 		if dao.IsAlreadyExists(err) {
 			continue
 		}

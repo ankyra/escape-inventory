@@ -37,6 +37,7 @@ func Export(w io.Writer) error {
 		if err != nil {
 			return err
 		}
+		metadata["project"] = r.GetProject()
 		metadata["URI"] = uris
 		result = append(result, metadata)
 	}
