@@ -20,7 +20,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/ankyra/escape-client/util"
+	"github.com/ankyra/escape-core/util"
 	"github.com/ankyra/escape-core/parsers"
 	"github.com/ankyra/escape-core/script"
 	"github.com/ankyra/escape-core/templates"
@@ -115,10 +115,28 @@ func validate(m *ReleaseMetadata) error {
 	if err := parsers.ValidateVersion(m.Version); err != nil {
 		return err
 	}
+	for _, i := range m.Inputs {
+		if err := i.Validate(); err != nil {
+			return err
+		}
+	}
+	for _, i := range m.Outputs {
+		if err := i.Validate(); err != nil {
+			return err
+		}
+	}
 	return nil
 }
 func (m *ReleaseMetadata) GetExtends() []string {
 	return m.Extends
+}
+func (m *ReleaseMetadata) AddExtension(releaseId string) {
+	for _, e := range m.Extends {
+		if e == releaseId {
+			return
+		}
+	}
+	m.Extends = append(m.Extends, releaseId)
 }
 func (m *ReleaseMetadata) GetStages() map[string]*ExecStage {
 	return m.Stages
@@ -228,9 +246,22 @@ func (m *ReleaseMetadata) GetVersionlessReleaseId() string {
 }
 
 func (m *ReleaseMetadata) AddInputVariable(input *variables.Variable) {
+	for _, i := range m.Inputs {
+		if i.GetId() == input.GetId() {
+			if !i.HasDefault() {
+				i.Default = input.Default
+			}
+			return
+		}
+	}
 	m.Inputs = append(m.Inputs, input)
 }
 func (m *ReleaseMetadata) AddOutputVariable(output *variables.Variable) {
+	for _, i := range m.Outputs {
+		if i.GetId() == output.GetId() {
+			return
+		}
+	}
 	m.Outputs = append(m.Outputs, output)
 }
 
@@ -301,7 +332,7 @@ func (m *ReleaseMetadata) ToScriptMap() map[string]script.Script {
 		"branch":      script.LiftString(m.GetBranch()),
 		"description": script.LiftString(m.GetDescription()),
 		"logo":        script.LiftString(m.GetLogo()),
-		"build":       script.LiftString(m.GetName()),
+		"name":        script.LiftString(m.GetName()),
 		"revision":    script.LiftString(m.GetRevision()),
 		"id":          script.LiftString(m.GetReleaseId()),
 		"version":     script.LiftString(m.GetVersion()),

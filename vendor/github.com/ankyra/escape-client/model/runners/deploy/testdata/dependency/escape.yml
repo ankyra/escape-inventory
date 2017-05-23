@@ -1,5 +1,0 @@
-name: dependency
-version: 0.0.1
-outputs:
-- id: output_variable
-  default: dependency output
