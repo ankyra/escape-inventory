@@ -17,13 +17,12 @@ limitations under the License.
 package model
 
 import (
-	"github.com/ankyra/escape-core/parsers"
 	"github.com/ankyra/escape-registry/dao"
 	"strings"
 )
 
-func GetNextVersion(project, releaseIdString, prefix string) (string, error) {
-	latest, err := getLastVersionForPrefix(project, releaseIdString, prefix)
+func GetNextVersion(project, app, prefix string) (string, error) {
+	latest, err := getLastVersionForPrefix(project, app, prefix)
 	if err != nil {
 		if dao.IsNotFound(err) {
 			return prefix + "0", nil
@@ -37,12 +36,8 @@ func GetNextVersion(project, releaseIdString, prefix string) (string, error) {
 
 }
 
-func getLastVersionForPrefix(project, releaseIdString, prefix string) (*SemanticVersion, error) {
-	releaseId, err := parsers.ParseReleaseId(releaseIdString)
-	if err != nil {
-		return nil, NewUserError(err)
-	}
-	app, err := dao.GetApplication(project, releaseId.Name)
+func getLastVersionForPrefix(project, appName, prefix string) (*SemanticVersion, error) {
+	app, err := dao.GetApplication(project, appName)
 	if err != nil {
 		return nil, NewUserError(err)
 	}

@@ -24,15 +24,15 @@ import (
 )
 
 var ReadRoutes = map[string]http.HandlerFunc{
-	"/":                              HomeHandler,
-	"/a/{project}/":                  handlers.RegistryHandler,
-	"/a/{project}/{name}/":           handlers.RegistryHandler,
-	"/a/{project}/{name}/{version}/": handlers.RegistryHandler,
+	"/":                                HomeHandler,
+	"/a/{project}/":                    handlers.RegistryHandler,
+	"/a/{project}/{name}/":             handlers.RegistryHandler,
+	"/a/{project}/{name}/{version}/":   handlers.RegistryHandler,
+	"/a/{project}/{name}/next-version": handlers.NextVersionHandler,
 
-	"/r/{project}/{release}/next-version": handlers.NextVersionHandler,
-	"/r/{project}/{release}/download":     handlers.DownloadHandler,
-	"/r/{project}/{release}/":             handlers.GetMetadataHandler,
-	"/export-releases":                    handlers.ExportReleasesHandler,
+	"/r/{project}/{release}/download": handlers.DownloadHandler,
+	"/r/{project}/{release}/":         handlers.GetMetadataHandler,
+	"/export-releases":                handlers.ExportReleasesHandler,
 }
 
 var WriteRoutes = map[string]http.HandlerFunc{

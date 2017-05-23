@@ -63,14 +63,14 @@ func ResolveReleaseId(project, releaseIdString string) (ReleaseDAO, error) {
 		return nil, NewUserError(err)
 	}
 	if releaseId.Version == "latest" {
-		version, err := getLastVersionForPrefix(project, releaseIdString, "")
+		version, err := getLastVersionForPrefix(project, releaseId.Name, "")
 		if err != nil {
 			return nil, NewUserError(err)
 		}
 		releaseId.Version = version.ToString()
 	} else if strings.HasSuffix(releaseId.Version, ".@") {
 		prefix := releaseId.Version[:len(releaseId.Version)-1]
-		version, err := getLastVersionForPrefix(project, releaseIdString, prefix)
+		version, err := getLastVersionForPrefix(project, releaseId.Name, prefix)
 		if err != nil {
 			return nil, NewUserError(err)
 		}

@@ -45,14 +45,17 @@ func (s *suite) SetUpTest(c *C) {
 const (
 	registerEndpoint = "/a/my-project/register"
 
-	applicationsTestProject       = "applications-test"
+	applicationsTestProject       = "applications-test-prj"
 	applicationsEndpoint          = "/a/" + applicationsTestProject + "/"
 	applicationsEndpointNoProject = "/a/doesnt-exist/"
 
-	applicationVersionsTestProject = "versions-test"
+	applicationVersionsTestProject = "versions-test-prj"
 	applicationVersionsEndpoint    = "/a/" + applicationVersionsTestProject + "/my-app/"
 	applicationVersionsNoProject   = "/a/doesnt-exist/my-app/"
 	applicationVersionsNoApp       = "/a/versions-test/doesnt-exist/"
+
+	nextVersionProject  = "next-version-prj"
+	nextVersionEndpoint = "/a/" + nextVersionProject + "/my-app/next-version"
 )
 
 func testRequest(c *C, req *http.Request, expectedStatus int) {
@@ -164,4 +167,32 @@ func (s *suite) Test_GetVersions_fails_if_app_not_found(c *C) {
 	rr = httptest.NewRecorder()
 	req, _ = http.NewRequest("GET", applicationVersionsNoProject, nil)
 	testRequest(c, req, 404)
+}
+
+func (s *suite) Test_NextVersion(c *C) {
+	req, _ := http.NewRequest("GET", nextVersionEndpoint, nil)
+	testRequest(c, req, http.StatusOK)
+	c.Assert(rr.Body.String(), Equals, `0`)
+
+	s.addRelease(c, nextVersionProject, "0")
+	req, _ = http.NewRequest("GET", nextVersionEndpoint, nil)
+	testRequest(c, req, http.StatusOK)
+	c.Assert(rr.Body.String(), Equals, `1`)
+
+	s.addRelease(c, nextVersionProject, "10")
+	req, _ = http.NewRequest("GET", nextVersionEndpoint, nil)
+	testRequest(c, req, http.StatusOK)
+	c.Assert(rr.Body.String(), Equals, `11`)
+}
+
+func (s *suite) Test_NextVersion_with_prefix(c *C) {
+	req, _ := http.NewRequest("GET", nextVersionEndpoint+"?prefix=0.0.", nil)
+	testRequest(c, req, http.StatusOK)
+	c.Assert(rr.Body.String(), Equals, `0.0.0`)
+
+	s.addRelease(c, nextVersionProject, "0.1.0")
+	s.addRelease(c, nextVersionProject, "0.0.0")
+	req, _ = http.NewRequest("GET", nextVersionEndpoint+"?prefix=0.0.", nil)
+	testRequest(c, req, http.StatusOK)
+	c.Assert(rr.Body.String(), Equals, `0.0.1`)
 }
