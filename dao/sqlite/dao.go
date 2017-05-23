@@ -21,7 +21,7 @@ import (
 	"fmt"
 	"github.com/ankyra/escape-core"
 	. "github.com/ankyra/escape-registry/dao/types"
-	_ "github.com/mattn/go-sqlite3"
+	sqlite3 "github.com/mattn/go-sqlite3"
 )
 
 type sql_dao struct {
@@ -55,6 +55,16 @@ func NewSQLiteDAO(path string) (DAO, error) {
 	if err != nil {
 		return nil, fmt.Errorf("Couldn't initialise SQLite storage backend '%s' [2]: %s", path, err.Error())
 	}
+	_, err = db.Exec(`
+        CREATE TABLE IF NOT EXISTS acl (
+            project string,
+            group_name string, 
+            permission varchar(1),
+            PRIMARY KEY(project, group_name)
+        )`)
+	if err != nil {
+		return nil, fmt.Errorf("Couldn't initialise SQLite storage backend '%s' [3]: %s", path, err.Error())
+	}
 	return &sql_dao{
 		db: db,
 	}, nil
@@ -65,6 +75,7 @@ func (a *sql_dao) GetApplications(project string) ([]ApplicationDAO, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer stmt.Close()
 	rows, err := stmt.Query(project)
 	if err != nil {
 		return nil, err
@@ -86,6 +97,7 @@ func (a *sql_dao) GetApplication(project, name string) (ApplicationDAO, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer stmt.Close()
 	rows, err := stmt.Query(project, name)
 	if err != nil {
 		return nil, err
@@ -102,6 +114,7 @@ func (a *sql_dao) GetRelease(project, name, releaseId string) (ReleaseDAO, error
 	if err != nil {
 		return nil, err
 	}
+	defer stmt.Close()
 	rows, err := stmt.Query(project, name, releaseId)
 	if err != nil {
 		return nil, err
@@ -127,6 +140,7 @@ func (a *sql_dao) GetAllReleases() ([]ReleaseDAO, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer stmt.Close()
 	rows, err := stmt.Query()
 	if err != nil {
 		return nil, err
@@ -149,4 +163,57 @@ func (a *sql_dao) GetAllReleases() ([]ReleaseDAO, error) {
 func (a *sql_dao) AddRelease(project string, release *core.ReleaseMetadata) (ReleaseDAO, error) {
 	releaseDao := newRelease(project, release, a)
 	return releaseDao.Save()
+}
+
+func (a *sql_dao) SetACL(project, group string, perm Permission) error {
+	stmt, err := a.db.Prepare(`INSERT INTO acl(project, group_name, permission) VALUES(?, ?, ?)`)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+	_, err = stmt.Exec(project, group, perm)
+	if err != nil {
+		if err.(sqlite3.Error).Code == sqlite3.ErrConstraint {
+			stmt, err := a.db.Prepare(`UPDATE acl SET permission = ? WHERE project = ? AND group_name = ?`)
+			if err != nil {
+				return err
+			}
+			_, err = stmt.Exec(project, group, perm)
+			return err
+		}
+		return err
+	}
+	return nil
+}
+
+func (a *sql_dao) DeleteACL(project, group string) error {
+	stmt, err := a.db.Prepare("DELETE FROM acl WHERE project = ? AND group_name = ?")
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+	_, err = stmt.Exec(project, group)
+	return err
+}
+
+func (a *sql_dao) GetPermittedGroups(project string, perm Permission) ([]string, error) {
+	result := []string{}
+	stmt, err := a.db.Prepare("SELECT group_name FROM acl WHERE project = ? AND (permission = ? OR permission = ?)")
+	if err != nil {
+		return nil, err
+	}
+	defer stmt.Close()
+	rows, err := stmt.Query(project, perm, ReadAndWritePermission)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var group string
+		if err := rows.Scan(&group); err != nil {
+			return nil, err
+		}
+		result = append(result, group)
+	}
+	return result, nil
 }

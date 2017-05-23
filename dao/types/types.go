@@ -21,12 +21,21 @@ import (
 	"github.com/ankyra/escape-core"
 )
 
+type Permission rune
+
+const ReadPermission = Permission('r')
+const WritePermission = Permission('w')
+const ReadAndWritePermission = Permission('A')
+
 type DAO interface {
 	GetApplications(project string) ([]ApplicationDAO, error)
 	GetApplication(project, name string) (ApplicationDAO, error)
 	GetRelease(project, name, releaseId string) (ReleaseDAO, error)
 	AddRelease(project string, metadata *core.ReleaseMetadata) (ReleaseDAO, error)
 	GetAllReleases() ([]ReleaseDAO, error)
+	SetACL(project, group string, perm Permission) error
+	DeleteACL(project, group string) error
+	GetPermittedGroups(project string, perm Permission) ([]string, error)
 }
 
 type ApplicationDAO interface {

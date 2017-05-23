@@ -23,11 +23,13 @@ import (
 
 type mem_dao struct {
 	projects map[string]map[string]ApplicationDAO
+	acls     map[string]map[string]Permission
 }
 
 func NewInMemoryDAO() DAO {
 	return &mem_dao{
 		projects: map[string]map[string]ApplicationDAO{},
+		acls:     map[string]map[string]Permission{},
 	}
 }
 
@@ -95,6 +97,37 @@ func (a *mem_dao) GetAllReleases() ([]ReleaseDAO, error) {
 			for _, rel := range app.(*mem_application).releases {
 				result = append(result, rel)
 			}
+		}
+	}
+	return result, nil
+}
+
+func (a *mem_dao) SetACL(project, group string, perm Permission) error {
+	groups, ok := a.acls[project]
+	if !ok {
+		groups = map[string]Permission{}
+	}
+	groups[group] = perm
+	a.acls[project] = groups
+	return nil
+}
+func (a *mem_dao) DeleteACL(project, group string) error {
+	groups, ok := a.acls[project]
+	if !ok {
+		return nil
+	}
+	delete(groups, group)
+	return nil
+}
+func (a *mem_dao) GetPermittedGroups(project string, perm Permission) ([]string, error) {
+	result := []string{}
+	groups, ok := a.acls[project]
+	if !ok {
+		return result, nil
+	}
+	for group, groupPerm := range groups {
+		if groupPerm == ReadAndWritePermission || perm == groupPerm {
+			result = append(result, group)
 		}
 	}
 	return result, nil

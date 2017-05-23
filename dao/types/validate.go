@@ -33,6 +33,7 @@ func ValidateDAO(dao func() DAO, c *C) {
 	Validate_GetPackageURIs(dao(), c)
 	Validate_AddPackageURI_Unique(dao(), c)
 	Validate_GetAllReleases(dao(), c)
+	Validate_ACL(dao(), c)
 }
 
 func addReleaseToProject(dao DAO, c *C, name, version, project string) ReleaseDAO {
@@ -204,4 +205,66 @@ func Validate_GetAllReleases(dao DAO, c *C) {
 	releases, err := dao.GetAllReleases()
 	c.Assert(err, IsNil)
 	c.Assert(releases, HasLen, 2)
+}
+
+func Validate_ACL(dao DAO, c *C) {
+	err := dao.SetACL("_", "*", ReadPermission)
+	c.Assert(err, IsNil)
+	err = dao.SetACL("_", "admin", ReadAndWritePermission)
+	c.Assert(err, IsNil)
+
+	groups, err := dao.GetPermittedGroups("_", ReadPermission)
+	c.Assert(err, IsNil)
+	c.Assert(groups, HasLen, 2)
+	c.Assert(groups, HasItem, "*")
+	c.Assert(groups, HasItem, "admin")
+
+	groups, err = dao.GetPermittedGroups("_", WritePermission)
+	c.Assert(err, IsNil)
+	c.Assert(groups, HasLen, 1)
+	c.Assert(groups, HasItem, "admin")
+
+	err = dao.DeleteACL("_", "*")
+	c.Assert(err, IsNil)
+
+	err = dao.DeleteACL("doesnt-exist", "*")
+	c.Assert(err, IsNil)
+
+	groups, err = dao.GetPermittedGroups("_", ReadPermission)
+	c.Assert(err, IsNil)
+	c.Assert(groups, HasLen, 1)
+	c.Assert(groups, DeepEquals, []string{"admin"})
+
+	groups, err = dao.GetPermittedGroups("doesnt-exist", ReadPermission)
+	c.Assert(err, IsNil)
+	c.Assert(groups, DeepEquals, []string{})
+}
+
+type hasItemChecker struct{}
+
+var HasItem = &hasItemChecker{}
+
+func (*hasItemChecker) Info() *CheckerInfo {
+	return &CheckerInfo{Name: "HasItem", Params: []string{"obtained", "expected to have item"}}
+}
+func (*hasItemChecker) Check(params []interface{}, names []string) (bool, string) {
+	obtained := params[0]
+	expectedItem := params[1]
+	switch obtained.(type) {
+	case []interface{}:
+		for _, v := range obtained.([]interface{}) {
+			if v == expectedItem {
+				return true, ""
+			}
+		}
+	case []string:
+		for _, v := range obtained.([]string) {
+			if v == expectedItem {
+				return true, ""
+			}
+		}
+	default:
+		return false, "Unexpected type."
+	}
+	return false, "Item not found"
 }

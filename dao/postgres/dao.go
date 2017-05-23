@@ -21,7 +21,7 @@ import (
 	"fmt"
 	"github.com/ankyra/escape-core"
 	. "github.com/ankyra/escape-registry/dao/types"
-	_ "github.com/lib/pq"
+	pq "github.com/lib/pq"
 )
 
 type postgres_dao struct {
@@ -51,6 +51,16 @@ func NewPostgresDAO(url string) (DAO, error) {
             release_id varchar(256), 
             uri varchar(256), 
             PRIMARY KEY(release_id, uri, project)
+        )`)
+	if err != nil {
+		return nil, fmt.Errorf("Couldn't initialise Postgres storage backend '%s' [2]: %s", url, err.Error())
+	}
+	_, err = db.Exec(`
+        CREATE TABLE IF NOT EXISTS acl (
+            project varchar(32),
+            group_name varchar(256),
+            permission varchar(1), 
+            PRIMARY KEY(project, group_name)
         )`)
 	if err != nil {
 		return nil, fmt.Errorf("Couldn't initialise Postgres storage backend '%s' [2]: %s", url, err.Error())
@@ -149,4 +159,54 @@ func (a *postgres_dao) GetAllReleases() ([]ReleaseDAO, error) {
 func (a *postgres_dao) AddRelease(project string, release *core.ReleaseMetadata) (ReleaseDAO, error) {
 	releaseDao := newRelease(project, release, a)
 	return releaseDao.Save()
+}
+func (a *postgres_dao) SetACL(project, group string, perm Permission) error {
+	stmt, err := a.db.Prepare(`INSERT INTO acl(project, group_name, permission) VALUES($1, $2, $3)`)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+	_, err = stmt.Exec(project, group, string(perm))
+	if err != nil {
+		if err.(*pq.Error).Code.Name() == "unique_violation" {
+			stmt, err := a.db.Prepare(`UPDATE acl SET permission = $1 WHERE project = $2 AND group_name = $3`)
+			if err != nil {
+				return err
+			}
+			_, err = stmt.Exec(project, group, string(perm))
+			return err
+		}
+		return err
+	}
+	return nil
+}
+func (a *postgres_dao) DeleteACL(project, group string) error {
+	stmt, err := a.db.Prepare("DELETE FROM acl WHERE project = $1 AND group_name = $2")
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+	_, err = stmt.Exec(project, group)
+	return err
+}
+func (a *postgres_dao) GetPermittedGroups(project string, perm Permission) ([]string, error) {
+	result := []string{}
+	stmt, err := a.db.Prepare("SELECT group_name FROM acl WHERE project = $1 AND (permission = $2 OR permission = $3)")
+	if err != nil {
+		return nil, err
+	}
+	defer stmt.Close()
+	rows, err := stmt.Query(project, string(perm), string(ReadAndWritePermission))
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var group string
+		if err := rows.Scan(&group); err != nil {
+			return nil, err
+		}
+		result = append(result, group)
+	}
+	return result, nil
 }
