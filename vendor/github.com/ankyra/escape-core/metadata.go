@@ -20,10 +20,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/ankyra/escape-core/util"
 	"github.com/ankyra/escape-core/parsers"
 	"github.com/ankyra/escape-core/script"
 	"github.com/ankyra/escape-core/templates"
+	"github.com/ankyra/escape-core/util"
 	"github.com/ankyra/escape-core/variables"
 	"io/ioutil"
 	"path/filepath"
@@ -88,10 +88,7 @@ func NewReleaseMetadataFromJsonString(content string) (*ReleaseMetadata, error) 
 	if err := json.Unmarshal([]byte(content), &result); err != nil {
 		return nil, fmt.Errorf("Couldn't unmarshal JSON release metadata: %s", err.Error())
 	}
-	if err := validate(result); err != nil {
-		return nil, err
-	}
-	return result, nil
+	return result, validate(result)
 }
 
 func NewReleaseMetadataFromFile(metadataFile string) (*ReleaseMetadata, error) {
@@ -106,6 +103,9 @@ func NewReleaseMetadataFromFile(metadataFile string) (*ReleaseMetadata, error) {
 }
 
 func validate(m *ReleaseMetadata) error {
+	if m == nil {
+		return fmt.Errorf("Missing release metadata")
+	}
 	if m.Name == "" {
 		return fmt.Errorf("Missing name field in release metadata")
 	}
