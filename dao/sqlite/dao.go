@@ -47,9 +47,10 @@ func NewSQLiteDAO(path string) (DAO, error) {
 	}
 	_, err = db.Exec(`
         CREATE TABLE IF NOT EXISTS package (
+            project string,
             release_id string, 
             uri string, 
-            PRIMARY KEY(release_id, uri)
+            PRIMARY KEY(project, release_id, uri)
         )`)
 	if err != nil {
 		return nil, fmt.Errorf("Couldn't initialise SQLite storage backend '%s' [2]: %s", path, err.Error())
@@ -60,11 +61,11 @@ func NewSQLiteDAO(path string) (DAO, error) {
 }
 
 func (a *sql_dao) GetApplications(project string) ([]ApplicationDAO, error) {
-	stmt, err := a.db.Prepare("SELECT name FROM release")
+	stmt, err := a.db.Prepare("SELECT DISTINCT(name) FROM release WHERE project = ?")
 	if err != nil {
 		return nil, err
 	}
-	rows, err := stmt.Query()
+	rows, err := stmt.Query(project)
 	if err != nil {
 		return nil, err
 	}
@@ -75,33 +76,33 @@ func (a *sql_dao) GetApplications(project string) ([]ApplicationDAO, error) {
 		if err := rows.Scan(&name); err != nil {
 			return nil, err
 		}
-		result = append(result, newApplicationDAO(name, a))
+		result = append(result, newApplicationDAO(project, name, a))
 	}
 	return result, nil
 }
 
 func (a *sql_dao) GetApplication(project, name string) (ApplicationDAO, error) {
-	stmt, err := a.db.Prepare("SELECT name FROM release WHERE name = ?")
+	stmt, err := a.db.Prepare("SELECT name FROM release WHERE project = ? AND name = ?")
 	if err != nil {
 		return nil, err
 	}
-	rows, err := stmt.Query(name)
+	rows, err := stmt.Query(project, name)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 	for rows.Next() {
-		return newApplicationDAO(name, a), nil
+		return newApplicationDAO(project, name, a), nil
 	}
 	return nil, NotFound
 }
 
 func (a *sql_dao) GetRelease(project, name, releaseId string) (ReleaseDAO, error) {
-	stmt, err := a.db.Prepare("SELECT metadata FROM release WHERE release_id = ?")
+	stmt, err := a.db.Prepare("SELECT metadata FROM release WHERE project = ? AND name = ? AND release_id = ?")
 	if err != nil {
 		return nil, err
 	}
-	rows, err := stmt.Query(releaseId)
+	rows, err := stmt.Query(project, name, releaseId)
 	if err != nil {
 		return nil, err
 	}
@@ -115,14 +116,14 @@ func (a *sql_dao) GetRelease(project, name, releaseId string) (ReleaseDAO, error
 		if err != nil {
 			return nil, err
 		}
-		return newRelease(metadata, a), nil
+		return newRelease(project, metadata, a), nil
 	}
 	return nil, NotFound
 }
 
 func (a *sql_dao) GetAllReleases() ([]ReleaseDAO, error) {
 	result := []ReleaseDAO{}
-	stmt, err := a.db.Prepare("SELECT metadata FROM release")
+	stmt, err := a.db.Prepare("SELECT project, metadata FROM release")
 	if err != nil {
 		return nil, err
 	}
@@ -132,24 +133,20 @@ func (a *sql_dao) GetAllReleases() ([]ReleaseDAO, error) {
 	}
 	defer rows.Close()
 	for rows.Next() {
-		var metadataJson string
-		if err := rows.Scan(&metadataJson); err != nil {
+		var project, metadataJson string
+		if err := rows.Scan(&project, &metadataJson); err != nil {
 			return nil, err
 		}
 		metadata, err := core.NewReleaseMetadataFromJsonString(metadataJson)
 		if err != nil {
 			return nil, err
 		}
-		result = append(result, newRelease(metadata, a))
+		result = append(result, newRelease(project, metadata, a))
 	}
 	return result, nil
 }
 
 func (a *sql_dao) AddRelease(project string, release *core.ReleaseMetadata) (ReleaseDAO, error) {
-	releaseDao := newRelease(release, a)
+	releaseDao := newRelease(project, release, a)
 	return releaseDao.Save()
-}
-
-func (a *sql_dao) AddProject(project string) error {
-	return nil
 }

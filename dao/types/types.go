@@ -22,7 +22,6 @@ import (
 )
 
 type DAO interface {
-	AddProject(project string) error
 	GetApplications(project string) ([]ApplicationDAO, error)
 	GetApplication(project, name string) (ApplicationDAO, error)
 	GetRelease(project, name, releaseId string) (ReleaseDAO, error)

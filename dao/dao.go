@@ -68,10 +68,6 @@ func AddRelease(project string, metadata *core.ReleaseMetadata) (ReleaseDAO, err
 	return globalDAO.AddRelease(project, metadata)
 }
 
-func AddProject(project string) error {
-	return globalDAO.AddProject(project)
-}
-
 // TODO: Rename to export releases
 func GetAllReleases() ([]ReleaseDAO, error) {
 	return globalDAO.GetAllReleases()

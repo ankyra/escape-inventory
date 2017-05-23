@@ -149,7 +149,3 @@ func (a *postgres_dao) AddRelease(project string, release *core.ReleaseMetadata)
 	releaseDao := newRelease(release, a)
 	return releaseDao.Save()
 }
-
-func (a *postgres_dao) AddProject(project string) error {
-	return nil
-}

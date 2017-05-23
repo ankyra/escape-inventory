@@ -26,20 +26,23 @@ type release_dao struct {
 	dao       *sql_dao
 	releaseId string
 	version   string
+	project   string
 	metadata  *core.ReleaseMetadata
 }
 
-func newRelease(release *core.ReleaseMetadata, dao *sql_dao) *release_dao {
+func newRelease(project string, release *core.ReleaseMetadata, dao *sql_dao) *release_dao {
 	return &release_dao{
 		dao:       dao,
 		releaseId: release.GetReleaseId(),
 		version:   release.GetVersion(),
 		metadata:  release,
+		project:   project,
 	}
 }
 
 func (r *release_dao) GetApplication() ApplicationDAO {
 	return newApplicationDAO(
+		r.project,
 		r.metadata.GetName(),
 		r.dao,
 	)
@@ -54,11 +57,11 @@ func (r *release_dao) GetMetadata() *core.ReleaseMetadata {
 }
 
 func (r *release_dao) GetPackageURIs() ([]string, error) {
-	stmt, err := r.dao.db.Prepare("SELECT uri FROM package WHERE release_id = ?")
+	stmt, err := r.dao.db.Prepare("SELECT uri FROM package WHERE project = ? AND release_id = ?")
 	if err != nil {
 		return nil, err
 	}
-	rows, err := stmt.Query(r.releaseId)
+	rows, err := stmt.Query(r.project, r.releaseId)
 	if err != nil {
 		return nil, err
 	}
@@ -75,11 +78,11 @@ func (r *release_dao) GetPackageURIs() ([]string, error) {
 }
 
 func (r *release_dao) AddPackageURI(uri string) error {
-	stmt, err := r.dao.db.Prepare("INSERT INTO package (release_id, uri) VALUES (?, ?)")
+	stmt, err := r.dao.db.Prepare("INSERT INTO package (project, release_id, uri) VALUES (?, ?, ?)")
 	if err != nil {
 		return err
 	}
-	_, err = stmt.Exec(r.releaseId, uri)
+	_, err = stmt.Exec(r.project, r.releaseId, uri)
 	if err != nil {
 		if err.(sqlite3.Error).Code == sqlite3.ErrConstraint {
 			return AlreadyExists
@@ -95,9 +98,8 @@ func (r *release_dao) Save() (ReleaseDAO, error) {
 	if err != nil {
 		return nil, err
 	}
-	project := ""
 	name := r.metadata.GetName()
-	_, err = stmt.Exec(project, name, r.releaseId, r.version, r.metadata.ToJson())
+	_, err = stmt.Exec(r.project, name, r.releaseId, r.version, r.metadata.ToJson())
 	if err != nil {
 		if err.(sqlite3.Error).Code == sqlite3.ErrConstraint {
 			return nil, AlreadyExists

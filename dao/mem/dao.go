@@ -70,7 +70,7 @@ func (a *mem_dao) GetRelease(project, name, releaseId string) (ReleaseDAO, error
 func (a *mem_dao) AddRelease(project string, release *core.ReleaseMetadata) (ReleaseDAO, error) {
 	apps, ok := a.projects[project]
 	if !ok {
-		return nil, NotFound
+		apps = map[string]ApplicationDAO{}
 	}
 	key := release.GetReleaseId()
 	app, ok := apps[release.GetName()]
@@ -84,6 +84,7 @@ func (a *mem_dao) AddRelease(project string, release *core.ReleaseMetadata) (Rel
 	}
 	application.releases[key] = newRelease(release, application)
 	apps[release.GetName()] = app
+	a.projects[project] = apps
 	return application.releases[key], nil
 }
 
@@ -97,12 +98,4 @@ func (a *mem_dao) GetAllReleases() ([]ReleaseDAO, error) {
 		}
 	}
 	return result, nil
-}
-
-func (a *mem_dao) AddProject(project string) error {
-	if _, exists := a.projects[project]; exists {
-		return nil
-	}
-	a.projects[project] = map[string]ApplicationDAO{}
-	return nil
 }
