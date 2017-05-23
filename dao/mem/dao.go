@@ -33,11 +33,11 @@ func NewInMemoryDAO() DAO {
 	}
 }
 
-func (a *mem_dao) GetApplications() ([]ApplicationDAO, error) {
+func (a *mem_dao) GetApplications(project string) ([]ApplicationDAO, error) {
 	return a.applications, nil
 }
 
-func (a *mem_dao) GetApplication(name string) (ApplicationDAO, error) {
+func (a *mem_dao) GetApplication(project, name string) (ApplicationDAO, error) {
 	for _, app := range a.applications {
 		if app.GetName() == name {
 			return app, nil
@@ -46,7 +46,7 @@ func (a *mem_dao) GetApplication(name string) (ApplicationDAO, error) {
 	return nil, NotFound
 }
 
-func (a *mem_dao) GetRelease(releaseId string) (ReleaseDAO, error) {
+func (a *mem_dao) GetRelease(project, releaseId string) (ReleaseDAO, error) {
 	release, ok := a.releases[releaseId]
 	if !ok {
 		return nil, NotFound
@@ -54,15 +54,7 @@ func (a *mem_dao) GetRelease(releaseId string) (ReleaseDAO, error) {
 	return release, nil
 }
 
-func (a *mem_dao) GetAllReleases() ([]ReleaseDAO, error) {
-	result := []ReleaseDAO{}
-	for _, rel := range a.releases {
-		result = append(result, rel)
-	}
-	return result, nil
-}
-
-func (a *mem_dao) AddRelease(release *core.ReleaseMetadata) (ReleaseDAO, error) {
+func (a *mem_dao) AddRelease(project string, release *core.ReleaseMetadata) (ReleaseDAO, error) {
 	key := release.GetReleaseId()
 	_, alreadyExists := a.releases[key]
 	if alreadyExists {
@@ -82,4 +74,12 @@ func (a *mem_dao) AddRelease(release *core.ReleaseMetadata) (ReleaseDAO, error) 
 	a.releases[key] = newRelease(release, application)
 	application.releases[key] = a.releases[key]
 	return a.releases[key], nil
+}
+
+func (a *mem_dao) GetAllReleases() ([]ReleaseDAO, error) {
+	result := []ReleaseDAO{}
+	for _, rel := range a.releases {
+		result = append(result, rel)
+	}
+	return result, nil
 }

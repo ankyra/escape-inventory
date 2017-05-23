@@ -59,7 +59,7 @@ func NewSQLiteDAO(path string) (DAO, error) {
 	}, nil
 }
 
-func (a *sql_dao) GetApplications() ([]ApplicationDAO, error) {
+func (a *sql_dao) GetApplications(project string) ([]ApplicationDAO, error) {
 	stmt, err := a.db.Prepare("SELECT name FROM release")
 	if err != nil {
 		return nil, err
@@ -80,7 +80,7 @@ func (a *sql_dao) GetApplications() ([]ApplicationDAO, error) {
 	return result, nil
 }
 
-func (a *sql_dao) GetApplication(name string) (ApplicationDAO, error) {
+func (a *sql_dao) GetApplication(project, name string) (ApplicationDAO, error) {
 	stmt, err := a.db.Prepare("SELECT name FROM release WHERE name = ?")
 	if err != nil {
 		return nil, err
@@ -96,7 +96,7 @@ func (a *sql_dao) GetApplication(name string) (ApplicationDAO, error) {
 	return nil, NotFound
 }
 
-func (a *sql_dao) GetRelease(releaseId string) (ReleaseDAO, error) {
+func (a *sql_dao) GetRelease(project, releaseId string) (ReleaseDAO, error) {
 	stmt, err := a.db.Prepare("SELECT metadata FROM release WHERE release_id = ?")
 	if err != nil {
 		return nil, err
@@ -145,7 +145,7 @@ func (a *sql_dao) GetAllReleases() ([]ReleaseDAO, error) {
 	return result, nil
 }
 
-func (a *sql_dao) AddRelease(release *core.ReleaseMetadata) (ReleaseDAO, error) {
+func (a *sql_dao) AddRelease(project string, release *core.ReleaseMetadata) (ReleaseDAO, error) {
 	releaseDao := newRelease(release, a)
 	return releaseDao.Save()
 }

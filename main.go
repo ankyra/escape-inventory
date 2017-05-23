@@ -35,9 +35,9 @@ var ReadRoutes = map[string]http.HandlerFunc{
 }
 
 var WriteRoutes = map[string]http.HandlerFunc{
-	"/p/{project}/register": handlers.RegisterHandler,
+	"/p/{project}/register":         handlers.RegisterHandler,
 	"/p/{project}/{release}/upload": handlers.UploadHandler,
-	"/import-releases":    handlers.ImportReleasesHandler,
+	"/import-releases":              handlers.ImportReleasesHandler,
 }
 
 func HomeHandler(w http.ResponseWriter, r *http.Request) {

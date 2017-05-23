@@ -22,11 +22,11 @@ import (
 )
 
 type DAO interface {
-	GetApplication(name string) (ApplicationDAO, error)
-	GetApplications() ([]ApplicationDAO, error)
-	GetRelease(releaseId string) (ReleaseDAO, error)
+	GetApplications(project string) ([]ApplicationDAO, error)
+	GetApplication(project, name string) (ApplicationDAO, error)
+	GetRelease(project, releaseId string) (ReleaseDAO, error)
+	AddRelease(project string, metadata *core.ReleaseMetadata) (ReleaseDAO, error)
 	GetAllReleases() ([]ReleaseDAO, error)
-	AddRelease(metadata *core.ReleaseMetadata) (ReleaseDAO, error)
 }
 
 type ApplicationDAO interface {

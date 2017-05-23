@@ -53,19 +53,19 @@ func LoadFromConfig(conf *config.Config) error {
 }
 
 func GetApplications(project string) ([]ApplicationDAO, error) {
-	return globalDAO.GetApplications()
+	return globalDAO.GetApplications(project)
 }
 
 func GetApplication(project, name string) (ApplicationDAO, error) {
-	return globalDAO.GetApplication(name)
+	return globalDAO.GetApplication(project, name)
 }
 
 func GetRelease(project, releaseId string) (ReleaseDAO, error) {
-	return globalDAO.GetRelease(releaseId)
+	return globalDAO.GetRelease(project, releaseId)
 }
 
 func AddRelease(project string, metadata *core.ReleaseMetadata) (ReleaseDAO, error) {
-	return globalDAO.AddRelease(metadata)
+	return globalDAO.AddRelease(project, metadata)
 }
 
 // TODO: Rename to export releases
