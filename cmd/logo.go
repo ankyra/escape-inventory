@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package shared
+package cmd
 
 const EscapeLogo = `Escape Registry v0
 Copyright(c) 2017 Ankyra Ltd

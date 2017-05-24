@@ -20,7 +20,6 @@ import (
 	"fmt"
 	"github.com/ankyra/escape-registry/config"
 	"github.com/ankyra/escape-registry/dao"
-	"github.com/ankyra/escape-registry/shared"
 	"github.com/ankyra/escape-registry/storage"
 	"github.com/gorilla/mux"
 	"github.com/urfave/negroni"
@@ -91,7 +90,7 @@ func GetHandler(router *mux.Router) http.Handler {
 }
 
 func StartRegistry(router *mux.Router) {
-	fmt.Println(shared.EscapeLogo)
+	fmt.Println(EscapeLogo)
 	config := loadAndActivateConfig()
 
 	handler := GetHandler(router)
