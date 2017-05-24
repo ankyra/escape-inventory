@@ -309,6 +309,10 @@ func (s *suite) Test_Import_fails_with_malformed_json(c *C) {
 		rr = httptest.NewRecorder()
 	}
 }
+func (s *suite) Test_Import_fails_with_empty_body(c *C) {
+	req, _ := http.NewRequest("POST", importEndpoint, nil)
+	testRequest(c, req, 400)
+}
 
 func (s *suite) Test_Export(c *C) {
 	s.addRelease(c, exportProject, "1")

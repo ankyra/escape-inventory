@@ -18,12 +18,17 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/ankyra/escape-registry/model"
 	"io/ioutil"
 	"net/http"
 )
 
 func ImportReleasesHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Body == nil {
+		HandleError(w, r, model.NewUserError(fmt.Errorf("Empty body")))
+		return
+	}
 	releases, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		HandleError(w, r, err)
