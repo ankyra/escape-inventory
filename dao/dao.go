@@ -70,6 +70,9 @@ func GetRelease(project, name, releaseId string) (ReleaseDAO, error) {
 func AddRelease(project string, metadata *core.ReleaseMetadata) (ReleaseDAO, error) {
 	return globalDAO.AddRelease(project, metadata)
 }
+func GetPermittedGroups(project string, perm Permission) ([]string, error) {
+	return globalDAO.GetPermittedGroups(project, perm)
+}
 
 // TODO: Rename to export releases
 func GetAllReleases() ([]ReleaseDAO, error) {
