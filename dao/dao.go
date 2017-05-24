@@ -70,8 +70,17 @@ func GetRelease(project, name, releaseId string) (ReleaseDAO, error) {
 func AddRelease(project string, metadata *core.ReleaseMetadata) (ReleaseDAO, error) {
 	return globalDAO.AddRelease(project, metadata)
 }
+
 func GetPermittedGroups(project string, perm Permission) ([]string, error) {
 	return globalDAO.GetPermittedGroups(project, perm)
+}
+
+func SetACL(project, group string, perm Permission) error {
+	return globalDAO.SetACL(project, group, perm)
+}
+
+func DeleteACL(project, group string) error {
+	return globalDAO.DeleteACL(project, group)
 }
 
 // TODO: Rename to export releases
