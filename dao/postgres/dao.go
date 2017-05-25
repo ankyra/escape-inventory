@@ -24,7 +24,7 @@ import (
 	pq "github.com/lib/pq"
 )
 
-type postgres_dao struct {
+type dao struct {
 	db *sql.DB
 }
 
@@ -65,12 +65,12 @@ func NewPostgresDAO(url string) (DAO, error) {
 	if err != nil {
 		return nil, fmt.Errorf("Couldn't initialise Postgres storage backend '%s' [2]: %s", url, err.Error())
 	}
-	return &postgres_dao{
+	return &dao{
 		db: db,
 	}, nil
 }
 
-func (a *postgres_dao) GetApplications(project string) ([]ApplicationDAO, error) {
+func (a *dao) GetApplications(project string) ([]*Application, error) {
 	stmt, err := a.db.Prepare("SELECT DISTINCT(name) FROM release WHERE project = $1")
 	if err != nil {
 		return nil, err
@@ -80,18 +80,18 @@ func (a *postgres_dao) GetApplications(project string) ([]ApplicationDAO, error)
 		return nil, err
 	}
 	defer rows.Close()
-	result := []ApplicationDAO{}
+	result := []*Application{}
 	for rows.Next() {
 		var name string
 		if err := rows.Scan(&name); err != nil {
 			return nil, err
 		}
-		result = append(result, newApplicationDAO(project, name, a))
+		result = append(result, NewApplication(project, name))
 	}
 	return result, nil
 }
 
-func (a *postgres_dao) GetApplication(project, name string) (ApplicationDAO, error) {
+func (a *dao) GetApplication(project, name string) (*Application, error) {
 	stmt, err := a.db.Prepare("SELECT name FROM release WHERE project = $1 AND name = $2")
 	if err != nil {
 		return nil, err
@@ -102,12 +102,33 @@ func (a *postgres_dao) GetApplication(project, name string) (ApplicationDAO, err
 	}
 	defer rows.Close()
 	for rows.Next() {
-		return newApplicationDAO(project, name, a), nil
+		return NewApplication(project, name), nil
 	}
 	return nil, NotFound
 }
 
-func (a *postgres_dao) GetRelease(project, name, releaseId string) (ReleaseDAO, error) {
+func (a *dao) FindAllVersions(app *Application) ([]string, error) {
+	stmt, err := a.db.Prepare("SELECT version FROM release WHERE project = $1 AND name = $2")
+	if err != nil {
+		return nil, err
+	}
+	rows, err := stmt.Query(app.Project, app.Name)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	result := []string{}
+	for rows.Next() {
+		var version string
+		if err := rows.Scan(&version); err != nil {
+			return nil, err
+		}
+		result = append(result, version)
+	}
+	return result, nil
+}
+
+func (a *dao) GetRelease(project, name, releaseId string) (*Release, error) {
 	stmt, err := a.db.Prepare("SELECT metadata FROM release WHERE project = $1 AND release_id = $2")
 	if err != nil {
 		return nil, err
@@ -126,13 +147,13 @@ func (a *postgres_dao) GetRelease(project, name, releaseId string) (ReleaseDAO, 
 		if err != nil {
 			return nil, err
 		}
-		return newRelease(project, metadata, a), nil
+		return NewRelease(NewApplication(project, name), metadata), nil
 	}
 	return nil, NotFound
 }
 
-func (a *postgres_dao) GetAllReleases() ([]ReleaseDAO, error) {
-	result := []ReleaseDAO{}
+func (a *dao) GetAllReleases() ([]*Release, error) {
+	result := []*Release{}
 	stmt, err := a.db.Prepare("SELECT project, metadata FROM release")
 	if err != nil {
 		return nil, err
@@ -151,16 +172,65 @@ func (a *postgres_dao) GetAllReleases() ([]ReleaseDAO, error) {
 		if err != nil {
 			return nil, err
 		}
-		result = append(result, newRelease(project, metadata, a))
+		result = append(result, NewRelease(NewApplication(project, metadata.GetName()), metadata))
 	}
 	return result, nil
 }
 
-func (a *postgres_dao) AddRelease(project string, release *core.ReleaseMetadata) (ReleaseDAO, error) {
-	releaseDao := newRelease(project, release, a)
-	return releaseDao.Save()
+func (a *dao) AddRelease(project string, release *core.ReleaseMetadata) (*Release, error) {
+	stmt, err := a.db.Prepare(`
+        INSERT INTO release(project, name, release_id, version, metadata) VALUES($1, $2, $3, $4, $5)`)
+	if err != nil {
+		return nil, err
+	}
+	name := release.GetName()
+	_, err = stmt.Exec(project, name, release.GetReleaseId(), release.GetVersion(), release.ToJson())
+	if err != nil {
+		if err.(*pq.Error).Code.Name() == "unique_violation" {
+			return nil, AlreadyExists
+		}
+		return nil, err
+	}
+	return NewRelease(NewApplication(project, release.GetName()), release), nil
 }
-func (a *postgres_dao) SetACL(project, group string, perm Permission) error {
+
+func (a *dao) GetPackageURIs(release *Release) ([]string, error) {
+	stmt, err := a.db.Prepare("SELECT uri FROM package WHERE project = $1 AND release_id = $2")
+	if err != nil {
+		return nil, err
+	}
+	rows, err := stmt.Query(release.Application.Project, release.ReleaseId)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	result := []string{}
+	for rows.Next() {
+		var uri string
+		if err := rows.Scan(&uri); err != nil {
+			return nil, err
+		}
+		result = append(result, uri)
+	}
+	return result, nil
+}
+
+func (a *dao) AddPackageURI(release *Release, uri string) error {
+	stmt, err := a.db.Prepare("INSERT INTO package (project, release_id, uri) VALUES ($1, $2, $3)")
+	if err != nil {
+		return err
+	}
+	_, err = stmt.Exec(release.Application.Project, release.ReleaseId, uri)
+	if err != nil {
+		if err.(*pq.Error).Code.Name() == "unique_violation" {
+			return AlreadyExists
+		}
+		return err
+	}
+	return nil
+}
+
+func (a *dao) SetACL(project, group string, perm Permission) error {
 	stmt, err := a.db.Prepare(`INSERT INTO acl(project, group_name, permission) VALUES($1, $2, $3)`)
 	if err != nil {
 		return err
@@ -180,7 +250,7 @@ func (a *postgres_dao) SetACL(project, group string, perm Permission) error {
 	}
 	return nil
 }
-func (a *postgres_dao) DeleteACL(project, group string) error {
+func (a *dao) DeleteACL(project, group string) error {
 	stmt, err := a.db.Prepare("DELETE FROM acl WHERE project = $1 AND group_name = $2")
 	if err != nil {
 		return err
@@ -189,7 +259,7 @@ func (a *postgres_dao) DeleteACL(project, group string) error {
 	_, err = stmt.Exec(project, group)
 	return err
 }
-func (a *postgres_dao) GetPermittedGroups(project string, perm Permission) ([]string, error) {
+func (a *dao) GetPermittedGroups(project string, perm Permission) ([]string, error) {
 	result := []string{}
 	stmt, err := a.db.Prepare("SELECT group_name FROM acl WHERE project = $1 AND (permission = $2 OR permission = $3)")
 	if err != nil {

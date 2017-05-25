@@ -55,19 +55,23 @@ func TestSetup() {
 	globalDAO = mem.NewInMemoryDAO()
 }
 
-func GetApplications(project string) ([]ApplicationDAO, error) {
+func GetApplications(project string) ([]*Application, error) {
 	return globalDAO.GetApplications(project)
 }
 
-func GetApplication(project, name string) (ApplicationDAO, error) {
+func GetApplication(project, name string) (*Application, error) {
 	return globalDAO.GetApplication(project, name)
 }
 
-func GetRelease(project, name, releaseId string) (ReleaseDAO, error) {
+func FindAllVersions(app *Application) ([]string, error) {
+	return globalDAO.FindAllVersions(app)
+}
+
+func GetRelease(project, name, releaseId string) (*Release, error) {
 	return globalDAO.GetRelease(project, name, releaseId)
 }
 
-func AddRelease(project string, metadata *core.ReleaseMetadata) (ReleaseDAO, error) {
+func AddRelease(project string, metadata *core.ReleaseMetadata) (*Release, error) {
 	return globalDAO.AddRelease(project, metadata)
 }
 
@@ -83,8 +87,16 @@ func DeleteACL(project, group string) error {
 	return globalDAO.DeleteACL(project, group)
 }
 
+func GetPackageURIs(r *Release) ([]string, error) {
+	return globalDAO.GetPackageURIs(r)
+}
+
+func AddPackageURI(r *Release, uri string) error {
+	return globalDAO.AddPackageURI(r, uri)
+}
+
 // TODO: Rename to export releases
-func GetAllReleases() ([]ReleaseDAO, error) {
+func GetAllReleases() ([]*Release, error) {
 	return globalDAO.GetAllReleases()
 }
 

@@ -21,27 +21,41 @@ import (
 	. "github.com/ankyra/escape-registry/dao/types"
 )
 
-type mem_dao struct {
-	projects map[string]map[string]ApplicationDAO
+type application struct {
+	App      *Application
+	Releases map[string]*release
+}
+
+type release struct {
+	Release  *Release
+	Packages []string
+}
+
+type dao struct {
+	projects map[string]map[string]*application
+	apps     map[*Application]*application
+	releases map[*Release]*release
 	acls     map[string]map[string]Permission
 }
 
 func NewInMemoryDAO() DAO {
-	return &mem_dao{
-		projects: map[string]map[string]ApplicationDAO{},
+	return &dao{
+		projects: map[string]map[string]*application{},
+		apps:     map[*Application]*application{},
+		releases: map[*Release]*release{},
 		acls:     map[string]map[string]Permission{},
 	}
 }
 
-func (a *mem_dao) GetApplications(project string) ([]ApplicationDAO, error) {
-	result := []ApplicationDAO{}
+func (a *dao) GetApplications(project string) ([]*Application, error) {
+	result := []*Application{}
 	for _, app := range a.projects[project] {
-		result = append(result, app)
+		result = append(result, app.App)
 	}
 	return result, nil
 }
 
-func (a *mem_dao) GetApplication(project, name string) (ApplicationDAO, error) {
+func (a *dao) GetApplication(project, name string) (*Application, error) {
 	prj, ok := a.projects[project]
 	if !ok {
 		return nil, NotFound
@@ -50,10 +64,22 @@ func (a *mem_dao) GetApplication(project, name string) (ApplicationDAO, error) {
 	if !ok {
 		return nil, NotFound
 	}
-	return result, nil
+	return result.App, nil
 }
 
-func (a *mem_dao) GetRelease(project, name, releaseId string) (ReleaseDAO, error) {
+func (a *dao) FindAllVersions(app *Application) ([]string, error) {
+	application := a.apps[app]
+	versions := []string{}
+	if application == nil {
+		return versions, nil
+	}
+	for _, r := range application.Releases {
+		versions = append(versions, r.Release.Version)
+	}
+	return versions, nil
+}
+
+func (a *dao) GetRelease(project, name, releaseId string) (*Release, error) {
 	prj, ok := a.projects[project]
 	if !ok {
 		return nil, NotFound
@@ -62,47 +88,71 @@ func (a *mem_dao) GetRelease(project, name, releaseId string) (ReleaseDAO, error
 	if !ok {
 		return nil, NotFound
 	}
-	release, ok := app.(*mem_application).releases[releaseId]
+	release, ok := app.Releases[releaseId]
 	if !ok {
 		return nil, NotFound
 	}
-	return release, nil
+	return release.Release, nil
 }
 
-func (a *mem_dao) AddRelease(project string, release *core.ReleaseMetadata) (ReleaseDAO, error) {
+func (a *dao) AddRelease(project string, rel *core.ReleaseMetadata) (*Release, error) {
 	apps, ok := a.projects[project]
 	if !ok {
-		apps = map[string]ApplicationDAO{}
+		apps = map[string]*application{}
 	}
-	key := release.GetReleaseId()
-	app, ok := apps[release.GetName()]
+	key := rel.GetReleaseId()
+	app, ok := apps[rel.GetName()]
 	if !ok {
-		app = newApplication(project, release.GetName(), a)
+		unwrapped, err := a.GetApplication(project, rel.GetName())
+		if err != nil {
+			unwrapped = NewApplication(project, rel.GetName())
+		}
+		app = &application{
+			App:      unwrapped,
+			Releases: map[string]*release{},
+		}
+		a.apps[unwrapped] = app
 	}
-	application := app.(*mem_application)
-	_, alreadyExists := application.releases[key]
+	_, alreadyExists := app.Releases[key]
 	if alreadyExists {
 		return nil, AlreadyExists
 	}
-	application.releases[key] = newRelease(release, application)
-	apps[release.GetName()] = app
+	newRelease := NewRelease(app.App, rel)
+	app.Releases[key] = &release{
+		Release:  newRelease,
+		Packages: []string{},
+	}
+	apps[rel.GetName()] = app
 	a.projects[project] = apps
-	return application.releases[key], nil
+	a.releases[newRelease] = app.Releases[key]
+	return app.Releases[key].Release, nil
 }
 
-func (a *mem_dao) GetAllReleases() ([]ReleaseDAO, error) {
-	result := []ReleaseDAO{}
-	for _, prj := range a.projects {
-		for _, app := range prj {
-			for _, rel := range app.(*mem_application).releases {
-				result = append(result, rel)
-			}
-		}
+func (a *dao) GetAllReleases() ([]*Release, error) {
+	result := []*Release{}
+	for _, rel := range a.releases {
+		result = append(result, rel.Release)
 	}
 	return result, nil
 }
 
-func (a *mem_dao) SetACL(project, group string, perm Permission) error {
+func (a *dao) GetPackageURIs(release *Release) ([]string, error) {
+	r := a.releases[release]
+	return r.Packages, nil
+}
+
+func (a *dao) AddPackageURI(release *Release, uri string) error {
+	r := a.releases[release]
+	for _, u := range r.Packages {
+		if u == uri {
+			return AlreadyExists
+		}
+	}
+	r.Packages = append(r.Packages, uri)
+	return nil
+}
+
+func (a *dao) SetACL(project, group string, perm Permission) error {
 	groups, ok := a.acls[project]
 	if !ok {
 		groups = map[string]Permission{}
@@ -111,7 +161,7 @@ func (a *mem_dao) SetACL(project, group string, perm Permission) error {
 	a.acls[project] = groups
 	return nil
 }
-func (a *mem_dao) DeleteACL(project, group string) error {
+func (a *dao) DeleteACL(project, group string) error {
 	groups, ok := a.acls[project]
 	if !ok {
 		return nil
@@ -119,7 +169,7 @@ func (a *mem_dao) DeleteACL(project, group string) error {
 	delete(groups, group)
 	return nil
 }
-func (a *mem_dao) GetPermittedGroups(project string, perm Permission) ([]string, error) {
+func (a *dao) GetPermittedGroups(project string, perm Permission) ([]string, error) {
 	result := []string{}
 	groups, ok := a.acls[project]
 	if !ok {

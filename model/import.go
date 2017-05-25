@@ -41,7 +41,7 @@ func Import(releases []map[string]interface{}) error {
 		if err != nil {
 			return NewUserError(fmt.Errorf("Could not get metadata from JSON: %s", err.Error()))
 		}
-		releaseDAO, err := dao.AddRelease(project, metadata)
+		release, err := dao.AddRelease(project, metadata)
 		if dao.IsAlreadyExists(err) {
 			continue
 		}
@@ -52,7 +52,7 @@ func Import(releases []map[string]interface{}) error {
 		if ok {
 			uriList := uris.([]interface{})
 			for _, uri := range uriList {
-				if err := releaseDAO.AddPackageURI(uri.(string)); err != nil {
+				if err := dao.AddPackageURI(release, uri.(string)); err != nil {
 					return err
 				}
 			}

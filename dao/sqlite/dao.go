@@ -24,7 +24,7 @@ import (
 	sqlite3 "github.com/mattn/go-sqlite3"
 )
 
-type sql_dao struct {
+type dao struct {
 	db *sql.DB
 }
 
@@ -65,12 +65,12 @@ func NewSQLiteDAO(path string) (DAO, error) {
 	if err != nil {
 		return nil, fmt.Errorf("Couldn't initialise SQLite storage backend '%s' [3]: %s", path, err.Error())
 	}
-	return &sql_dao{
+	return &dao{
 		db: db,
 	}, nil
 }
 
-func (a *sql_dao) GetApplications(project string) ([]ApplicationDAO, error) {
+func (a *dao) GetApplications(project string) ([]*Application, error) {
 	stmt, err := a.db.Prepare("SELECT DISTINCT(name) FROM release WHERE project = ?")
 	if err != nil {
 		return nil, err
@@ -81,18 +81,18 @@ func (a *sql_dao) GetApplications(project string) ([]ApplicationDAO, error) {
 		return nil, err
 	}
 	defer rows.Close()
-	result := []ApplicationDAO{}
+	result := []*Application{}
 	for rows.Next() {
 		var name string
 		if err := rows.Scan(&name); err != nil {
 			return nil, err
 		}
-		result = append(result, newApplicationDAO(project, name, a))
+		result = append(result, NewApplication(project, name))
 	}
 	return result, nil
 }
 
-func (a *sql_dao) GetApplication(project, name string) (ApplicationDAO, error) {
+func (a *dao) GetApplication(project, name string) (*Application, error) {
 	stmt, err := a.db.Prepare("SELECT name FROM release WHERE project = ? AND name = ?")
 	if err != nil {
 		return nil, err
@@ -104,12 +104,33 @@ func (a *sql_dao) GetApplication(project, name string) (ApplicationDAO, error) {
 	}
 	defer rows.Close()
 	for rows.Next() {
-		return newApplicationDAO(project, name, a), nil
+		return NewApplication(project, name), nil
 	}
 	return nil, NotFound
 }
 
-func (a *sql_dao) GetRelease(project, name, releaseId string) (ReleaseDAO, error) {
+func (a *dao) FindAllVersions(app *Application) ([]string, error) {
+	stmt, err := a.db.Prepare("SELECT version FROM release WHERE project = ? AND name = ?")
+	if err != nil {
+		return nil, err
+	}
+	rows, err := stmt.Query(app.Project, app.Name)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	result := []string{}
+	for rows.Next() {
+		var version string
+		if err := rows.Scan(&version); err != nil {
+			return nil, err
+		}
+		result = append(result, version)
+	}
+	return result, nil
+}
+
+func (a *dao) GetRelease(project, name, releaseId string) (*Release, error) {
 	stmt, err := a.db.Prepare("SELECT metadata FROM release WHERE project = ? AND name = ? AND release_id = ?")
 	if err != nil {
 		return nil, err
@@ -129,13 +150,13 @@ func (a *sql_dao) GetRelease(project, name, releaseId string) (ReleaseDAO, error
 		if err != nil {
 			return nil, err
 		}
-		return newRelease(project, metadata, a), nil
+		return NewRelease(NewApplication(project, name), metadata), nil
 	}
 	return nil, NotFound
 }
 
-func (a *sql_dao) GetAllReleases() ([]ReleaseDAO, error) {
-	result := []ReleaseDAO{}
+func (a *dao) GetAllReleases() ([]*Release, error) {
+	result := []*Release{}
 	stmt, err := a.db.Prepare("SELECT project, metadata FROM release")
 	if err != nil {
 		return nil, err
@@ -155,17 +176,65 @@ func (a *sql_dao) GetAllReleases() ([]ReleaseDAO, error) {
 		if err != nil {
 			return nil, err
 		}
-		result = append(result, newRelease(project, metadata, a))
+		result = append(result, NewRelease(NewApplication(project, metadata.GetName()), metadata))
 	}
 	return result, nil
 }
 
-func (a *sql_dao) AddRelease(project string, release *core.ReleaseMetadata) (ReleaseDAO, error) {
-	releaseDao := newRelease(project, release, a)
-	return releaseDao.Save()
+func (a *dao) AddRelease(project string, release *core.ReleaseMetadata) (*Release, error) {
+	stmt, err := a.db.Prepare(`
+        INSERT INTO release(project, name, release_id, version, metadata) VALUES(?, ?, ?, ?, ?)`)
+	if err != nil {
+		return nil, err
+	}
+	name := release.GetName()
+	_, err = stmt.Exec(project, name, release.GetReleaseId(), release.GetVersion(), release.ToJson())
+	if err != nil {
+		if err.(sqlite3.Error).Code == sqlite3.ErrConstraint {
+			return nil, AlreadyExists
+		}
+		return nil, err
+	}
+	return NewRelease(NewApplication(project, release.GetName()), release), nil
 }
 
-func (a *sql_dao) SetACL(project, group string, perm Permission) error {
+func (a *dao) GetPackageURIs(release *Release) ([]string, error) {
+	stmt, err := a.db.Prepare("SELECT uri FROM package WHERE project = ? AND release_id = ?")
+	if err != nil {
+		return nil, err
+	}
+	rows, err := stmt.Query(release.Application.Project, release.ReleaseId)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	result := []string{}
+	for rows.Next() {
+		var uri string
+		if err := rows.Scan(&uri); err != nil {
+			return nil, err
+		}
+		result = append(result, uri)
+	}
+	return result, nil
+}
+
+func (a *dao) AddPackageURI(release *Release, uri string) error {
+	stmt, err := a.db.Prepare("INSERT INTO package (project, release_id, uri) VALUES (?, ?, ?)")
+	if err != nil {
+		return err
+	}
+	_, err = stmt.Exec(release.Application.Project, release.ReleaseId, uri)
+	if err != nil {
+		if err.(sqlite3.Error).Code == sqlite3.ErrConstraint {
+			return AlreadyExists
+		}
+		return err
+	}
+	return nil
+}
+
+func (a *dao) SetACL(project, group string, perm Permission) error {
 	stmt, err := a.db.Prepare(`INSERT INTO acl(project, group_name, permission) VALUES(?, ?, ?)`)
 	if err != nil {
 		return err
@@ -186,7 +255,7 @@ func (a *sql_dao) SetACL(project, group string, perm Permission) error {
 	return nil
 }
 
-func (a *sql_dao) DeleteACL(project, group string) error {
+func (a *dao) DeleteACL(project, group string) error {
 	stmt, err := a.db.Prepare("DELETE FROM acl WHERE project = ? AND group_name = ?")
 	if err != nil {
 		return err
@@ -196,7 +265,7 @@ func (a *sql_dao) DeleteACL(project, group string) error {
 	return err
 }
 
-func (a *sql_dao) GetPermittedGroups(project string, perm Permission) ([]string, error) {
+func (a *dao) GetPermittedGroups(project string, perm Permission) ([]string, error) {
 	result := []string{}
 	stmt, err := a.db.Prepare("SELECT group_name FROM acl WHERE project = ? AND (permission = ? OR permission = ?)")
 	if err != nil {

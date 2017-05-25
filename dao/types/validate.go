@@ -36,7 +36,7 @@ func ValidateDAO(dao func() DAO, c *C) {
 	Validate_ACL(dao(), c)
 }
 
-func addReleaseToProject(dao DAO, c *C, name, version, project string) ReleaseDAO {
+func addReleaseToProject(dao DAO, c *C, name, version, project string) *Release {
 	metadataJson := `{"name": "` + name + `", "version": "` + version + `"}`
 	metadata, err := core.NewReleaseMetadataFromJsonString(metadataJson)
 	c.Assert(err, IsNil)
@@ -45,7 +45,7 @@ func addReleaseToProject(dao DAO, c *C, name, version, project string) ReleaseDA
 	return result
 }
 
-func addRelease(dao DAO, c *C, name, version string) ReleaseDAO {
+func addRelease(dao DAO, c *C, name, version string) *Release {
 	return addReleaseToProject(dao, c, name, version, "_")
 }
 
@@ -77,9 +77,9 @@ func Validate_GetRelease(dao DAO, c *C) {
 	c.Assert(err, IsNil)
 	release, err := dao.GetRelease("_", "dao-val", "dao-val-v1")
 	c.Assert(err, IsNil)
-	c.Assert(release.GetVersion(), Equals, "1")
-	c.Assert(release.GetApplication().GetName(), Equals, "dao-val")
-	c.Assert(release.GetMetadata().GetVersion(), Equals, "1")
+	c.Assert(release.Version, Equals, "1")
+	c.Assert(release.Application.Name, Equals, "dao-val")
+	c.Assert(release.Metadata.Version, Equals, "1")
 	_, err = dao.GetRelease("other-project", "dao-val", "dao-val-v1")
 	c.Assert(err, Equals, NotFound)
 }
@@ -95,7 +95,7 @@ func Validate_GetApplication(dao DAO, c *C) {
 	addRelease(dao, c, "dao-val", "0.0.1")
 	app, err := dao.GetApplication("_", "dao-val")
 	c.Assert(err, IsNil)
-	c.Assert(app.GetName(), Equals, "dao-val")
+	c.Assert(app.Name, Equals, "dao-val")
 }
 
 func Validate_GetApplications(dao DAO, c *C) {
@@ -106,11 +106,11 @@ func Validate_GetApplications(dao DAO, c *C) {
 	addReleaseToProject(dao, c, "other-project", "0.3", "other-rpoject")
 	applications, err := dao.GetApplications("_")
 	c.Assert(err, IsNil)
-	var archive, ansible ApplicationDAO
+	var archive, ansible *Application
 	for _, app := range applications {
-		if app.GetName() == "ansible-dao-ansible" {
+		if app.Name == "ansible-dao-ansible" {
 			ansible = app
-		} else if app.GetName() == "archive-dao-archive" {
+		} else if app.Name == "archive-dao-archive" {
 			archive = app
 		} else {
 			c.Fail()
@@ -119,8 +119,8 @@ func Validate_GetApplications(dao DAO, c *C) {
 	c.Assert(applications, HasLen, 2)
 	c.Assert(archive, Not(IsNil))
 	c.Assert(ansible, Not(IsNil))
-	c.Assert(archive.GetName(), Equals, "archive-dao-archive")
-	c.Assert(ansible.GetName(), Equals, "ansible-dao-ansible")
+	c.Assert(archive.Name, Equals, "archive-dao-archive")
+	c.Assert(ansible.Name, Equals, "ansible-dao-ansible")
 }
 
 func Validate_FindAllVersions(dao DAO, c *C) {
@@ -129,7 +129,7 @@ func Validate_FindAllVersions(dao DAO, c *C) {
 	addReleaseToProject(dao, c, "dao-val", "0.0.3", "other-project")
 	app, err := dao.GetApplication("_", "dao-val")
 	c.Assert(err, IsNil)
-	versions, err := app.FindAllVersions()
+	versions, err := dao.FindAllVersions(app)
 	c.Assert(err, IsNil)
 	c.Assert(len(versions), Equals, 2)
 	var firstFound, secondFound bool
@@ -150,7 +150,7 @@ func Validate_FindAllVersions_Empty(dao DAO, c *C) {
 	addRelease(dao, c, "dao-val", "0.1")
 	app, err := dao.GetApplication("_", "dao-val")
 	c.Assert(err, IsNil)
-	versions, err := app.FindAllVersions()
+	versions, err := dao.FindAllVersions(app)
 	c.Assert(err, IsNil)
 	c.Assert(len(versions), Equals, 1)
 }
@@ -158,15 +158,15 @@ func Validate_FindAllVersions_Empty(dao DAO, c *C) {
 func Validate_GetPackageURIs(dao DAO, c *C) {
 	release := addRelease(dao, c, "dao-val", "1")
 	_ = addReleaseToProject(dao, c, "dao-val", "1", "other-project")
-	err := release.AddPackageURI("file:///test.txt")
+	err := dao.AddPackageURI(release, "file:///test.txt")
 	c.Assert(err, IsNil)
-	err = release.AddPackageURI("gcs:///test.txt")
+	err = dao.AddPackageURI(release, "gcs:///test.txt")
 	c.Assert(err, IsNil)
 
 	release, err = dao.GetRelease("_", "dao-val", "dao-val-v1")
 	c.Assert(err, IsNil)
 
-	uris, err := release.GetPackageURIs()
+	uris, err := dao.GetPackageURIs(release)
 	c.Assert(err, IsNil)
 	var fileFound, gcsFound bool
 	for _, uri := range uris {
@@ -182,7 +182,7 @@ func Validate_GetPackageURIs(dao DAO, c *C) {
 
 	release, err = dao.GetRelease("other-project", "dao-val", "dao-val-v1")
 	c.Assert(err, IsNil)
-	uris, err = release.GetPackageURIs()
+	uris, err = dao.GetPackageURIs(release)
 	c.Assert(err, IsNil)
 	c.Assert(uris, HasLen, 0)
 }
@@ -193,9 +193,9 @@ func Validate_AddPackageURI_Unique(dao DAO, c *C) {
 	c.Assert(err, IsNil)
 	release, err := dao.AddRelease("_", metadata)
 	c.Assert(err, IsNil)
-	err = release.AddPackageURI("file:///test.txt")
+	err = dao.AddPackageURI(release, "file:///test.txt")
 	c.Assert(err, IsNil)
-	err = release.AddPackageURI("file:///test.txt")
+	err = dao.AddPackageURI(release, "file:///test.txt")
 	c.Assert(err, Equals, AlreadyExists)
 }
 

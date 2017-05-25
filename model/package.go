@@ -42,7 +42,7 @@ func UploadPackage(project, releaseId string, pkg io.ReadSeeker) error {
 	if err != nil {
 		return err
 	}
-	return release.AddPackageURI(uri)
+	return dao.AddPackageURI(release, uri)
 }
 
 func GetDownloadReadSeeker(project, releaseId string) (io.Reader, error) {
@@ -50,7 +50,7 @@ func GetDownloadReadSeeker(project, releaseId string) (io.Reader, error) {
 	if err != nil {
 		return nil, err
 	}
-	uris, err := release.GetPackageURIs()
+	uris, err := dao.GetPackageURIs(release)
 	if err != nil {
 		return nil, err
 	}

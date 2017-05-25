@@ -41,7 +41,7 @@ func getLastVersionForPrefix(project, appName, prefix string) (*SemanticVersion,
 	if err != nil {
 		return nil, NewUserError(err)
 	}
-	versions, err := app.FindAllVersions()
+	versions, err := dao.FindAllVersions(app)
 	if err != nil {
 		return nil, err
 	}

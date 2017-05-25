@@ -54,10 +54,10 @@ func GetReleaseMetadata(project, releaseIdString string) (*core.ReleaseMetadata,
 	if err != nil {
 		return nil, err
 	}
-	return release.GetMetadata(), nil
+	return release.Metadata, nil
 }
 
-func ResolveReleaseId(project, releaseIdString string) (ReleaseDAO, error) {
+func ResolveReleaseId(project, releaseIdString string) (*Release, error) {
 	releaseId, err := parsers.ParseReleaseId(releaseIdString)
 	if err != nil {
 		return nil, NewUserError(err)

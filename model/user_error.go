@@ -36,9 +36,6 @@ func (u UserError) Error() string {
 }
 
 func IsUserError(err error) bool {
-	switch err.(type) {
-	case UserError:
-		return true
-	}
-	return false
+	_, ok := err.(UserError)
+	return ok
 }

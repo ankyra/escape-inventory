@@ -29,15 +29,15 @@ func Export(w io.Writer) error {
 	}
 	result := []interface{}{}
 	for _, r := range releases {
-		metadata, err := r.GetMetadata().ToDict()
+		metadata, err := r.Metadata.ToDict()
 		if err != nil {
 			return err
 		}
-		uris, err := r.GetPackageURIs()
+		uris, err := dao.GetPackageURIs(r)
 		if err != nil {
 			return err
 		}
-		metadata["project"] = r.GetProject()
+		metadata["project"] = r.Application.Project
 		metadata["URI"] = uris
 		result = append(result, metadata)
 	}

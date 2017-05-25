@@ -29,7 +29,7 @@ func Registry(project, name string) ([]string, error) {
 			return nil, err
 		}
 		for _, app := range apps {
-			result = append(result, app.GetName())
+			result = append(result, app.Name)
 		}
 		if len(result) == 0 {
 			return nil, types.NotFound
@@ -40,7 +40,7 @@ func Registry(project, name string) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	result, err := app.FindAllVersions()
+	result, err := dao.FindAllVersions(app)
 	if err != nil {
 		return nil, err
 	}

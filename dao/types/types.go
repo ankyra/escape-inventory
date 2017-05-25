@@ -27,30 +27,48 @@ const ReadPermission = Permission('r')
 const WritePermission = Permission('w')
 const ReadAndWritePermission = Permission('A')
 
+type Application struct {
+	Name    string
+	Project string
+}
+
+func NewApplication(project, name string) *Application {
+	return &Application{
+		Name:    name,
+		Project: project,
+	}
+}
+
+type Release struct {
+	Application *Application
+	ReleaseId   string
+	Version     string
+	Metadata    *core.ReleaseMetadata
+}
+
+func NewRelease(app *Application, metadata *core.ReleaseMetadata) *Release {
+	return &Release{
+		Application: app,
+		ReleaseId:   metadata.GetReleaseId(),
+		Version:     metadata.GetVersion(),
+		Metadata:    metadata,
+	}
+}
+
 type DAO interface {
-	GetApplications(project string) ([]ApplicationDAO, error)
-	GetApplication(project, name string) (ApplicationDAO, error)
-	GetRelease(project, name, releaseId string) (ReleaseDAO, error)
-	AddRelease(project string, metadata *core.ReleaseMetadata) (ReleaseDAO, error)
-	GetAllReleases() ([]ReleaseDAO, error)
+	GetApplications(project string) ([]*Application, error)
+	GetApplication(project, name string) (*Application, error)
+	FindAllVersions(application *Application) ([]string, error)
+
+	GetRelease(project, name, releaseId string) (*Release, error)
+	AddRelease(project string, metadata *core.ReleaseMetadata) (*Release, error)
+	GetAllReleases() ([]*Release, error)
+	GetPackageURIs(release *Release) ([]string, error)
+	AddPackageURI(release *Release, uri string) error
+
 	SetACL(project, group string, perm Permission) error
 	DeleteACL(project, group string) error
 	GetPermittedGroups(project string, perm Permission) ([]string, error)
-}
-
-type ApplicationDAO interface {
-	GetName() string
-	FindAllVersions() ([]string, error)
-}
-
-type ReleaseDAO interface {
-	GetApplication() ApplicationDAO
-	GetVersion() string
-	GetProject() string
-	GetMetadata() *core.ReleaseMetadata
-
-	GetPackageURIs() ([]string, error)
-	AddPackageURI(uri string) error
 }
 
 var NotFound = fmt.Errorf("Not found")
