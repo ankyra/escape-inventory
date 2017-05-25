@@ -21,11 +21,11 @@ import (
 	"github.com/ankyra/escape-core"
 )
 
-type Permission rune
+type Permission int
 
-const ReadPermission = Permission('r')
-const WritePermission = Permission('w')
-const ReadAndWritePermission = Permission('A')
+const ReadPermission = Permission(1)
+const WritePermission = Permission(2)
+const ReadAndWritePermission = Permission(3)
 
 type Application struct {
 	Name    string
