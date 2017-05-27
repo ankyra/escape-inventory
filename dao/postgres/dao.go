@@ -73,7 +73,8 @@ func NewPostgresDAO(url string) (DAO, error) {
 		DeleteACLQuery:          "DELETE FROM acl WHERE project = $1 AND group_name = $2",
 		GetPermittedGroupsQuery: "SELECT group_name FROM acl WHERE project = $1 AND (permission = $2 OR permission = $3)",
 		IsUniqueConstraintError: func(err error) bool {
-			return err.(*pq.Error).Code.Name() == "unique_violation"
+			_, typeOk := err.(*pq.Error)
+			return typeOk && err.(*pq.Error).Code.Name() == "unique_violation"
 		},
 	}, nil
 }
