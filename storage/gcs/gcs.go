@@ -59,8 +59,8 @@ func (ls *GoogleCloudStorageBackend) Init(settings config.StorageSettings) error
 	return nil
 }
 
-func (ls *GoogleCloudStorageBackend) Upload(releaseId *parsers.ReleaseId, pkg io.ReadSeeker) (string, error) {
-	archive := strings.Join([]string{releaseId.Name, releaseId.ToString() + ".tgz"}, "/")
+func (ls *GoogleCloudStorageBackend) Upload(project string, releaseId *parsers.ReleaseId, pkg io.ReadSeeker) (string, error) {
+	archive := strings.Join([]string{project, releaseId.Name, releaseId.ToString() + ".tgz"}, "/")
 	writer := ls.Bucket.Object(archive).NewWriter(ls.Context)
 	if _, err := io.Copy(writer, pkg); err != nil {
 		return "", err
@@ -71,7 +71,7 @@ func (ls *GoogleCloudStorageBackend) Upload(releaseId *parsers.ReleaseId, pkg io
 	return "gcs://" + ls.BucketString + "/" + archive, nil
 }
 
-func (ls *GoogleCloudStorageBackend) Download(uri string) (io.Reader, error) {
+func (ls *GoogleCloudStorageBackend) Download(project, uri string) (io.Reader, error) {
 	path := uri[len("gcs://"):]
 	parts := strings.SplitN(path, "/", 2)
 	bucket := ls.Client.Bucket(parts[0])

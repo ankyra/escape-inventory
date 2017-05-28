@@ -38,7 +38,7 @@ func UploadPackage(project, releaseId string, pkg io.ReadSeeker) error {
 	if err != nil {
 		return NewUserError(err)
 	}
-	uri, err := storage.Upload(releaseId, pkg)
+	uri, err := storage.Upload(project, releaseId, pkg)
 	if err != nil {
 		return err
 	}
@@ -55,7 +55,7 @@ func GetDownloadReadSeeker(project, releaseId string) (io.Reader, error) {
 		return nil, err
 	}
 	for _, uri := range uris {
-		reader, err := storage.Download(uri)
+		reader, err := storage.Download(project, uri)
 		if err == nil {
 			return reader, nil
 		}

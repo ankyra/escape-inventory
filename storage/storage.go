@@ -28,8 +28,8 @@ import (
 
 type StorageBackend interface {
 	Init(settings config.StorageSettings) error
-	Upload(releaseId *parsers.ReleaseId, pkg io.ReadSeeker) (string, error)
-	Download(uri string) (io.Reader, error)
+	Upload(project string, releaseId *parsers.ReleaseId, pkg io.ReadSeeker) (string, error)
+	Download(project, uri string) (io.Reader, error)
 }
 
 var storageBackends = map[string]StorageBackend{
@@ -56,7 +56,7 @@ func LoadFromConfig(conf *config.Config) error {
 	return fmt.Errorf("Unknown storage backend: %s", conf.StorageBackend)
 }
 
-func Upload(releaseId string, pkg io.ReadSeeker) (string, error) {
+func Upload(project, releaseId string, pkg io.ReadSeeker) (string, error) {
 	backend, ok := storageBackends[uploadBackend]
 	if !ok {
 		return "", fmt.Errorf("Unknown scheme")
@@ -65,10 +65,10 @@ func Upload(releaseId string, pkg io.ReadSeeker) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return backend.Upload(parsedReleaseId, pkg)
+	return backend.Upload(project, parsedReleaseId, pkg)
 }
 
-func Download(uri string) (io.Reader, error) {
+func Download(project, uri string) (io.Reader, error) {
 	u, err := url.Parse(uri)
 	if err != nil {
 		return nil, err
@@ -77,5 +77,5 @@ func Download(uri string) (io.Reader, error) {
 	if !ok {
 		return nil, fmt.Errorf("Unknown scheme")
 	}
-	return backend.Download(uri)
+	return backend.Download(project, uri)
 }

@@ -43,9 +43,9 @@ func (s *localSuite) Test_Local_Storage_Backend_Upload(c *C) {
 	c.Assert(err, IsNil)
 	releaseId, err := parsers.ParseReleaseId("archive-upload-test-v1")
 	c.Assert(err, IsNil)
-	uri, err := backend.Upload(releaseId, pkg)
+	uri, err := backend.Upload("project", releaseId, pkg)
 	c.Assert(err, IsNil)
-	c.Assert(uri, Equals, "file:///tmp/escape-test/archive-upload-test/archive-upload-test-v1.tgz")
+	c.Assert(uri, Equals, "file:///tmp/escape-test/project/archive-upload-test/archive-upload-test-v1.tgz")
 	os.RemoveAll(test_data_path)
 	os.RemoveAll(test_local_storage_path)
 }
@@ -58,9 +58,9 @@ func (s *localSuite) Test_Local_Storage_Backend_Download(c *C) {
 	c.Assert(err, IsNil)
 	releaseId, err := parsers.ParseReleaseId("archive-upload-test-v1")
 	c.Assert(err, IsNil)
-	uri, err := backend.Upload(releaseId, pkg)
+	uri, err := backend.Upload("project", releaseId, pkg)
 	c.Assert(err, IsNil)
-	seeker, err := backend.Download(uri)
+	seeker, err := backend.Download("project", uri)
 
 	payload, err := ioutil.ReadAll(seeker)
 	c.Assert(err, IsNil)
