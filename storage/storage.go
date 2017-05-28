@@ -34,6 +34,7 @@ type StorageBackend interface {
 
 var storageBackends = map[string]StorageBackend{
 	"local": local.NewLocalStorageBackend(),
+	"file":  local.NewLocalStorageBackend(),
 	"gcs":   gcs.NewGoogleCloudStorageBackend(),
 }
 
