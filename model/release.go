@@ -38,6 +38,9 @@ func AddRelease(project, metadataJson string) error {
 	if parsed.NeedsResolving() {
 		return NewUserError(fmt.Errorf("Can't add release with unresolved version"))
 	}
+	if metadata.ApiVersion > core.CurrentApiVersion {
+		return NewUserError(fmt.Errorf("Release format version v%s is not supported (this registry supports up to v%s)", metadata.ApiVersion, core.CurrentApiVersion))
+	}
 	release, err := dao.GetRelease(project, parsed.Name, releaseId)
 	if err != nil && !dao.IsNotFound(err) {
 		return err

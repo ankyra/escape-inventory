@@ -91,9 +91,14 @@ func GetHandler(router *mux.Router) http.Handler {
 	return middleware
 }
 
-func StartRegistry(router *mux.Router) {
+func LoadConfig() *config.Config {
 	fmt.Println(EscapeLogo)
 	Config = loadAndActivateConfig()
+	return Config
+}
+
+func StartRegistry(router *mux.Router) {
+	LoadConfig()
 
 	handler := GetHandler(router)
 	http.Handle("/", handler)
