@@ -28,6 +28,8 @@ import (
 	"os"
 )
 
+var Config *config.Config
+
 const (
 	defaultConfigFile = "/etc/escape-registry/config.json"
 )
@@ -91,12 +93,12 @@ func GetHandler(router *mux.Router) http.Handler {
 
 func StartRegistry(router *mux.Router) {
 	fmt.Println(EscapeLogo)
-	config := loadAndActivateConfig()
+	Config = loadAndActivateConfig()
 
 	handler := GetHandler(router)
 	http.Handle("/", handler)
 
-	port := config.Port
+	port := Config.Port
 	log.Printf("INFO: Starting Escape Registry v%s on port %s\n", RegistryVersion, port)
 	log.Fatalln(http.ListenAndServe(":"+port, nil))
 }

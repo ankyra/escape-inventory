@@ -115,6 +115,8 @@ func (s *configSuite) Test_LoadConfig_Parses_Yaml(c *C) {
 	c.Assert(conf.StorageSettings.Path, Equals, "")
 	c.Assert(conf.StorageSettings.Bucket, Equals, "gs://escape-releases/")
 	c.Assert(conf.StorageSettings.Credentials, Equals, "test")
+	c.Assert(conf.UserServiceURL, Equals, "http://user-service.com")
+
 }
 
 func (s *configSuite) Test_LoadConfig_Parses_Yml(c *C) {
@@ -154,6 +156,7 @@ func (s *configSuite) Test_NewConfig_Uses_EnvironmentVariables(c *C) {
 		"STORAGE_SETTINGS_PATH=",
 		"STORAGE_SETTINGS_BUCKET=gs://escape-releases/",
 		"STORAGE_SETTINGS_CREDENTIALS=test",
+		"USER_SERVICE_URL=http://example.com",
 	}
 	conf, err := NewConfig(env)
 	c.Assert(err, IsNil)
@@ -164,6 +167,7 @@ func (s *configSuite) Test_NewConfig_Uses_EnvironmentVariables(c *C) {
 	c.Assert(conf.StorageSettings.Path, Equals, "")
 	c.Assert(conf.StorageSettings.Bucket, Equals, "gs://escape-releases/")
 	c.Assert(conf.StorageSettings.Credentials, Equals, "test")
+	c.Assert(conf.UserServiceURL, Equals, "http://example.com")
 }
 
 func (s *configSuite) Test_LoadConfig_Uses_EnvironmentVariables(c *C) {
@@ -176,6 +180,7 @@ func (s *configSuite) Test_LoadConfig_Uses_EnvironmentVariables(c *C) {
 		"STORAGE_SETTINGS_PATH=/test/",
 		"STORAGE_SETTINGS_BUCKET=",
 		"STORAGE_SETTINGS_CREDENTIALS=",
+		"USER_SERVICE_URL=http://example.com",
 	}
 	conf, err := LoadConfig("testdata/yml_config.yml", env)
 	c.Assert(err, IsNil)
@@ -187,4 +192,5 @@ func (s *configSuite) Test_LoadConfig_Uses_EnvironmentVariables(c *C) {
 	c.Assert(conf.StorageSettings.Path, Equals, "/test/")
 	c.Assert(conf.StorageSettings.Bucket, Equals, "")
 	c.Assert(conf.StorageSettings.Credentials, Equals, "")
+	c.Assert(conf.UserServiceURL, Equals, "http://example.com")
 }
