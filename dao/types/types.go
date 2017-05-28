@@ -50,7 +50,7 @@ func NewRelease(app *Application, metadata *core.ReleaseMetadata) *Release {
 	return &Release{
 		Application: app,
 		ReleaseId:   metadata.GetReleaseId(),
-		Version:     metadata.GetVersion(),
+		Version:     metadata.Version,
 		Metadata:    metadata,
 	}
 }

@@ -42,7 +42,7 @@ func (s *importSuite) Test_Import(c *C) {
 	c.Assert(err, IsNil)
 	metadata, err := GetReleaseMetadata("_", "import-test-v1")
 	c.Assert(err, IsNil)
-	c.Assert(metadata.GetName(), Equals, "import-test")
+	c.Assert(metadata.Name, Equals, "import-test")
 }
 
 func (s *importSuite) Test_Import_Ignore_Existing(c *C) {
@@ -62,7 +62,7 @@ func (s *importSuite) Test_Import_Ignore_Existing(c *C) {
 	c.Assert(err, IsNil)
 	metadata, err := GetReleaseMetadata("_", "import-exists-test-v1")
 	c.Assert(err, IsNil)
-	c.Assert(metadata.GetName(), Equals, "import-exists-test")
+	c.Assert(metadata.Name, Equals, "import-exists-test")
 }
 
 func (s *importSuite) Test_Import_fails_if_project_field_is_invalid(c *C) {

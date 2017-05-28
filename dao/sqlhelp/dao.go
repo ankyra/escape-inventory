@@ -95,7 +95,7 @@ func (s *SQLHelper) GetAllReleases() ([]*Release, error) {
 		if err != nil {
 			return nil, err
 		}
-		result = append(result, NewRelease(NewApplication(project, metadata.GetName()), metadata))
+		result = append(result, NewRelease(NewApplication(project, metadata.Name), metadata))
 	}
 	return result, nil
 }
@@ -105,15 +105,15 @@ func (s *SQLHelper) AddRelease(project string, release *core.ReleaseMetadata) (*
 	if err != nil {
 		return nil, err
 	}
-	name := release.GetName()
-	_, err = stmt.Exec(project, name, release.GetReleaseId(), release.GetVersion(), release.ToJson())
+	name := release.Name
+	_, err = stmt.Exec(project, name, release.GetReleaseId(), release.Version, release.ToJson())
 	if err != nil {
 		if s.IsUniqueConstraintError(err) {
 			return nil, AlreadyExists
 		}
 		return nil, err
 	}
-	return NewRelease(NewApplication(project, release.GetName()), release), nil
+	return NewRelease(NewApplication(project, release.Name), release), nil
 }
 
 func (s *SQLHelper) GetPackageURIs(release *Release) ([]string, error) {

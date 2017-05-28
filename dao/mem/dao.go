@@ -101,11 +101,11 @@ func (a *dao) AddRelease(project string, rel *core.ReleaseMetadata) (*Release, e
 		apps = map[string]*application{}
 	}
 	key := rel.GetReleaseId()
-	app, ok := apps[rel.GetName()]
+	app, ok := apps[rel.Name]
 	if !ok {
-		unwrapped, err := a.GetApplication(project, rel.GetName())
+		unwrapped, err := a.GetApplication(project, rel.Name)
 		if err != nil {
-			unwrapped = NewApplication(project, rel.GetName())
+			unwrapped = NewApplication(project, rel.Name)
 		}
 		app = &application{
 			App:      unwrapped,
@@ -122,7 +122,7 @@ func (a *dao) AddRelease(project string, rel *core.ReleaseMetadata) (*Release, e
 		Release:  newRelease,
 		Packages: []string{},
 	}
-	apps[rel.GetName()] = app
+	apps[rel.Name] = app
 	a.projects[project] = apps
 	a.releases[newRelease] = app.Releases[key]
 	return app.Releases[key].Release, nil

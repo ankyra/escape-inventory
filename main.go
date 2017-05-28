@@ -43,7 +43,7 @@ var WriteRoutes = map[string]http.HandlerFunc{
 }
 
 func HomeHandler(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Escape Release Registry v" + cmd.RegistryVersion))
+	w.Write([]byte("Escape Release Registry [+project] v" + cmd.RegistryVersion))
 }
 
 func getMux() *mux.Router {
