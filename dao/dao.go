@@ -26,78 +26,78 @@ import (
 	. "github.com/ankyra/escape-registry/dao/types"
 )
 
-var globalDAO = mem.NewInMemoryDAO()
+var GlobalDAO = mem.NewInMemoryDAO()
 
 func LoadFromConfig(conf *config.Config) error {
 	if conf.Database == "" {
 		return fmt.Errorf("Missing database configuration variable")
 	} else if conf.Database == "memory" {
-		globalDAO = mem.NewInMemoryDAO()
+		GlobalDAO = mem.NewInMemoryDAO()
 		return nil
 	} else if conf.Database == "sqlite" {
 		dao, err := sqlite.NewSQLiteDAO(conf.DatabaseSettings.Path)
 		if err != nil {
 			return err
 		}
-		globalDAO = dao
+		GlobalDAO = dao
 		return nil
 	} else if conf.Database == "postgres" {
 		dao, err := postgres.NewPostgresDAO(conf.DatabaseSettings.PostgresUrl)
 		if err != nil {
 			return err
 		}
-		globalDAO = dao
+		GlobalDAO = dao
 		return nil
 	}
 	return fmt.Errorf("Unknown database backend: %s", conf.Database)
 }
 func TestSetup() {
-	globalDAO = mem.NewInMemoryDAO()
+	GlobalDAO = mem.NewInMemoryDAO()
 }
 
 func GetApplications(project string) ([]*Application, error) {
-	return globalDAO.GetApplications(project)
+	return GlobalDAO.GetApplications(project)
 }
 
 func GetApplication(project, name string) (*Application, error) {
-	return globalDAO.GetApplication(project, name)
+	return GlobalDAO.GetApplication(project, name)
 }
 
 func FindAllVersions(app *Application) ([]string, error) {
-	return globalDAO.FindAllVersions(app)
+	return GlobalDAO.FindAllVersions(app)
 }
 
 func GetRelease(project, name, releaseId string) (*Release, error) {
-	return globalDAO.GetRelease(project, name, releaseId)
+	return GlobalDAO.GetRelease(project, name, releaseId)
 }
 
 func AddRelease(project string, metadata *core.ReleaseMetadata) (*Release, error) {
-	return globalDAO.AddRelease(project, metadata)
+	return GlobalDAO.AddRelease(project, metadata)
 }
 
 func GetPermittedGroups(project string, perm Permission) ([]string, error) {
-	return globalDAO.GetPermittedGroups(project, perm)
+	return GlobalDAO.GetPermittedGroups(project, perm)
 }
 
 func SetACL(project, group string, perm Permission) error {
-	return globalDAO.SetACL(project, group, perm)
+	return GlobalDAO.SetACL(project, group, perm)
 }
 
 func DeleteACL(project, group string) error {
-	return globalDAO.DeleteACL(project, group)
+	return GlobalDAO.DeleteACL(project, group)
 }
 
 func GetPackageURIs(r *Release) ([]string, error) {
-	return globalDAO.GetPackageURIs(r)
+	return GlobalDAO.GetPackageURIs(r)
 }
 
 func AddPackageURI(r *Release, uri string) error {
-	return globalDAO.AddPackageURI(r, uri)
+	return GlobalDAO.AddPackageURI(r, uri)
 }
 
 // TODO: Rename to export releases
 func GetAllReleases() ([]*Release, error) {
-	return globalDAO.GetAllReleases()
+	return GlobalDAO.GetAllReleases()
 }
 
 func IsNotFound(err error) bool {
