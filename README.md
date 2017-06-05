@@ -85,9 +85,9 @@ The `path` variable points to a directory in which the releases will be stored.
 }
 ```
 
-Stores uploaded packages in Google Cloud Storage. 
-The `credentials` variable is optional, but should point to an existing service
-account json file if provided.
+Stores uploaded packages in Google Cloud Storage.  The `credentials` variable
+is optional, but should point to an existing service account json file if
+provided. The service account should have the "Storage -> Storage Admin" role.
 
 ## Databases
 
