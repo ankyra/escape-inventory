@@ -176,7 +176,7 @@ func (a *dao) GetPermittedGroups(project string, perm Permission) ([]string, err
 		return result, nil
 	}
 	for group, groupPerm := range groups {
-		if groupPerm == ReadAndWritePermission || perm == groupPerm {
+		if perm <= groupPerm {
 			result = append(result, group)
 		}
 	}

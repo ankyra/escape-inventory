@@ -71,7 +71,7 @@ func NewSQLiteDAO(path string) (DAO, error) {
 		InsertACLQuery:          "INSERT INTO acl(project, group_name, permission) VALUES(?, ?, ?)",
 		UpdateACLQuery:          "UPDATE acl SET permission = ? WHERE project = ? AND group_name = ?",
 		DeleteACLQuery:          "DELETE FROM acl WHERE project = ? AND group_name = ?",
-		GetPermittedGroupsQuery: "SELECT group_name FROM acl WHERE project = ? AND (permission = ? OR permission = ?)",
+		GetPermittedGroupsQuery: "SELECT group_name FROM acl WHERE project = ? AND (permission >= ?)",
 		IsUniqueConstraintError: func(err error) bool {
 			return err.(sqlite3.Error).Code == sqlite3.ErrConstraint
 		},

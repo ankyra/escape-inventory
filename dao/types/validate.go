@@ -210,7 +210,7 @@ func Validate_GetAllReleases(dao DAO, c *C) {
 func Validate_ACL(dao DAO, c *C) {
 	err := dao.SetACL("_", "*", ReadPermission)
 	c.Assert(err, IsNil)
-	err = dao.SetACL("_", "admin", ReadAndWritePermission)
+	err = dao.SetACL("_", "admin", WritePermission)
 	c.Assert(err, IsNil)
 
 	groups, err := dao.GetPermittedGroups("_", ReadPermission)

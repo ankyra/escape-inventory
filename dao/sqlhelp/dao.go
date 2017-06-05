@@ -171,7 +171,7 @@ func (s *SQLHelper) DeleteACL(project, group string) error {
 }
 
 func (s *SQLHelper) GetPermittedGroups(project string, perm Permission) ([]string, error) {
-	rows, err := s.PrepareAndQuery(s.GetPermittedGroupsQuery, project, int(perm), ReadAndWritePermission)
+	rows, err := s.PrepareAndQuery(s.GetPermittedGroupsQuery, project, int(perm))
 	if err != nil {
 		return nil, err
 	}
