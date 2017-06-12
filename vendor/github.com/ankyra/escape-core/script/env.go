@@ -40,6 +40,10 @@ func NewScriptEnvironmentWithGlobals(globals map[string]Script) *ScriptEnvironme
 	globals[func_builtinToLower] = builtinToLower
 	globals[func_builtinToUpper] = builtinToUpper
 	globals[func_builtinTitle] = builtinTitle
+	globals[func_builtinSplit] = builtinSplit
+	globals[func_builtinJoin] = builtinJoin
+	globals[func_builtinBase64Encode] = builtinBase64Encode
+	globals[func_builtinBase64Decode] = builtinBase64Decode
 	globalsDict := LiftDict(globals)
 	result["$"] = globalsDict
 	return &result

@@ -35,6 +35,8 @@ func Lift(val interface{}) (Script, error) {
 	switch val.(type) {
 	case string:
 		return LiftString(val.(string)), nil
+	case []byte:
+		return LiftString(string(val.([]byte))), nil
 	case bool:
 		return LiftBool(val.(bool)), nil
 	case float64:
@@ -49,8 +51,24 @@ func Lift(val interface{}) (Script, error) {
 		return LiftList(val.([]Script)), nil
 	case scriptFuncType:
 		return LiftFunction(val.(scriptFuncType)), nil
+	case func([]byte) string:
+		return LiftGoFunc(val), nil
+	case func(string) ([]byte, error):
+		return LiftGoFunc(val), nil
 	case func(string) string:
-		return LiftFunc_string_to_string(val.(func(string) string)), nil
+		return LiftGoFunc(val), nil
+	case func(string, string) []string:
+		return LiftGoFunc(val), nil
+	case func(string, string) string:
+		return LiftGoFunc(val), nil
+	case func([]string, string) string:
+		return LiftGoFunc(val), nil
+	case []string:
+		vals := []Script{}
+		for _, k := range val.([]string) {
+			vals = append(vals, LiftString(k))
+		}
+		return LiftList(vals), nil
 	case []interface{}:
 		vals := []Script{}
 		for _, k := range val.([]interface{}) {
