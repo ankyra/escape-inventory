@@ -47,6 +47,14 @@ func NewInMemoryDAO() DAO {
 	}
 }
 
+func (a *dao) GetProjects() ([]string, error) {
+	result := []string{}
+	for key, _ := range a.projects {
+		result = append(result, key)
+	}
+	return result, nil
+}
+
 func (a *dao) GetApplications(project string) ([]*Application, error) {
 	result := []*Application{}
 	for _, app := range a.projects[project] {

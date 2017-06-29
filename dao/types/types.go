@@ -55,6 +55,8 @@ func NewRelease(app *Application, metadata *core.ReleaseMetadata) *Release {
 }
 
 type DAO interface {
+	GetProjects() ([]string, error)
+
 	GetApplications(project string) ([]*Application, error)
 	GetApplication(project, name string) (*Application, error)
 	FindAllVersions(application *Application) ([]string, error)

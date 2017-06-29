@@ -60,6 +60,7 @@ func NewPostgresDAO(url string) (DAO, error) {
 	}
 	return &sqlhelp.SQLHelper{
 		DB:                      db,
+		GetProjectsQuery:        "SELECT distinct(project) FROM release",
 		GetApplicationsQuery:    "SELECT DISTINCT(name) FROM release WHERE project = $1",
 		GetApplicationQuery:     "SELECT name FROM release WHERE project = $1 AND name = $2",
 		FindAllVersionsQuery:    "SELECT version FROM release WHERE project = $1 AND name = $2",

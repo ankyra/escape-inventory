@@ -60,6 +60,7 @@ func NewSQLiteDAO(path string) (DAO, error) {
 	}
 	return &sqlhelp.SQLHelper{
 		DB:                      db,
+		GetProjectsQuery:        "SELECT distinct(project) FROM release",
 		GetApplicationsQuery:    "SELECT DISTINCT(name) FROM release WHERE project = ?",
 		GetApplicationQuery:     "SELECT name FROM release WHERE project = ? AND name = ?",
 		FindAllVersionsQuery:    "SELECT version FROM release WHERE project = ? AND name = ?",

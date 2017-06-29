@@ -55,6 +55,10 @@ func TestSetup() {
 	GlobalDAO = mem.NewInMemoryDAO()
 }
 
+func GetProjects() ([]string, error) {
+	return GlobalDAO.GetProjects()
+}
+
 func GetApplications(project string) ([]*Application, error) {
 	return GlobalDAO.GetApplications(project)
 }

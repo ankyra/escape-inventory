@@ -8,6 +8,7 @@ import (
 
 type SQLHelper struct {
 	DB                      *sql.DB
+	GetProjectsQuery        string
 	GetApplicationsQuery    string
 	GetApplicationQuery     string
 	FindAllVersionsQuery    string
@@ -21,6 +22,14 @@ type SQLHelper struct {
 	DeleteACLQuery          string
 	GetPermittedGroupsQuery string
 	IsUniqueConstraintError func(error) bool
+}
+
+func (s *SQLHelper) GetProjects() ([]string, error) {
+	rows, err := s.PrepareAndQuery(s.GetProjectsQuery)
+	if err != nil {
+		return nil, err
+	}
+	return s.ReadRowsIntoStringArray(rows)
 }
 
 func (s *SQLHelper) GetApplications(project string) ([]*Application, error) {

@@ -26,6 +26,7 @@ func ValidateDAO(dao func() DAO, c *C) {
 	Validate_AddRelease_Unique_per_project(dao(), c)
 	Validate_GetRelease(dao(), c)
 	Validate_GetRelease_NotFound(dao(), c)
+	Validate_GetProjects(dao(), c)
 	Validate_GetApplication(dao(), c)
 	Validate_GetApplications(dao(), c)
 	Validate_FindAllVersions(dao(), c)
@@ -87,6 +88,24 @@ func Validate_GetRelease(dao DAO, c *C) {
 func Validate_GetRelease_NotFound(dao DAO, c *C) {
 	_, err := dao.GetRelease("_", "archive-dao-val", "archive-dao-val-v1")
 	c.Assert(err, Equals, NotFound)
+}
+
+func Validate_GetProjects(dao DAO, c *C) {
+	empty, err := dao.GetProjects()
+	c.Assert(err, IsNil)
+	c.Assert(empty, HasLen, 0)
+
+	addReleaseToProject(dao, c, "test", "0.0.1", "_")
+	addReleaseToProject(dao, c, "test", "0.0.1", "project1")
+	addReleaseToProject(dao, c, "test", "0.0.1", "project2")
+	addReleaseToProject(dao, c, "test", "0.0.2", "project2")
+
+	projects, err := dao.GetProjects()
+	c.Assert(err, IsNil)
+	c.Assert(projects, HasLen, 3)
+	c.Assert(projects, HasItem, "_")
+	c.Assert(projects, HasItem, "project1")
+	c.Assert(projects, HasItem, "project2")
 }
 
 func Validate_GetApplication(dao DAO, c *C) {

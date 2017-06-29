@@ -22,20 +22,31 @@ import (
 )
 
 func Registry(project, name string) ([]string, error) {
-	if name == "" {
-		result := []string{}
-		apps, err := dao.GetApplications(project)
-		if err != nil {
-			return nil, err
-		}
-		for _, app := range apps {
-			result = append(result, app.Name)
-		}
-		if len(result) == 0 {
-			return nil, types.NotFound
-		}
-		return result, nil
+	if project == "" {
+		return GetProjects()
 	}
+	if name == "" {
+		return GetApplications(project)
+	}
+	return GetApplicationVersions(project, name)
+}
+
+func GetApplications(project string) ([]string, error) {
+	result := []string{}
+	apps, err := dao.GetApplications(project)
+	if err != nil {
+		return nil, err
+	}
+	for _, app := range apps {
+		result = append(result, app.Name)
+	}
+	if len(result) == 0 {
+		return nil, types.NotFound
+	}
+	return result, nil
+}
+
+func GetApplicationVersions(project, name string) ([]string, error) {
 	app, err := dao.GetApplication(project, name)
 	if err != nil {
 		return nil, err
@@ -48,4 +59,8 @@ func Registry(project, name string) ([]string, error) {
 		return nil, types.NotFound
 	}
 	return result, nil
+}
+
+func GetProjects() ([]string, error) {
+	return dao.GetProjects()
 }

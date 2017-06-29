@@ -29,6 +29,7 @@ var ReadRoutes = map[string]http.HandlerFunc{
 	"/export": handlers.ExportReleasesHandler,
 	"/health": handlers.HealthCheckHandler,
 
+	"/a/":                                    handlers.RegistryHandler,
 	"/a/{project}/":                          handlers.RegistryHandler,
 	"/a/{project}/{name}/":                   handlers.RegistryHandler,
 	"/a/{project}/{name}/{version}/":         handlers.RegistryHandler,

@@ -45,6 +45,8 @@ func (s *suite) SetUpTest(c *C) {
 const (
 	registerEndpoint = "/a/my-project/register"
 
+	getProjectsEndpoints = "/a/"
+
 	applicationsTestProject       = "applications-test-prj"
 	applicationsEndpoint          = "/a/" + applicationsTestProject + "/"
 	applicationsEndpointNoProject = "/a/doesnt-exist/"
@@ -121,6 +123,14 @@ func (s *suite) Test_Register_success_with_minimal_metadata(c *C) {
 func (s *suite) Test_GetApplications_empty_list(c *C) {
 	req, _ := http.NewRequest("GET", applicationsEndpointNoProject, nil)
 	testRequest(c, req, 404)
+}
+
+func (s *suite) Test_GetProjects(c *C) {
+	s.addRelease(c, "project1", "1")
+	s.addRelease(c, "project2", "2")
+	req, _ := http.NewRequest("GET", getProjectsEndpoints, nil)
+	testRequest(c, req, http.StatusOK)
+	c.Assert(rr.Body.String(), Equals, `["project1","project2"]`)
 }
 
 func (s *suite) Test_GetApplications(c *C) {
