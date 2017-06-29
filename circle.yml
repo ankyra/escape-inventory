@@ -5,7 +5,7 @@ machine:
     ESCAPE_PROJECT: "_"
 
 dependencies:
-  override:
+  pre:
   - curl https://storage.googleapis.com/escape-releases-eu/escape-v0.11.2.tgz > /home/ubuntu/bin/escape.tgz
   - tar -C /home/ubuntu/bin -xvzf /home/ubuntu/bin/escape.tgz
 
@@ -15,5 +15,5 @@ compile:
 
 test:
   override:
-  - true
+  - echo "Already tested"
 
