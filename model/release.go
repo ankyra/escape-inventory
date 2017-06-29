@@ -25,31 +25,34 @@ import (
 	"strings"
 )
 
-func AddRelease(project, metadataJson string) error {
+func AddRelease(project, metadataJson string) (*core.ReleaseMetadata, error) {
 	metadata, err := core.NewReleaseMetadataFromJsonString(metadataJson)
 	if err != nil {
-		return NewUserError(err)
+		return nil, NewUserError(err)
 	}
 	releaseId := metadata.GetReleaseId()
 	parsed, err := parsers.ParseReleaseId(releaseId)
 	if err != nil {
-		return NewUserError(err)
+		return nil, NewUserError(err)
 	}
 	if parsed.NeedsResolving() {
-		return NewUserError(fmt.Errorf("Can't add release with unresolved version"))
+		return nil, NewUserError(fmt.Errorf("Can't add release with unresolved version"))
 	}
 	if metadata.ApiVersion > core.CurrentApiVersion {
-		return NewUserError(fmt.Errorf("Release format version v%s is not supported (this registry supports up to v%s)", metadata.ApiVersion, core.CurrentApiVersion))
+		return nil, NewUserError(fmt.Errorf("Release format version v%s is not supported (this registry supports up to v%s)", metadata.ApiVersion, core.CurrentApiVersion))
 	}
 	release, err := dao.GetRelease(project, parsed.Name, releaseId)
 	if err != nil && !dao.IsNotFound(err) {
-		return err
+		return nil, err
 	}
 	if release != nil {
-		return NewUserError(fmt.Errorf("Release %s already exists", releaseId))
+		return nil, NewUserError(fmt.Errorf("Release %s already exists", releaseId))
 	}
-	_, err = dao.AddRelease(project, metadata)
-	return err
+	result, err := dao.AddRelease(project, metadata)
+	if err != nil {
+		return nil, err
+	}
+	return result.Metadata, nil
 }
 
 func GetReleaseMetadata(project, releaseIdString string) (*core.ReleaseMetadata, error) {

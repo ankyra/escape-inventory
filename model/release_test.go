@@ -26,16 +26,16 @@ type releaseSuite struct{}
 var _ = Suite(&releaseSuite{})
 
 func (s *releaseSuite) Test_AddRelease_Missing_Field_Name(c *C) {
-	err := AddRelease("_", `{"version": "0"}`)
+	_, err := AddRelease("_", `{"version": "0"}`)
 	c.Assert(err, Not(IsNil))
 }
 func (s *releaseSuite) Test_AddRelease_Missing_Field_Version(c *C) {
-	err := AddRelease("_", `{"name": "asdaiasd"}`)
+	_, err := AddRelease("_", `{"name": "asdaiasd"}`)
 	c.Assert(err, Not(IsNil))
 }
 
 func (s *releaseSuite) Test_AddRelease_GetMetadata(c *C) {
-	err := AddRelease("_", `{"name": "rel-test", "version": "0"}`)
+	_, err := AddRelease("_", `{"name": "rel-test", "version": "0"}`)
 	c.Assert(err, IsNil)
 	metadata, err := GetReleaseMetadata("_", "rel-test-v0")
 	c.Assert(err, IsNil)

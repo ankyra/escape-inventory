@@ -35,7 +35,7 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		HandleError(w, r, err)
 		return
 	}
-	if err := model.AddRelease(project, string(metadata)); err != nil {
+	if _, err := model.AddRelease(project, string(metadata)); err != nil {
 		HandleError(w, r, err)
 		return
 	}

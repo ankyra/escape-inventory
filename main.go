@@ -38,6 +38,7 @@ var ReadRoutes = map[string]http.HandlerFunc{
 }
 
 var WriteRoutes = map[string]http.HandlerFunc{
+	"/a/{project}/upload":                  handlers.RegisterAndUploadHandler,
 	"/a/{project}/register":                handlers.RegisterHandler,
 	"/a/{project}/{name}/{version}/upload": handlers.UploadHandler,
 	"/import": handlers.ImportReleasesHandler,
