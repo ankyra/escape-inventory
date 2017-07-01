@@ -49,6 +49,8 @@ func (s *memSuite) Test_DAO(c *C) {
 			c.Assert(err, IsNil)
 			_, err = db.Exec(`DROP TABLE IF EXISTS package`)
 			c.Assert(err, IsNil)
+			_, err = db.Exec(`DROP TABLE IF EXISTS acl`)
+			c.Assert(err, IsNil)
 
 			// Create unit
 			dao, err := NewPostgresDAO(url)

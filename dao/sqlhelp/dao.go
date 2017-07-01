@@ -4,28 +4,68 @@ import (
 	"database/sql"
 	"github.com/ankyra/escape-core"
 	. "github.com/ankyra/escape-registry/dao/types"
+	"strconv"
+	"strings"
 )
 
 type SQLHelper struct {
-	DB                      *sql.DB
-	GetProjectsQuery        string
-	GetApplicationsQuery    string
-	GetApplicationQuery     string
-	FindAllVersionsQuery    string
-	GetReleaseQuery         string
-	GetAllReleasesQuery     string
-	AddReleaseQuery         string
-	GetPackageURIsQuery     string
-	AddPackageURIQuery      string
-	InsertACLQuery          string
-	UpdateACLQuery          string
-	DeleteACLQuery          string
-	GetPermittedGroupsQuery string
-	IsUniqueConstraintError func(error) bool
+	DB                       *sql.DB
+	UseNumericInsertMarks    bool
+	GetProjectsQuery         string
+	GetProjectsByGroupsQuery string
+	GetApplicationsQuery     string
+	GetApplicationQuery      string
+	FindAllVersionsQuery     string
+	GetReleaseQuery          string
+	GetAllReleasesQuery      string
+	AddReleaseQuery          string
+	GetPackageURIsQuery      string
+	AddPackageURIQuery       string
+	InsertACLQuery           string
+	UpdateACLQuery           string
+	DeleteACLQuery           string
+	GetPermittedGroupsQuery  string
+	IsUniqueConstraintError  func(error) bool
 }
 
 func (s *SQLHelper) GetProjects() ([]string, error) {
 	rows, err := s.PrepareAndQuery(s.GetProjectsQuery)
+	if err != nil {
+		return nil, err
+	}
+	return s.ReadRowsIntoStringArray(rows)
+}
+
+func (s *SQLHelper) GetProjectsByGroups(readGroups []string) ([]string, error) {
+	starFound := false
+	for _, g := range readGroups {
+		if g == "*" {
+			starFound = true
+			break
+		}
+	}
+	if !starFound {
+		readGroups = append(readGroups, "*")
+	}
+	insertMarks := []string{}
+	for i, _ := range readGroups {
+		if s.UseNumericInsertMarks {
+			insertMarks = append(insertMarks, "$"+strconv.Itoa(i+1))
+		} else {
+			insertMarks = append(insertMarks, "?")
+		}
+	}
+	query := s.GetProjectsByGroupsQuery
+	if len(readGroups) == 1 {
+		query += " = " + insertMarks[0]
+	} else {
+		query += "IN (" + strings.Join(insertMarks, ", ") + ")"
+	}
+	interfaceGroups := []interface{}{}
+	for _, g := range readGroups {
+		interfaceGroups = append(interfaceGroups, g)
+	}
+	rows, err := s.PrepareAndQuery(query, interfaceGroups...)
 	if err != nil {
 		return nil, err
 	}

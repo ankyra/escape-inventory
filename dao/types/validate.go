@@ -27,6 +27,7 @@ func ValidateDAO(dao func() DAO, c *C) {
 	Validate_GetRelease(dao(), c)
 	Validate_GetRelease_NotFound(dao(), c)
 	Validate_GetProjects(dao(), c)
+	Validate_GetProjectsByGroups(dao(), c)
 	Validate_GetApplication(dao(), c)
 	Validate_GetApplications(dao(), c)
 	Validate_FindAllVersions(dao(), c)
@@ -101,6 +102,68 @@ func Validate_GetProjects(dao DAO, c *C) {
 	addReleaseToProject(dao, c, "test", "0.0.2", "project2")
 
 	projects, err := dao.GetProjects()
+	c.Assert(err, IsNil)
+	c.Assert(projects, HasLen, 3)
+	c.Assert(projects, HasItem, "_")
+	c.Assert(projects, HasItem, "project1")
+	c.Assert(projects, HasItem, "project2")
+}
+
+func Validate_GetProjectsByGroups(dao DAO, c *C) {
+	anon := []string{}
+	oneGroup := []string{"project1"}
+	allGroups := []string{"project1", "project2"}
+	cases := [][]string{anon, oneGroup, allGroups}
+
+	for _, testCase := range cases {
+		empty, err := dao.GetProjectsByGroups(testCase)
+		c.Assert(err, IsNil)
+		c.Assert(empty, HasLen, 0)
+	}
+
+	addReleaseToProject(dao, c, "test", "0.0.1", "_")
+	addReleaseToProject(dao, c, "test", "0.0.1", "project1")
+	addReleaseToProject(dao, c, "test", "0.0.1", "project2")
+	addReleaseToProject(dao, c, "test", "0.0.2", "project2")
+
+	c.Assert(dao.SetACL("_", "*", ReadPermission), IsNil)
+
+	for _, testCase := range cases {
+		projects, err := dao.GetProjectsByGroups(testCase)
+		c.Assert(err, IsNil)
+		c.Assert(projects, HasLen, 1, Commentf("%s should have one group, got %v", testCase, projects))
+		c.Assert(projects, HasItem, "_")
+	}
+
+	c.Assert(dao.SetACL("project1", "project1", ReadPermission), IsNil)
+
+	projects, err := dao.GetProjectsByGroups(anon)
+	c.Assert(err, IsNil)
+	c.Assert(projects, HasLen, 1)
+
+	projects, err = dao.GetProjectsByGroups(oneGroup)
+	c.Assert(err, IsNil)
+	c.Assert(projects, HasLen, 2)
+	c.Assert(projects, HasItem, "_")
+	c.Assert(projects, HasItem, "project1")
+
+	projects, err = dao.GetProjectsByGroups(allGroups)
+	c.Assert(err, IsNil)
+	c.Assert(projects, HasLen, 2)
+	c.Assert(projects, HasItem, "_")
+	c.Assert(projects, HasItem, "project1")
+
+	c.Assert(dao.SetACL("project2", "project2", ReadPermission), IsNil)
+
+	projects, err = dao.GetProjectsByGroups(anon)
+	c.Assert(err, IsNil)
+	c.Assert(projects, HasLen, 1)
+
+	projects, err = dao.GetProjectsByGroups(oneGroup)
+	c.Assert(err, IsNil)
+	c.Assert(projects, HasLen, 2)
+
+	projects, err = dao.GetProjectsByGroups(allGroups)
 	c.Assert(err, IsNil)
 	c.Assert(projects, HasLen, 3)
 	c.Assert(projects, HasItem, "_")

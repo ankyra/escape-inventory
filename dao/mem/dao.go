@@ -55,6 +55,27 @@ func (a *dao) GetProjects() ([]string, error) {
 	return result, nil
 }
 
+func (a *dao) GetProjectsByGroups(readGroups []string) ([]string, error) {
+	result := []string{}
+	for key, _ := range a.projects {
+		allowedGroups, found := a.acls[key]
+		if found {
+			for _, g := range readGroups {
+				_, found := allowedGroups[g]
+				if found {
+					result = append(result, key)
+					break
+				}
+			}
+			_, found := allowedGroups["*"]
+			if found {
+				result = append(result, key)
+			}
+		}
+	}
+	return result, nil
+}
+
 func (a *dao) GetApplications(project string) ([]*Application, error) {
 	result := []*Application{}
 	for _, app := range a.projects[project] {

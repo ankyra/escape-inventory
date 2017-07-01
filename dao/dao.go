@@ -59,6 +59,10 @@ func GetProjects() ([]string, error) {
 	return GlobalDAO.GetProjects()
 }
 
+func GetProjectsByGroups(readGroups []string) ([]string, error) {
+	return GlobalDAO.GetProjectsByGroups(readGroups)
+}
+
 func GetApplications(project string) ([]*Application, error) {
 	return GlobalDAO.GetApplications(project)
 }

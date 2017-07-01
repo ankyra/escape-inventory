@@ -59,20 +59,22 @@ func NewPostgresDAO(url string) (DAO, error) {
 		return nil, fmt.Errorf("Couldn't initialise Postgres storage backend '%s' [1]: %s", url, err.Error())
 	}
 	return &sqlhelp.SQLHelper{
-		DB:                      db,
-		GetProjectsQuery:        "SELECT distinct(project) FROM release",
-		GetApplicationsQuery:    "SELECT DISTINCT(name) FROM release WHERE project = $1",
-		GetApplicationQuery:     "SELECT name FROM release WHERE project = $1 AND name = $2",
-		FindAllVersionsQuery:    "SELECT version FROM release WHERE project = $1 AND name = $2",
-		GetReleaseQuery:         "SELECT metadata FROM release WHERE project = $1 AND name = $2 AND release_id = $3",
-		GetAllReleasesQuery:     "SELECT project, metadata FROM release",
-		AddReleaseQuery:         "INSERT INTO release(project, name, release_id, version, metadata) VALUES($1, $2, $3, $4, $5)",
-		GetPackageURIsQuery:     "SELECT uri FROM package WHERE project = $1 AND release_id = $2",
-		AddPackageURIQuery:      "INSERT INTO package (project, release_id, uri) VALUES ($1, $2, $3)",
-		InsertACLQuery:          "INSERT INTO acl(project, group_name, permission) VALUES ($1, $2, $3)",
-		UpdateACLQuery:          "UPDATE acl SET permission = $1 WHERE project = $2 AND group_name = $3",
-		DeleteACLQuery:          "DELETE FROM acl WHERE project = $1 AND group_name = $2",
-		GetPermittedGroupsQuery: "SELECT group_name FROM acl WHERE project = $1 AND (permission >= $2)",
+		DB: db,
+		UseNumericInsertMarks:    true,
+		GetProjectsQuery:         "SELECT distinct(project) FROM release",
+		GetProjectsByGroupsQuery: "SELECT distinct(project) FROM acl WHERE group_name ",
+		GetApplicationsQuery:     "SELECT DISTINCT(name) FROM release WHERE project = $1",
+		GetApplicationQuery:      "SELECT name FROM release WHERE project = $1 AND name = $2",
+		FindAllVersionsQuery:     "SELECT version FROM release WHERE project = $1 AND name = $2",
+		GetReleaseQuery:          "SELECT metadata FROM release WHERE project = $1 AND name = $2 AND release_id = $3",
+		GetAllReleasesQuery:      "SELECT project, metadata FROM release",
+		AddReleaseQuery:          "INSERT INTO release(project, name, release_id, version, metadata) VALUES($1, $2, $3, $4, $5)",
+		GetPackageURIsQuery:      "SELECT uri FROM package WHERE project = $1 AND release_id = $2",
+		AddPackageURIQuery:       "INSERT INTO package (project, release_id, uri) VALUES ($1, $2, $3)",
+		InsertACLQuery:           "INSERT INTO acl(project, group_name, permission) VALUES ($1, $2, $3)",
+		UpdateACLQuery:           "UPDATE acl SET permission = $1 WHERE project = $2 AND group_name = $3",
+		DeleteACLQuery:           "DELETE FROM acl WHERE project = $1 AND group_name = $2",
+		GetPermittedGroupsQuery:  "SELECT group_name FROM acl WHERE project = $1 AND (permission >= $2)",
 		IsUniqueConstraintError: func(err error) bool {
 			_, typeOk := err.(*pq.Error)
 			return typeOk && err.(*pq.Error).Code.Name() == "unique_violation"
