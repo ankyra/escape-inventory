@@ -45,6 +45,20 @@ var (
 			Help: "Number of uploads",
 		},
 	)
+	ResponsesTotal = prometheus.NewCounterVec(
+		prometheus.CounterOpts{
+			Name: "escape_http_responses_total",
+			Help: "The count of http responses issued, classified by code and method",
+		},
+		[]string{"code", "method"},
+	)
+	ResponsesLatency = prometheus.NewHistogramVec(
+		prometheus.HistogramOpts{
+			Name: "escape_http_responses_latency",
+			Help: "The latency of http responses issued, classified by code and method",
+		},
+		[]string{"code", "method"},
+	)
 )
 
 func init() {
@@ -52,6 +66,9 @@ func init() {
 		RequestCounter,
 		ErrorCounter,
 		DownloadCounter,
+		UploadCounter,
+		ResponsesTotal,
+		ResponsesLatency,
 	}
 	for _, metric := range metrics {
 		prometheus.MustRegister(metric)

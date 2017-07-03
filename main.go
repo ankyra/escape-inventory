@@ -52,11 +52,11 @@ func getMux() *mux.Router {
 	r := mux.NewRouter()
 	getRouter := r.Methods("GET").Subrouter()
 	for url, handler := range ReadRoutes {
-		getRouter.HandleFunc(url, handler)
+		getRouter.Handle(url, handler)
 	}
 	postRouter := r.Methods("POST").Subrouter()
 	for url, handler := range WriteRoutes {
-		postRouter.HandleFunc(url, handler)
+		postRouter.Handle(url, handler)
 	}
 	r.Handle("/metrics", promhttp.Handler())
 	return r

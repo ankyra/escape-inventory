@@ -1,3 +1,3 @@
 package cmd
 
-const RegistryVersion="{{ version }}"
+const RegistryVersion = "{{ version }}"

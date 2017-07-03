@@ -20,12 +20,15 @@ import (
 	"fmt"
 	"github.com/ankyra/escape-registry/config"
 	"github.com/ankyra/escape-registry/dao"
+	"github.com/ankyra/escape-registry/metrics"
 	"github.com/ankyra/escape-registry/storage"
 	"github.com/gorilla/mux"
 	"github.com/urfave/negroni"
 	"log"
 	"net/http"
 	"os"
+	"strconv"
+	"time"
 )
 
 var Config *config.Config
@@ -81,10 +84,28 @@ func loadAndActivateConfig() *config.Config {
 	return conf
 }
 
+type MetricMiddleware struct{}
+
+func NewMetricMiddleware() *MetricMiddleware {
+	return &MetricMiddleware{}
+}
+
+func (m *MetricMiddleware) ServeHTTP(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+	start := time.Now()
+	next(rw, r)
+	res := rw.(negroni.ResponseWriter)
+	elapsed := time.Since(start)
+
+	status := strconv.Itoa(res.Status())
+	metrics.ResponsesTotal.WithLabelValues(status, r.Method).Inc()
+	metrics.ResponsesLatency.WithLabelValues(status, r.Method).Observe(float64(elapsed.Seconds()))
+}
+
 func GetHandler(router *mux.Router) http.Handler {
 	middleware := negroni.New()
 	recovery := negroni.NewRecovery()
 	recovery.PrintStack = false
+	middleware.Use(NewMetricMiddleware())
 	middleware.Use(recovery)
 	middleware.Use(negroni.NewLogger())
 	middleware.UseHandler(router)
