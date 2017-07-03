@@ -33,11 +33,25 @@ var (
 			Help: "Number of errors requests",
 		},
 	)
+	DownloadCounter = prometheus.NewCounter(
+		prometheus.CounterOpts{
+			Name: "escape_downloads",
+			Help: "Number of downloads",
+		},
+	)
+	UploadCounter = prometheus.NewCounter(
+		prometheus.CounterOpts{
+			Name: "escape_uploads",
+			Help: "Number of uploads",
+		},
+	)
 )
 
 func init() {
 	metrics := []prometheus.Collector{
 		RequestCounter,
+		ErrorCounter,
+		DownloadCounter,
 	}
 	for _, metric := range metrics {
 		prometheus.MustRegister(metric)

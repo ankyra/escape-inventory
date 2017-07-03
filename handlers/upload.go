@@ -18,6 +18,7 @@ package handlers
 
 import (
 	"fmt"
+	"github.com/ankyra/escape-registry/metrics"
 	"github.com/ankyra/escape-registry/model"
 	"github.com/gorilla/mux"
 	"io/ioutil"
@@ -66,5 +67,6 @@ func RegisterAndUploadHandler(w http.ResponseWriter, r *http.Request) {
 		HandleError(w, r, err)
 		return
 	}
+	metrics.UploadCounter.Inc()
 	w.WriteHeader(200)
 }

@@ -17,6 +17,7 @@ limitations under the License.
 package handlers
 
 import (
+	"github.com/ankyra/escape-registry/metrics"
 	"github.com/ankyra/escape-registry/model"
 	"github.com/gorilla/mux"
 	"io"
@@ -33,6 +34,7 @@ func DownloadHandler(w http.ResponseWriter, r *http.Request) {
 		HandleError(w, r, err)
 		return
 	}
+	metrics.DownloadCounter.Inc()
 	w.Header().Set("Content-Type", "application/gzip")
 	w.WriteHeader(200)
 	io.Copy(w, reader)
