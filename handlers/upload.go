@@ -39,6 +39,7 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 		HandleError(w, r, err)
 		return
 	}
+	metrics.UploadCounter.Inc()
 	w.WriteHeader(200)
 }
 

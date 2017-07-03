@@ -21,18 +21,6 @@ import (
 )
 
 var (
-	RequestCounter = prometheus.NewCounter(
-		prometheus.CounterOpts{
-			Name: "escape_requests",
-			Help: "Number of requests",
-		},
-	)
-	ErrorCounter = prometheus.NewCounter(
-		prometheus.CounterOpts{
-			Name: "escape_error_requests",
-			Help: "Number of errors requests",
-		},
-	)
 	DownloadCounter = prometheus.NewCounter(
 		prometheus.CounterOpts{
 			Name: "escape_downloads",
@@ -63,8 +51,6 @@ var (
 
 func init() {
 	metrics := []prometheus.Collector{
-		RequestCounter,
-		ErrorCounter,
 		DownloadCounter,
 		UploadCounter,
 		ResponsesTotal,
