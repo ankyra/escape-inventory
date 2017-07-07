@@ -67,6 +67,7 @@ const (
 	getPreviousEndpoint2     = "/a/" + getVersionProject + "/my-app/v0.0.1/previous/"
 	getPreviousEndpoint3     = "/a/" + getVersionProject + "/my-app/v0.0.@/previous/"
 	getDiffEndpoint          = "/a/" + getVersionProject + "/my-app/v0.0.2/diff/"
+	getDiffWithEndpoint      = "/a/" + getVersionProject + "/my-app/v0.0.3/diff/v0.0.1/"
 
 	importEndpoint           = "/import"
 	importGetVersionEndpoint = "/a/_/my-app/v1/"
@@ -287,6 +288,7 @@ func (s *suite) Test_GetPreviousVersion(c *C) {
 func (s *suite) Test_Diff(c *C) {
 	s.addRelease(c, getVersionProject, "0.0.1")
 	s.addRelease(c, getVersionProject, "0.0.2")
+	s.addRelease(c, getVersionProject, "0.0.3")
 	req, _ := http.NewRequest("GET", getDiffEndpoint, nil)
 	testRequest(c, req, http.StatusOK)
 	result := []string{}
@@ -294,6 +296,14 @@ func (s *suite) Test_Diff(c *C) {
 	c.Assert(err, IsNil)
 	c.Assert(result, HasLen, 1)
 	c.Assert(result[0], Equals, "Change Version from '0.0.1' to '0.0.2'")
+
+	req, _ = http.NewRequest("GET", getDiffWithEndpoint, nil)
+	rr = httptest.NewRecorder()
+	testRequest(c, req, http.StatusOK)
+	err = json.Unmarshal([]byte(rr.Body.String()), &result)
+	c.Assert(err, IsNil)
+	c.Assert(result, HasLen, 1)
+	c.Assert(result[0], Equals, "Change Version from '0.0.1' to '0.0.3'")
 }
 
 func (s *suite) Test_GetVersion_fails_if_app_doesnt_exist(c *C) {

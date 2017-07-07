@@ -28,17 +28,21 @@ func DiffHandler(w http.ResponseWriter, r *http.Request) {
 	project := mux.Vars(r)["project"]
 	name := mux.Vars(r)["name"]
 	version := mux.Vars(r)["version"]
+	diffWith := mux.Vars(r)["diffWith"]
 	metadata, err := model.GetReleaseMetadata(project, name+"-"+version)
 	if err != nil {
 		HandleError(w, r, err)
 		return
 	}
-	prev, err := model.GetPreviousVersion(project, name, metadata.Version)
-	if err != nil {
-		HandleError(w, r, err)
-		return
+	releaseId := name + "-" + diffWith
+	if diffWith == "" {
+		prev, err := model.GetPreviousVersion(project, name, metadata.Version)
+		if err != nil {
+			HandleError(w, r, err)
+			return
+		}
+		releaseId = name + "-v" + prev
 	}
-	releaseId := name + "-v" + prev
 	previousMetadata, err := model.GetReleaseMetadata(project, releaseId)
 	if err != nil {
 		HandleError(w, r, err)
