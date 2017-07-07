@@ -121,7 +121,7 @@ func diffStruct(name string, oldValue, newValue interface{}) Changes {
 
 func diffSimpleType(name string, oldValue, newValue interface{}) *Change {
 	if !reflect.DeepEqual(oldValue, newValue) {
-		v := NewUpdate(name, oldValue, newValue)
+		v := NewUpdate(name, diffValue(oldValue), diffValue(newValue))
 		return &v
 	}
 	return nil
@@ -221,8 +221,10 @@ func diffPointer(name string, oldValue, newValue interface{}) []Change {
 
 func diffValue(v interface{}) interface{} {
 	switch v.(type) {
-	case string, int:
+	case string:
 		return v
+	case int:
+		return strconv.Itoa(v.(int))
 	case *ExecStage:
 		return v.(*ExecStage).Script
 	case *ConsumerConfig:
