@@ -63,6 +63,10 @@ const (
 	getVersionEndpoint       = "/a/" + getVersionProject + "/my-app/v1/"
 	getLatestVersionEndpoint = "/a/" + getVersionProject + "/my-app/latest/"
 	getAutoVersionEndpoint   = "/a/" + getVersionProject + "/my-app/v0.0.@/"
+	getPreviousEndpoint      = "/a/" + getVersionProject + "/my-app/v0.0.2/previous/"
+	getPreviousEndpoint2     = "/a/" + getVersionProject + "/my-app/v0.0.1/previous/"
+	getPreviousEndpoint3     = "/a/" + getVersionProject + "/my-app/v0.0.@/previous/"
+	getDiffEndpoint          = "/a/" + getVersionProject + "/my-app/v0.0.2/diff/"
 
 	importEndpoint           = "/import"
 	importGetVersionEndpoint = "/a/_/my-app/v1/"
@@ -75,7 +79,7 @@ const (
 
 func testRequest(c *C, req *http.Request, expectedStatus int) {
 	handler.ServeHTTP(rr, req)
-	c.Assert(rr.Code, DeepEquals, expectedStatus, Commentf("Responded with body '%s'", rr.Body.String()))
+	c.Assert(rr.Code, DeepEquals, expectedStatus, Commentf("%s Responded with body '%s'", req.URL, rr.Body.String()))
 }
 
 func (s *suite) addRelease(c *C, project, version string) {
@@ -254,6 +258,42 @@ func (s *suite) Test_GetVersion_Resolves_auto_version(c *C) {
 	c.Assert(err, IsNil)
 	c.Assert(result["name"], Equals, "my-app")
 	c.Assert(result["version"], Equals, "0.0.2")
+}
+
+func (s *suite) Test_GetPreviousVersion(c *C) {
+	s.addRelease(c, getVersionProject, "0.0.1")
+	s.addRelease(c, getVersionProject, "0.0.2")
+	req, _ := http.NewRequest("GET", getPreviousEndpoint, nil)
+	testRequest(c, req, http.StatusOK)
+	result := map[string]interface{}{}
+	err := json.Unmarshal([]byte(rr.Body.String()), &result)
+	c.Assert(err, IsNil)
+	c.Assert(result["name"], Equals, "my-app")
+	c.Assert(result["version"], Equals, "0.0.1")
+
+	req, _ = http.NewRequest("GET", getPreviousEndpoint2, nil)
+	rr = httptest.NewRecorder()
+	testRequest(c, req, http.StatusNotFound)
+
+	req, _ = http.NewRequest("GET", getPreviousEndpoint3, nil)
+	rr = httptest.NewRecorder()
+	testRequest(c, req, http.StatusOK)
+	err = json.Unmarshal([]byte(rr.Body.String()), &result)
+	c.Assert(err, IsNil)
+	c.Assert(result["name"], Equals, "my-app")
+	c.Assert(result["version"], Equals, "0.0.1")
+}
+
+func (s *suite) Test_Diff(c *C) {
+	s.addRelease(c, getVersionProject, "0.0.1")
+	s.addRelease(c, getVersionProject, "0.0.2")
+	req, _ := http.NewRequest("GET", getDiffEndpoint, nil)
+	testRequest(c, req, http.StatusOK)
+	result := []string{}
+	err := json.Unmarshal([]byte(rr.Body.String()), &result)
+	c.Assert(err, IsNil)
+	c.Assert(result, HasLen, 1)
+	c.Assert(result[0], Equals, "Change Version from '0.0.1' to '0.0.2'")
 }
 
 func (s *suite) Test_GetVersion_fails_if_app_doesnt_exist(c *C) {

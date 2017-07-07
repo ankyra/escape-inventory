@@ -47,6 +47,10 @@ func (s *SemanticVersion) ToString() string {
 	return strings.Join(s.versionParts, ".")
 }
 
+func (s *SemanticVersion) Equals(o *SemanticVersion) bool {
+	return s.ToString() == o.ToString()
+}
+
 func (s *SemanticVersion) LessOrEqual(o *SemanticVersion) bool {
 	ix := 0
 	for true {

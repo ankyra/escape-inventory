@@ -29,12 +29,15 @@ var ReadRoutes = map[string]http.HandlerFunc{
 	"/export": handlers.ExportReleasesHandler,
 	"/health": handlers.HealthCheckHandler,
 
-	"/a/":                                    handlers.RegistryHandler,
-	"/a/{project}/":                          handlers.RegistryHandler,
-	"/a/{project}/{name}/":                   handlers.RegistryHandler,
-	"/a/{project}/{name}/{version}/":         handlers.RegistryHandler,
-	"/a/{project}/{name}/{version}/download": handlers.DownloadHandler,
-	"/a/{project}/{name}/next-version":       handlers.NextVersionHandler,
+	"/a/":                                            handlers.RegistryHandler,
+	"/a/{project}/":                                  handlers.RegistryHandler,
+	"/a/{project}/{name}/":                           handlers.RegistryHandler,
+	"/a/{project}/{name}/{version}/":                 handlers.RegistryHandler,
+	"/a/{project}/{name}/{version}/diff/":            handlers.DiffHandler,
+	"/a/{project}/{name}/{version}/diff/{diffWith}/": handlers.DiffHandler,
+	"/a/{project}/{name}/{version}/download":         handlers.DownloadHandler,
+	"/a/{project}/{name}/next-version":               handlers.NextVersionHandler,
+	"/a/{project}/{name}/{version}/previous/":        handlers.PreviousHandler,
 }
 
 var WriteRoutes = map[string]http.HandlerFunc{

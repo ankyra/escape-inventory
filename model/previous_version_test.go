@@ -14,29 +14,28 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package variable_types
+package model
 
 import (
-	"fmt"
+	. "gopkg.in/check.v1"
 )
 
-var boolType = NewUserManagedVariableType("bool", validateBool)
-
-func validateBool(value interface{}, options map[string]interface{}) (interface{}, error) {
-	switch value.(type) {
-	case bool:
-		return value.(bool), nil
-	case int:
-		return value.(int) >= 1, nil
-	case string:
-		truthy := map[string]bool{
-			"true": true,
-			"1":    true,
-			"yay":  true,
-			"yes":  true,
-		}
-		_, found := truthy[value.(string)]
-		return found, nil
+func (s *appSuite) Test_GetPre(c *C) {
+	versions := []string{"0", "0.0", "0.0.0", "0.1", "0.1.0", "0.1.1", "0.1.2"}
+	testCases := map[string]string{
+		"1":     "0.1.2",
+		"0.2":   "0.1.2",
+		"0.1.3": "0.1.2",
+		"0.1.2": "0.1.1",
+		"0.1.1": "0.1.0",
+		"0.1.0": "0.1",
+		"0.1":   "0.0.0",
+		"0.0.0": "0.0",
+		"0.0":   "0",
+		"0":     "-1",
 	}
-	return nil, fmt.Errorf("Expecting 'bool' value, but got '%T'", value)
+	for test, expected := range testCases {
+		maxVer := getPrevVersion(versions, test)
+		c.Assert(maxVer.ToString(), Equals, expected, Commentf(test))
+	}
 }

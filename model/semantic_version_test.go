@@ -32,6 +32,7 @@ func (s *semverSuite) Test_LessOrEqual(c *C) {
 	c.Assert(unit.LessOrEqual(NewSemanticVersion("0.0.4.0")), Equals, true)
 	c.Assert(unit.LessOrEqual(NewSemanticVersion("0.0.3.1")), Equals, true)
 	c.Assert(unit.LessOrEqual(NewSemanticVersion("0.0.3.0")), Equals, true)
+	c.Assert(NewSemanticVersion("0.0.3.0").LessOrEqual(unit), Equals, false)
 	c.Assert(unit.LessOrEqual(NewSemanticVersion("0.0.1")), Equals, false)
 	c.Assert(unit.LessOrEqual(NewSemanticVersion("0.0.2")), Equals, false)
 	c.Assert(unit.LessOrEqual(NewSemanticVersion("0.0.3")), Equals, true)
