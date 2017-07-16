@@ -31,7 +31,7 @@ import (
 	"strings"
 )
 
-const CurrentApiVersion = 2
+const CurrentApiVersion = 3
 
 type ExecStage struct {
 	Script string `json:"script"`
@@ -51,14 +51,6 @@ type ProviderConfig struct {
 
 func NewProviderConfig(name string) *ProviderConfig {
 	return &ProviderConfig{name}
-}
-
-type DependencyConfig struct {
-	ReleaseId string `json:"release_id"`
-}
-
-func NewDependencyConfig(releaseId string) *DependencyConfig {
-	return &DependencyConfig{releaseId}
 }
 
 type ExtensionConfig struct {
@@ -140,6 +132,10 @@ func NewReleaseMetadataFromFile(metadataFile string) (*ReleaseMetadata, error) {
 	return NewReleaseMetadataFromJsonString(string(content))
 }
 
+func (m *ReleaseMetadata) Validate() error {
+	return validate(m)
+}
+
 func validate(m *ReleaseMetadata) error {
 	if m == nil {
 		return fmt.Errorf("Missing release metadata")
@@ -172,6 +168,11 @@ func validate(m *ReleaseMetadata) error {
 	}
 	for _, i := range m.Outputs {
 		if err := i.Validate(); err != nil {
+			return err
+		}
+	}
+	for _, d := range m.Depends {
+		if err := d.Validate(m); err != nil {
 			return err
 		}
 	}
@@ -305,20 +306,19 @@ func (m *ReleaseMetadata) SetProvides(p []string) {
 	}
 }
 
-func (m *ReleaseMetadata) GetDependencies() []string {
-	result := []string{}
-	for _, c := range m.Depends {
-		result = append(result, c.ReleaseId)
-	}
-	return result
+func (m *ReleaseMetadata) AddDependency(dep *DependencyConfig) {
+	m.Depends = append(m.Depends, dep)
+}
+
+func (m *ReleaseMetadata) AddDependencyFromString(dep string) {
+	m.Depends = append(m.Depends, NewDependencyConfig(dep))
 }
 
 func (m *ReleaseMetadata) SetDependencies(deps []string) {
-	result := []*DependencyConfig{}
+	m.Depends = []*DependencyConfig{}
 	for _, d := range deps {
-		result = append(result, NewDependencyConfig(d))
+		m.AddDependencyFromString(d)
 	}
-	m.Depends = result
 }
 
 func (m *ReleaseMetadata) GetVariableContext() map[string]string {
@@ -355,7 +355,7 @@ func (m *ReleaseMetadata) GetVersionlessReleaseId() string {
 
 func (m *ReleaseMetadata) AddInputVariable(input *variables.Variable) {
 	for _, i := range m.Inputs {
-		if i.GetId() == input.GetId() {
+		if i.Id == input.Id {
 			i.Default = input.Default
 			return
 		}
@@ -365,7 +365,7 @@ func (m *ReleaseMetadata) AddInputVariable(input *variables.Variable) {
 
 func (m *ReleaseMetadata) AddOutputVariable(output *variables.Variable) {
 	for _, i := range m.Outputs {
-		if i.GetId() == output.GetId() {
+		if i.Id == output.Id {
 			return
 		}
 	}
@@ -436,15 +436,15 @@ func (m *ReleaseMetadata) ToScriptMap() map[string]script.Script {
 	return map[string]script.Script{
 		"metadata": script.LiftDict(metadataDict),
 
-		"branch":             script.LiftString(m.Branch),
-		"description":        script.LiftString(m.Description),
-		"logo":               script.LiftString(m.Logo),
-		"name":               script.LiftString(m.Name),
-		"revision":           script.LiftString(m.Revision),
-		"repository":         script.LiftString(m.Repository),
-		"version":            script.LiftString(m.Version),
-		"release":            script.LiftString(m.GetReleaseId()),
-		"versionlessRelease": script.LiftString(m.GetVersionlessReleaseId()),
-		"id":                 script.LiftString(m.GetQualifiedReleaseId()),
+		"branch":              script.LiftString(m.Branch),
+		"description":         script.LiftString(m.Description),
+		"logo":                script.LiftString(m.Logo),
+		"name":                script.LiftString(m.Name),
+		"revision":            script.LiftString(m.Revision),
+		"repository":          script.LiftString(m.Repository),
+		"version":             script.LiftString(m.Version),
+		"release":             script.LiftString(m.GetReleaseId()),
+		"versionless_release": script.LiftString(m.GetVersionlessReleaseId()),
+		"id": script.LiftString(m.GetQualifiedReleaseId()),
 	}
 }
