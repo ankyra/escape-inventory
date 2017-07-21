@@ -26,6 +26,7 @@ type Permission int
 const ReadPermission = Permission(1)
 const WritePermission = Permission(2)
 const OwnerPermission = Permission(3)
+const AdminPermission = Permission(4)
 
 type Application struct {
 	Name    string

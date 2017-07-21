@@ -292,18 +292,22 @@ func Validate_GetAllReleases(dao DAO, c *C) {
 func Validate_ACL(dao DAO, c *C) {
 	err := dao.SetACL("_", "*", ReadPermission)
 	c.Assert(err, IsNil)
-	err = dao.SetACL("_", "admin", WritePermission)
+	err = dao.SetACL("_", "writer", WritePermission)
+	c.Assert(err, IsNil)
+	err = dao.SetACL("_", "admin", AdminPermission)
 	c.Assert(err, IsNil)
 
 	groups, err := dao.GetPermittedGroups("_", ReadPermission)
 	c.Assert(err, IsNil)
-	c.Assert(groups, HasLen, 2)
+	c.Assert(groups, HasLen, 3)
 	c.Assert(groups, HasItem, "*")
+	c.Assert(groups, HasItem, "writer")
 	c.Assert(groups, HasItem, "admin")
 
 	groups, err = dao.GetPermittedGroups("_", WritePermission)
 	c.Assert(err, IsNil)
-	c.Assert(groups, HasLen, 1)
+	c.Assert(groups, HasLen, 2)
+	c.Assert(groups, HasItem, "writer")
 	c.Assert(groups, HasItem, "admin")
 
 	err = dao.DeleteACL("_", "*")
@@ -314,8 +318,9 @@ func Validate_ACL(dao DAO, c *C) {
 
 	groups, err = dao.GetPermittedGroups("_", ReadPermission)
 	c.Assert(err, IsNil)
-	c.Assert(groups, HasLen, 1)
-	c.Assert(groups, DeepEquals, []string{"admin"})
+	c.Assert(groups, HasLen, 2)
+	c.Assert(groups, HasItem, "writer")
+	c.Assert(groups, HasItem, "admin")
 
 	groups, err = dao.GetPermittedGroups("doesnt-exist", ReadPermission)
 	c.Assert(err, IsNil)
