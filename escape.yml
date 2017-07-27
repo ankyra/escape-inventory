@@ -77,7 +77,22 @@ errands:
     description: "Upload the produced linux/amd64 binary to a GCS bucket"
     script: scripts/upload_to_gcs.sh
     inputs:
-    - bucket
+    - id: bucket
+      description: "The target bucket"
+    - id: credentials
+      description: "Service account credentials"
+    - id: version
+      default: $this.version
+  publish_binaries:
+    description: Create binaries for all platforms and upload to a GCS bucket
+    inputs:
+    - id: bucket
+      description: "The target bucket"
+    - id: credentials
+      description: "Service account credentials"
+    - id: version
+      default: $this.version
+    script: scripts/publish-binaries.sh
 
 templates:
 - cmd/metadata.go.tpl
