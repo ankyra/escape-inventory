@@ -13,8 +13,8 @@ compile:
   override:
   - escape release
   - echo $GCLOUD_SERVICE_KEY | base64 --decode -i > ${HOME}/gcloud-service-key.json
-  - escape deploy escape-registry-latest
-  - escape errands run publish_binaries -v bucket=escape-releases-eu -v credentials=@${HOME}/gcloud-service-key.json
+  - escape deploy escape-registry-latest -d "latest_binaries"
+  - escape errands run publish_binaries -v bucket=escape-releases-eu -v credentials=@${HOME}/gcloud-service-key.json -d "latest_binaries"
 
 test:
   override:
