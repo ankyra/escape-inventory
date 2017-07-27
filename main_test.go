@@ -135,7 +135,12 @@ func (s *suite) Test_GetProjects(c *C) {
 	s.addRelease(c, "project2", "2")
 	req, _ := http.NewRequest("GET", getProjectsEndpoints, nil)
 	testRequest(c, req, http.StatusOK)
-	c.Assert(rr.Body.String(), Equals, `["project1","project2"]`)
+
+	result := []string{}
+	err := json.Unmarshal([]byte(rr.Body.String()), &result)
+	c.Assert(err, IsNil)
+    c.Assert(result, HasItem, "project1")
+    c.Assert(result, HasItem, "project2")
 }
 
 func (s *suite) Test_GetApplications(c *C) {
