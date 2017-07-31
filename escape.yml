@@ -66,6 +66,7 @@ includes:
 - shared/
 - storage/
 - vendor/
+- docs/
 
 inputs:
 - version
