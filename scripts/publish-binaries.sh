@@ -26,7 +26,9 @@ for GOOS in $PLATFORMS; do
             echo "File $target already exists"
         fi
         gcs_target="gs://$INPUT_bucket/escape-registry/$INPUT_version/$target"
+        echo "Copying to $gcs_target"
         gsutil cp "$target" "$gcs_target"
+        echo "Setting ACL on $gcs_target"
         gsutil acl ch -u AllUsers:R "$gcs_target"
     done
 done
