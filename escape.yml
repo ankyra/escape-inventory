@@ -47,7 +47,8 @@ description: "A Go build for the Escape Registry"
 # To resolve the latest path release:
 #   depends: [archive-example-v0.1.@]
 
-depends: []
+depends:
+- escape-core-latest as core
 
 # The files to includes in this release. The files don't have to exist at 
 # build time. Globbing patterns are supported.

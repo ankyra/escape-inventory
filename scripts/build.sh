@@ -2,10 +2,9 @@
 
 set -euf -o pipefail
 
-if [ -f escape-registry ] ; then
-    echo "./escape-registry already exists. Exiting"
-    exit 0
-fi
+rm -rf vendor/github.com/ankyra/escape-core
+cp -r deps/_/escape-core/ vendor/github.com/ankyra/escape-core
+rm -rf vendor/github.com/ankyra/escape-core/vendor/
 
 user_id=$(id -u $(whoami))
 

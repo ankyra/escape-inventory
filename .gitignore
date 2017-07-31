@@ -2,3 +2,5 @@
 escape_state.json
 escape-registry
 *.swp
+deps/
+test.db
