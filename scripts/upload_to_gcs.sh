@@ -3,7 +3,7 @@
 set -euf -o pipefail
 
 tarball="escape-registry-v$INPUT_version.tgz"
-target="gs://$INPUT_bucket/$tarball"
+target="gs://$INPUT_bucket/escape-registry/$INPUT_version/$tarball"
 
 echo "Packing $tarball"
 tar -cvzf "$tarball" escape-registry
