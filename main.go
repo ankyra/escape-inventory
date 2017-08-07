@@ -26,25 +26,29 @@ import (
 
 var ReadRoutes = map[string]http.HandlerFunc{
 	"/":       HomeHandler,
-	"/export": handlers.ExportReleasesHandler,
 	"/health": handlers.HealthCheckHandler,
 
-	"/a/":                                            handlers.RegistryHandler,
-	"/a/{project}/":                                  handlers.RegistryHandler,
-	"/a/{project}/{name}/":                           handlers.RegistryHandler,
-	"/a/{project}/{name}/{version}/":                 handlers.RegistryHandler,
-	"/a/{project}/{name}/{version}/diff/":            handlers.DiffHandler,
-	"/a/{project}/{name}/{version}/diff/{diffWith}/": handlers.DiffHandler,
-	"/a/{project}/{name}/{version}/download":         handlers.DownloadHandler,
-	"/a/{project}/{name}/next-version":               handlers.NextVersionHandler,
-	"/a/{project}/{name}/{version}/previous/":        handlers.PreviousHandler,
+	"/api/v1/registry/":                                                           handlers.RegistryHandler,
+	"/api/v1/registry/{project}/":                                                 handlers.RegistryHandler,
+	"/api/v1/registry/{project}/units/":                                           handlers.RegistryHandler,
+	"/api/v1/registry/{project}/units/{name}/":                                    handlers.RegistryHandler,
+	"/api/v1/registry/{project}/units/{name}/versions/":                           handlers.RegistryHandler,
+	"/api/v1/registry/{project}/units/{name}/versions/{version}/":                 handlers.RegistryHandler,
+	"/api/v1/registry/{project}/units/{name}/versions/{version}/diff/":            handlers.DiffHandler,
+	"/api/v1/registry/{project}/units/{name}/versions/{version}/diff/{diffWith}/": handlers.DiffHandler,
+	"/api/v1/registry/{project}/units/{name}/versions/{version}/download":         handlers.DownloadHandler,
+	"/api/v1/registry/{project}/units/{name}/versions/{version}/previous/":        handlers.PreviousHandler,
+	"/api/v1/registry/{project}/units/{name}/next-version":                        handlers.NextVersionHandler,
+
+	"/api/v1/internal/export": handlers.ExportReleasesHandler,
 }
 
 var WriteRoutes = map[string]http.HandlerFunc{
-	"/a/{project}/upload":                  handlers.RegisterAndUploadHandler,
-	"/a/{project}/register":                handlers.RegisterHandler,
-	"/a/{project}/{name}/{version}/upload": handlers.UploadHandler,
-	"/import": handlers.ImportReleasesHandler,
+	"/api/v1/registry/{project}/upload":                                 handlers.RegisterAndUploadHandler,
+	"/api/v1/registry/{project}/register":                               handlers.RegisterHandler,
+	"/api/v1/registry/{project}/units/{name}/versions/{version}/upload": handlers.UploadHandler,
+
+	"/api/v1/internal/import": handlers.ImportReleasesHandler,
 }
 
 func HomeHandler(w http.ResponseWriter, r *http.Request) {

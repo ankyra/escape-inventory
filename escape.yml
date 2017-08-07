@@ -19,7 +19,7 @@ name: escape-registry
 # Build the next path release in the 1.1.* series:
 #   version: 1.1.@
 #
-version: '0.7.@'
+version: '0.8.@'
 
  
 # An (optional) description for this release.

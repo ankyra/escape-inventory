@@ -43,36 +43,36 @@ func (s *suite) SetUpTest(c *C) {
 }
 
 const (
-	registerEndpoint = "/a/my-project/register"
+	registerEndpoint = "/api/v1/registry/my-project/register"
 
-	getProjectsEndpoints = "/a/"
+	getProjectsEndpoints = "/api/v1/registry/"
 
 	applicationsTestProject       = "applications-test-prj"
-	applicationsEndpoint          = "/a/" + applicationsTestProject + "/"
-	applicationsEndpointNoProject = "/a/doesnt-exist/"
+	applicationsEndpoint          = "/api/v1/registry/" + applicationsTestProject + "/"
+	applicationsEndpointNoProject = "/api/v1/registry/doesnt-exist/"
 
 	applicationVersionsTestProject = "versions-test-prj"
-	applicationVersionsEndpoint    = "/a/" + applicationVersionsTestProject + "/my-app/"
-	applicationVersionsNoProject   = "/a/doesnt-exist/my-app/"
-	applicationVersionsNoApp       = "/a/versions-test/doesnt-exist/"
+	applicationVersionsEndpoint    = "/api/v1/registry/" + applicationVersionsTestProject + "/units/my-app/"
+	applicationVersionsNoProject   = "/api/v1/registry/doesnt-exist/units/my-app/"
+	applicationVersionsNoApp       = "/api/v1/registry/versions-test/units/doesnt-exist/"
 
 	nextVersionProject  = "next-version-prj"
-	nextVersionEndpoint = "/a/" + nextVersionProject + "/my-app/next-version"
+	nextVersionEndpoint = "/api/v1/registry/" + nextVersionProject + "/units/my-app/next-version"
 
 	getVersionProject        = "get-version-prj"
-	getVersionEndpoint       = "/a/" + getVersionProject + "/my-app/v1/"
-	getLatestVersionEndpoint = "/a/" + getVersionProject + "/my-app/latest/"
-	getAutoVersionEndpoint   = "/a/" + getVersionProject + "/my-app/v0.0.@/"
-	getPreviousEndpoint      = "/a/" + getVersionProject + "/my-app/v0.0.2/previous/"
-	getPreviousEndpoint2     = "/a/" + getVersionProject + "/my-app/v0.0.1/previous/"
-	getPreviousEndpoint3     = "/a/" + getVersionProject + "/my-app/v0.0.@/previous/"
-	getDiffEndpoint          = "/a/" + getVersionProject + "/my-app/v0.0.2/diff/"
-	getDiffWithEndpoint      = "/a/" + getVersionProject + "/my-app/v0.0.3/diff/v0.0.1/"
+	getVersionEndpoint       = "/api/v1/registry/" + getVersionProject + "/units/my-app/versions/v1/"
+	getLatestVersionEndpoint = "/api/v1/registry/" + getVersionProject + "/units/my-app/versions/latest/"
+	getAutoVersionEndpoint   = "/api/v1/registry/" + getVersionProject + "/units/my-app/versions/v0.0.@/"
+	getPreviousEndpoint      = "/api/v1/registry/" + getVersionProject + "/units/my-app/versions/v0.0.2/previous/"
+	getPreviousEndpoint2     = "/api/v1/registry/" + getVersionProject + "/units/my-app/versions/v0.0.1/previous/"
+	getPreviousEndpoint3     = "/api/v1/registry/" + getVersionProject + "/units/my-app/versions/v0.0.@/previous/"
+	getDiffEndpoint          = "/api/v1/registry/" + getVersionProject + "/units/my-app/versions/v0.0.2/diff/"
+	getDiffWithEndpoint      = "/api/v1/registry/" + getVersionProject + "/units/my-app/versions/v0.0.3/diff/v0.0.1/"
 
-	importEndpoint           = "/import"
-	importGetVersionEndpoint = "/a/_/my-app/v1/"
+	importEndpoint           = "/api/v1/internal/import"
+	importGetVersionEndpoint = "/api/v1/registry/_/units/my-app/versions/v1/"
 	exportProject            = "export-prj"
-	exportEndpoint           = "/export"
+	exportEndpoint           = "/api/v1/internal/export"
 
 	metricsEndpoint = "/metrics"
 	healthEndpoint  = "/health"
@@ -86,7 +86,7 @@ func testRequest(c *C, req *http.Request, expectedStatus int) {
 func (s *suite) addRelease(c *C, project, version string) {
 	rr = httptest.NewRecorder()
 	body := bytes.NewReader([]byte(`{"name": "my-app", "version": "` + version + `"}`))
-	req, _ := http.NewRequest("POST", "/a/"+project+"/register", body)
+	req, _ := http.NewRequest("POST", "/api/v1/registry/"+project+"/register", body)
 	testRequest(c, req, 200)
 	rr = httptest.NewRecorder()
 }
@@ -139,8 +139,8 @@ func (s *suite) Test_GetProjects(c *C) {
 	result := []string{}
 	err := json.Unmarshal([]byte(rr.Body.String()), &result)
 	c.Assert(err, IsNil)
-    c.Assert(result, HasItem, "project1")
-    c.Assert(result, HasItem, "project2")
+	c.Assert(result, HasItem, "project1")
+	c.Assert(result, HasItem, "project2")
 }
 
 func (s *suite) Test_GetApplications(c *C) {
@@ -327,7 +327,7 @@ func (s *suite) Test_GetVersion_fails_if_version_doesnt_exist(c *C) {
 		"v0.0.@",
 	}
 	for _, v := range versions {
-		req, _ := http.NewRequest("GET", "/a/"+getVersionProject+"/my-app/"+v+"/", nil)
+		req, _ := http.NewRequest("GET", "/api/v1/registry/"+getVersionProject+"/units/my-app/versions/"+v+"/", nil)
 		testRequest(c, req, 404)
 		rr = httptest.NewRecorder()
 	}
@@ -341,7 +341,7 @@ func (s *suite) Test_GetVersion_fails_if_version_format_invalid(c *C) {
 		"1.0",
 	}
 	for _, v := range versions {
-		req, _ := http.NewRequest("GET", "/a/"+getVersionProject+"/my-app/"+v+"/", nil)
+		req, _ := http.NewRequest("GET", "/api/v1/registry/"+getVersionProject+"/units/my-app/versions/"+v+"/", nil)
 		testRequest(c, req, 400)
 		rr = httptest.NewRecorder()
 	}
