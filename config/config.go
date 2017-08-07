@@ -43,6 +43,7 @@ type Config struct {
 	StorageBackend   string           `json:"storage_backend" yaml:"storage_backend"`
 	StorageSettings  StorageSettings  `json:"storage_settings" yaml:"storage_settings"`
 	UserServiceURL   string           `json:"user_service_url" yaml:"user_service_url"`
+	WebHook          string           `json:"web_hook" yaml:"web_hook"`
 }
 
 func NewConfig(env []string) (*Config, error) {
@@ -115,6 +116,8 @@ func processEnvironmentOverrides(config *Config, env []string) *Config {
 			config.StorageSettings.Bucket = value
 		} else if key == "STORAGE_SETTINGS_CREDENTIALS" {
 			config.StorageSettings.Credentials = value
+		} else if key == "WEB_HOOK" {
+			config.WebHook = value
 		} else if key == "USER_SERVICE_URL" {
 			config.UserServiceURL = value
 		}

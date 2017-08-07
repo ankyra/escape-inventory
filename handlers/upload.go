@@ -17,11 +17,15 @@ limitations under the License.
 package handlers
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
+	"github.com/ankyra/escape-registry/cmd"
 	"github.com/ankyra/escape-registry/metrics"
 	"github.com/ankyra/escape-registry/model"
 	"github.com/gorilla/mux"
 	"io/ioutil"
+	"log"
 	"net/http"
 )
 
@@ -40,6 +44,7 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	metrics.UploadCounter.Inc()
+	go CallWebHook(project, releaseId)
 	w.WriteHeader(200)
 }
 
@@ -69,5 +74,39 @@ func RegisterAndUploadHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	metrics.UploadCounter.Inc()
+	go CallWebHook(project, release.GetReleaseId())
 	w.WriteHeader(200)
+}
+
+func CallWebHook(project, releaseId string) {
+	if cmd.Config.WebHook == "" {
+		return
+	}
+	url := cmd.Config.WebHook
+	data := map[string]interface{}{
+		"event":   "NEW_UPLOAD",
+		"project": project,
+		"release": project + "/" + releaseId,
+	}
+	body, err := json.Marshal(data)
+	if err != nil {
+		log.Println("ERROR: Failed to marshal webhook request:", err)
+		return
+	}
+	req, err := http.NewRequest("POST", url, bytes.NewReader(body))
+	if err != nil {
+		log.Println("ERROR: Failed to create webhook request:", err)
+		return
+	}
+	log.Println("INFO: Calling webhook:", url)
+	client := http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Println("ERROR: Failed to call webhook:", err)
+		return
+	}
+	if resp.StatusCode != 200 {
+		log.Println("ERROR: Failed to call webhook, expecting status code 200, but got", resp.StatusCode)
+		return
+	}
 }
