@@ -46,7 +46,6 @@
 		},
 		{
 			"checksumSHA1": "JRgDEGpKIt8fsuVqGSNjd4grJ8Q=",
-			"origin": "github.com/ankyra/escape-registry/vendor/github.com/ankyra/escape-core/docs",
 			"path": "github.com/ankyra/escape-core/docs",
 			"revision": "8fb0b8e4e736fcb6c6a36fae5eb9c74c4b80bb3c",
 			"revisionTime": "2017-07-31T05:10:18Z"
@@ -243,6 +242,42 @@
 			"path": "github.com/lib/pq/oid",
 			"revision": "11fc39a580a008f1f39bb3d11d984fb34ed778d9",
 			"revisionTime": "2015-11-25T21:47:21Z"
+		},
+		{
+			"checksumSHA1": "uSG4V6AcVQNcll5Vk3HG0eT9+UU=",
+			"path": "github.com/mattes/migrate",
+			"revision": "50068870a15f7c56518b5d7652dc799adb79183e",
+			"revisionTime": "2017-06-10T17:25:06Z"
+		},
+		{
+			"checksumSHA1": "6QePtWUFN9x9U/Y6OzcENUUudmM=",
+			"path": "github.com/mattes/migrate/database",
+			"revision": "50068870a15f7c56518b5d7652dc799adb79183e",
+			"revisionTime": "2017-06-10T17:25:06Z"
+		},
+		{
+			"checksumSHA1": "QSLooIeXnzHZElwTfIZoPH4FNH0=",
+			"path": "github.com/mattes/migrate/database/postgres",
+			"revision": "50068870a15f7c56518b5d7652dc799adb79183e",
+			"revisionTime": "2017-06-10T17:25:06Z"
+		},
+		{
+			"checksumSHA1": "wXPn7mDehT7MjrBgzi0M1sduuLA=",
+			"path": "github.com/mattes/migrate/database/sqlite3",
+			"revision": "50068870a15f7c56518b5d7652dc799adb79183e",
+			"revisionTime": "2017-06-10T17:25:06Z"
+		},
+		{
+			"checksumSHA1": "kIHQkF+Nm0LBPppYbchll3njidY=",
+			"path": "github.com/mattes/migrate/source",
+			"revision": "50068870a15f7c56518b5d7652dc799adb79183e",
+			"revisionTime": "2017-06-10T17:25:06Z"
+		},
+		{
+			"checksumSHA1": "k/prxs5UJ3aiz0wEiHVIPfGGR9k=",
+			"path": "github.com/mattes/migrate/source/go-bindata",
+			"revision": "50068870a15f7c56518b5d7652dc799adb79183e",
+			"revisionTime": "2017-06-10T17:25:06Z"
 		},
 		{
 			"checksumSHA1": "CmknXrMVBRJrx4LsIA9jEOmsLQQ=",
@@ -463,6 +498,12 @@
 		{
 			"checksumSHA1": "ioINwG/Y5fFZFHGJ7MZCZNoyoDo=",
 			"path": "google.golang.org/api/transport",
+			"revision": "629ff0da413865688533e3d3cad3c54966efcb73",
+			"revisionTime": "2017-07-28T15:49:15Z"
+		},
+		{
+			"checksumSHA1": "xwbVX4c2O/XL3Pz0QgGeJEME8oI=",
+			"path": "google.golang.org/api/transport/grpc",
 			"revision": "629ff0da413865688533e3d3cad3c54966efcb73",
 			"revisionTime": "2017-07-28T15:49:15Z"
 		},

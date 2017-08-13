@@ -21,42 +21,37 @@ import (
 	"fmt"
 	"github.com/ankyra/escape-registry/dao/sqlhelp"
 	. "github.com/ankyra/escape-registry/dao/types"
-	pq "github.com/lib/pq"
+	"github.com/lib/pq"
+	"github.com/mattes/migrate"
+	_ "github.com/mattes/migrate/database/postgres"
+	"github.com/mattes/migrate/source/go-bindata"
 )
 
-var schema = `
-CREATE TABLE IF NOT EXISTS release (
-    name varchar(128), 
-    release_id varchar(256),
-    version varchar(32),
-    metadata text,
-    project varchar(32),
-    PRIMARY KEY(name, version, project)
-);
-
-CREATE TABLE IF NOT EXISTS package (
-    project varchar(32),
-    release_id varchar(256), 
-    uri varchar(256), 
-    PRIMARY KEY(release_id, uri, project)
-);
-
-CREATE TABLE IF NOT EXISTS acl (
-    project varchar(32),
-    group_name varchar(256),
-    permission int, 
-    PRIMARY KEY(project, group_name)
-);
-`
-
 func NewPostgresDAO(url string) (DAO, error) {
+	s, err := bindata.WithInstance(bindata.Resource(AssetNames(),
+		func(name string) ([]byte, error) {
+			return Asset(name)
+		}))
+	if err != nil {
+		return nil, fmt.Errorf("Couldn't open Postgres storage backend '%s' [3]: %s", url, err.Error())
+	}
+	m, err := migrate.NewWithSourceInstance("go-bindata", s, url)
+	if err != nil {
+		return nil, fmt.Errorf("Couldn't open migrations for Postgres storage backend '%s' [3]: %s", url, err.Error())
+	}
+	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
+		return nil, fmt.Errorf("Couldn't apply Postgres migrations to '%s' [4]: %s", url, err.Error())
+	}
+	sourceError, dbError := m.Close()
+	if sourceError != nil {
+		return nil, fmt.Errorf("Couldn't close Postgres migrations to '%s' [4]: %s", url, sourceError)
+	}
+	if dbError != nil {
+		return nil, fmt.Errorf("Couldn't close Postgres migrations to '%s' [4]: %s", url, dbError)
+	}
 	db, err := sql.Open("postgres", url)
 	if err != nil {
 		return nil, fmt.Errorf("Couldn't open Postgres storage backend '%s': %s", url, err.Error())
-	}
-	_, err = db.Exec(schema)
-	if err != nil {
-		return nil, fmt.Errorf("Couldn't initialise Postgres storage backend '%s' [1]: %s", url, err.Error())
 	}
 	return &sqlhelp.SQLHelper{
 		DB: db,

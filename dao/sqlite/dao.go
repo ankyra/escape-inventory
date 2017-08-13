@@ -21,42 +21,31 @@ import (
 	"fmt"
 	"github.com/ankyra/escape-registry/dao/sqlhelp"
 	. "github.com/ankyra/escape-registry/dao/types"
+	"github.com/mattes/migrate"
+	sqlite_migrate "github.com/mattes/migrate/database/sqlite3"
+	"github.com/mattes/migrate/source/go-bindata"
 	sqlite3 "github.com/mattn/go-sqlite3"
 )
-
-var schema = `
-CREATE TABLE IF NOT EXISTS release (
-    name string, 
-    release_id string,
-    version string,
-    metadata string,
-    project string,
-    PRIMARY KEY(name, version, project)
-);
-
-CREATE TABLE IF NOT EXISTS package (
-    project string,
-    release_id string, 
-    uri string, 
-    PRIMARY KEY(project, release_id, uri)
-);
-
-CREATE TABLE IF NOT EXISTS acl (
-    project string,
-    group_name string, 
-    permission varchar(1),
-    PRIMARY KEY(project, group_name)
-);
-`
 
 func NewSQLiteDAO(path string) (DAO, error) {
 	db, err := sql.Open("sqlite3", path)
 	if err != nil {
 		return nil, fmt.Errorf("Couldn't open SQLite storage backend '%s': %s", path, err.Error())
 	}
-	_, err = db.Exec(schema)
+	driver, err := sqlite_migrate.WithInstance(db, &sqlite_migrate.Config{})
+	s, err := bindata.WithInstance(bindata.Resource(AssetNames(),
+		func(name string) ([]byte, error) {
+			return Asset(name)
+		}))
 	if err != nil {
 		return nil, fmt.Errorf("Couldn't initialise SQLite storage backend '%s' [1]: %s", path, err.Error())
+	}
+	m, err := migrate.NewWithInstance("go-bindata", s, "sqlite3", driver)
+	if err != nil {
+		return nil, fmt.Errorf("Couldn't initialise migrations for SQLite storage backend '%s' [1]: %s", path, err.Error())
+	}
+	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
+		return nil, fmt.Errorf("Couldn't apply migrations to SQLite storage backend '%s' [1]: %s", path, err.Error())
 	}
 	return &sqlhelp.SQLHelper{
 		DB:                       db,

@@ -45,12 +45,9 @@ func (s *memSuite) Test_DAO(c *C) {
 			url := "postgres://postgres:@localhost/postgres?sslmode=disable"
 			db, err := sql.Open("postgres", url)
 			c.Assert(err, IsNil)
-			_, err = db.Exec(`DROP TABLE IF EXISTS release`)
-			c.Assert(err, IsNil)
-			_, err = db.Exec(`DROP TABLE IF EXISTS package`)
-			c.Assert(err, IsNil)
-			_, err = db.Exec(`DROP TABLE IF EXISTS acl`)
-			c.Assert(err, IsNil)
+			_, err = db.Exec(`TRUNCATE release CASCADE`)
+			_, err = db.Exec(`TRUNCATE package CASCADE`)
+			_, err = db.Exec(`TRUNCATE acl CASCADE`)
 
 			// Create unit
 			dao, err := NewPostgresDAO(url)
