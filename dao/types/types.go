@@ -28,6 +28,19 @@ const WritePermission = Permission(2)
 const OwnerPermission = Permission(3)
 const AdminPermission = Permission(4)
 
+func (p Permission) String() string {
+	if p == ReadPermission {
+		return "read"
+	} else if p == WritePermission {
+		return "write"
+	} else if p == OwnerPermission {
+		return "owner"
+	} else if p == AdminPermission {
+		return "admin"
+	}
+	return "???"
+}
+
 type Application struct {
 	Name    string
 	Project string
