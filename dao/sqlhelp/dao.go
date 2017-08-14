@@ -21,6 +21,7 @@ type SQLHelper struct {
 	AddReleaseQuery          string
 	GetPackageURIsQuery      string
 	AddPackageURIQuery       string
+	GetACLQuery              string
 	InsertACLQuery           string
 	UpdateACLQuery           string
 	DeleteACLQuery           string
@@ -207,6 +208,24 @@ func (s *SQLHelper) SetACL(project, group string, perm Permission) error {
 		return err
 	}
 	return nil
+}
+
+func (s *SQLHelper) GetACL(project string) (map[string]Permission, error) {
+	rows, err := s.PrepareAndQuery(s.GetACLQuery, project)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	result := map[string]Permission{}
+	for rows.Next() {
+		var group_name string
+		var permission Permission
+		if err := rows.Scan(&group_name, &permission); err != nil {
+			return nil, err
+		}
+		result[group_name] = permission
+	}
+	return result, nil
 }
 
 func (s *SQLHelper) DeleteACL(project, group string) error {

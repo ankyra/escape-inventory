@@ -66,6 +66,7 @@ func NewPostgresDAO(url string) (DAO, error) {
 		AddReleaseQuery:          "INSERT INTO release(project, name, release_id, version, metadata) VALUES($1, $2, $3, $4, $5)",
 		GetPackageURIsQuery:      "SELECT uri FROM package WHERE project = $1 AND release_id = $2",
 		AddPackageURIQuery:       "INSERT INTO package (project, release_id, uri) VALUES ($1, $2, $3)",
+		GetACLQuery:              "SELECT group_name, permission FROM acl WHERE project = $1",
 		InsertACLQuery:           "INSERT INTO acl(project, group_name, permission) VALUES ($1, $2, $3)",
 		UpdateACLQuery:           "UPDATE acl SET permission = $1 WHERE project = $2 AND group_name = $3",
 		DeleteACLQuery:           "DELETE FROM acl WHERE project = $1 AND group_name = $2",

@@ -91,6 +91,10 @@ func SetACL(project, group string, perm Permission) error {
 	return GlobalDAO.SetACL(project, group, perm)
 }
 
+func GetACL(project string) (map[string]Permission, error) {
+	return GlobalDAO.GetACL(project)
+}
+
 func DeleteACL(project, group string) error {
 	return GlobalDAO.DeleteACL(project, group)
 }

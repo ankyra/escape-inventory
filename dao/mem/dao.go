@@ -190,6 +190,15 @@ func (a *dao) SetACL(project, group string, perm Permission) error {
 	a.acls[project] = groups
 	return nil
 }
+
+func (a *dao) GetACL(project string) (map[string]Permission, error) {
+	groups, ok := a.acls[project]
+	if !ok {
+		groups = map[string]Permission{}
+	}
+	return groups, nil
+}
+
 func (a *dao) DeleteACL(project, group string) error {
 	groups, ok := a.acls[project]
 	if !ok {

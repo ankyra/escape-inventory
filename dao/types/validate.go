@@ -310,6 +310,12 @@ func Validate_ACL(dao DAO, c *C) {
 	c.Assert(groups, HasItem, "writer")
 	c.Assert(groups, HasItem, "admin")
 
+	members, err := dao.GetACL("_")
+	c.Assert(err, IsNil)
+	c.Assert(members["*"], Equals, ReadPermission)
+	c.Assert(members["writer"], Equals, WritePermission)
+	c.Assert(members["admin"], Equals, AdminPermission)
+
 	err = dao.DeleteACL("_", "*")
 	c.Assert(err, IsNil)
 

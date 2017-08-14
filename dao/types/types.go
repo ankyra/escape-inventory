@@ -71,6 +71,7 @@ type DAO interface {
 	AddPackageURI(release *Release, uri string) error
 
 	SetACL(project, group string, perm Permission) error
+	GetACL(project string) (map[string]Permission, error)
 	DeleteACL(project, group string) error
 	GetPermittedGroups(project string, perm Permission) ([]string, error)
 }

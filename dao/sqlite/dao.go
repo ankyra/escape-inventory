@@ -59,6 +59,7 @@ func NewSQLiteDAO(path string) (DAO, error) {
 		AddReleaseQuery:          "INSERT INTO release(project, name, release_id, version, metadata) VALUES(?, ?, ?, ?, ?)",
 		GetPackageURIsQuery:      "SELECT uri FROM package WHERE project = ? AND release_id = ?",
 		AddPackageURIQuery:       "INSERT INTO package (project, release_id, uri) VALUES (?, ?, ?)",
+		GetACLQuery:              "SELECT group_name, permission FROM acl WHERE project = ?",
 		InsertACLQuery:           "INSERT INTO acl(project, group_name, permission) VALUES(?, ?, ?)",
 		UpdateACLQuery:           "UPDATE acl SET permission = ? WHERE project = ? AND group_name = ?",
 		DeleteACLQuery:           "DELETE FROM acl WHERE project = ? AND group_name = ?",
