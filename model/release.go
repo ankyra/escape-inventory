@@ -38,10 +38,18 @@ func ensureProjectExists(project string) error {
 	return dao.AddProject(prj)
 }
 
-func AddRelease(project, metadataJson string) (*core.ReleaseMetadata, error) {
-	if err := ensureProjectExists(project); err != nil {
-		return nil, err
+func ensureApplicationExists(project, name string) error {
+	_, err := dao.GetApplication(project, name)
+	if err == nil {
+		return nil
 	}
+	if err != NotFound {
+		return err
+	}
+	return dao.AddApplication(NewApplication(project, name))
+}
+
+func AddRelease(project, metadataJson string) (*core.ReleaseMetadata, error) {
 	metadata, err := core.NewReleaseMetadataFromJsonString(metadataJson)
 	if err != nil {
 		return nil, NewUserError(err)
@@ -56,6 +64,12 @@ func AddRelease(project, metadataJson string) (*core.ReleaseMetadata, error) {
 	}
 	if metadata.ApiVersion > core.CurrentApiVersion {
 		return nil, NewUserError(fmt.Errorf("Release format version v%s is not supported (this registry supports up to v%s)", metadata.ApiVersion, core.CurrentApiVersion))
+	}
+	if err := ensureProjectExists(project); err != nil {
+		return nil, err
+	}
+	if err := ensureApplicationExists(project, parsed.Name); err != nil {
+		return nil, err
 	}
 	release, err := dao.GetRelease(project, parsed.Name, releaseId)
 	if err != nil && !dao.IsNotFound(err) {

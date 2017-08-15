@@ -186,15 +186,7 @@ func (a *dao) AddRelease(project string, rel *core.ReleaseMetadata) (*Release, e
 	key := rel.GetReleaseId()
 	app, ok := apps[rel.Name]
 	if !ok {
-		unwrapped, err := a.GetApplication(project, rel.Name)
-		if err != nil {
-			unwrapped = NewApplication(project, rel.Name)
-		}
-		app = &application{
-			App:      unwrapped,
-			Releases: map[string]*release{},
-		}
-		a.apps[unwrapped] = app
+		return nil, NotFound
 	}
 	_, alreadyExists := app.Releases[key]
 	if alreadyExists {

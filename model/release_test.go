@@ -26,10 +26,15 @@ type releaseSuite struct{}
 
 var _ = Suite(&releaseSuite{})
 
+func (s *releaseSuite) SetUpTest(c *C) {
+	dao.TestSetup()
+}
+
 func (s *releaseSuite) Test_AddRelease_Missing_Field_Name(c *C) {
 	_, err := AddRelease("_", `{"version": "0"}`)
 	c.Assert(err, Not(IsNil))
 }
+
 func (s *releaseSuite) Test_AddRelease_Missing_Field_Version(c *C) {
 	_, err := AddRelease("_", `{"name": "asdaiasd"}`)
 	c.Assert(err, Not(IsNil))
@@ -48,7 +53,7 @@ func (s *releaseSuite) Test_GetMetadataNotFound(c *C) {
 	c.Assert(dao.IsNotFound(err), Equals, true)
 }
 
-func (s *releaseSuite) Test_AddRelease_CreateProjectMetadata(c *C) {
+func (s *releaseSuite) Test_AddRelease_Creates_Project_Metadata(c *C) {
 	_, err := dao.GetProject("test")
 	c.Assert(err, Equals, types.NotFound)
 
@@ -58,4 +63,17 @@ func (s *releaseSuite) Test_AddRelease_CreateProjectMetadata(c *C) {
 	prj, err := dao.GetProject("test")
 	c.Assert(err, IsNil)
 	c.Assert(prj.Name, Equals, "test")
+}
+
+func (s *releaseSuite) Test_AddRelease_Creates_Application_Metadata(c *C) {
+	_, err := dao.GetApplication("test", "up-test")
+	c.Assert(err, Equals, types.NotFound)
+
+	_, err = AddRelease("test", `{"name": "up-test", "version": "0"}`)
+	c.Assert(err, IsNil)
+
+	app, err := dao.GetApplication("test", "up-test")
+	c.Assert(err, IsNil)
+	c.Assert(app.Name, Equals, "up-test")
+	c.Assert(app.Project, Equals, "test")
 }

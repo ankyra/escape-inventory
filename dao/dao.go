@@ -80,6 +80,14 @@ func GetApplications(project string) (map[string]*Application, error) {
 	return GlobalDAO.GetApplications(project)
 }
 
+func AddApplication(app *Application) error {
+	return GlobalDAO.AddApplication(app)
+}
+
+func UpdateApplication(app *Application) error {
+	return GlobalDAO.UpdateApplication(app)
+}
+
 func GetApplication(project, name string) (*Application, error) {
 	return GlobalDAO.GetApplication(project, name)
 }

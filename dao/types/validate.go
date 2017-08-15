@@ -40,6 +40,8 @@ func ValidateDAO(dao func() DAO, c *C) {
 }
 
 func addReleaseToProject(dao DAO, c *C, name, version, project string) *Release {
+	dao.AddProject(NewProject(project))
+	dao.AddApplication(NewApplication(project, name))
 	metadataJson := `{"name": "` + name + `", "version": "` + version + `"}`
 	metadata, err := core.NewReleaseMetadataFromJsonString(metadataJson)
 	c.Assert(err, IsNil)
@@ -53,6 +55,8 @@ func addRelease(dao DAO, c *C, name, version string) *Release {
 }
 
 func Validate_AddRelease_Unique(dao DAO, c *C) {
+	c.Assert(dao.AddProject(NewProject("_")), IsNil)
+	c.Assert(dao.AddApplication(NewApplication("_", "dao-val")), IsNil)
 	metadataJson := `{"name": "dao-val", "version": "1"}`
 	metadata, err := core.NewReleaseMetadataFromJsonString(metadataJson)
 	c.Assert(err, IsNil)
@@ -63,6 +67,10 @@ func Validate_AddRelease_Unique(dao DAO, c *C) {
 }
 
 func Validate_AddRelease_Unique_per_project(dao DAO, c *C) {
+	c.Assert(dao.AddProject(NewProject("_")), IsNil)
+	c.Assert(dao.AddApplication(NewApplication("_", "dao-val")), IsNil)
+	c.Assert(dao.AddProject(NewProject("my-project")), IsNil)
+	c.Assert(dao.AddApplication(NewApplication("my-project", "dao-val")), IsNil)
 	metadataJson := `{"name": "dao-val", "version": "1"}`
 	metadata, err := core.NewReleaseMetadataFromJsonString(metadataJson)
 	c.Assert(err, IsNil)
@@ -73,6 +81,8 @@ func Validate_AddRelease_Unique_per_project(dao DAO, c *C) {
 }
 
 func Validate_GetRelease(dao DAO, c *C) {
+	c.Assert(dao.AddProject(NewProject("_")), IsNil)
+	c.Assert(dao.AddApplication(NewApplication("_", "dao-val")), IsNil)
 	metadataJson := `{"name": "dao-val", "version": "1"}`
 	metadata, err := core.NewReleaseMetadataFromJsonString(metadataJson)
 	c.Assert(err, IsNil)
@@ -97,7 +107,7 @@ func Validate_GetProjects(dao DAO, c *C) {
 	c.Assert(err, IsNil)
 	c.Assert(empty, HasLen, 0)
 
-	c.Assert(dao.AddProject(NewProject("_")), Equals, nil)
+	c.Assert(dao.AddProject(NewProject("_")), IsNil)
 	c.Assert(dao.AddProject(NewProject("project1")), Equals, nil)
 	c.Assert(dao.AddProject(NewProject("project2")), Equals, nil)
 
@@ -312,6 +322,8 @@ func Validate_GetPackageURIs(dao DAO, c *C) {
 }
 
 func Validate_AddPackageURI_Unique(dao DAO, c *C) {
+	c.Assert(dao.AddProject(NewProject("_")), IsNil)
+	c.Assert(dao.AddApplication(NewApplication("_", "dao-val")), IsNil)
 	metadataJson := `{"name": "dao-val", "version": "1"}`
 	metadata, err := core.NewReleaseMetadataFromJsonString(metadataJson)
 	c.Assert(err, IsNil)

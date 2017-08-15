@@ -19,6 +19,7 @@ package model
 import (
 	"encoding/json"
 	"fmt"
+
 	"github.com/ankyra/escape-core"
 	"github.com/ankyra/escape-registry/dao"
 )
@@ -40,6 +41,12 @@ func Import(releases []map[string]interface{}) error {
 		metadata, err := core.NewReleaseMetadataFromJsonString(string(metadataJson))
 		if err != nil {
 			return NewUserError(fmt.Errorf("Could not get metadata from JSON: %s", err.Error()))
+		}
+		if err := ensureProjectExists(project); err != nil {
+			return err
+		}
+		if err := ensureApplicationExists(project, metadata.Name); err != nil {
+			return err
 		}
 		release, err := dao.AddRelease(project, metadata)
 		if dao.IsAlreadyExists(err) {
