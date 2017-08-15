@@ -28,6 +28,7 @@ func ValidateDAO(dao func() DAO, c *C) {
 	Validate_GetRelease_NotFound(dao(), c)
 	Validate_GetProjects(dao(), c)
 	Validate_ProjectMetadata(dao(), c)
+	Validate_ApplicationMetadata(dao(), c)
 	Validate_GetProjectsByGroups(dao(), c)
 	Validate_GetApplication(dao(), c)
 	Validate_GetApplications(dao(), c)
@@ -110,20 +111,18 @@ func Validate_GetProjects(dao DAO, c *C) {
 }
 
 func Validate_ProjectMetadata(dao DAO, c *C) {
-	_, err := dao.GetProject("test")
-	c.Assert(err, Equals, NotFound)
-
 	update := NewProject("test")
 	update.Description = "yo"
+	_, err := dao.GetProject("test")
+	c.Assert(err, Equals, NotFound)
 	c.Assert(dao.UpdateProject(update), Equals, NotFound)
 	c.Assert(dao.AddProject(update), IsNil)
+	c.Assert(dao.AddProject(update), Equals, AlreadyExists)
 
 	project, err := dao.GetProject("test")
 	c.Assert(err, IsNil)
 	c.Assert(project.Name, Equals, "test")
 	c.Assert(project.Description, Equals, "yo")
-
-	c.Assert(dao.AddProject(update), Equals, AlreadyExists)
 
 	update = NewProject("test")
 	update.Description = "new description"
@@ -132,6 +131,34 @@ func Validate_ProjectMetadata(dao DAO, c *C) {
 	project, err = dao.GetProject("test")
 	c.Assert(err, IsNil)
 	c.Assert(project.Description, Equals, "new description")
+}
+
+func Validate_ApplicationMetadata(dao DAO, c *C) {
+	app := NewApplication("project", "name")
+	update := NewApplication("project", "name")
+	update.Description = "Test"
+
+	_, err := dao.GetApplication("project", "name")
+	c.Assert(err, Equals, NotFound)
+
+	c.Assert(dao.AddProject(NewProject("project")), Equals, nil)
+	c.Assert(dao.UpdateApplication(update), Equals, NotFound)
+	c.Assert(dao.AddApplication(app), IsNil)
+	c.Assert(dao.AddApplication(app), Equals, AlreadyExists)
+
+	//	app, err = dao.GetApplication("project", "name")
+	//	c.Assert(err, IsNil)
+	//	c.Assert(app.Name, Equals, "name")
+	//	c.Assert(app.Project, Equals, "project")
+	//	c.Assert(app.Description, Equals, "")
+	//
+	//	c.Assert(dao.UpdateApplication(update), IsNil)
+	//
+	//	app, err = dao.GetApplication("project", "name")
+	//	c.Assert(err, IsNil)
+	//	c.Assert(app.Name, Equals, "name")
+	//	c.Assert(app.Project, Equals, "project")
+	//	c.Assert(app.Description, Equals, "Test")
 }
 
 func Validate_GetProjectsByGroups(dao DAO, c *C) {

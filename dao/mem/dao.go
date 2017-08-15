@@ -62,7 +62,36 @@ func (a *dao) AddProject(project *Project) error {
 	if exists {
 		return AlreadyExists
 	}
+	_, ok := a.projects[project.Name]
+	if !ok {
+		a.projects[project.Name] = map[string]*application{}
+	}
 	a.projectMetadata[project.Name] = project
+	return nil
+}
+
+func (a *dao) AddApplication(app *Application) error {
+	apps, ok := a.projects[app.Project]
+	if !ok {
+		return NotFound
+	}
+	_, ok = apps[app.Name]
+	if ok {
+		return AlreadyExists
+	}
+	apps[app.Name] = &application{app, map[string]*release{}}
+	return nil
+}
+func (a *dao) UpdateApplication(app *Application) error {
+	apps, ok := a.projects[app.Project]
+	if !ok {
+		return NotFound
+	}
+	proj, ok := apps[app.Name]
+	if !ok {
+		return NotFound
+	}
+	apps[app.Name] = &application{app, proj.Releases}
 	return nil
 }
 

@@ -59,6 +59,10 @@ func NewSQLiteDAO(path string) (DAO, error) {
 									 JOIN acl ON p.name = acl.project
 									 WHERE group_name `,
 
+		AddApplicationQuery: `INSERT INTO application(name, project, description, latest_release_id, logo)
+						      VALUES (?, ?, ?, ?, ?)`,
+		UpdateApplicationQuery: `UPDATE application SET description = ?, latest_release_id = ?, logo = ? 
+								 WHERE name = ? AND project = ?`,
 		GetApplicationsQuery:    "SELECT DISTINCT(name) FROM release WHERE project = ?",
 		GetApplicationQuery:     "SELECT name FROM release WHERE project = ? AND name = ?",
 		FindAllVersionsQuery:    "SELECT version FROM release WHERE project = ? AND name = ?",

@@ -56,8 +56,11 @@ func NewProject(project string) *Project {
 }
 
 type Application struct {
-	Name    string
-	Project string
+	Name            string
+	Project         string
+	Description     string
+	LatestReleaseId string
+	Logo            string
 }
 
 func NewApplication(project, name string) *Application {
@@ -87,10 +90,11 @@ type DAO interface {
 	GetProject(project string) (*Project, error)
 	AddProject(*Project) error
 	UpdateProject(*Project) error
-
 	GetProjects() (map[string]*Project, error)
 	GetProjectsByGroups(readGroups []string) (map[string]*Project, error)
 
+	AddApplication(app *Application) error
+	UpdateApplication(app *Application) error
 	GetApplications(project string) ([]*Application, error)
 	GetApplication(project, name string) (*Application, error)
 	FindAllVersions(application *Application) ([]string, error)

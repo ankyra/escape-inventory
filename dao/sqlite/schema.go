@@ -5,6 +5,8 @@
 // dao/sqlite/schemas/2_project_metadata.down.sql
 // dao/sqlite/schemas/2_project_metadata.up.sql
 // dao/sqlite/schemas/3_migrate_existing_projects.up.sql
+// dao/sqlite/schemas/4_application_metadata.down.sql
+// dao/sqlite/schemas/4_application_metadata.up.sql
 // DO NOT EDIT!
 
 package sqlite
@@ -107,7 +109,7 @@ func _1_initial_schemaUpSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "1_initial_schema.up.sql", size: 471, mode: os.FileMode(436), modTime: time.Unix(1502613546, 0)}
+	info := bindataFileInfo{name: "1_initial_schema.up.sql", size: 471, mode: os.FileMode(436), modTime: time.Unix(1502815314, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -172,6 +174,46 @@ func _3_migrate_existing_projectsUpSql() (*asset, error) {
 	return a, nil
 }
 
+var __4_application_metadataDownSql = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x72\x09\xf2\x0f\x50\x08\x71\x74\xf2\x71\x55\x48\x2c\x28\xc8\xc9\x4c\x4e\x2c\xc9\xcc\xcf\xb3\xe6\x02\x04\x00\x00\xff\xff\xc6\x19\x92\xd8\x18\x00\x00\x00")
+
+func _4_application_metadataDownSqlBytes() ([]byte, error) {
+	return bindataRead(
+		__4_application_metadataDownSql,
+		"4_application_metadata.down.sql",
+	)
+}
+
+func _4_application_metadataDownSql() (*asset, error) {
+	bytes, err := _4_application_metadataDownSqlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "4_application_metadata.down.sql", size: 24, mode: os.FileMode(436), modTime: time.Unix(1502815392, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var __4_application_metadataUpSql = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x54\xcd\xbd\x0a\xc3\x20\x18\x85\xe1\xdd\xab\x38\x63\x02\xb9\x83\x4e\xb6\x58\x90\xfe\x62\x1c\x9a\x29\x88\xf9\x08\x16\xab\xa2\xde\x3f\xa5\x42\xa0\x59\x9f\xc3\xe1\x3d\x29\xc1\xb5\x80\xe6\xc7\xab\x80\x3c\xe3\xfe\xd0\x10\x2f\x39\xea\x11\x26\x25\xef\xac\xa9\x2e\x06\x74\x0c\x00\x82\xf9\x10\x4a\xcd\x2e\xac\x03\x9a\xa4\x1c\xdf\x64\xeb\x86\xcd\x16\x2a\x36\xbb\xd4\x7e\xff\xee\x4d\xa5\x52\xe7\x4c\x9e\x4c\xa1\xd9\x2d\xfb\x35\xae\x71\x07\x4f\x25\x6f\x5c\x4d\xb8\x88\xa9\xfb\x85\x87\x2d\xd6\xb3\xfe\xc0\xbe\x01\x00\x00\xff\xff\x72\xfa\x3e\xe4\xb8\x00\x00\x00")
+
+func _4_application_metadataUpSqlBytes() ([]byte, error) {
+	return bindataRead(
+		__4_application_metadataUpSql,
+		"4_application_metadata.up.sql",
+	)
+}
+
+func _4_application_metadataUpSql() (*asset, error) {
+	bytes, err := _4_application_metadataUpSqlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "4_application_metadata.up.sql", size: 184, mode: os.FileMode(436), modTime: time.Unix(1502815376, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
 // Asset loads and returns the asset for the given name.
 // It returns an error if the asset could not be found or
 // could not be loaded.
@@ -229,6 +271,8 @@ var _bindata = map[string]func() (*asset, error){
 	"2_project_metadata.down.sql": _2_project_metadataDownSql,
 	"2_project_metadata.up.sql": _2_project_metadataUpSql,
 	"3_migrate_existing_projects.up.sql": _3_migrate_existing_projectsUpSql,
+	"4_application_metadata.down.sql": _4_application_metadataDownSql,
+	"4_application_metadata.up.sql": _4_application_metadataUpSql,
 }
 
 // AssetDir returns the file names below a certain
@@ -276,6 +320,8 @@ var _bintree = &bintree{nil, map[string]*bintree{
 	"2_project_metadata.down.sql": &bintree{_2_project_metadataDownSql, map[string]*bintree{}},
 	"2_project_metadata.up.sql": &bintree{_2_project_metadataUpSql, map[string]*bintree{}},
 	"3_migrate_existing_projects.up.sql": &bintree{_3_migrate_existing_projectsUpSql, map[string]*bintree{}},
+	"4_application_metadata.down.sql": &bintree{_4_application_metadataDownSql, map[string]*bintree{}},
+	"4_application_metadata.up.sql": &bintree{_4_application_metadataUpSql, map[string]*bintree{}},
 }}
 
 // RestoreAsset restores an asset under the given directory
