@@ -68,11 +68,11 @@ func UpdateProject(project *Project) error {
 	return GlobalDAO.UpdateProject(project)
 }
 
-func GetProjects() ([]string, error) {
+func GetProjects() (map[string]*Project, error) {
 	return GlobalDAO.GetProjects()
 }
 
-func GetProjectsByGroups(readGroups []string) ([]string, error) {
+func GetProjectsByGroups(readGroups []string) (map[string]*Project, error) {
 	return GlobalDAO.GetProjectsByGroups(readGroups)
 }
 

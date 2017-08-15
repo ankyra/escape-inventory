@@ -49,25 +49,29 @@ func NewSQLiteDAO(path string) (DAO, error) {
 		return nil, fmt.Errorf("Couldn't apply migrations to SQLite storage backend '%s' [1]: %s", path, err.Error())
 	}
 	return &sqlhelp.SQLHelper{
-		DB:                       db,
-		GetProjectQuery:          `SELECT name, description, orgURL, logo FROM project WHERE name = ?`,
-		AddProjectQuery:          `INSERT INTO project(name, description, orgURL, logo) VALUES (?, ?, ?, ?)`,
-		UpdateProjectQuery:       `UPDATE project SET name = ?, description = ?, orgURL = ?, logo = ? WHERE name = ?`,
-		GetProjectsQuery:         "SELECT distinct(project) FROM release",
-		GetProjectsByGroupsQuery: "SELECT distinct(project) FROM acl WHERE group_name ",
-		GetApplicationsQuery:     "SELECT DISTINCT(name) FROM release WHERE project = ?",
-		GetApplicationQuery:      "SELECT name FROM release WHERE project = ? AND name = ?",
-		FindAllVersionsQuery:     "SELECT version FROM release WHERE project = ? AND name = ?",
-		GetReleaseQuery:          "SELECT metadata FROM release WHERE project = ? AND name = ? AND release_id = ?",
-		GetAllReleasesQuery:      "SELECT project, metadata FROM release",
-		AddReleaseQuery:          "INSERT INTO release(project, name, release_id, version, metadata) VALUES(?, ?, ?, ?, ?)",
-		GetPackageURIsQuery:      "SELECT uri FROM package WHERE project = ? AND release_id = ?",
-		AddPackageURIQuery:       "INSERT INTO package (project, release_id, uri) VALUES (?, ?, ?)",
-		GetACLQuery:              "SELECT group_name, permission FROM acl WHERE project = ?",
-		InsertACLQuery:           "INSERT INTO acl(project, group_name, permission) VALUES(?, ?, ?)",
-		UpdateACLQuery:           "UPDATE acl SET permission = ? WHERE project = ? AND group_name = ?",
-		DeleteACLQuery:           "DELETE FROM acl WHERE project = ? AND group_name = ?",
-		GetPermittedGroupsQuery:  "SELECT group_name FROM acl WHERE project = ? AND (permission >= ?)",
+		DB:                 db,
+		GetProjectQuery:    `SELECT name, description, orgURL, logo FROM project WHERE name = ?`,
+		AddProjectQuery:    `INSERT INTO project(name, description, orgURL, logo) VALUES (?, ?, ?, ?)`,
+		UpdateProjectQuery: `UPDATE project SET name = ?, description = ?, orgURL = ?, logo = ? WHERE name = ?`,
+		GetProjectsQuery:   `SELECT name, description, orgURL, logo FROM project`,
+		GetProjectsByGroupsQuery: `SELECT p.name, p.description, p.orgURL, p.logo 
+								     FROM project AS p
+									 JOIN acl ON p.name = acl.project
+									 WHERE group_name `,
+
+		GetApplicationsQuery:    "SELECT DISTINCT(name) FROM release WHERE project = ?",
+		GetApplicationQuery:     "SELECT name FROM release WHERE project = ? AND name = ?",
+		FindAllVersionsQuery:    "SELECT version FROM release WHERE project = ? AND name = ?",
+		GetReleaseQuery:         "SELECT metadata FROM release WHERE project = ? AND name = ? AND release_id = ?",
+		GetAllReleasesQuery:     "SELECT project, metadata FROM release",
+		AddReleaseQuery:         "INSERT INTO release(project, name, release_id, version, metadata) VALUES(?, ?, ?, ?, ?)",
+		GetPackageURIsQuery:     "SELECT uri FROM package WHERE project = ? AND release_id = ?",
+		AddPackageURIQuery:      "INSERT INTO package (project, release_id, uri) VALUES (?, ?, ?)",
+		GetACLQuery:             "SELECT group_name, permission FROM acl WHERE project = ?",
+		InsertACLQuery:          "INSERT INTO acl(project, group_name, permission) VALUES(?, ?, ?)",
+		UpdateACLQuery:          "UPDATE acl SET permission = ? WHERE project = ? AND group_name = ?",
+		DeleteACLQuery:          "DELETE FROM acl WHERE project = ? AND group_name = ?",
+		GetPermittedGroupsQuery: "SELECT group_name FROM acl WHERE project = ? AND (permission >= ?)",
 		IsUniqueConstraintError: func(err error) bool {
 			return err.(sqlite3.Error).Code == sqlite3.ErrConstraint
 		},

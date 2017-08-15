@@ -19,12 +19,13 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/ankyra/escape-registry/cmd"
-	"github.com/ankyra/escape-registry/dao"
-	. "gopkg.in/check.v1"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/ankyra/escape-registry/cmd"
+	"github.com/ankyra/escape-registry/dao"
+	. "gopkg.in/check.v1"
 )
 
 func Test(t *testing.T) { TestingT(t) }
@@ -45,7 +46,9 @@ func (s *suite) SetUpTest(c *C) {
 const (
 	registerEndpoint = "/api/v1/registry/my-project/register"
 
-	getProjectsEndpoints = "/api/v1/registry/"
+	getProjectsEndpoints  = "/api/v1/registry/"
+	addProjectEndpoint    = "/api/v1/registry/test/add-project"
+	updateProjectEndpoint = "/api/v1/registry/test/"
 
 	applicationsTestProject       = "applications-test-prj"
 	applicationsEndpoint          = "/api/v1/registry/" + applicationsTestProject + "/"
@@ -89,6 +92,16 @@ func (s *suite) addRelease(c *C, project, version string) {
 	req, _ := http.NewRequest("POST", "/api/v1/registry/"+project+"/register", body)
 	testRequest(c, req, 200)
 	rr = httptest.NewRecorder()
+}
+
+func (s *suite) Test_AddProject_fails_with_empty_body(c *C) {
+	req, _ := http.NewRequest("POST", addProjectEndpoint, nil)
+	testRequest(c, req, 400)
+}
+
+func (s *suite) Test_UpdateProject_fails_with_empty_body(c *C) {
+	req, _ := http.NewRequest("PUT", updateProjectEndpoint, nil)
+	testRequest(c, req, 400)
 }
 
 func (s *suite) Test_Register_fails_with_empty_body(c *C) {
@@ -136,11 +149,11 @@ func (s *suite) Test_GetProjects(c *C) {
 	req, _ := http.NewRequest("GET", getProjectsEndpoints, nil)
 	testRequest(c, req, http.StatusOK)
 
-	result := []string{}
+	result := map[string]map[string]string{}
 	err := json.Unmarshal([]byte(rr.Body.String()), &result)
 	c.Assert(err, IsNil)
-	c.Assert(result, HasItem, "project1")
-	c.Assert(result, HasItem, "project2")
+	c.Assert(result["project1"]["name"], Equals, "project1")
+	c.Assert(result["project2"]["name"], Equals, "project2")
 }
 
 func (s *suite) Test_GetApplications(c *C) {

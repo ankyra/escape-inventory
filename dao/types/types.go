@@ -43,10 +43,10 @@ func (p Permission) String() string {
 }
 
 type Project struct {
-	Name        string
-	Description string
-	OrgURL      string
-	Logo        string
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	OrgURL      string `json:"org_url"`
+	Logo        string `json:"logo"`
 }
 
 func NewProject(project string) *Project {
@@ -88,8 +88,8 @@ type DAO interface {
 	AddProject(*Project) error
 	UpdateProject(*Project) error
 
-	GetProjects() ([]string, error) // should return []*Project
-	GetProjectsByGroups(readGroups []string) ([]string, error)
+	GetProjects() (map[string]*Project, error)
+	GetProjectsByGroups(readGroups []string) (map[string]*Project, error)
 
 	GetApplications(project string) ([]*Application, error)
 	GetApplication(project, name string) (*Application, error)

@@ -18,11 +18,12 @@ package postgres
 
 import (
 	"database/sql"
+	"os"
+	"testing"
+
 	"github.com/ankyra/escape-registry/dao/types"
 	_ "github.com/lib/pq"
 	. "gopkg.in/check.v1"
-	"os"
-	"testing"
 )
 
 func Test(t *testing.T) { TestingT(t) }
@@ -48,6 +49,7 @@ func (s *memSuite) Test_DAO(c *C) {
 			_, err = db.Exec(`TRUNCATE release CASCADE`)
 			_, err = db.Exec(`TRUNCATE package CASCADE`)
 			_, err = db.Exec(`TRUNCATE acl CASCADE`)
+			_, err = db.Exec(`TRUNCATE project CASCADE`)
 
 			// Create unit
 			dao, err := NewPostgresDAO(url)

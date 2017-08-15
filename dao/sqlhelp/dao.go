@@ -33,6 +33,32 @@ type SQLHelper struct {
 	IsUniqueConstraintError  func(error) bool
 }
 
+func (s *SQLHelper) scanProject(rows *sql.Rows) (*Project, error) {
+	var name, description, orgURL, logo string
+	if err := rows.Scan(&name, &description, &orgURL, &logo); err != nil {
+		return nil, err
+	}
+	return &Project{
+		Name:        name,
+		Description: description,
+		OrgURL:      orgURL,
+		Logo:        logo,
+	}, nil
+}
+
+func (s *SQLHelper) scanProjects(rows *sql.Rows) (map[string]*Project, error) {
+	defer rows.Close()
+	result := map[string]*Project{}
+	for rows.Next() {
+		prj, err := s.scanProject(rows)
+		if err != nil {
+			return nil, err
+		}
+		result[prj.Name] = prj
+	}
+	return result, nil
+}
+
 func (s *SQLHelper) GetProject(project string) (*Project, error) {
 	rows, err := s.PrepareAndQuery(s.GetProjectQuery, project)
 	if err != nil {
@@ -40,16 +66,7 @@ func (s *SQLHelper) GetProject(project string) (*Project, error) {
 	}
 	defer rows.Close()
 	for rows.Next() {
-		var name, description, orgURL, logo string
-		if err := rows.Scan(&name, &description, &orgURL, &logo); err != nil {
-			return nil, err
-		}
-		return &Project{
-			Name:        name,
-			Description: description,
-			OrgURL:      orgURL,
-			Logo:        logo,
-		}, nil
+		return s.scanProject(rows)
 	}
 	return nil, NotFound
 }
@@ -71,15 +88,15 @@ func (s *SQLHelper) UpdateProject(project *Project) error {
 		project.Name)
 }
 
-func (s *SQLHelper) GetProjects() ([]string, error) {
+func (s *SQLHelper) GetProjects() (map[string]*Project, error) {
 	rows, err := s.PrepareAndQuery(s.GetProjectsQuery)
 	if err != nil {
 		return nil, err
 	}
-	return s.ReadRowsIntoStringArray(rows)
+	return s.scanProjects(rows)
 }
 
-func (s *SQLHelper) GetProjectsByGroups(readGroups []string) ([]string, error) {
+func (s *SQLHelper) GetProjectsByGroups(readGroups []string) (map[string]*Project, error) {
 	starFound := false
 	for _, g := range readGroups {
 		if g == "*" {
@@ -112,7 +129,7 @@ func (s *SQLHelper) GetProjectsByGroups(readGroups []string) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	return s.ReadRowsIntoStringArray(rows)
+	return s.scanProjects(rows)
 }
 
 func (s *SQLHelper) GetApplications(project string) ([]*Application, error) {

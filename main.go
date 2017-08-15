@@ -17,11 +17,12 @@ limitations under the License.
 package main
 
 import (
+	"net/http"
+
 	"github.com/ankyra/escape-registry/cmd"
 	"github.com/ankyra/escape-registry/handlers"
 	"github.com/gorilla/mux"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"net/http"
 )
 
 var ReadRoutes = map[string]http.HandlerFunc{
@@ -44,6 +45,7 @@ var ReadRoutes = map[string]http.HandlerFunc{
 }
 
 var WriteRoutes = map[string]http.HandlerFunc{
+	"/api/v1/registry/{project}/add-project":                            handlers.AddProjectHandler,
 	"/api/v1/registry/{project}/upload":                                 handlers.RegisterAndUploadHandler,
 	"/api/v1/registry/{project}/register":                               handlers.RegisterHandler,
 	"/api/v1/registry/{project}/units/{name}/versions/{version}/upload": handlers.UploadHandler,
@@ -51,8 +53,12 @@ var WriteRoutes = map[string]http.HandlerFunc{
 	"/api/v1/internal/import": handlers.ImportReleasesHandler,
 }
 
+var UpdateRoutes = map[string]http.HandlerFunc{
+	"/api/v1/registry/{project}/": handlers.UpdateProjectHandler,
+}
+
 func HomeHandler(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Escape Release Registry [+project] v" + cmd.RegistryVersion))
+	w.Write([]byte("Escape Release Registry v" + cmd.RegistryVersion))
 }
 
 func getMux() *mux.Router {
@@ -64,6 +70,10 @@ func getMux() *mux.Router {
 	postRouter := r.Methods("POST").Subrouter()
 	for url, handler := range WriteRoutes {
 		postRouter.Handle(url, handler)
+	}
+	putRouter := r.Methods("PUT").Subrouter()
+	for url, handler := range UpdateRoutes {
+		putRouter.Handle(url, handler)
 	}
 	r.Handle("/metrics", promhttp.Handler())
 	return r

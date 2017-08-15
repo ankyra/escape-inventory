@@ -14,29 +14,25 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package handlers
+package model
 
 import (
-	"log"
-	"net/http"
+	"fmt"
 
 	"github.com/ankyra/escape-registry/dao"
-	"github.com/ankyra/escape-registry/model"
+	"github.com/ankyra/escape-registry/dao/types"
 )
 
-func HandleError(w http.ResponseWriter, r *http.Request, err error) {
-	if dao.IsNotFound(err) {
-		w.WriteHeader(http.StatusNotFound)
-		return
-	} else if dao.IsAlreadyExists(err) {
-		w.WriteHeader(http.StatusConflict)
-		w.Write([]byte("Resource already exists"))
-		return
-	} else if model.IsUserError(err) {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(err.Error()))
-		return
+func AddProject(p *types.Project) error {
+	if p.Name == "" {
+		return NewUserError(fmt.Errorf("Missing name"))
 	}
-	log.Println("Error:", err.Error())
-	w.WriteHeader(http.StatusInternalServerError)
+	return dao.AddProject(p)
+}
+
+func UpdateProject(p *types.Project) error {
+	if p.Name == "" {
+		return NewUserError(fmt.Errorf("Missing name"))
+	}
+	return dao.UpdateProject(p)
 }

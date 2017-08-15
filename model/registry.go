@@ -22,9 +22,6 @@ import (
 )
 
 func Registry(project, name string) ([]string, error) {
-	if project == "" {
-		return GetProjects()
-	}
 	if name == "" {
 		return GetApplications(project)
 	}
@@ -59,8 +56,4 @@ func GetApplicationVersions(project, name string) ([]string, error) {
 		return nil, types.NotFound
 	}
 	return result, nil
-}
-
-func GetProjects() ([]string, error) {
-	return dao.GetProjects()
 }

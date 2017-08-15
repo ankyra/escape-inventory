@@ -97,17 +97,16 @@ func Validate_GetProjects(dao DAO, c *C) {
 	c.Assert(err, IsNil)
 	c.Assert(empty, HasLen, 0)
 
-	addReleaseToProject(dao, c, "test", "0.0.1", "_")
-	addReleaseToProject(dao, c, "test", "0.0.1", "project1")
-	addReleaseToProject(dao, c, "test", "0.0.1", "project2")
-	addReleaseToProject(dao, c, "test", "0.0.2", "project2")
+	c.Assert(dao.AddProject(NewProject("_")), Equals, nil)
+	c.Assert(dao.AddProject(NewProject("project1")), Equals, nil)
+	c.Assert(dao.AddProject(NewProject("project2")), Equals, nil)
 
 	projects, err := dao.GetProjects()
 	c.Assert(err, IsNil)
 	c.Assert(projects, HasLen, 3)
-	c.Assert(projects, HasItem, "_")
-	c.Assert(projects, HasItem, "project1")
-	c.Assert(projects, HasItem, "project2")
+	c.Assert(projects["_"].Name, Equals, "_")
+	c.Assert(projects["project1"].Name, Equals, "project1")
+	c.Assert(projects["project2"].Name, Equals, "project2")
 }
 
 func Validate_ProjectMetadata(dao DAO, c *C) {
@@ -147,10 +146,9 @@ func Validate_GetProjectsByGroups(dao DAO, c *C) {
 		c.Assert(empty, HasLen, 0)
 	}
 
-	addReleaseToProject(dao, c, "test", "0.0.1", "_")
-	addReleaseToProject(dao, c, "test", "0.0.1", "project1")
-	addReleaseToProject(dao, c, "test", "0.0.1", "project2")
-	addReleaseToProject(dao, c, "test", "0.0.2", "project2")
+	c.Assert(dao.AddProject(NewProject("_")), Equals, nil)
+	c.Assert(dao.AddProject(NewProject("project1")), Equals, nil)
+	c.Assert(dao.AddProject(NewProject("project2")), Equals, nil)
 
 	c.Assert(dao.SetACL("_", "*", ReadPermission), IsNil)
 
@@ -158,7 +156,7 @@ func Validate_GetProjectsByGroups(dao DAO, c *C) {
 		projects, err := dao.GetProjectsByGroups(testCase)
 		c.Assert(err, IsNil)
 		c.Assert(projects, HasLen, 1, Commentf("%s should have one group, got %v", testCase, projects))
-		c.Assert(projects, HasItem, "_")
+		c.Assert(projects["_"].Name, Equals, "_")
 	}
 
 	c.Assert(dao.SetACL("project1", "project1", ReadPermission), IsNil)
@@ -170,14 +168,14 @@ func Validate_GetProjectsByGroups(dao DAO, c *C) {
 	projects, err = dao.GetProjectsByGroups(oneGroup)
 	c.Assert(err, IsNil)
 	c.Assert(projects, HasLen, 2)
-	c.Assert(projects, HasItem, "_")
-	c.Assert(projects, HasItem, "project1")
+	c.Assert(projects["_"].Name, Equals, "_")
+	c.Assert(projects["project1"].Name, Equals, "project1")
 
 	projects, err = dao.GetProjectsByGroups(allGroups)
 	c.Assert(err, IsNil)
 	c.Assert(projects, HasLen, 2)
-	c.Assert(projects, HasItem, "_")
-	c.Assert(projects, HasItem, "project1")
+	c.Assert(projects["_"].Name, Equals, "_")
+	c.Assert(projects["project1"].Name, Equals, "project1")
 
 	c.Assert(dao.SetACL("project2", "project2", ReadPermission), IsNil)
 
@@ -192,9 +190,9 @@ func Validate_GetProjectsByGroups(dao DAO, c *C) {
 	projects, err = dao.GetProjectsByGroups(allGroups)
 	c.Assert(err, IsNil)
 	c.Assert(projects, HasLen, 3)
-	c.Assert(projects, HasItem, "_")
-	c.Assert(projects, HasItem, "project1")
-	c.Assert(projects, HasItem, "project2")
+	c.Assert(projects["_"].Name, Equals, "_")
+	c.Assert(projects["project1"].Name, Equals, "project1")
+	c.Assert(projects["project2"].Name, Equals, "project2")
 }
 
 func Validate_GetApplication(dao DAO, c *C) {

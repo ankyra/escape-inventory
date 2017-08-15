@@ -75,29 +75,25 @@ func (a *dao) UpdateProject(project *Project) error {
 	return nil
 }
 
-func (a *dao) GetProjects() ([]string, error) {
-	result := []string{}
-	for key, _ := range a.projects {
-		result = append(result, key)
-	}
-	return result, nil
+func (a *dao) GetProjects() (map[string]*Project, error) {
+	return a.projectMetadata, nil
 }
 
-func (a *dao) GetProjectsByGroups(readGroups []string) ([]string, error) {
-	result := []string{}
-	for key, _ := range a.projects {
-		allowedGroups, found := a.acls[key]
+func (a *dao) GetProjectsByGroups(readGroups []string) (map[string]*Project, error) {
+	result := map[string]*Project{}
+	for name, project := range a.projectMetadata {
+		allowedGroups, found := a.acls[name]
 		if found {
 			for _, g := range readGroups {
 				_, found := allowedGroups[g]
 				if found {
-					result = append(result, key)
+					result[name] = project
 					break
 				}
 			}
 			_, found := allowedGroups["*"]
 			if found {
-				result = append(result, key)
+				result[name] = project
 			}
 		}
 	}
