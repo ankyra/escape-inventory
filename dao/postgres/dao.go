@@ -19,6 +19,7 @@ package postgres
 import (
 	"database/sql"
 	"fmt"
+
 	"github.com/ankyra/escape-registry/dao/sqlhelp"
 	. "github.com/ankyra/escape-registry/dao/types"
 	"github.com/lib/pq"
@@ -56,6 +57,9 @@ func NewPostgresDAO(url string) (DAO, error) {
 	return &sqlhelp.SQLHelper{
 		DB: db,
 		UseNumericInsertMarks:    true,
+		GetProjectQuery:          `SELECT name, description, orgURL, logo FROM project WHERE name = $1`,
+		AddProjectQuery:          `INSERT INTO project(name, description, orgURL, logo) VALUES ($1, $2, $3, $4)`,
+		UpdateProjectQuery:       `UPDATE project SET name = $1, description = $2, orgURL = $3, logo = $4 WHERE name = $5`,
 		GetProjectsQuery:         "SELECT distinct(project) FROM release",
 		GetProjectsByGroupsQuery: "SELECT distinct(project) FROM acl WHERE group_name ",
 		GetApplicationsQuery:     "SELECT DISTINCT(name) FROM release WHERE project = $1",

@@ -2,15 +2,19 @@ package sqlhelp
 
 import (
 	"database/sql"
-	"github.com/ankyra/escape-core"
-	. "github.com/ankyra/escape-registry/dao/types"
 	"strconv"
 	"strings"
+
+	"github.com/ankyra/escape-core"
+	. "github.com/ankyra/escape-registry/dao/types"
 )
 
 type SQLHelper struct {
 	DB                       *sql.DB
 	UseNumericInsertMarks    bool
+	GetProjectQuery          string
+	AddProjectQuery          string
+	UpdateProjectQuery       string
 	GetProjectsQuery         string
 	GetProjectsByGroupsQuery string
 	GetApplicationsQuery     string
@@ -27,6 +31,44 @@ type SQLHelper struct {
 	DeleteACLQuery           string
 	GetPermittedGroupsQuery  string
 	IsUniqueConstraintError  func(error) bool
+}
+
+func (s *SQLHelper) GetProject(project string) (*Project, error) {
+	rows, err := s.PrepareAndQuery(s.GetProjectQuery, project)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var name, description, orgURL, logo string
+		if err := rows.Scan(&name, &description, &orgURL, &logo); err != nil {
+			return nil, err
+		}
+		return &Project{
+			Name:        name,
+			Description: description,
+			OrgURL:      orgURL,
+			Logo:        logo,
+		}, nil
+	}
+	return nil, NotFound
+}
+
+func (s *SQLHelper) AddProject(project *Project) error {
+	return s.PrepareAndExecInsert(s.AddProjectQuery,
+		project.Name,
+		project.Description,
+		project.OrgURL,
+		project.Logo)
+}
+
+func (s *SQLHelper) UpdateProject(project *Project) error {
+	return s.PrepareAndExecUpdate(s.UpdateProjectQuery,
+		project.Name,
+		project.Description,
+		project.OrgURL,
+		project.Logo,
+		project.Name)
 }
 
 func (s *SQLHelper) GetProjects() ([]string, error) {
@@ -266,4 +308,39 @@ func (s *SQLHelper) PrepareAndQuery(query string, arg ...interface{}) (*sql.Rows
 	}
 	defer stmt.Close()
 	return stmt.Query(arg...)
+}
+
+func (s *SQLHelper) PrepareAndExecInsert(query string, arg ...interface{}) error {
+	stmt, err := s.DB.Prepare(query)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+	_, err = stmt.Exec(arg...)
+	if err != nil {
+		if s.IsUniqueConstraintError(err) {
+			return AlreadyExists
+		}
+	}
+	return err
+}
+
+func (s *SQLHelper) PrepareAndExecUpdate(query string, arg ...interface{}) error {
+	stmt, err := s.DB.Prepare(query)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+	result, err := stmt.Exec(arg...)
+	if err != nil {
+		return err
+	}
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if rowsAffected == 0 {
+		return NotFound
+	}
+	return err
 }

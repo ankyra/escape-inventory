@@ -18,6 +18,7 @@ package types
 
 import (
 	"fmt"
+
 	"github.com/ankyra/escape-core"
 )
 
@@ -39,6 +40,19 @@ func (p Permission) String() string {
 		return "admin"
 	}
 	return "???"
+}
+
+type Project struct {
+	Name        string
+	Description string
+	OrgURL      string
+	Logo        string
+}
+
+func NewProject(project string) *Project {
+	return &Project{
+		Name: project,
+	}
 }
 
 type Application struct {
@@ -70,7 +84,11 @@ func NewRelease(app *Application, metadata *core.ReleaseMetadata) *Release {
 }
 
 type DAO interface {
-	GetProjects() ([]string, error)
+	GetProject(project string) (*Project, error)
+	AddProject(*Project) error
+	UpdateProject(*Project) error
+
+	GetProjects() ([]string, error) // should return []*Project
 	GetProjectsByGroups(readGroups []string) ([]string, error)
 
 	GetApplications(project string) ([]*Application, error)

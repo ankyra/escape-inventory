@@ -32,19 +32,47 @@ type release struct {
 }
 
 type dao struct {
-	projects map[string]map[string]*application
-	apps     map[*Application]*application
-	releases map[*Release]*release
-	acls     map[string]map[string]Permission
+	projectMetadata map[string]*Project
+	projects        map[string]map[string]*application
+	apps            map[*Application]*application
+	releases        map[*Release]*release
+	acls            map[string]map[string]Permission
 }
 
 func NewInMemoryDAO() DAO {
 	return &dao{
-		projects: map[string]map[string]*application{},
-		apps:     map[*Application]*application{},
-		releases: map[*Release]*release{},
-		acls:     map[string]map[string]Permission{},
+		projectMetadata: map[string]*Project{},
+		projects:        map[string]map[string]*application{},
+		apps:            map[*Application]*application{},
+		releases:        map[*Release]*release{},
+		acls:            map[string]map[string]Permission{},
 	}
+}
+
+func (a *dao) GetProject(project string) (*Project, error) {
+	prj, ok := a.projectMetadata[project]
+	if !ok {
+		return nil, NotFound
+	}
+	return prj, nil
+}
+
+func (a *dao) AddProject(project *Project) error {
+	_, exists := a.projectMetadata[project.Name]
+	if exists {
+		return AlreadyExists
+	}
+	a.projectMetadata[project.Name] = project
+	return nil
+}
+
+func (a *dao) UpdateProject(project *Project) error {
+	_, exists := a.projectMetadata[project.Name]
+	if !exists {
+		return NotFound
+	}
+	a.projectMetadata[project.Name] = project
+	return nil
 }
 
 func (a *dao) GetProjects() ([]string, error) {

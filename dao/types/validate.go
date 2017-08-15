@@ -27,6 +27,7 @@ func ValidateDAO(dao func() DAO, c *C) {
 	Validate_GetRelease(dao(), c)
 	Validate_GetRelease_NotFound(dao(), c)
 	Validate_GetProjects(dao(), c)
+	Validate_ProjectMetadata(dao(), c)
 	Validate_GetProjectsByGroups(dao(), c)
 	Validate_GetApplication(dao(), c)
 	Validate_GetApplications(dao(), c)
@@ -107,6 +108,31 @@ func Validate_GetProjects(dao DAO, c *C) {
 	c.Assert(projects, HasItem, "_")
 	c.Assert(projects, HasItem, "project1")
 	c.Assert(projects, HasItem, "project2")
+}
+
+func Validate_ProjectMetadata(dao DAO, c *C) {
+	_, err := dao.GetProject("test")
+	c.Assert(err, Equals, NotFound)
+
+	update := NewProject("test")
+	update.Description = "yo"
+	c.Assert(dao.UpdateProject(update), Equals, NotFound)
+	c.Assert(dao.AddProject(update), IsNil)
+
+	project, err := dao.GetProject("test")
+	c.Assert(err, IsNil)
+	c.Assert(project.Name, Equals, "test")
+	c.Assert(project.Description, Equals, "yo")
+
+	c.Assert(dao.AddProject(update), Equals, AlreadyExists)
+
+	update = NewProject("test")
+	update.Description = "new description"
+	c.Assert(dao.UpdateProject(update), IsNil)
+
+	project, err = dao.GetProject("test")
+	c.Assert(err, IsNil)
+	c.Assert(project.Description, Equals, "new description")
 }
 
 func Validate_GetProjectsByGroups(dao DAO, c *C) {

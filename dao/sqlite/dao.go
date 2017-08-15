@@ -19,6 +19,7 @@ package sqlite
 import (
 	"database/sql"
 	"fmt"
+
 	"github.com/ankyra/escape-registry/dao/sqlhelp"
 	. "github.com/ankyra/escape-registry/dao/types"
 	"github.com/mattes/migrate"
@@ -49,6 +50,9 @@ func NewSQLiteDAO(path string) (DAO, error) {
 	}
 	return &sqlhelp.SQLHelper{
 		DB:                       db,
+		GetProjectQuery:          `SELECT name, description, orgURL, logo FROM project WHERE name = ?`,
+		AddProjectQuery:          `INSERT INTO project(name, description, orgURL, logo) VALUES (?, ?, ?, ?)`,
+		UpdateProjectQuery:       `UPDATE project SET name = ?, description = ?, orgURL = ?, logo = ? WHERE name = ?`,
 		GetProjectsQuery:         "SELECT distinct(project) FROM release",
 		GetProjectsByGroupsQuery: "SELECT distinct(project) FROM acl WHERE group_name ",
 		GetApplicationsQuery:     "SELECT DISTINCT(name) FROM release WHERE project = ?",
