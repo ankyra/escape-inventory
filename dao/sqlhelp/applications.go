@@ -11,13 +11,13 @@ func (s *SQLHelper) AddApplication(app *Application) error {
 		app.Name,
 		app.Project,
 		app.Description,
-		app.LatestReleaseId,
+		app.LatestVersion,
 		app.Logo)
 }
 func (s *SQLHelper) UpdateApplication(app *Application) error {
 	return s.PrepareAndExecUpdate(s.UpdateApplicationQuery,
 		app.Description,
-		app.LatestReleaseId,
+		app.LatestVersion,
 		app.Logo,
 		app.Name,
 		app.Project)
@@ -44,16 +44,16 @@ func (s *SQLHelper) GetApplication(project, name string) (*Application, error) {
 }
 
 func (s *SQLHelper) scanApplication(rows *sql.Rows) (*Application, error) {
-	var name, project, description, latestReleaseId, logo string
-	if err := rows.Scan(&name, &project, &description, &latestReleaseId, &logo); err != nil {
+	var name, project, description, latestVersion, logo string
+	if err := rows.Scan(&name, &project, &description, &latestVersion, &logo); err != nil {
 		return nil, err
 	}
 	return &Application{
-		Name:            name,
-		Project:         project,
-		Description:     description,
-		LatestReleaseId: latestReleaseId,
-		Logo:            logo,
+		Name:          name,
+		Project:       project,
+		Description:   description,
+		LatestVersion: latestVersion,
+		Logo:          logo,
 	}, nil
 }
 

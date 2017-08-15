@@ -21,26 +21,36 @@ import (
 	"github.com/ankyra/escape-registry/dao/types"
 )
 
-func Registry(project, name string) ([]string, error) {
-	if name == "" {
-		return GetApplications(project)
-	}
-	return GetApplicationVersions(project, name)
+type ApplicationPayload struct {
+	*types.Application
+	Versions []string `json:"versions",omitempty`
 }
 
-func GetApplications(project string) ([]string, error) {
-	result := []string{}
-	apps, err := dao.GetApplications(project)
+func GetApplication(project, name string) (*ApplicationPayload, error) {
+	_, err := dao.GetProject(project)
 	if err != nil {
 		return nil, err
 	}
-	for _, app := range apps {
-		result = append(result, app.Name)
+	app, err := dao.GetApplication(project, name)
+	if err != nil {
+		return nil, err
 	}
-	if len(result) == 0 {
-		return nil, types.NotFound
+	versions, err := dao.FindAllVersions(app)
+	if err != nil {
+		return nil, err
 	}
-	return result, nil
+	return &ApplicationPayload{
+		app,
+		versions,
+	}, nil
+}
+
+func GetApplications(project string) (map[string]*types.Application, error) {
+	_, err := dao.GetProject(project)
+	if err != nil {
+		return nil, err
+	}
+	return dao.GetApplications(project)
 }
 
 func GetApplicationVersions(project, name string) ([]string, error) {

@@ -24,32 +24,35 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func RegistryHandler(w http.ResponseWriter, r *http.Request) {
+func GetApplicationsHandler(w http.ResponseWriter, r *http.Request) {
 	project := mux.Vars(r)["project"]
-	name := mux.Vars(r)["name"]
-	version := mux.Vars(r)["version"]
-	var bytes []byte
-	if version == "" {
-		result, err := model.GetApplicationVersions(project, name)
-		if err != nil {
-			HandleError(w, r, err)
-			return
-		}
-		bytes, err = json.Marshal(result)
-		if err != nil {
-			HandleError(w, r, err)
-			return
-		}
-	} else {
-		releaseId := name + "-" + version
-		metadata, err := model.GetReleaseMetadata(project, releaseId)
-		if err != nil {
-			HandleError(w, r, err)
-			return
-		}
-		bytes = []byte(metadata.ToJson())
+	getApplicationsHandler(w, r, project)
+}
+
+func getApplicationsHandler(w http.ResponseWriter, r *http.Request, project string) {
+	apps, err := model.GetApplications(project)
+	if err != nil {
+		HandleError(w, r, err)
+		return
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(200)
-	w.Write(bytes)
+	json.NewEncoder(w).Encode(apps)
+}
+
+func GetApplicationHandler(w http.ResponseWriter, r *http.Request) {
+	project := mux.Vars(r)["project"]
+	name := mux.Vars(r)["name"]
+	getApplicationHandler(w, r, project, name)
+}
+
+func getApplicationHandler(w http.ResponseWriter, r *http.Request, project, name string) {
+	app, err := model.GetApplication(project, name)
+	if err != nil {
+		HandleError(w, r, err)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	json.NewEncoder(w).Encode(app)
 }

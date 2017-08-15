@@ -45,7 +45,7 @@ func Import(releases []map[string]interface{}) error {
 		if err := ensureProjectExists(project); err != nil {
 			return err
 		}
-		if err := ensureApplicationExists(project, metadata.Name); err != nil {
+		if err := ensureApplicationExists(project, metadata); err != nil {
 			return err
 		}
 		release, err := dao.AddRelease(project, metadata)

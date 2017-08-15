@@ -92,7 +92,7 @@ func (s *suite) Test_GetProject(c *C) {
 
 	c.Assert(result.Name, Equals, "test")
 	c.Assert(result.Description, Equals, "")
-	c.Assert(result.Units, IsNil)
+	c.Assert(result.Units, HasLen, 0)
 }
 
 /*

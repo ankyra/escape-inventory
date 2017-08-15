@@ -56,11 +56,11 @@ func NewProject(project string) *Project {
 }
 
 type Application struct {
-	Name            string
-	Project         string
-	Description     string
-	LatestReleaseId string
-	Logo            string
+	Name          string `json:"name"`
+	Project       string `json:"project"`
+	Description   string `json:"description"`
+	LatestVersion string `json:"latest_version"`
+	Logo          string `json:"logo"`
 }
 
 func NewApplication(project, name string) *Application {

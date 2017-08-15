@@ -25,7 +25,7 @@ import (
 
 type ProjectPayload struct {
 	*types.Project
-	Units []string `json:"units"`
+	Units map[string]*types.Application `json:"units"`
 }
 
 func GetProject(project string) (*ProjectPayload, error) {
@@ -33,7 +33,7 @@ func GetProject(project string) (*ProjectPayload, error) {
 	if err != nil {
 		return nil, err
 	}
-	units, err := GetApplications(project)
+	units, err := dao.GetApplications(project)
 	if err != nil && !dao.IsNotFound(err) {
 		return nil, err
 	}

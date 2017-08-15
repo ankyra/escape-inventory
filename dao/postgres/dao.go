@@ -66,13 +66,13 @@ func NewPostgresDAO(url string) (DAO, error) {
 									 JOIN acl ON p.name = acl.project
 									 WHERE group_name `,
 
-		GetApplicationQuery: `SELECT name, project, description, latest_release_id, logo 
+		GetApplicationQuery: `SELECT name, project, description, latest_version, logo 
 							     FROM application WHERE project = $1 AND name = $2`,
-		AddApplicationQuery: `INSERT INTO application(name, project, description, latest_release_id, logo)
+		AddApplicationQuery: `INSERT INTO application(name, project, description, latest_version, logo)
 						      VALUES ($1, $2, $3, $4, $5)`,
-		UpdateApplicationQuery: `UPDATE application SET description = $1, latest_release_id = $2, logo = $3
+		UpdateApplicationQuery: `UPDATE application SET description = $1, latest_version = $2, logo = $3
 								 WHERE name = $4 AND project = $5`,
-		GetApplicationsQuery: `SELECT name, project, description, latest_release_id, logo 
+		GetApplicationsQuery: `SELECT name, project, description, latest_version, logo 
 								  FROM application WHERE project = $1`,
 
 		FindAllVersionsQuery:    "SELECT version FROM release WHERE project = $1 AND name = $2",

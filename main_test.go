@@ -19,12 +19,14 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
 	"github.com/ankyra/escape-registry/cmd"
 	"github.com/ankyra/escape-registry/dao"
+	"github.com/ankyra/escape-registry/dao/types"
 	"github.com/ankyra/escape-registry/model"
 	. "gopkg.in/check.v1"
 )
@@ -47,16 +49,18 @@ func (s *suite) SetUpTest(c *C) {
 const (
 	registerEndpoint = "/api/v1/registry/my-project/register"
 
-	getProjectsEndpoints  = "/api/v1/registry/"
+	getProjectEndpoint    = "/api/v1/registry/" + applicationsTestProject + "/"
 	addProjectEndpoint    = "/api/v1/registry/test/add-project"
 	updateProjectEndpoint = "/api/v1/registry/test/"
+	getProjectsEndpoints  = "/api/v1/registry/"
 
+	getProjectUnitsEndpoint       = "/api/v1/registry/" + applicationsTestProject + "/units/"
+	getProjectUnitEndpoint        = "/api/v1/registry/" + applicationsTestProject + "/units/my-app/"
 	applicationsTestProject       = "applications-test-prj"
-	applicationsEndpoint          = "/api/v1/registry/" + applicationsTestProject + "/"
 	applicationsEndpointNoProject = "/api/v1/registry/doesnt-exist/"
 
 	applicationVersionsTestProject = "versions-test-prj"
-	applicationVersionsEndpoint    = "/api/v1/registry/" + applicationVersionsTestProject + "/units/my-app/"
+	applicationVersionsEndpoint    = "/api/v1/registry/" + applicationVersionsTestProject + "/units/my-app/versions/"
 	applicationVersionsNoProject   = "/api/v1/registry/doesnt-exist/units/my-app/"
 	applicationVersionsNoApp       = "/api/v1/registry/versions-test/units/doesnt-exist/"
 
@@ -89,7 +93,7 @@ func testRequest(c *C, req *http.Request, expectedStatus int) {
 
 func (s *suite) addRelease(c *C, project, version string) {
 	rr = httptest.NewRecorder()
-	body := bytes.NewReader([]byte(`{"name": "my-app", "version": "` + version + `"}`))
+	body := bytes.NewReader([]byte(`{"name": "my-app", "version": "` + version + `", "project": "` + project + `"}`))
 	req, _ := http.NewRequest("POST", "/api/v1/registry/"+project+"/register", body)
 	testRequest(c, req, 200)
 	rr = httptest.NewRecorder()
@@ -157,17 +161,53 @@ func (s *suite) Test_GetProjects(c *C) {
 	c.Assert(result["project2"]["name"], Equals, "project2")
 }
 
-func (s *suite) Test_GetApplications(c *C) {
+func (s *suite) Test_GetProject(c *C) {
 	s.addRelease(c, applicationsTestProject, "1")
 	s.addRelease(c, applicationsTestProject, "2")
-	req, _ := http.NewRequest("GET", applicationsEndpoint, nil)
+	req, _ := http.NewRequest("GET", getProjectEndpoint, nil)
 	testRequest(c, req, http.StatusOK)
 
 	result := model.ProjectPayload{}
 	err := json.Unmarshal([]byte(rr.Body.String()), &result)
 	c.Assert(err, IsNil)
 	c.Assert(result.Name, Equals, applicationsTestProject)
-	c.Assert(result.Units, HasItem, "my-app")
+	c.Assert(result.Units["my-app"].Name, Equals, "my-app")
+}
+
+func (s *suite) Test_GetProjectUnits(c *C) {
+	s.addRelease(c, applicationsTestProject, "1")
+	s.addRelease(c, applicationsTestProject, "2")
+	req, _ := http.NewRequest("GET", getProjectUnitsEndpoint, nil)
+	testRequest(c, req, http.StatusOK)
+
+	result := map[string]*types.Application{}
+	err := json.Unmarshal([]byte(rr.Body.String()), &result)
+	c.Assert(err, IsNil)
+	c.Assert(result, HasLen, 1)
+	c.Assert(result["my-app"], Not(IsNil))
+	c.Assert(result["my-app"].Name, Equals, "my-app")
+	c.Assert(result["my-app"].Project, Equals, applicationsTestProject)
+	c.Assert(result["my-app"].Description, Equals, "")
+	c.Assert(result["my-app"].Logo, Equals, "")
+	c.Assert(result["my-app"].LatestVersion, Equals, "2")
+}
+
+func (s *suite) Test_GetProjectUnit(c *C) {
+	s.addRelease(c, applicationsTestProject, "1")
+	s.addRelease(c, applicationsTestProject, "2")
+	req, _ := http.NewRequest("GET", getProjectUnitEndpoint, nil)
+	testRequest(c, req, http.StatusOK)
+
+	result := model.ApplicationPayload{}
+	err := json.Unmarshal([]byte(rr.Body.String()), &result)
+	fmt.Println(rr.Body.String())
+	c.Assert(err, IsNil)
+	c.Assert(result, Not(IsNil))
+	c.Assert(result.Name, Equals, "my-app")
+	c.Assert(result.Project, Equals, applicationsTestProject)
+	c.Assert(result.Description, Equals, "")
+	c.Assert(result.Logo, Equals, "")
+	c.Assert(result.LatestVersion, Equals, "2")
 }
 
 type hasItemChecker struct{}
