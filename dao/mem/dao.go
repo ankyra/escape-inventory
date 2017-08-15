@@ -80,6 +80,7 @@ func (a *dao) AddApplication(app *Application) error {
 		return AlreadyExists
 	}
 	apps[app.Name] = &application{app, map[string]*release{}}
+	a.apps[app] = apps[app.Name]
 	return nil
 }
 func (a *dao) UpdateApplication(app *Application) error {
@@ -129,10 +130,10 @@ func (a *dao) GetProjectsByGroups(readGroups []string) (map[string]*Project, err
 	return result, nil
 }
 
-func (a *dao) GetApplications(project string) ([]*Application, error) {
-	result := []*Application{}
+func (a *dao) GetApplications(project string) (map[string]*Application, error) {
+	result := map[string]*Application{}
 	for _, app := range a.projects[project] {
-		result = append(result, app.App)
+		result[app.App.Name] = app.App
 	}
 	return result, nil
 }

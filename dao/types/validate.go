@@ -28,9 +28,8 @@ func ValidateDAO(dao func() DAO, c *C) {
 	Validate_GetRelease_NotFound(dao(), c)
 	Validate_GetProjects(dao(), c)
 	Validate_ProjectMetadata(dao(), c)
-	Validate_ApplicationMetadata(dao(), c)
 	Validate_GetProjectsByGroups(dao(), c)
-	Validate_GetApplication(dao(), c)
+	Validate_ApplicationMetadata(dao(), c)
 	Validate_GetApplications(dao(), c)
 	Validate_FindAllVersions(dao(), c)
 	Validate_FindAllVersions_Empty(dao(), c)
@@ -133,34 +132,6 @@ func Validate_ProjectMetadata(dao DAO, c *C) {
 	c.Assert(project.Description, Equals, "new description")
 }
 
-func Validate_ApplicationMetadata(dao DAO, c *C) {
-	app := NewApplication("project", "name")
-	update := NewApplication("project", "name")
-	update.Description = "Test"
-
-	_, err := dao.GetApplication("project", "name")
-	c.Assert(err, Equals, NotFound)
-
-	c.Assert(dao.AddProject(NewProject("project")), Equals, nil)
-	c.Assert(dao.UpdateApplication(update), Equals, NotFound)
-	c.Assert(dao.AddApplication(app), IsNil)
-	c.Assert(dao.AddApplication(app), Equals, AlreadyExists)
-
-	//	app, err = dao.GetApplication("project", "name")
-	//	c.Assert(err, IsNil)
-	//	c.Assert(app.Name, Equals, "name")
-	//	c.Assert(app.Project, Equals, "project")
-	//	c.Assert(app.Description, Equals, "")
-	//
-	//	c.Assert(dao.UpdateApplication(update), IsNil)
-	//
-	//	app, err = dao.GetApplication("project", "name")
-	//	c.Assert(err, IsNil)
-	//	c.Assert(app.Name, Equals, "name")
-	//	c.Assert(app.Project, Equals, "project")
-	//	c.Assert(app.Description, Equals, "Test")
-}
-
 func Validate_GetProjectsByGroups(dao DAO, c *C) {
 	anon := []string{}
 	oneGroup := []string{"project1"}
@@ -222,46 +193,65 @@ func Validate_GetProjectsByGroups(dao DAO, c *C) {
 	c.Assert(projects["project2"].Name, Equals, "project2")
 }
 
-func Validate_GetApplication(dao DAO, c *C) {
-	_, err := dao.GetApplication("_", "dao-val")
+func Validate_ApplicationMetadata(dao DAO, c *C) {
+	app := NewApplication("project", "name")
+	update := NewApplication("project", "name")
+	update.Description = "Test"
+
+	_, err := dao.GetApplication("project", "name")
 	c.Assert(err, Equals, NotFound)
-	addRelease(dao, c, "dao-val", "0.0.1")
-	app, err := dao.GetApplication("_", "dao-val")
+
+	c.Assert(dao.AddProject(NewProject("project")), Equals, nil)
+	c.Assert(dao.UpdateApplication(update), Equals, NotFound)
+	c.Assert(dao.AddApplication(app), IsNil)
+	c.Assert(dao.AddApplication(app), Equals, AlreadyExists)
+
+	app, err = dao.GetApplication("project", "name")
 	c.Assert(err, IsNil)
-	c.Assert(app.Name, Equals, "dao-val")
+	c.Assert(app.Name, Equals, "name")
+	c.Assert(app.Project, Equals, "project")
+	c.Assert(app.Description, Equals, "")
+
+	c.Assert(dao.UpdateApplication(update), IsNil)
+
+	app, err = dao.GetApplication("project", "name")
+	c.Assert(err, IsNil)
+	c.Assert(app.Name, Equals, "name")
+	c.Assert(app.Project, Equals, "project")
+	c.Assert(app.Description, Equals, "Test")
 }
 
 func Validate_GetApplications(dao DAO, c *C) {
-	addRelease(dao, c, "archive-dao-archive", "0.1")
-	addRelease(dao, c, "archive-dao-archive", "0.2")
-	addRelease(dao, c, "ansible-dao-ansible", "0.1")
-	addRelease(dao, c, "ansible-dao-ansible", "0.2")
-	addReleaseToProject(dao, c, "other-project", "0.3", "other-rpoject")
+	app1 := NewApplication("_", "archive")
+	app1.Description = "archive stuff"
+	app2 := NewApplication("_", "ansible")
+	app2.Description = "ansible stuff"
+	app3 := NewApplication("other-project", "whatever")
+	c.Assert(dao.AddProject(NewProject("_")), IsNil)
+	c.Assert(dao.AddProject(NewProject("other-project")), IsNil)
+	c.Assert(dao.AddApplication(app1), IsNil)
+	c.Assert(dao.AddApplication(app2), IsNil)
+	c.Assert(dao.AddApplication(app3), IsNil)
 	applications, err := dao.GetApplications("_")
 	c.Assert(err, IsNil)
-	var archive, ansible *Application
-	for _, app := range applications {
-		if app.Name == "ansible-dao-ansible" {
-			ansible = app
-		} else if app.Name == "archive-dao-archive" {
-			archive = app
-		} else {
-			c.Fail()
-		}
-	}
+	archive := applications["archive"]
+	ansible := applications["ansible"]
 	c.Assert(applications, HasLen, 2)
 	c.Assert(archive, Not(IsNil))
 	c.Assert(ansible, Not(IsNil))
-	c.Assert(archive.Name, Equals, "archive-dao-archive")
-	c.Assert(ansible.Name, Equals, "ansible-dao-ansible")
+	c.Assert(archive.Name, Equals, "archive")
+	c.Assert(archive.Description, Equals, "archive stuff")
+	c.Assert(ansible.Name, Equals, "ansible")
+	c.Assert(ansible.Description, Equals, "ansible stuff")
 }
 
 func Validate_FindAllVersions(dao DAO, c *C) {
+	c.Assert(dao.AddProject(NewProject("_")), IsNil)
+	app := NewApplication("_", "dao-val")
+	c.Assert(dao.AddApplication(app), IsNil)
 	addRelease(dao, c, "dao-val", "0.0.1")
 	addRelease(dao, c, "dao-val", "0.0.2")
 	addReleaseToProject(dao, c, "dao-val", "0.0.3", "other-project")
-	app, err := dao.GetApplication("_", "dao-val")
-	c.Assert(err, IsNil)
 	versions, err := dao.FindAllVersions(app)
 	c.Assert(err, IsNil)
 	c.Assert(len(versions), Equals, 2)
@@ -280,9 +270,10 @@ func Validate_FindAllVersions(dao DAO, c *C) {
 }
 
 func Validate_FindAllVersions_Empty(dao DAO, c *C) {
+	c.Assert(dao.AddProject(NewProject("_")), IsNil)
+	app := NewApplication("_", "dao-val")
+	c.Assert(dao.AddApplication(app), IsNil)
 	addRelease(dao, c, "dao-val", "0.1")
-	app, err := dao.GetApplication("_", "dao-val")
-	c.Assert(err, IsNil)
 	versions, err := dao.FindAllVersions(app)
 	c.Assert(err, IsNil)
 	c.Assert(len(versions), Equals, 1)

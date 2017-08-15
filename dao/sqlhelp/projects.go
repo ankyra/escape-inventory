@@ -8,44 +8,6 @@ import (
 	. "github.com/ankyra/escape-registry/dao/types"
 )
 
-func (s *SQLHelper) scanProject(rows *sql.Rows) (*Project, error) {
-	var name, description, orgURL, logo string
-	if err := rows.Scan(&name, &description, &orgURL, &logo); err != nil {
-		return nil, err
-	}
-	return &Project{
-		Name:        name,
-		Description: description,
-		OrgURL:      orgURL,
-		Logo:        logo,
-	}, nil
-}
-
-func (s *SQLHelper) scanProjects(rows *sql.Rows) (map[string]*Project, error) {
-	defer rows.Close()
-	result := map[string]*Project{}
-	for rows.Next() {
-		prj, err := s.scanProject(rows)
-		if err != nil {
-			return nil, err
-		}
-		result[prj.Name] = prj
-	}
-	return result, nil
-}
-
-func (s *SQLHelper) GetProject(project string) (*Project, error) {
-	rows, err := s.PrepareAndQuery(s.GetProjectQuery, project)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	for rows.Next() {
-		return s.scanProject(rows)
-	}
-	return nil, NotFound
-}
-
 func (s *SQLHelper) AddProject(project *Project) error {
 	return s.PrepareAndExecInsert(s.AddProjectQuery,
 		project.Name,
@@ -61,6 +23,18 @@ func (s *SQLHelper) UpdateProject(project *Project) error {
 		project.OrgURL,
 		project.Logo,
 		project.Name)
+}
+
+func (s *SQLHelper) GetProject(project string) (*Project, error) {
+	rows, err := s.PrepareAndQuery(s.GetProjectQuery, project)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		return s.scanProject(rows)
+	}
+	return nil, NotFound
 }
 
 func (s *SQLHelper) GetProjects() (map[string]*Project, error) {
@@ -105,4 +79,30 @@ func (s *SQLHelper) GetProjectsByGroups(readGroups []string) (map[string]*Projec
 		return nil, err
 	}
 	return s.scanProjects(rows)
+}
+
+func (s *SQLHelper) scanProject(rows *sql.Rows) (*Project, error) {
+	var name, description, orgURL, logo string
+	if err := rows.Scan(&name, &description, &orgURL, &logo); err != nil {
+		return nil, err
+	}
+	return &Project{
+		Name:        name,
+		Description: description,
+		OrgURL:      orgURL,
+		Logo:        logo,
+	}, nil
+}
+
+func (s *SQLHelper) scanProjects(rows *sql.Rows) (map[string]*Project, error) {
+	defer rows.Close()
+	result := map[string]*Project{}
+	for rows.Next() {
+		prj, err := s.scanProject(rows)
+		if err != nil {
+			return nil, err
+		}
+		result[prj.Name] = prj
+	}
+	return result, nil
 }

@@ -49,6 +49,7 @@ func (s *memSuite) Test_DAO(c *C) {
 			_, err = db.Exec(`TRUNCATE release CASCADE`)
 			_, err = db.Exec(`TRUNCATE package CASCADE`)
 			_, err = db.Exec(`TRUNCATE acl CASCADE`)
+			_, err = db.Exec(`TRUNCATE application CASCADE`)
 			_, err = db.Exec(`TRUNCATE project CASCADE`)
 
 			// Create unit

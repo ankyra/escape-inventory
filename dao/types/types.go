@@ -93,10 +93,10 @@ type DAO interface {
 	GetProjects() (map[string]*Project, error)
 	GetProjectsByGroups(readGroups []string) (map[string]*Project, error)
 
+	GetApplication(project, name string) (*Application, error)
 	AddApplication(app *Application) error
 	UpdateApplication(app *Application) error
-	GetApplications(project string) ([]*Application, error)
-	GetApplication(project, name string) (*Application, error)
+	GetApplications(project string) (map[string]*Application, error)
 	FindAllVersions(application *Application) ([]string, error)
 
 	GetRelease(project, name, releaseId string) (*Release, error)

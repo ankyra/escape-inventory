@@ -1,6 +1,8 @@
 package sqlhelp
 
 import (
+	"database/sql"
+
 	. "github.com/ankyra/escape-registry/dao/types"
 )
 
@@ -21,20 +23,12 @@ func (s *SQLHelper) UpdateApplication(app *Application) error {
 		app.Project)
 }
 
-func (s *SQLHelper) GetApplications(project string) ([]*Application, error) {
+func (s *SQLHelper) GetApplications(project string) (map[string]*Application, error) {
 	rows, err := s.PrepareAndQuery(s.GetApplicationsQuery, project)
 	if err != nil {
 		return nil, err
 	}
-	apps, err := s.ReadRowsIntoStringArray(rows)
-	if err != nil {
-		return nil, err
-	}
-	result := []*Application{}
-	for _, app := range apps {
-		result = append(result, NewApplication(project, app))
-	}
-	return result, nil
+	return s.scanApplications(rows)
 }
 
 func (s *SQLHelper) GetApplication(project, name string) (*Application, error) {
@@ -44,7 +38,34 @@ func (s *SQLHelper) GetApplication(project, name string) (*Application, error) {
 	}
 	defer rows.Close()
 	for rows.Next() {
-		return NewApplication(project, name), nil
+		return s.scanApplication(rows)
 	}
 	return nil, NotFound
+}
+
+func (s *SQLHelper) scanApplication(rows *sql.Rows) (*Application, error) {
+	var name, project, description, latestReleaseId, logo string
+	if err := rows.Scan(&name, &project, &description, &latestReleaseId, &logo); err != nil {
+		return nil, err
+	}
+	return &Application{
+		Name:            name,
+		Project:         project,
+		Description:     description,
+		LatestReleaseId: latestReleaseId,
+		Logo:            logo,
+	}, nil
+}
+
+func (s *SQLHelper) scanApplications(rows *sql.Rows) (map[string]*Application, error) {
+	defer rows.Close()
+	result := map[string]*Application{}
+	for rows.Next() {
+		app, err := s.scanApplication(rows)
+		if err != nil {
+			return nil, err
+		}
+		result[app.Name] = app
+	}
+	return result, nil
 }
