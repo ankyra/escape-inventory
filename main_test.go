@@ -25,6 +25,7 @@ import (
 
 	"github.com/ankyra/escape-registry/cmd"
 	"github.com/ankyra/escape-registry/dao"
+	"github.com/ankyra/escape-registry/model"
 	. "gopkg.in/check.v1"
 )
 
@@ -161,7 +162,12 @@ func (s *suite) Test_GetApplications(c *C) {
 	s.addRelease(c, applicationsTestProject, "2")
 	req, _ := http.NewRequest("GET", applicationsEndpoint, nil)
 	testRequest(c, req, http.StatusOK)
-	c.Assert(rr.Body.String(), Equals, `["my-app"]`)
+
+	result := model.ProjectPayload{}
+	err := json.Unmarshal([]byte(rr.Body.String()), &result)
+	c.Assert(err, IsNil)
+	c.Assert(result.Name, Equals, applicationsTestProject)
+	c.Assert(result.Units, HasItem, "my-app")
 }
 
 type hasItemChecker struct{}

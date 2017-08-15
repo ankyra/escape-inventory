@@ -29,8 +29,8 @@ var ReadRoutes = map[string]http.HandlerFunc{
 	"/":       HomeHandler,
 	"/health": handlers.HealthCheckHandler,
 
-	"/api/v1/registry/":                                                           handlers.RegistryHandler,
-	"/api/v1/registry/{project}/":                                                 handlers.RegistryHandler,
+	"/api/v1/registry/":                                                           handlers.GetProjectsHandler,
+	"/api/v1/registry/{project}/":                                                 handlers.GetProjectHandler,
 	"/api/v1/registry/{project}/units/":                                           handlers.RegistryHandler,
 	"/api/v1/registry/{project}/units/{name}/":                                    handlers.RegistryHandler,
 	"/api/v1/registry/{project}/units/{name}/versions/":                           handlers.RegistryHandler,

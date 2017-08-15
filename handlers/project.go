@@ -21,9 +21,39 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/ankyra/escape-registry/dao"
 	"github.com/ankyra/escape-registry/dao/types"
 	"github.com/ankyra/escape-registry/model"
+	"github.com/gorilla/mux"
 )
+
+func GetProjectsHandler(w http.ResponseWriter, r *http.Request) {
+	result, err := dao.GetProjects()
+	if err != nil {
+		HandleError(w, r, err)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	json.NewEncoder(w).Encode(result)
+}
+
+func GetProjectHandler(w http.ResponseWriter, r *http.Request) {
+	project := mux.Vars(r)["project"]
+	getProjectHandler(w, r, project)
+}
+
+func getProjectHandler(w http.ResponseWriter, r *http.Request, project string) {
+	proj, err := model.GetProject(project)
+	if err != nil {
+		HandleError(w, r, err)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	json.NewEncoder(w).Encode(proj)
+
+}
 
 func AddProjectHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Body == nil {

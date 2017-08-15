@@ -18,11 +18,13 @@ package handlers
 
 import (
 	"bytes"
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
 	"github.com/ankyra/escape-registry/dao"
+	"github.com/ankyra/escape-registry/model"
 
 	. "gopkg.in/check.v1"
 )
@@ -36,6 +38,10 @@ var _ = Suite(&suite{})
 func (s *suite) SetUpTest(c *C) {
 	dao.TestSetup()
 }
+
+/*
+	JSON TEST HELPERS
+*/
 
 func (s *suite) JsonNilBodyTest(c *C, handler http.HandlerFunc) {
 	req := httptest.NewRequest("POST", "/url", nil)
@@ -58,6 +64,40 @@ func (s *suite) JsonParseTesting(c *C, handler http.HandlerFunc) {
 	s.JsonNilBodyTest(c, handler)
 	s.JsonEmptyBodyTest(c, handler)
 }
+
+/*
+	GET PROJECT
+*/
+
+func (s *suite) Test_GetProject_Not_Found(c *C) {
+	req := httptest.NewRequest("GET", "/url", nil)
+	w := httptest.NewRecorder()
+	getProjectHandler(w, req, "test")
+
+	resp := w.Result()
+	c.Assert(resp.StatusCode, Equals, 404)
+}
+
+func (s *suite) Test_GetProject(c *C) {
+	s.addProject(c, "test")
+	req := httptest.NewRequest("GET", "/get", nil)
+	w := httptest.NewRecorder()
+	getProjectHandler(w, req, "test")
+
+	resp := w.Result()
+	c.Assert(resp.StatusCode, Equals, 200)
+
+	result := model.ProjectPayload{}
+	c.Assert(json.NewDecoder(resp.Body).Decode(&result), IsNil)
+
+	c.Assert(result.Name, Equals, "test")
+	c.Assert(result.Description, Equals, "")
+	c.Assert(result.Units, IsNil)
+}
+
+/*
+	ADD PROJECT
+*/
 
 func (s *suite) Test_AddProject_Json_Tests(c *C) {
 	s.JsonParseTesting(c, AddProjectHandler)
@@ -89,6 +129,23 @@ func (s *suite) Test_AddProject_Already_Exists(c *C) {
 	resp = w.Result()
 	c.Assert(resp.StatusCode, Equals, 409)
 }
+
+/*
+	ADD PROJECT HELPER
+*/
+
+func (s *suite) addProject(c *C, name string) {
+	body := `{"name": "` + name + `"}`
+	req := httptest.NewRequest("POST", "/api/v1/registry/add-project", bytes.NewReader([]byte(body)))
+	w := httptest.NewRecorder()
+	AddProjectHandler(w, req)
+	resp := w.Result()
+	c.Assert(resp.StatusCode, Equals, 200)
+}
+
+/*
+	UPDATE PROJECT
+*/
 
 func (s *suite) Test_UpdateProject_Json_Test(c *C) {
 	s.JsonParseTesting(c, UpdateProjectHandler)
@@ -123,13 +180,4 @@ func (s *suite) Test_UpdateProject(c *C) {
 
 	resp := w.Result()
 	c.Assert(resp.StatusCode, Equals, 201)
-}
-
-func (s *suite) addProject(c *C, name string) {
-	body := `{"name": "` + name + `"}`
-	req := httptest.NewRequest("POST", "/api/v1/registry/add-project", bytes.NewReader([]byte(body)))
-	w := httptest.NewRecorder()
-	AddProjectHandler(w, req)
-	resp := w.Result()
-	c.Assert(resp.StatusCode, Equals, 200)
 }

@@ -23,6 +23,26 @@ import (
 	"github.com/ankyra/escape-registry/dao/types"
 )
 
+type ProjectPayload struct {
+	*types.Project
+	Units []string `json:"units"`
+}
+
+func GetProject(project string) (*ProjectPayload, error) {
+	prj, err := dao.GetProject(project)
+	if err != nil {
+		return nil, err
+	}
+	units, err := GetApplications(project)
+	if err != nil && !dao.IsNotFound(err) {
+		return nil, err
+	}
+	return &ProjectPayload{
+		prj,
+		units,
+	}, nil
+}
+
 func AddProject(p *types.Project) error {
 	if p.Name == "" {
 		return NewUserError(fmt.Errorf("Missing name"))

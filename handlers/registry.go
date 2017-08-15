@@ -20,7 +20,6 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/ankyra/escape-registry/dao"
 	"github.com/ankyra/escape-registry/model"
 	"github.com/gorilla/mux"
 )
@@ -30,18 +29,7 @@ func RegistryHandler(w http.ResponseWriter, r *http.Request) {
 	name := mux.Vars(r)["name"]
 	version := mux.Vars(r)["version"]
 	var bytes []byte
-	if project == "" {
-		result, err := dao.GetProjects()
-		if err != nil {
-			HandleError(w, r, err)
-			return
-		}
-		bytes, err = json.Marshal(result)
-		if err != nil {
-			HandleError(w, r, err)
-			return
-		}
-	} else if version == "" {
+	if version == "" {
 		result, err := model.Registry(project, name)
 		if err != nil {
 			HandleError(w, r, err)
