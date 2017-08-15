@@ -18,6 +18,7 @@ package model
 
 import (
 	"github.com/ankyra/escape-registry/dao"
+	"github.com/ankyra/escape-registry/dao/types"
 	. "gopkg.in/check.v1"
 )
 
@@ -45,4 +46,16 @@ func (s *releaseSuite) Test_AddRelease_GetMetadata(c *C) {
 func (s *releaseSuite) Test_GetMetadataNotFound(c *C) {
 	_, err := GetReleaseMetadata("_", "whatiojasdiofjasd-test-v0")
 	c.Assert(dao.IsNotFound(err), Equals, true)
+}
+
+func (s *releaseSuite) Test_AddRelease_CreateProjectMetadata(c *C) {
+	_, err := dao.GetProject("test")
+	c.Assert(err, Equals, types.NotFound)
+
+	_, err = AddRelease("test", `{"name": "rel-test", "version": "0"}`)
+	c.Assert(err, IsNil)
+
+	prj, err := dao.GetProject("test")
+	c.Assert(err, IsNil)
+	c.Assert(prj.Name, Equals, "test")
 }

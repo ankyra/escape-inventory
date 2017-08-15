@@ -18,6 +18,7 @@ package dao
 
 import (
 	"fmt"
+
 	"github.com/ankyra/escape-core"
 	"github.com/ankyra/escape-registry/config"
 	"github.com/ankyra/escape-registry/dao/mem"
@@ -53,6 +54,18 @@ func LoadFromConfig(conf *config.Config) error {
 }
 func TestSetup() {
 	GlobalDAO = mem.NewInMemoryDAO()
+}
+
+func GetProject(project string) (*Project, error) {
+	return GlobalDAO.GetProject(project)
+}
+
+func AddProject(project *Project) error {
+	return GlobalDAO.AddProject(project)
+}
+
+func UpdateProject(project *Project) error {
+	return GlobalDAO.UpdateProject(project)
 }
 
 func GetProjects() ([]string, error) {

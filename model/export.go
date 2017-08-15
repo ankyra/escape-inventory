@@ -18,8 +18,9 @@ package model
 
 import (
 	"encoding/json"
-	"github.com/ankyra/escape-registry/dao"
 	"io"
+
+	"github.com/ankyra/escape-registry/dao"
 )
 
 func Export(w io.Writer) error {

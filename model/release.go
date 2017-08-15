@@ -18,14 +18,30 @@ package model
 
 import (
 	"fmt"
+	"strings"
+
 	"github.com/ankyra/escape-core"
 	"github.com/ankyra/escape-core/parsers"
 	"github.com/ankyra/escape-registry/dao"
 	. "github.com/ankyra/escape-registry/dao/types"
-	"strings"
 )
 
+func ensureProjectExists(project string) error {
+	prj, err := dao.GetProject(project)
+	if err == nil {
+		return nil
+	}
+	if err != NotFound {
+		return err
+	}
+	prj = NewProject(project)
+	return dao.AddProject(prj)
+}
+
 func AddRelease(project, metadataJson string) (*core.ReleaseMetadata, error) {
+	if err := ensureProjectExists(project); err != nil {
+		return nil, err
+	}
 	metadata, err := core.NewReleaseMetadataFromJsonString(metadataJson)
 	if err != nil {
 		return nil, NewUserError(err)
