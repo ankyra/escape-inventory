@@ -4,6 +4,7 @@
 // dao/postgres/schemas/1_initial_schema.up.sql
 // dao/postgres/schemas/2_project_metadata.down.sql
 // dao/postgres/schemas/2_project_metadata.up.sql
+// dao/postgres/schemas/3_migrate_existing_projects.up.sql
 // DO NOT EDIT!
 
 package postgres
@@ -151,6 +152,26 @@ func _2_project_metadataUpSql() (*asset, error) {
 	return a, nil
 }
 
+var __3_migrate_existing_projectsUpSql = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\xf2\xf4\x0b\x76\x0d\x0a\x51\xf0\xf4\x0b\xf1\x57\x28\x28\xca\xcf\x4a\x4d\x2e\xd1\xc8\x4b\xcc\x4d\xd5\x51\x48\x49\x2d\x4e\x2e\xca\x2c\x28\xc9\xcc\xcf\xd3\x51\xc8\x2f\x4a\x0f\x0d\xf2\xd1\x51\xc8\xc9\x4f\xcf\xd7\xe4\x0a\x76\xf5\x71\x75\x0e\x51\x48\xc9\x2c\x2e\xc9\xcc\x4b\x2e\xd1\x80\x6a\xd4\xd4\x51\x50\x57\x87\x61\x2e\xb7\x20\x7f\x5f\x85\xa2\xd4\x9c\xd4\xc4\xe2\x54\x6b\x2e\x40\x00\x00\x00\xff\xff\x5b\xed\x91\x00\x68\x00\x00\x00")
+
+func _3_migrate_existing_projectsUpSqlBytes() ([]byte, error) {
+	return bindataRead(
+		__3_migrate_existing_projectsUpSql,
+		"3_migrate_existing_projects.up.sql",
+	)
+}
+
+func _3_migrate_existing_projectsUpSql() (*asset, error) {
+	bytes, err := _3_migrate_existing_projectsUpSqlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "3_migrate_existing_projects.up.sql", size: 104, mode: os.FileMode(436), modTime: time.Unix(1502806903, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
 // Asset loads and returns the asset for the given name.
 // It returns an error if the asset could not be found or
 // could not be loaded.
@@ -207,6 +228,7 @@ var _bindata = map[string]func() (*asset, error){
 	"1_initial_schema.up.sql": _1_initial_schemaUpSql,
 	"2_project_metadata.down.sql": _2_project_metadataDownSql,
 	"2_project_metadata.up.sql": _2_project_metadataUpSql,
+	"3_migrate_existing_projects.up.sql": _3_migrate_existing_projectsUpSql,
 }
 
 // AssetDir returns the file names below a certain
@@ -253,6 +275,7 @@ var _bintree = &bintree{nil, map[string]*bintree{
 	"1_initial_schema.up.sql": &bintree{_1_initial_schemaUpSql, map[string]*bintree{}},
 	"2_project_metadata.down.sql": &bintree{_2_project_metadataDownSql, map[string]*bintree{}},
 	"2_project_metadata.up.sql": &bintree{_2_project_metadataUpSql, map[string]*bintree{}},
+	"3_migrate_existing_projects.up.sql": &bintree{_3_migrate_existing_projectsUpSql, map[string]*bintree{}},
 }}
 
 // RestoreAsset restores an asset under the given directory
