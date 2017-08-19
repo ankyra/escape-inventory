@@ -19,13 +19,14 @@ name: escape-registry
 # Build the next path release in the 1.1.* series:
 #   version: 1.1.@
 #
-version: '0.9.@'
+version: '0.10.@'
 
  
 # An (optional) description for this release.
 
 description: "A Go build for the Escape Registry"
 
+logo: logo.png
 
 # Dependencies. Reference dependencies by their full release ID or use
 # the '@' symbol to resolve versions at build time.
@@ -68,9 +69,6 @@ includes:
 - vendor/
 - docs/
 
-inputs:
-- version
-
 post_build: scripts/build.sh
 test: scripts/test.sh
 
@@ -83,7 +81,7 @@ errands:
       description: "The target bucket"
     - id: credentials
       description: "Service account credentials"
-    - id: version
+    - id: registry_version
       default: $this.version
   publish_binaries:
     description: Create binaries for all platforms and upload to a GCS bucket
@@ -92,7 +90,7 @@ errands:
       description: "The target bucket"
     - id: credentials
       description: "Service account credentials"
-    - id: version
+    - id: registry_version
       default: $this.version
     script: scripts/publish-binaries.sh
 

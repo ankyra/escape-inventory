@@ -11,7 +11,7 @@ gcloud auth activate-service-account --key-file service_account.json
 
 for GOOS in $PLATFORMS; do
     for ARCH in $ARCHS; do
-        target="escape-registry-v$INPUT_version-$GOOS-$ARCH.tgz"
+        target="escape-registry-v$INPUT_registry_version-$GOOS-$ARCH.tgz"
         echo "Building $target"
         if [ ! -f $target ] ; then
             docker run --rm -v "$PWD":/go/src/github.com/ankyra/escape-registry \
@@ -25,7 +25,7 @@ for GOOS in $PLATFORMS; do
         else
             echo "File $target already exists"
         fi
-        gcs_target="gs://$INPUT_bucket/escape-registry/$INPUT_version/$target"
+        gcs_target="gs://$INPUT_bucket/escape-registry/$INPUT_registry_version/$target"
         echo "Copying to $gcs_target"
         gsutil cp "$target" "$gcs_target"
         echo "Setting ACL on $gcs_target"
