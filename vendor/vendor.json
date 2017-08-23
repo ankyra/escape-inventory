@@ -39,58 +39,58 @@
 			"revisionTime": "2017-07-26T21:16:44Z"
 		},
 		{
-			"checksumSHA1": "KJjMNenmMiWQDfIUz/wkN0FCqQY=",
+			"checksumSHA1": "bLI+Y17S5UeAHYG3N/cUWlSFi6c=",
 			"path": "github.com/ankyra/escape-core",
-			"revision": "8fb0b8e4e736fcb6c6a36fae5eb9c74c4b80bb3c",
-			"revisionTime": "2017-07-31T05:10:18Z"
+			"revision": "79bc2fc41e63c81e27b9e42d5ad73cc889e170ef",
+			"revisionTime": "2017-08-21T16:35:47Z"
 		},
 		{
-			"checksumSHA1": "JRgDEGpKIt8fsuVqGSNjd4grJ8Q=",
+			"checksumSHA1": "FRcsf4XzrOlWYnPXsQuC0aSDHao=",
 			"path": "github.com/ankyra/escape-core/docs",
-			"revision": "8fb0b8e4e736fcb6c6a36fae5eb9c74c4b80bb3c",
-			"revisionTime": "2017-07-31T05:10:18Z"
+			"revision": "79bc2fc41e63c81e27b9e42d5ad73cc889e170ef",
+			"revisionTime": "2017-08-21T16:35:47Z"
 		},
 		{
 			"checksumSHA1": "oVoOO3iAvpvgGQPPHqhGMkJ6nqo=",
 			"path": "github.com/ankyra/escape-core/parsers",
-			"revision": "8fb0b8e4e736fcb6c6a36fae5eb9c74c4b80bb3c",
-			"revisionTime": "2017-07-31T05:10:18Z"
+			"revision": "79bc2fc41e63c81e27b9e42d5ad73cc889e170ef",
+			"revisionTime": "2017-08-21T16:35:47Z"
 		},
 		{
 			"checksumSHA1": "qymYpqxq2qiGowoeE5+JzEkdl/s=",
 			"path": "github.com/ankyra/escape-core/script",
-			"revision": "8fb0b8e4e736fcb6c6a36fae5eb9c74c4b80bb3c",
-			"revisionTime": "2017-07-31T05:10:18Z"
+			"revision": "79bc2fc41e63c81e27b9e42d5ad73cc889e170ef",
+			"revisionTime": "2017-08-21T16:35:47Z"
 		},
 		{
-			"checksumSHA1": "cUuzu4HqaZqsaUpVfAZPDVShf4Q=",
+			"checksumSHA1": "cDUaryJzJYneoDiaC9S0kGQa3Cw=",
 			"path": "github.com/ankyra/escape-core/state",
-			"revision": "8fb0b8e4e736fcb6c6a36fae5eb9c74c4b80bb3c",
-			"revisionTime": "2017-07-31T05:10:18Z"
+			"revision": "79bc2fc41e63c81e27b9e42d5ad73cc889e170ef",
+			"revisionTime": "2017-08-21T16:35:47Z"
 		},
 		{
-			"checksumSHA1": "Ln4lOOR9puNemf33/mFiwXg5XJU=",
+			"checksumSHA1": "6nqI04Y3XC6bAihbOchXvxwtAL0=",
 			"path": "github.com/ankyra/escape-core/templates",
-			"revision": "8fb0b8e4e736fcb6c6a36fae5eb9c74c4b80bb3c",
-			"revisionTime": "2017-07-31T05:10:18Z"
+			"revision": "79bc2fc41e63c81e27b9e42d5ad73cc889e170ef",
+			"revisionTime": "2017-08-21T16:35:47Z"
 		},
 		{
-			"checksumSHA1": "NqS93/zAQXWN80ERNTzWCLOZsOM=",
+			"checksumSHA1": "UitAaUNlXBESVfwQkBhl2YY5wXM=",
 			"path": "github.com/ankyra/escape-core/util",
-			"revision": "8fb0b8e4e736fcb6c6a36fae5eb9c74c4b80bb3c",
-			"revisionTime": "2017-07-31T05:10:18Z"
+			"revision": "79bc2fc41e63c81e27b9e42d5ad73cc889e170ef",
+			"revisionTime": "2017-08-21T16:35:47Z"
 		},
 		{
-			"checksumSHA1": "32FLXnl1NJ5+LeKIuu5zznKwebY=",
+			"checksumSHA1": "N0O0F112bXgGsGszDmWTxb7Yx+E=",
 			"path": "github.com/ankyra/escape-core/variables",
-			"revision": "8fb0b8e4e736fcb6c6a36fae5eb9c74c4b80bb3c",
-			"revisionTime": "2017-07-31T05:10:18Z"
+			"revision": "79bc2fc41e63c81e27b9e42d5ad73cc889e170ef",
+			"revisionTime": "2017-08-21T16:35:47Z"
 		},
 		{
-			"checksumSHA1": "pq3jmtOVeRsLFEoNiAG7e5o7Lyw=",
+			"checksumSHA1": "KgNH6kHm7IlHbMG26vKyhIXSbUw=",
 			"path": "github.com/ankyra/escape-core/variables/variable_types",
-			"revision": "8fb0b8e4e736fcb6c6a36fae5eb9c74c4b80bb3c",
-			"revisionTime": "2017-07-31T05:10:18Z"
+			"revision": "79bc2fc41e63c81e27b9e42d5ad73cc889e170ef",
+			"revisionTime": "2017-08-21T16:35:47Z"
 		},
 		{
 			"checksumSHA1": "g9J1173rqdbRkaI7yoE6LLcuZnI=",
@@ -192,8 +192,8 @@
 			"checksumSHA1": "NNElWY1DDnkaMFqBDKoBL+UwUUQ=",
 			"origin": "github.com/ankyra/escape-core/vendor/github.com/cbroglie/mustache",
 			"path": "github.com/cbroglie/mustache",
-			"revision": "8fb0b8e4e736fcb6c6a36fae5eb9c74c4b80bb3c",
-			"revisionTime": "2017-07-31T05:10:18Z"
+			"revision": "79bc2fc41e63c81e27b9e42d5ad73cc889e170ef",
+			"revisionTime": "2017-08-21T16:35:47Z"
 		},
 		{
 			"checksumSHA1": "kBeNcaKk56FguvPSUCEaH6AxpRc=",
@@ -436,13 +436,13 @@
 			"revisionTime": "2017-07-09T00:38:22Z"
 		},
 		{
-			"checksumSHA1": "KG+XZAbxdkpBm3Fa3bJ3Ylq8CKI=",
+			"checksumSHA1": "MRLtTu/vpd18le8/HPLxOdjO5RE=",
 			"path": "golang.org/x/text/unicode/bidi",
 			"revision": "836efe42bb4aa16aaa17b9c155d8813d336ed720",
 			"revisionTime": "2017-07-09T00:38:22Z"
 		},
 		{
-			"checksumSHA1": "Anof4bt0AU+Sa3R8Rq0KBnlpbaQ=",
+			"checksumSHA1": "kKylzIrLEnH8NKyeVAL0dq5gjVQ=",
 			"path": "golang.org/x/text/unicode/norm",
 			"revision": "836efe42bb4aa16aaa17b9c155d8813d336ed720",
 			"revisionTime": "2017-07-09T00:38:22Z"
