@@ -12,14 +12,16 @@ includes:
 - Makefile
 - README.md
 - "*.go"
+- cmd/
 - config/
 - dao/
+- deps/
+- docs/
 - handlers/
+- metrics/
 - model/
-- shared/
 - storage/
 - vendor/
-- docs/
 
 metadata:
   release_metadata_api_version: $core.metadata.release_metadata_api_version

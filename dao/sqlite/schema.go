@@ -7,6 +7,8 @@
 // dao/sqlite/schemas/3_migrate_existing_projects.up.sql
 // dao/sqlite/schemas/4_application_metadata.down.sql
 // dao/sqlite/schemas/4_application_metadata.up.sql
+// dao/sqlite/schemas/5_build_dependencies.down.sql
+// dao/sqlite/schemas/5_build_dependencies.up.sql
 // DO NOT EDIT!
 
 package sqlite
@@ -214,6 +216,46 @@ func _4_application_metadataUpSql() (*asset, error) {
 	return a, nil
 }
 
+var __5_build_dependenciesDownSql = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x72\x09\xf2\x0f\x50\x08\x71\x74\xf2\x71\x55\x28\x4a\xcd\x49\x4d\x2c\x4e\x8d\x4f\x49\x2d\x48\xcd\x4b\x49\xcd\x4b\xae\xb4\xe6\x02\x04\x00\x00\xff\xff\xf4\xa7\x3f\x11\x1f\x00\x00\x00")
+
+func _5_build_dependenciesDownSqlBytes() ([]byte, error) {
+	return bindataRead(
+		__5_build_dependenciesDownSql,
+		"5_build_dependencies.down.sql",
+	)
+}
+
+func _5_build_dependenciesDownSql() (*asset, error) {
+	bytes, err := _5_build_dependenciesDownSqlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "5_build_dependencies.down.sql", size: 31, mode: os.FileMode(436), modTime: time.Unix(1503525858, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var __5_build_dependenciesUpSql = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x6c\xce\xbd\x0a\x83\x30\x14\xc5\xf1\xdd\xa7\x38\xa3\x42\xde\xa0\x93\x2d\x29\x48\x3f\xd1\x0c\x75\x12\x35\x97\x62\x49\x93\x90\xd8\x82\x6f\x5f\x94\x56\x94\x66\xfd\x5f\xee\xe1\xb7\xcb\x79\x2a\x38\x44\xba\x3d\x72\x64\x7b\x9c\x2f\x02\xfc\x96\x15\xa2\x80\x23\x45\xb5\xa7\x4a\x92\x25\x2d\x49\xb7\x03\xe2\x08\x00\xac\x33\x0f\x6a\x7b\xf8\xde\x75\xfa\xce\xa6\xa6\xeb\x27\xad\xc2\x9b\x9c\xef\x8c\x5e\x35\x49\xb6\x0a\x3d\x8f\xfd\x6f\x60\x8c\xa1\x91\xe6\xd5\x29\x59\xf9\xd6\x58\x42\x63\x8c\xa2\x5a\xcf\x0f\xca\x0c\xa1\xcb\x35\xcf\x4e\x69\x5e\xe2\xc0\x4b\xc4\x5f\x00\x9b\xc8\xec\xe7\x64\x4b\x1c\x9b\x45\x6c\xc9\x48\xa2\x64\x13\x7d\x02\x00\x00\xff\xff\x78\x04\xf8\x44\x31\x01\x00\x00")
+
+func _5_build_dependenciesUpSqlBytes() ([]byte, error) {
+	return bindataRead(
+		__5_build_dependenciesUpSql,
+		"5_build_dependencies.up.sql",
+	)
+}
+
+func _5_build_dependenciesUpSql() (*asset, error) {
+	bytes, err := _5_build_dependenciesUpSqlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "5_build_dependencies.up.sql", size: 305, mode: os.FileMode(436), modTime: time.Unix(1503525852, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
 // Asset loads and returns the asset for the given name.
 // It returns an error if the asset could not be found or
 // could not be loaded.
@@ -273,6 +315,8 @@ var _bindata = map[string]func() (*asset, error){
 	"3_migrate_existing_projects.up.sql": _3_migrate_existing_projectsUpSql,
 	"4_application_metadata.down.sql": _4_application_metadataDownSql,
 	"4_application_metadata.up.sql": _4_application_metadataUpSql,
+	"5_build_dependencies.down.sql": _5_build_dependenciesDownSql,
+	"5_build_dependencies.up.sql": _5_build_dependenciesUpSql,
 }
 
 // AssetDir returns the file names below a certain
@@ -322,6 +366,8 @@ var _bintree = &bintree{nil, map[string]*bintree{
 	"3_migrate_existing_projects.up.sql": &bintree{_3_migrate_existing_projectsUpSql, map[string]*bintree{}},
 	"4_application_metadata.down.sql": &bintree{_4_application_metadataDownSql, map[string]*bintree{}},
 	"4_application_metadata.up.sql": &bintree{_4_application_metadataUpSql, map[string]*bintree{}},
+	"5_build_dependencies.down.sql": &bintree{_5_build_dependenciesDownSql, map[string]*bintree{}},
+	"5_build_dependencies.up.sql": &bintree{_5_build_dependenciesUpSql, map[string]*bintree{}},
 }}
 
 // RestoreAsset restores an asset under the given directory

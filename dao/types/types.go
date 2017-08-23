@@ -77,6 +77,14 @@ type Release struct {
 	Metadata    *core.ReleaseMetadata
 }
 
+type Dependency struct {
+	Project     string
+	Application string
+	Version     string
+	BuildScope  bool
+	DeployScope bool
+}
+
 func NewRelease(app *Application, metadata *core.ReleaseMetadata) *Release {
 	return &Release{
 		Application: app,
@@ -102,6 +110,8 @@ type DAO interface {
 	GetRelease(project, name, releaseId string) (*Release, error)
 	AddRelease(project string, metadata *core.ReleaseMetadata) (*Release, error)
 	GetAllReleases() ([]*Release, error)
+	SetDependencies(*Release, []*Dependency) error
+	GetDependencies(*Release) ([]*Dependency, error)
 	GetPackageURIs(release *Release) ([]string, error)
 	AddPackageURI(release *Release, uri string) error
 

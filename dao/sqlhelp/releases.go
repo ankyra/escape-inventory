@@ -92,3 +92,44 @@ func (s *SQLHelper) AddPackageURI(release *Release, uri string) error {
 	}
 	return nil
 }
+
+func (s *SQLHelper) SetDependencies(release *Release, depends []*Dependency) error {
+	for _, dep := range depends {
+		err := s.PrepareAndExecInsert(s.InsertDependencyQuery,
+			release.Application.Project,
+			release.Application.Name,
+			release.Version,
+			dep.Project,
+			dep.Application,
+			dep.Version,
+			dep.BuildScope,
+			dep.DeployScope)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+func (s *SQLHelper) GetDependencies(release *Release) ([]*Dependency, error) {
+	rows, err := s.PrepareAndQuery(s.GetDependenciesQuery, release.Application.Project, release.Application.Name, release.Version)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	result := []*Dependency{}
+	for rows.Next() {
+		var depProject, depApplication, depVersion string
+		var buildScope, deployScope bool
+		if err := rows.Scan(&depProject, &depApplication, &depVersion, &buildScope, &deployScope); err != nil {
+			return nil, err
+		}
+		result = append(result, &Dependency{
+			Project:     depProject,
+			Application: depApplication,
+			Version:     depVersion,
+			BuildScope:  buildScope,
+			DeployScope: deployScope,
+		})
+	}
+	return result, nil
+}

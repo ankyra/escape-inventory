@@ -51,6 +51,7 @@ func (s *memSuite) Test_DAO(c *C) {
 			_, err = db.Exec(`TRUNCATE acl CASCADE`)
 			_, err = db.Exec(`TRUNCATE application CASCADE`)
 			_, err = db.Exec(`TRUNCATE project CASCADE`)
+			_, err = db.Exec(`TRUNCATE release_dependency CASCADE`)
 
 			// Create unit
 			dao, err := NewPostgresDAO(url)

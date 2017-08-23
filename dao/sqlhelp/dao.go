@@ -22,12 +22,14 @@ type SQLHelper struct {
 	GetApplicationsQuery   string
 	GetApplicationQuery    string
 
-	FindAllVersionsQuery string
-	GetReleaseQuery      string
-	GetAllReleasesQuery  string
-	AddReleaseQuery      string
-	GetPackageURIsQuery  string
-	AddPackageURIQuery   string
+	FindAllVersionsQuery  string
+	GetReleaseQuery       string
+	GetAllReleasesQuery   string
+	InsertDependencyQuery string
+	GetDependenciesQuery  string
+	AddReleaseQuery       string
+	GetPackageURIsQuery   string
+	AddPackageURIQuery    string
 
 	GetACLQuery             string
 	InsertACLQuery          string

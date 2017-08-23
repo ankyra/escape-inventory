@@ -75,10 +75,18 @@ func NewPostgresDAO(url string) (DAO, error) {
 		GetApplicationsQuery: `SELECT name, project, description, latest_version, logo 
 								  FROM application WHERE project = $1`,
 
-		FindAllVersionsQuery:    "SELECT version FROM release WHERE project = $1 AND name = $2",
-		GetReleaseQuery:         "SELECT metadata FROM release WHERE project = $1 AND name = $2 AND release_id = $3",
-		GetAllReleasesQuery:     "SELECT project, metadata FROM release",
-		AddReleaseQuery:         "INSERT INTO release(project, name, release_id, version, metadata) VALUES($1, $2, $3, $4, $5)",
+		FindAllVersionsQuery: "SELECT version FROM release WHERE project = $1 AND name = $2",
+		GetReleaseQuery:      "SELECT metadata FROM release WHERE project = $1 AND name = $2 AND release_id = $3",
+		GetAllReleasesQuery:  "SELECT project, metadata FROM release",
+		AddReleaseQuery:      "INSERT INTO release(project, name, release_id, version, metadata) VALUES($1, $2, $3, $4, $5)",
+		InsertDependencyQuery: `INSERT INTO release_dependency(project, name, version,
+										dep_project, dep_name, dep_version,
+										build_scope, deploy_scope)
+								VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+		GetDependenciesQuery: `SELECT dep_project, dep_name, dep_version, 
+									  build_scope, deploy_scope 
+							   FROM release_dependency 
+							   WHERE project = $1 AND name = $2 AND version = $3`,
 		GetPackageURIsQuery:     "SELECT uri FROM package WHERE project = $1 AND release_id = $2",
 		AddPackageURIQuery:      "INSERT INTO package (project, release_id, uri) VALUES ($1, $2, $3)",
 		GetACLQuery:             "SELECT group_name, permission FROM acl WHERE project = $1",

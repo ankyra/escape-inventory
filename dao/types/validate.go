@@ -37,6 +37,7 @@ func ValidateDAO(dao func() DAO, c *C) {
 	Validate_AddPackageURI_Unique(dao(), c)
 	Validate_GetAllReleases(dao(), c)
 	Validate_ACL(dao(), c)
+	Validate_Dependencies(dao(), c)
 }
 
 func addReleaseToProject(dao DAO, c *C, name, version, project string) *Release {
@@ -385,6 +386,34 @@ func Validate_ACL(dao DAO, c *C) {
 	groups, err = dao.GetPermittedGroups("doesnt-exist", ReadPermission)
 	c.Assert(err, IsNil)
 	c.Assert(groups, DeepEquals, []string{})
+}
+
+func Validate_Dependencies(dao DAO, c *C) {
+	release := addRelease(dao, c, "dao-val", "1")
+	deps, err := dao.GetDependencies(release)
+	c.Assert(err, IsNil)
+	c.Assert(deps, HasLen, 0)
+
+	dao.AddApplication(NewApplication("_", "dao-parent"))
+	metadataJson := `{"name": "dao-parent", "version": "1", "depends": [{"id": "_/dao-val-v1"}]}`
+	metadata, err := core.NewReleaseMetadataFromJsonString(metadataJson)
+	c.Assert(err, IsNil)
+	releaseParent, err := dao.AddRelease("_", metadata)
+	c.Assert(err, IsNil)
+	dependencies := []*Dependency{
+		&Dependency{
+			Project:     "_",
+			Application: "dao-val",
+			Version:     "1",
+			BuildScope:  true,
+			DeployScope: true,
+		},
+	}
+	c.Assert(dao.SetDependencies(releaseParent, dependencies), IsNil)
+	deps, err = dao.GetDependencies(releaseParent)
+	c.Assert(err, IsNil)
+	c.Assert(deps, DeepEquals, dependencies)
+
 }
 
 type hasItemChecker struct{}

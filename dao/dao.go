@@ -128,6 +128,14 @@ func AddPackageURI(r *Release, uri string) error {
 	return GlobalDAO.AddPackageURI(r, uri)
 }
 
+func SetDependencies(r *Release, deps []*Dependency) error {
+	return GlobalDAO.SetDependencies(r, deps)
+}
+
+func GetDependencies(r *Release) ([]*Dependency, error) {
+	return GlobalDAO.GetDependencies(r)
+}
+
 // TODO: Rename to export releases
 func GetAllReleases() ([]*Release, error) {
 	return GlobalDAO.GetAllReleases()
