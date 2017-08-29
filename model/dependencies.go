@@ -68,6 +68,7 @@ func GetDependencyGraph(project, name, version string, downstreamFunc Downstream
 	}
 	mainId := release.Metadata.GetQualifiedReleaseId()
 	result.AddNode(mainId, "main")
+	mainId = "main" + mainId
 
 	upstream, err := dao.GetDependencies(release)
 	if err != nil {
@@ -83,18 +84,18 @@ func GetDependencyGraph(project, name, version string, downstreamFunc Downstream
 	}
 
 	for _, ext := range release.Metadata.Extends {
-		result.AddNode(ext.ReleaseId, "release")
-		result.AddEdge(mainId, ext.ReleaseId, "extends")
+		result.AddNode(ext.ReleaseId, "extension")
+		result.AddEdge(mainId, "extension"+ext.ReleaseId, "extends")
 	}
 	for _, dep := range upstream {
 		id := dep.Project + "/" + dep.Application + "-v" + dep.Version
 		result.AddNode(id, "upstream")
-		result.AddEdge(mainId, id, "upstream")
+		result.AddEdge(mainId, "upstream"+id, "upstream")
 	}
 	for _, dep := range downstream {
 		id := dep.Project + "/" + dep.Application + "-v" + dep.Version
 		result.AddNode(id, "downstream")
-		result.AddEdge(id, mainId, "downstream")
+		result.AddEdge("downstream"+id, mainId, "downstream")
 	}
 	return result, nil
 }
