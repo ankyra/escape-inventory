@@ -52,7 +52,9 @@ func (d *DependencyGraph) AddEdge(from, to, typ string) {
 	})
 }
 
-func GetDependencyGraph(project, name, version string) (*DependencyGraph, error) {
+type DownstreamDependenciesResolver func(*types.Release) ([]*types.Dependency, error)
+
+func GetDependencyGraph(project, name, version string, downstreamFunc DownstreamDependenciesResolver) (*DependencyGraph, error) {
 	result := &DependencyGraph{
 		Nodes: []*DependencyGraphNode{},
 		Edges: []*DependencyGraphEdge{},
@@ -70,7 +72,10 @@ func GetDependencyGraph(project, name, version string) (*DependencyGraph, error)
 		return nil, err
 	}
 
-	downstream, err := dao.GetDownstreamDependencies(release)
+	if downstreamFunc == nil {
+		downstreamFunc = dao.GetDownstreamDependencies
+	}
+	downstream, err := downstreamFunc(release)
 	if err != nil {
 		return nil, err
 	}
