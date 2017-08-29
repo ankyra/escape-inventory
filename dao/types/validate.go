@@ -415,7 +415,7 @@ func Validate_Dependencies(dao DAO, c *C) {
 	c.Assert(deps, HasLen, 0)
 
 	dao.AddApplication(NewApplication("_", "dao-parent"))
-	metadataJson := `{"name": "dao-parent", "version": "1", "depends": [{"id": "_/dao-val-v1"}]}`
+	metadataJson := `{"name": "dao-parent", "version": "1", "depends": [{"id": "_/dao-val-v1", "scopes": ["build"]}]}`
 	metadata, err := core.NewReleaseMetadataFromJsonString(metadataJson)
 	c.Assert(err, IsNil)
 	releaseParent, err := dao.AddRelease("_", metadata)
@@ -426,7 +426,7 @@ func Validate_Dependencies(dao DAO, c *C) {
 			Application: "dao-val",
 			Version:     "1",
 			BuildScope:  true,
-			DeployScope: true,
+			DeployScope: false,
 		},
 	}
 	c.Assert(dao.SetDependencies(releaseParent, dependencies), IsNil)
@@ -434,6 +434,19 @@ func Validate_Dependencies(dao DAO, c *C) {
 	c.Assert(err, IsNil)
 	c.Assert(deps, DeepEquals, dependencies)
 
+	downstream := []*Dependency{
+		&Dependency{
+			Project:     "_",
+			Application: "dao-parent",
+			Version:     "1",
+			BuildScope:  true,
+			DeployScope: false,
+		},
+	}
+	ds, err := dao.GetDownstreamDependencies(release)
+	c.Assert(err, IsNil)
+	c.Assert(ds, HasLen, 1)
+	c.Assert(ds[0], DeepEquals, downstream[0])
 }
 
 type hasItemChecker struct{}

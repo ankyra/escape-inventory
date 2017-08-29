@@ -138,6 +138,10 @@ func GetDependencies(r *Release) ([]*Dependency, error) {
 	return GlobalDAO.GetDependencies(r)
 }
 
+func GetDownstreamDependencies(r *Release) ([]*Dependency, error) {
+	return GlobalDAO.GetDownstreamDependencies(r)
+}
+
 func GetAllReleases() ([]*Release, error) {
 	return GlobalDAO.GetAllReleases()
 }

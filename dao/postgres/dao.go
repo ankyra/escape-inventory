@@ -90,6 +90,10 @@ func NewPostgresDAO(url string) (DAO, error) {
 									  build_scope, deploy_scope 
 							   FROM release_dependency 
 							   WHERE project = $1 AND name = $2 AND version = $3`,
+		GetDownstreamDependenciesQuery: `SELECT project, name, version, 
+							   build_scope, deploy_scope 
+							   FROM release_dependency 
+							   WHERE dep_project = $1 AND dep_name = $2 AND dep_version = $3`,
 
 		GetPackageURIsQuery: "SELECT uri FROM package WHERE project = $1 AND release_id = $2",
 		AddPackageURIQuery:  "INSERT INTO package (project, release_id, uri) VALUES ($1, $2, $3)",

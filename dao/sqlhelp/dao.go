@@ -29,8 +29,9 @@ type SQLHelper struct {
 	GetAllReleasesWithoutProcessedDependenciesQuery string
 	FindAllVersionsQuery                            string
 
-	InsertDependencyQuery string
-	GetDependenciesQuery  string
+	InsertDependencyQuery          string
+	GetDependenciesQuery           string
+	GetDownstreamDependenciesQuery string
 
 	GetPackageURIsQuery string
 	AddPackageURIQuery  string

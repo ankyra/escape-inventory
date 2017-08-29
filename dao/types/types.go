@@ -79,11 +79,11 @@ type Release struct {
 }
 
 type Dependency struct {
-	Project     string
-	Application string
-	Version     string
-	BuildScope  bool
-	DeployScope bool
+	Project     string `json:"project"`
+	Application string `json:"name"`
+	Version     string `json:"version"`
+	BuildScope  bool   `json:"build"`
+	DeployScope bool   `json:"deploy"`
 }
 
 func NewRelease(app *Application, metadata *core.ReleaseMetadata) *Release {
@@ -113,8 +113,11 @@ type DAO interface {
 	UpdateRelease(*Release) error
 	GetAllReleases() ([]*Release, error)
 	GetAllReleasesWithoutProcessedDependencies() ([]*Release, error)
+
 	SetDependencies(*Release, []*Dependency) error
 	GetDependencies(*Release) ([]*Dependency, error)
+	GetDownstreamDependencies(*Release) ([]*Dependency, error)
+
 	GetPackageURIs(release *Release) ([]string, error)
 	AddPackageURI(release *Release, uri string) error
 

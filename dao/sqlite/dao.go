@@ -88,6 +88,10 @@ func NewSQLiteDAO(path string) (DAO, error) {
 									  build_scope, deploy_scope 
 							   FROM release_dependency 
 							   WHERE project = ? AND name = ? AND version = ?`,
+		GetDownstreamDependenciesQuery: `SELECT project, name, version, 
+									  build_scope, deploy_scope 
+							   FROM release_dependency 
+							   WHERE dep_project = ? AND dep_name = ? AND dep_version = ?`,
 		GetACLQuery:             "SELECT group_name, permission FROM acl WHERE project = ?",
 		InsertACLQuery:          "INSERT INTO acl(project, group_name, permission) VALUES(?, ?, ?)",
 		UpdateACLQuery:          "UPDATE acl SET permission = ? WHERE project = ? AND group_name = ?",

@@ -58,16 +58,6 @@ func (a *dao) GetAllReleases() ([]*Release, error) {
 	return result, nil
 }
 
-func (a *dao) GetAllReleasesWithoutProcessedDependencies() ([]*Release, error) {
-	result := []*Release{}
-	for _, rel := range a.releases {
-		if !rel.Release.ProcessedDependencies {
-			result = append(result, rel.Release)
-		}
-	}
-	return result, nil
-}
-
 func (a *dao) GetPackageURIs(release *Release) ([]string, error) {
 	r := a.releases[release]
 	return r.Packages, nil
@@ -82,14 +72,4 @@ func (a *dao) AddPackageURI(release *Release, uri string) error {
 	}
 	r.Packages = append(r.Packages, uri)
 	return nil
-}
-
-func (a *dao) SetDependencies(release *Release, depends []*Dependency) error {
-	r := a.releases[release]
-	r.Dependencies = depends
-	return nil
-}
-func (a *dao) GetDependencies(release *Release) ([]*Dependency, error) {
-	r := a.releases[release]
-	return r.Dependencies, nil
 }
