@@ -84,6 +84,7 @@ type Dependency struct {
 	Version     string `json:"version"`
 	BuildScope  bool   `json:"build"`
 	DeployScope bool   `json:"deploy"`
+	IsExtension bool   `json:"is_extension"`
 }
 
 func NewRelease(app *Application, metadata *core.ReleaseMetadata) *Release {

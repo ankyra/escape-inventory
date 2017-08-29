@@ -106,6 +106,7 @@ func ProcessDependencies(release *Release) error {
 			Version:     parsed.Version,
 			BuildScope:  dep.InScope("build"),
 			DeployScope: dep.InScope("deploy"),
+			IsExtension: false,
 		}
 		deps = append(deps, &d)
 	}
@@ -120,6 +121,7 @@ func ProcessDependencies(release *Release) error {
 			Version:     parsed.Version,
 			BuildScope:  true,
 			DeployScope: true,
+			IsExtension: true,
 		}
 		deps = append(deps, &d)
 	}

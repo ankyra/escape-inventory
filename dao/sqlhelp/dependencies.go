@@ -26,7 +26,8 @@ func (s *SQLHelper) SetDependencies(release *Release, depends []*Dependency) err
 			dep.Application,
 			dep.Version,
 			dep.BuildScope,
-			dep.DeployScope)
+			dep.DeployScope,
+			dep.IsExtension)
 		if err != nil {
 			return err
 		}
@@ -93,8 +94,8 @@ func (s *SQLHelper) scanDependencies(rows *sql.Rows) ([]*Dependency, error) {
 	result := []*Dependency{}
 	for rows.Next() {
 		var depProject, depApplication, depVersion string
-		var buildScope, deployScope bool
-		if err := rows.Scan(&depProject, &depApplication, &depVersion, &buildScope, &deployScope); err != nil {
+		var buildScope, deployScope, isExtension bool
+		if err := rows.Scan(&depProject, &depApplication, &depVersion, &buildScope, &deployScope, &isExtension); err != nil {
 			return nil, err
 		}
 		result = append(result, &Dependency{
@@ -103,6 +104,7 @@ func (s *SQLHelper) scanDependencies(rows *sql.Rows) ([]*Dependency, error) {
 			Version:     depVersion,
 			BuildScope:  buildScope,
 			DeployScope: deployScope,
+			IsExtension: isExtension,
 		})
 	}
 	return result, nil

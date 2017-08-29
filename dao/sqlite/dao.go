@@ -82,18 +82,18 @@ func NewSQLiteDAO(path string) (DAO, error) {
 
 		InsertDependencyQuery: `INSERT INTO release_dependency(project, name, version,
 										dep_project, dep_name, dep_version,
-										build_scope, deploy_scope)
-								VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+										build_scope, deploy_scope, is_extension)
+								VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
 		GetDependenciesQuery: `SELECT dep_project, dep_name, dep_version, 
-									  build_scope, deploy_scope 
+									  build_scope, deploy_scope, is_extension
 							   FROM release_dependency 
 							   WHERE project = ? AND name = ? AND version = ?`,
 		GetDownstreamDependenciesQuery: `SELECT project, name, version, 
-									  build_scope, deploy_scope 
+									  build_scope, deploy_scope, is_extension
 							   FROM release_dependency 
 							   WHERE dep_project = ? AND dep_name = ? AND dep_version = ?`,
 		GetDownstreamDependenciesByGroupsQuery: `SELECT r.project, r.name, r.version, 
-									  r.build_scope, r.deploy_scope 
+									  r.build_scope, r.deploy_scope, r.is_extension
 							   FROM release_dependency AS r
 							   JOIN acl ON r.project = acl.project
 							   WHERE r.dep_project = ? AND r.dep_name = ? AND r.dep_version = ?

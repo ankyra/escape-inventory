@@ -91,19 +91,27 @@ func GetDependencyGraph(project, name, version string, downstreamFunc Downstream
 		result.AddNode(c.Name, "provider")
 		result.AddEdge(mainId, "provider"+c.Name, "provides")
 	}
-	for _, ext := range release.Metadata.Extends {
-		result.AddNode(ext.ReleaseId, "extension")
-		result.AddEdge(mainId, "extension"+ext.ReleaseId, "extends")
-	}
 	for _, dep := range upstream {
 		id := dep.Project + "/" + dep.Application + "-v" + dep.Version
-		result.AddNode(id, "upstream")
-		result.AddEdge(mainId, "upstream"+id, "upstream")
+		typ := "upstream"
+		label := "upstream"
+		if dep.IsExtension {
+			typ = "extension"
+			label = "extends"
+		}
+		result.AddNode(id, typ)
+		result.AddEdge(mainId, typ+id, label)
 	}
 	for _, dep := range downstream {
 		id := dep.Project + "/" + dep.Application + "-v" + dep.Version
-		result.AddNode(id, "downstream")
-		result.AddEdge("downstream"+id, mainId, "downstream")
+		typ := "downstream"
+		label := "downstream"
+		if dep.IsExtension {
+			typ = "extension"
+			label = "extends"
+		}
+		result.AddNode(id, typ)
+		result.AddEdge(typ+id, mainId, label)
 	}
 	return result, nil
 }

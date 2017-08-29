@@ -84,18 +84,18 @@ func NewPostgresDAO(url string) (DAO, error) {
 
 		InsertDependencyQuery: `INSERT INTO release_dependency(project, name, version,
 										dep_project, dep_name, dep_version,
-										build_scope, deploy_scope)
-								VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+										build_scope, deploy_scope, is_extension)
+								VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
 		GetDependenciesQuery: `SELECT dep_project, dep_name, dep_version, 
-									  build_scope, deploy_scope 
+									  build_scope, deploy_scope, is_extension
 							   FROM release_dependency 
 							   WHERE project = $1 AND name = $2 AND version = $3`,
 		GetDownstreamDependenciesQuery: `SELECT project, name, version, 
-							   build_scope, deploy_scope 
+							   build_scope, deploy_scope, is_extension
 							   FROM release_dependency 
 							   WHERE dep_project = $1 AND dep_name = $2 AND dep_version = $3`,
 		GetDownstreamDependenciesByGroupsQuery: `SELECT r.project, r.name, r.version, 
-							   r.build_scope, r.deploy_scope 
+							   r.build_scope, r.deploy_scope, r.is_extension
 							   FROM release_dependency AS r
 							   JOIN acl ON r.project = acl.project
 							   WHERE dep_project = $1 AND dep_name = $2 AND dep_version = $3
