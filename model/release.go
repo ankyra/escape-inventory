@@ -116,6 +116,19 @@ func ProcessDependencies(release *Release) error {
 	return dao.UpdateRelease(release)
 }
 
+func ProcessUnprocessedReleases() error {
+	releases, err := dao.GetAllReleasesWithoutProcessedDependencies()
+	if err != nil {
+		return err
+	}
+	for _, release := range releases {
+		if err := ProcessDependencies(release); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func GetReleaseMetadata(project, releaseIdString string) (*core.ReleaseMetadata, error) {
 	release, err := ResolveReleaseId(project, releaseIdString)
 	if err != nil {

@@ -18,17 +18,19 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/ankyra/escape-registry/config"
-	"github.com/ankyra/escape-registry/dao"
-	"github.com/ankyra/escape-registry/metrics"
-	"github.com/ankyra/escape-registry/storage"
-	"github.com/gorilla/mux"
-	"github.com/urfave/negroni"
 	"log"
 	"net/http"
 	"os"
 	"strconv"
 	"time"
+
+	"github.com/ankyra/escape-registry/config"
+	"github.com/ankyra/escape-registry/dao"
+	"github.com/ankyra/escape-registry/metrics"
+	"github.com/ankyra/escape-registry/model"
+	"github.com/ankyra/escape-registry/storage"
+	"github.com/gorilla/mux"
+	"github.com/urfave/negroni"
 )
 
 var Config *config.Config
@@ -63,6 +65,10 @@ func loadConfig(configFile string) (*config.Config, error) {
 func activateConfig(conf *config.Config) error {
 	log.Printf("INFO: Activating '%s' database\n", conf.Database)
 	if err := dao.LoadFromConfig(conf); err != nil {
+		return err
+	}
+	log.Printf("INFO: Updating unprocessed release dependencies\n")
+	if err := model.ProcessUnprocessedReleases(); err != nil {
 		return err
 	}
 	log.Printf("INFO: Activating '%s' storage backend\n", conf.StorageBackend)

@@ -138,9 +138,11 @@ func GetDependencies(r *Release) ([]*Dependency, error) {
 	return GlobalDAO.GetDependencies(r)
 }
 
-// TODO: Rename to export releases
 func GetAllReleases() ([]*Release, error) {
 	return GlobalDAO.GetAllReleases()
+}
+func GetAllReleasesWithoutProcessedDependencies() ([]*Release, error) {
+	return GlobalDAO.GetAllReleasesWithoutProcessedDependencies()
 }
 
 func IsNotFound(err error) bool {

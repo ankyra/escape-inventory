@@ -39,58 +39,58 @@
 			"revisionTime": "2017-07-26T21:16:44Z"
 		},
 		{
-			"checksumSHA1": "bLI+Y17S5UeAHYG3N/cUWlSFi6c=",
+			"checksumSHA1": "0eWdn28OQaphDXKBIQiJUwj7Tug=",
 			"path": "github.com/ankyra/escape-core",
-			"revision": "79bc2fc41e63c81e27b9e42d5ad73cc889e170ef",
-			"revisionTime": "2017-08-21T16:35:47Z"
+			"revision": "17c319fdd3c05aa794d7dd3143ed8e9b2999c33f",
+			"revisionTime": "2017-08-29T14:50:39Z"
 		},
 		{
-			"checksumSHA1": "FRcsf4XzrOlWYnPXsQuC0aSDHao=",
+			"checksumSHA1": "80AWf9ZQhElzqh3ctVSBT4pEk9Y=",
 			"path": "github.com/ankyra/escape-core/docs",
-			"revision": "79bc2fc41e63c81e27b9e42d5ad73cc889e170ef",
-			"revisionTime": "2017-08-21T16:35:47Z"
+			"revision": "17c319fdd3c05aa794d7dd3143ed8e9b2999c33f",
+			"revisionTime": "2017-08-29T14:50:39Z"
 		},
 		{
 			"checksumSHA1": "oVoOO3iAvpvgGQPPHqhGMkJ6nqo=",
 			"path": "github.com/ankyra/escape-core/parsers",
-			"revision": "79bc2fc41e63c81e27b9e42d5ad73cc889e170ef",
-			"revisionTime": "2017-08-21T16:35:47Z"
+			"revision": "17c319fdd3c05aa794d7dd3143ed8e9b2999c33f",
+			"revisionTime": "2017-08-29T14:50:39Z"
 		},
 		{
 			"checksumSHA1": "qymYpqxq2qiGowoeE5+JzEkdl/s=",
 			"path": "github.com/ankyra/escape-core/script",
-			"revision": "79bc2fc41e63c81e27b9e42d5ad73cc889e170ef",
-			"revisionTime": "2017-08-21T16:35:47Z"
+			"revision": "17c319fdd3c05aa794d7dd3143ed8e9b2999c33f",
+			"revisionTime": "2017-08-29T14:50:39Z"
 		},
 		{
 			"checksumSHA1": "cDUaryJzJYneoDiaC9S0kGQa3Cw=",
 			"path": "github.com/ankyra/escape-core/state",
-			"revision": "79bc2fc41e63c81e27b9e42d5ad73cc889e170ef",
-			"revisionTime": "2017-08-21T16:35:47Z"
+			"revision": "17c319fdd3c05aa794d7dd3143ed8e9b2999c33f",
+			"revisionTime": "2017-08-29T14:50:39Z"
 		},
 		{
 			"checksumSHA1": "6nqI04Y3XC6bAihbOchXvxwtAL0=",
 			"path": "github.com/ankyra/escape-core/templates",
-			"revision": "79bc2fc41e63c81e27b9e42d5ad73cc889e170ef",
-			"revisionTime": "2017-08-21T16:35:47Z"
+			"revision": "17c319fdd3c05aa794d7dd3143ed8e9b2999c33f",
+			"revisionTime": "2017-08-29T14:50:39Z"
 		},
 		{
 			"checksumSHA1": "UitAaUNlXBESVfwQkBhl2YY5wXM=",
 			"path": "github.com/ankyra/escape-core/util",
-			"revision": "79bc2fc41e63c81e27b9e42d5ad73cc889e170ef",
-			"revisionTime": "2017-08-21T16:35:47Z"
+			"revision": "17c319fdd3c05aa794d7dd3143ed8e9b2999c33f",
+			"revisionTime": "2017-08-29T14:50:39Z"
 		},
 		{
-			"checksumSHA1": "N0O0F112bXgGsGszDmWTxb7Yx+E=",
+			"checksumSHA1": "LJswwkt9YOVQ4Icxs/KF79Tu5+w=",
 			"path": "github.com/ankyra/escape-core/variables",
-			"revision": "79bc2fc41e63c81e27b9e42d5ad73cc889e170ef",
-			"revisionTime": "2017-08-21T16:35:47Z"
+			"revision": "17c319fdd3c05aa794d7dd3143ed8e9b2999c33f",
+			"revisionTime": "2017-08-29T14:50:39Z"
 		},
 		{
 			"checksumSHA1": "KgNH6kHm7IlHbMG26vKyhIXSbUw=",
 			"path": "github.com/ankyra/escape-core/variables/variable_types",
-			"revision": "79bc2fc41e63c81e27b9e42d5ad73cc889e170ef",
-			"revisionTime": "2017-08-21T16:35:47Z"
+			"revision": "17c319fdd3c05aa794d7dd3143ed8e9b2999c33f",
+			"revisionTime": "2017-08-29T14:50:39Z"
 		},
 		{
 			"checksumSHA1": "g9J1173rqdbRkaI7yoE6LLcuZnI=",
@@ -192,8 +192,8 @@
 			"checksumSHA1": "NNElWY1DDnkaMFqBDKoBL+UwUUQ=",
 			"origin": "github.com/ankyra/escape-core/vendor/github.com/cbroglie/mustache",
 			"path": "github.com/cbroglie/mustache",
-			"revision": "79bc2fc41e63c81e27b9e42d5ad73cc889e170ef",
-			"revisionTime": "2017-08-21T16:35:47Z"
+			"revision": "17c319fdd3c05aa794d7dd3143ed8e9b2999c33f",
+			"revisionTime": "2017-08-29T14:50:39Z"
 		},
 		{
 			"checksumSHA1": "kBeNcaKk56FguvPSUCEaH6AxpRc=",
