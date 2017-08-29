@@ -83,6 +83,14 @@ func GetDependencyGraph(project, name, version string, downstreamFunc Downstream
 		return nil, err
 	}
 
+	for _, c := range release.Metadata.Consumes {
+		result.AddNode(c.Name, "consumer")
+		result.AddEdge("consumer"+c.Name, mainId, "consumes")
+	}
+	for _, c := range release.Metadata.Provides {
+		result.AddNode(c.Name, "provider")
+		result.AddEdge(mainId, "provider"+c.Name, "provides")
+	}
 	for _, ext := range release.Metadata.Extends {
 		result.AddNode(ext.ReleaseId, "extension")
 		result.AddEdge(mainId, "extension"+ext.ReleaseId, "extends")

@@ -112,15 +112,18 @@ func (s *releaseSuite) Test_AddRelease_Processes_Dependencies_2(c *C) {
 								   }, {
 									   "release_id": "yoyo/tester-v2",
 									   "scopes": ["build"]
-								   }
-								   ]}`)
+								   }],
+									 "extends": [{
+										 "release_id": "aight/ai-v3"
+									 }]
+								 }`)
 	c.Assert(err, IsNil)
 	release, err := ResolveReleaseId("test", "up-test-v1")
 	c.Assert(err, IsNil)
 	c.Assert(release.ProcessedDependencies, Equals, true)
 	deps, err := dao.GetDependencies(release)
 	c.Assert(err, IsNil)
-	c.Assert(deps, HasLen, 2)
+	c.Assert(deps, HasLen, 3)
 	c.Assert(deps[0].Project, Equals, "yo")
 	c.Assert(deps[0].Application, Equals, "test")
 	c.Assert(deps[0].Version, Equals, "1")
@@ -131,4 +134,9 @@ func (s *releaseSuite) Test_AddRelease_Processes_Dependencies_2(c *C) {
 	c.Assert(deps[1].Version, Equals, "2")
 	c.Assert(deps[1].BuildScope, Equals, true)
 	c.Assert(deps[1].DeployScope, Equals, false)
+	c.Assert(deps[2].Project, Equals, "aight")
+	c.Assert(deps[2].Application, Equals, "ai")
+	c.Assert(deps[2].Version, Equals, "3")
+	c.Assert(deps[2].BuildScope, Equals, true)
+	c.Assert(deps[2].DeployScope, Equals, true)
 }

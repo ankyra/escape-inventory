@@ -109,6 +109,20 @@ func ProcessDependencies(release *Release) error {
 		}
 		deps = append(deps, &d)
 	}
+	for _, ext := range release.Metadata.Extends {
+		parsed, err := parsers.ParseQualifiedReleaseId(ext.ReleaseId)
+		if err != nil {
+			return fmt.Errorf("Couldn't parse dependency: %s", err.Error())
+		}
+		d := Dependency{
+			Project:     parsed.Project,
+			Application: parsed.Name,
+			Version:     parsed.Version,
+			BuildScope:  true,
+			DeployScope: true,
+		}
+		deps = append(deps, &d)
+	}
 	if err := dao.SetDependencies(release, deps); err != nil {
 		return err
 	}
