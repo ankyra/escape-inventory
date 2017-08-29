@@ -142,6 +142,10 @@ func GetDownstreamDependencies(r *Release) ([]*Dependency, error) {
 	return GlobalDAO.GetDownstreamDependencies(r)
 }
 
+func GetDownstreamDependenciesByGroups(r *Release, readGroups []string) ([]*Dependency, error) {
+	return GlobalDAO.GetDownstreamDependenciesByGroups(r, readGroups)
+}
+
 func GetAllReleases() ([]*Release, error) {
 	return GlobalDAO.GetAllReleases()
 }

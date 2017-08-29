@@ -13,3 +13,12 @@ func GetDownstreamDependencies(project, name, version string) ([]*types.Dependen
 	}
 	return dao.GetDownstreamDependencies(release)
 }
+
+func GetDownstreamDependenciesByGroups(project, name, version string, readGroups []string) ([]*types.Dependency, error) {
+	releaseId := name + "-" + version
+	release, err := ResolveReleaseId(project, releaseId)
+	if err != nil {
+		return nil, err
+	}
+	return dao.GetDownstreamDependenciesByGroups(release, readGroups)
+}

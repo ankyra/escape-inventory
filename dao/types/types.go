@@ -117,6 +117,7 @@ type DAO interface {
 	SetDependencies(*Release, []*Dependency) error
 	GetDependencies(*Release) ([]*Dependency, error)
 	GetDownstreamDependencies(*Release) ([]*Dependency, error)
+	GetDownstreamDependenciesByGroups(rel *Release, readGroups []string) ([]*Dependency, error)
 
 	GetPackageURIs(release *Release) ([]string, error)
 	AddPackageURI(release *Release, uri string) error

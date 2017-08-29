@@ -39,6 +39,7 @@ func ValidateDAO(dao func() DAO, c *C) {
 	Validate_ACL(dao(), c)
 	Validate_GetReleasesWithoutProcessedDependencies(dao(), c)
 	Validate_Dependencies(dao(), c)
+	Validate_DependenciesByGroups(dao(), c)
 }
 
 func addReleaseToProject(dao DAO, c *C, name, version, project string) *Release {
@@ -447,6 +448,39 @@ func Validate_Dependencies(dao DAO, c *C) {
 	c.Assert(err, IsNil)
 	c.Assert(ds, HasLen, 1)
 	c.Assert(ds[0], DeepEquals, downstream[0])
+}
+
+func Validate_DependenciesByGroups(dao DAO, c *C) {
+	c.Assert(dao.SetACL("_", "cheeky-group", ReadPermission), IsNil)
+
+	release := addRelease(dao, c, "dao-val", "1")
+	deps, err := dao.GetDependencies(release)
+	c.Assert(err, IsNil)
+	c.Assert(deps, HasLen, 0)
+
+	dao.AddApplication(NewApplication("_", "dao-parent"))
+	metadataJson := `{"name": "dao-parent", "version": "1", "depends": [{"id": "_/dao-val-v1", "scopes": ["build"]}]}`
+	metadata, err := core.NewReleaseMetadataFromJsonString(metadataJson)
+	c.Assert(err, IsNil)
+	releaseParent, err := dao.AddRelease("_", metadata)
+	c.Assert(err, IsNil)
+	dependencies := []*Dependency{
+		&Dependency{
+			Project:     "_",
+			Application: "dao-val",
+			Version:     "1",
+			BuildScope:  true,
+			DeployScope: false,
+		},
+	}
+	c.Assert(dao.SetDependencies(releaseParent, dependencies), IsNil)
+	ds, err := dao.GetDownstreamDependenciesByGroups(release, []string{})
+	c.Assert(err, IsNil)
+	c.Assert(ds, HasLen, 0)
+
+	ds, err = dao.GetDownstreamDependenciesByGroups(release, []string{"cheeky-group"})
+	c.Assert(err, IsNil)
+	c.Assert(ds, HasLen, 1)
 }
 
 type hasItemChecker struct{}

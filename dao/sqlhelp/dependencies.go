@@ -2,6 +2,8 @@ package sqlhelp
 
 import (
 	"database/sql"
+	"strconv"
+	"strings"
 
 	. "github.com/ankyra/escape-registry/dao/types"
 )
@@ -41,6 +43,45 @@ func (s *SQLHelper) GetDependencies(release *Release) ([]*Dependency, error) {
 
 func (s *SQLHelper) GetDownstreamDependencies(release *Release) ([]*Dependency, error) {
 	rows, err := s.PrepareAndQuery(s.GetDownstreamDependenciesQuery, release.Application.Project, release.Application.Name, release.Version)
+	if err != nil {
+		return nil, err
+	}
+	return s.scanDependencies(rows)
+}
+func (s *SQLHelper) GetDownstreamDependenciesByGroups(release *Release, readGroups []string) ([]*Dependency, error) {
+	starFound := false
+	for _, g := range readGroups {
+		if g == "*" {
+			starFound = true
+			break
+		}
+	}
+	if !starFound {
+		readGroups = append(readGroups, "*")
+	}
+	insertMarks := []string{}
+	for i, _ := range readGroups {
+		if s.UseNumericInsertMarks {
+			insertMarks = append(insertMarks, "$"+strconv.Itoa(i+4))
+		} else {
+			insertMarks = append(insertMarks, "?")
+		}
+	}
+	query := s.GetDownstreamDependenciesByGroupsQuery
+	if len(readGroups) == 1 {
+		query += " = " + insertMarks[0]
+	} else {
+		query += "IN (" + strings.Join(insertMarks, ", ") + ")"
+	}
+	interfaceGroups := []interface{}{
+		release.Application.Project,
+		release.Application.Name,
+		release.Version,
+	}
+	for _, g := range readGroups {
+		interfaceGroups = append(interfaceGroups, g)
+	}
+	rows, err := s.PrepareAndQuery(query, interfaceGroups...)
 	if err != nil {
 		return nil, err
 	}
