@@ -9,6 +9,7 @@
 // dao/sqlite/schemas/4_application_metadata.up.sql
 // dao/sqlite/schemas/5_build_dependencies.down.sql
 // dao/sqlite/schemas/5_build_dependencies.up.sql
+// dao/sqlite/schemas/6_release_changes.up.sql
 // DO NOT EDIT!
 
 package sqlite
@@ -256,6 +257,26 @@ func _5_build_dependenciesUpSql() (*asset, error) {
 	return a, nil
 }
 
+var __6_release_changesUpSql = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x9c\xd0\xcf\x6a\x84\x30\x10\xc7\xf1\xbb\x4f\x31\x37\x4f\x85\xf6\xec\x29\xd6\x54\x84\x34\x82\x8d\x67\x99\x26\x63\x09\x0d\x49\x30\x96\xd2\x3e\xfd\xb2\x27\x59\xf6\x4f\x76\x7d\x80\xcf\x77\x7e\x0c\x13\x8a\x0f\xa0\x58\x2d\x38\x2c\xe4\x08\x13\x01\x6b\x1a\x78\xed\xc5\xf8\x2e\x21\x2e\x41\x53\x4a\x64\x26\x43\x91\xbc\x21\xaf\x2d\x25\xa8\xfb\x5e\x70\x26\xa1\xe1\x6f\x6c\x14\x0a\xca\x19\x5d\xa2\xb2\x2a\x32\x39\x13\x7e\xbd\x0b\x68\x12\x74\x52\xf1\x96\x0f\x5b\xe1\x39\xaf\x7f\xe2\xd1\x92\x99\x3e\xff\xe0\x43\x0d\x9d\x6c\x37\xfe\x80\xc6\xf5\xf2\xf5\x93\x00\xc6\xe8\xac\xc6\xd5\x06\xbf\x73\x42\xae\x70\xd7\x8c\x88\xfa\x1b\xbf\xf6\x7e\xe1\x96\xbe\x76\x3e\xe3\x67\xeb\x28\xd9\x7f\x3a\xc7\x4f\x2f\x65\x55\x1c\x02\x00\x00\xff\xff\xdf\x38\xf6\x44\x4f\x02\x00\x00")
+
+func _6_release_changesUpSqlBytes() ([]byte, error) {
+	return bindataRead(
+		__6_release_changesUpSql,
+		"6_release_changes.up.sql",
+	)
+}
+
+func _6_release_changesUpSql() (*asset, error) {
+	bytes, err := _6_release_changesUpSqlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "6_release_changes.up.sql", size: 591, mode: os.FileMode(436), modTime: time.Unix(1504013091, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
 // Asset loads and returns the asset for the given name.
 // It returns an error if the asset could not be found or
 // could not be loaded.
@@ -317,6 +338,7 @@ var _bindata = map[string]func() (*asset, error){
 	"4_application_metadata.up.sql": _4_application_metadataUpSql,
 	"5_build_dependencies.down.sql": _5_build_dependenciesDownSql,
 	"5_build_dependencies.up.sql": _5_build_dependenciesUpSql,
+	"6_release_changes.up.sql": _6_release_changesUpSql,
 }
 
 // AssetDir returns the file names below a certain
@@ -368,6 +390,7 @@ var _bintree = &bintree{nil, map[string]*bintree{
 	"4_application_metadata.up.sql": &bintree{_4_application_metadataUpSql, map[string]*bintree{}},
 	"5_build_dependencies.down.sql": &bintree{_5_build_dependenciesDownSql, map[string]*bintree{}},
 	"5_build_dependencies.up.sql": &bintree{_5_build_dependenciesUpSql, map[string]*bintree{}},
+	"6_release_changes.up.sql": &bintree{_6_release_changesUpSql, map[string]*bintree{}},
 }}
 
 // RestoreAsset restores an asset under the given directory

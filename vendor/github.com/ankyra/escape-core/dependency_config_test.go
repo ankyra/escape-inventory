@@ -71,7 +71,7 @@ func (s *metadataSuite) Test_DependencyConfig_validate_sets_default_mapping(c *C
 	c.Assert(dep.Mapping, HasLen, 2)
 	c.Assert(dep.Mapping["input_variable1"], Equals, "$this.inputs.input_variable1")
 	c.Assert(dep.Mapping["input_variable2"], Equals, "test")
-	c.Assert(dep.Scopes, DeepEquals, []string{})
+	c.Assert(dep.Scopes, DeepEquals, []string{"build", "deploy"})
 	c.Assert(dep.Consumes, DeepEquals, map[string]string{})
 }
 

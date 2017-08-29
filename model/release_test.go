@@ -96,3 +96,39 @@ func (s *releaseSuite) Test_AddRelease_Updates_Application_Metadata(c *C) {
 	c.Assert(app.Description, Equals, "updated")
 	c.Assert(app.LatestVersion, Equals, "1")
 }
+
+func (s *releaseSuite) Test_AddRelease_Processes_Dependencies(c *C) {
+	_, err := AddRelease("test", `{"name": "up-test", "version": "1", "project": "test"}`)
+	c.Assert(err, IsNil)
+	release, err := ResolveReleaseId("test", "up-test-v1")
+	c.Assert(err, IsNil)
+	c.Assert(release.ProcessedDependencies, Equals, true)
+}
+
+func (s *releaseSuite) Test_AddRelease_Processes_Dependencies_2(c *C) {
+	_, err := AddRelease("test", `{"name": "up-test", "version": "1", "project": "test", 
+								   "depends": [{
+									   "release_id": "yo/test-v1"
+								   }, {
+									   "release_id": "yoyo/tester-v2",
+									   "scopes": ["build"]
+								   }
+								   ]}`)
+	c.Assert(err, IsNil)
+	release, err := ResolveReleaseId("test", "up-test-v1")
+	c.Assert(err, IsNil)
+	c.Assert(release.ProcessedDependencies, Equals, true)
+	deps, err := dao.GetDependencies(release)
+	c.Assert(err, IsNil)
+	c.Assert(deps, HasLen, 2)
+	c.Assert(deps[0].Project, Equals, "yo")
+	c.Assert(deps[0].Application, Equals, "test")
+	c.Assert(deps[0].Version, Equals, "1")
+	c.Assert(deps[0].BuildScope, Equals, true)
+	c.Assert(deps[0].DeployScope, Equals, true)
+	c.Assert(deps[1].Project, Equals, "yoyo")
+	c.Assert(deps[1].Application, Equals, "tester")
+	c.Assert(deps[1].Version, Equals, "2")
+	c.Assert(deps[1].BuildScope, Equals, true)
+	c.Assert(deps[1].DeployScope, Equals, false)
+}

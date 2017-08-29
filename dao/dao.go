@@ -92,16 +92,18 @@ func GetApplication(project, name string) (*Application, error) {
 	return GlobalDAO.GetApplication(project, name)
 }
 
-func FindAllVersions(app *Application) ([]string, error) {
-	return GlobalDAO.FindAllVersions(app)
+func AddRelease(project string, metadata *core.ReleaseMetadata) (*Release, error) {
+	return GlobalDAO.AddRelease(project, metadata)
+}
+func UpdateRelease(release *Release) error {
+	return GlobalDAO.UpdateRelease(release)
 }
 
 func GetRelease(project, name, releaseId string) (*Release, error) {
 	return GlobalDAO.GetRelease(project, name, releaseId)
 }
-
-func AddRelease(project string, metadata *core.ReleaseMetadata) (*Release, error) {
-	return GlobalDAO.AddRelease(project, metadata)
+func FindAllVersions(app *Application) ([]string, error) {
+	return GlobalDAO.FindAllVersions(app)
 }
 
 func GetPermittedGroups(project string, perm Permission) ([]string, error) {

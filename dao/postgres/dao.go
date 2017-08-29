@@ -75,10 +75,13 @@ func NewPostgresDAO(url string) (DAO, error) {
 		GetApplicationsQuery: `SELECT name, project, description, latest_version, logo 
 								  FROM application WHERE project = $1`,
 
-		FindAllVersionsQuery: "SELECT version FROM release WHERE project = $1 AND name = $2",
-		GetReleaseQuery:      "SELECT metadata FROM release WHERE project = $1 AND name = $2 AND release_id = $3",
-		GetAllReleasesQuery:  "SELECT project, metadata FROM release",
-		AddReleaseQuery:      "INSERT INTO release(project, name, release_id, version, metadata) VALUES($1, $2, $3, $4, $5)",
+		AddReleaseQuery:                                 "INSERT INTO release(project, name, release_id, version, metadata) VALUES($1, $2, $3, $4, $5)",
+		UpdateReleaseQuery:                              `UPDATE release SET processed_dependencies = $1 WHERE project = $2 AND name = $3 AND release_id = $4`,
+		GetReleaseQuery:                                 `SELECT metadata, processed_dependencies FROM release WHERE project = $1 AND name = $2 AND release_id = $3`,
+		GetAllReleasesQuery:                             "SELECT project, metadata, processed_dependencies FROM release",
+		GetAllReleasesWithoutProcessedDependenciesQuery: `SELECT project, metadata, processed_dependencies FROM release WHERE processed_dependencies = 'false'`,
+		FindAllVersionsQuery:                            "SELECT version FROM release WHERE project = $1 AND name = $2",
+
 		InsertDependencyQuery: `INSERT INTO release_dependency(project, name, version,
 										dep_project, dep_name, dep_version,
 										build_scope, deploy_scope)
@@ -87,8 +90,10 @@ func NewPostgresDAO(url string) (DAO, error) {
 									  build_scope, deploy_scope 
 							   FROM release_dependency 
 							   WHERE project = $1 AND name = $2 AND version = $3`,
-		GetPackageURIsQuery:     "SELECT uri FROM package WHERE project = $1 AND release_id = $2",
-		AddPackageURIQuery:      "INSERT INTO package (project, release_id, uri) VALUES ($1, $2, $3)",
+
+		GetPackageURIsQuery: "SELECT uri FROM package WHERE project = $1 AND release_id = $2",
+		AddPackageURIQuery:  "INSERT INTO package (project, release_id, uri) VALUES ($1, $2, $3)",
+
 		GetACLQuery:             "SELECT group_name, permission FROM acl WHERE project = $1",
 		InsertACLQuery:          "INSERT INTO acl(project, group_name, permission) VALUES ($1, $2, $3)",
 		UpdateACLQuery:          "UPDATE acl SET permission = $1 WHERE project = $2 AND group_name = $3",

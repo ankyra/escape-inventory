@@ -37,6 +37,7 @@ func ValidateDAO(dao func() DAO, c *C) {
 	Validate_AddPackageURI_Unique(dao(), c)
 	Validate_GetAllReleases(dao(), c)
 	Validate_ACL(dao(), c)
+	Validate_GetReleasesWithoutProcessedDependencies(dao(), c)
 	Validate_Dependencies(dao(), c)
 }
 
@@ -386,6 +387,25 @@ func Validate_ACL(dao DAO, c *C) {
 	groups, err = dao.GetPermittedGroups("doesnt-exist", ReadPermission)
 	c.Assert(err, IsNil)
 	c.Assert(groups, DeepEquals, []string{})
+}
+
+func Validate_GetReleasesWithoutProcessedDependencies(dao DAO, c *C) {
+	releases, err := dao.GetAllReleasesWithoutProcessedDependencies()
+	c.Assert(err, IsNil)
+	c.Assert(releases, HasLen, 0)
+	release := addRelease(dao, c, "dao-val", "1")
+	c.Assert(release.ProcessedDependencies, Equals, false)
+	releases, err = dao.GetAllReleasesWithoutProcessedDependencies()
+	c.Assert(err, IsNil)
+	c.Assert(releases, HasLen, 1)
+	release.ProcessedDependencies = true
+	c.Assert(dao.UpdateRelease(release), IsNil)
+	releases, err = dao.GetAllReleasesWithoutProcessedDependencies()
+	c.Assert(err, IsNil)
+	c.Assert(releases, HasLen, 0)
+	release, err = dao.GetRelease("_", "dao-val", "dao-val-v1")
+	c.Assert(err, IsNil)
+	c.Assert(release.ProcessedDependencies, Equals, true)
 }
 
 func Validate_Dependencies(dao DAO, c *C) {

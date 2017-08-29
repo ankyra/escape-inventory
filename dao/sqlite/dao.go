@@ -68,8 +68,18 @@ func NewSQLiteDAO(path string) (DAO, error) {
 		GetApplicationsQuery: `SELECT name, project, description, latest_version, logo 
 								  FROM application WHERE project = ?`,
 
-		FindAllVersionsQuery: "SELECT version FROM release WHERE project = ? AND name = ?",
-		GetReleaseQuery:      "SELECT metadata FROM release WHERE project = ? AND name = ? AND release_id = ?",
+		AddReleaseQuery: "INSERT INTO release(project, name, release_id, version, metadata) VALUES(?, ?, ?, ?, ?)",
+		GetReleaseQuery: `SELECT metadata, processed_dependencies 
+						  FROM release 
+						  WHERE project = ? AND name = ? AND release_id = ?`,
+		UpdateReleaseQuery:                              `UPDATE release SET processed_dependencies = ? WHERE project = ? AND name = ? AND release_id = ?`,
+		GetAllReleasesQuery:                             "SELECT project, metadata, processed_dependencies FROM release",
+		GetAllReleasesWithoutProcessedDependenciesQuery: `SELECT project, metadata, processed_dependencies FROM release WHERE processed_dependencies = 'false'`,
+		FindAllVersionsQuery:                            "SELECT version FROM release WHERE project = ? AND name = ?",
+
+		GetPackageURIsQuery: "SELECT uri FROM package WHERE project = ? AND release_id = ?",
+		AddPackageURIQuery:  "INSERT INTO package (project, release_id, uri) VALUES (?, ?, ?)",
+
 		InsertDependencyQuery: `INSERT INTO release_dependency(project, name, version,
 										dep_project, dep_name, dep_version,
 										build_scope, deploy_scope)
@@ -78,10 +88,6 @@ func NewSQLiteDAO(path string) (DAO, error) {
 									  build_scope, deploy_scope 
 							   FROM release_dependency 
 							   WHERE project = ? AND name = ? AND version = ?`,
-		GetAllReleasesQuery:     "SELECT project, metadata FROM release",
-		AddReleaseQuery:         "INSERT INTO release(project, name, release_id, version, metadata) VALUES(?, ?, ?, ?, ?)",
-		GetPackageURIsQuery:     "SELECT uri FROM package WHERE project = ? AND release_id = ?",
-		AddPackageURIQuery:      "INSERT INTO package (project, release_id, uri) VALUES (?, ?, ?)",
 		GetACLQuery:             "SELECT group_name, permission FROM acl WHERE project = ?",
 		InsertACLQuery:          "INSERT INTO acl(project, group_name, permission) VALUES(?, ?, ?)",
 		UpdateACLQuery:          "UPDATE acl SET permission = ? WHERE project = ? AND group_name = ?",

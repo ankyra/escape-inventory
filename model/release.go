@@ -90,7 +90,30 @@ func AddRelease(project, metadataJson string) (*core.ReleaseMetadata, error) {
 	if err != nil {
 		return nil, err
 	}
-	return result.Metadata, nil
+	return result.Metadata, ProcessDependencies(result)
+}
+
+func ProcessDependencies(release *Release) error {
+	deps := []*Dependency{}
+	for _, dep := range release.Metadata.Depends {
+		parsed, err := parsers.ParseQualifiedReleaseId(dep.ReleaseId)
+		if err != nil {
+			return fmt.Errorf("Couldn't parse dependency: %s", err.Error())
+		}
+		d := Dependency{
+			Project:     parsed.Project,
+			Application: parsed.Name,
+			Version:     parsed.Version,
+			BuildScope:  dep.InScope("build"),
+			DeployScope: dep.InScope("deploy"),
+		}
+		deps = append(deps, &d)
+	}
+	if err := dao.SetDependencies(release, deps); err != nil {
+		return err
+	}
+	release.ProcessedDependencies = true
+	return dao.UpdateRelease(release)
 }
 
 func GetReleaseMetadata(project, releaseIdString string) (*core.ReleaseMetadata, error) {

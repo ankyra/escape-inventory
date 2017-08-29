@@ -46,10 +46,24 @@ func (a *dao) AddRelease(project string, rel *core.ReleaseMetadata) (*Release, e
 	return app.Releases[key].Release, nil
 }
 
+func (a *dao) UpdateRelease(r *Release) error {
+	return nil
+}
+
 func (a *dao) GetAllReleases() ([]*Release, error) {
 	result := []*Release{}
 	for _, rel := range a.releases {
 		result = append(result, rel.Release)
+	}
+	return result, nil
+}
+
+func (a *dao) GetAllReleasesWithoutProcessedDependencies() ([]*Release, error) {
+	result := []*Release{}
+	for _, rel := range a.releases {
+		if !rel.Release.ProcessedDependencies {
+			result = append(result, rel.Release)
+		}
 	}
 	return result, nil
 }

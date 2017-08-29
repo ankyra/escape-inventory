@@ -1,6 +1,8 @@
 package sqlhelp
 
 import (
+	"database/sql"
+
 	core "github.com/ankyra/escape-core"
 	. "github.com/ankyra/escape-registry/dao/types"
 )
@@ -20,15 +22,7 @@ func (s *SQLHelper) GetRelease(project, name, releaseId string) (*Release, error
 	}
 	defer rows.Close()
 	for rows.Next() {
-		var metadataJson string
-		if err := rows.Scan(&metadataJson); err != nil {
-			return nil, err
-		}
-		metadata, err := core.NewReleaseMetadataFromJsonString(metadataJson)
-		if err != nil {
-			return nil, err
-		}
-		return NewRelease(NewApplication(project, name), metadata), nil
+		return s.scanRelease(project, name, rows)
 	}
 	return nil, NotFound
 }
@@ -38,36 +32,38 @@ func (s *SQLHelper) GetAllReleases() ([]*Release, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
-	result := []*Release{}
-	for rows.Next() {
-		var project, metadataJson string
-		if err := rows.Scan(&project, &metadataJson); err != nil {
-			return nil, err
-		}
-		metadata, err := core.NewReleaseMetadataFromJsonString(metadataJson)
-		if err != nil {
-			return nil, err
-		}
-		result = append(result, NewRelease(NewApplication(project, metadata.Name), metadata))
+	return s.scanReleases(rows)
+}
+
+func (s *SQLHelper) GetAllReleasesWithoutProcessedDependencies() ([]*Release, error) {
+	rows, err := s.PrepareAndQuery(s.GetAllReleasesWithoutProcessedDependenciesQuery)
+	if err != nil {
+		return nil, err
 	}
-	return result, nil
+	return s.scanReleases(rows)
 }
 
 func (s *SQLHelper) AddRelease(project string, release *core.ReleaseMetadata) (*Release, error) {
-	stmt, err := s.DB.Prepare(s.AddReleaseQuery)
+	err := s.PrepareAndExecInsert(s.AddReleaseQuery,
+		project,
+		release.Name,
+		release.GetReleaseId(),
+		release.Version,
+		release.ToJson(),
+	)
 	if err != nil {
-		return nil, err
-	}
-	name := release.Name
-	_, err = stmt.Exec(project, name, release.GetReleaseId(), release.Version, release.ToJson())
-	if err != nil {
-		if s.IsUniqueConstraintError(err) {
-			return nil, AlreadyExists
-		}
 		return nil, err
 	}
 	return NewRelease(NewApplication(project, release.Name), release), nil
+}
+
+func (s *SQLHelper) UpdateRelease(release *Release) error {
+	return s.PrepareAndExecUpdate(s.UpdateReleaseQuery,
+		release.ProcessedDependencies,
+		release.Application.Project,
+		release.Application.Name,
+		release.ReleaseId,
+	)
 }
 
 func (s *SQLHelper) GetPackageURIs(release *Release) ([]string, error) {
@@ -130,6 +126,41 @@ func (s *SQLHelper) GetDependencies(release *Release) ([]*Dependency, error) {
 			BuildScope:  buildScope,
 			DeployScope: deployScope,
 		})
+	}
+	return result, nil
+}
+
+func (s *SQLHelper) scanRelease(project, name string, rows *sql.Rows) (*Release, error) {
+	var metadataJson string
+	var processedDependencies bool
+	if err := rows.Scan(&metadataJson, &processedDependencies); err != nil {
+		return nil, err
+	}
+	metadata, err := core.NewReleaseMetadataFromJsonString(metadataJson)
+	if err != nil {
+		return nil, err
+	}
+	rel := NewRelease(NewApplication(project, name), metadata)
+	rel.ProcessedDependencies = processedDependencies
+	return rel, nil
+}
+
+func (s *SQLHelper) scanReleases(rows *sql.Rows) ([]*Release, error) {
+	defer rows.Close()
+	result := []*Release{}
+	for rows.Next() {
+		var project, metadataJson string
+		var processedDependencies bool
+		if err := rows.Scan(&project, &metadataJson, &processedDependencies); err != nil {
+			return nil, err
+		}
+		metadata, err := core.NewReleaseMetadataFromJsonString(metadataJson)
+		if err != nil {
+			return nil, err
+		}
+		rel := NewRelease(NewApplication(project, metadata.Name), metadata)
+		rel.ProcessedDependencies = processedDependencies
+		result = append(result, rel)
 	}
 	return result, nil
 }

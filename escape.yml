@@ -1,5 +1,5 @@
 name: escape-registry
-version: '0.10.@'
+version: '0.11.@'
 description: "A Go build for the Escape Registry"
 logo: logo.png
 
