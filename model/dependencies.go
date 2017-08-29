@@ -24,8 +24,9 @@ func GetDownstreamDependenciesByGroups(project, name, version string, readGroups
 }
 
 type DependencyGraphNode struct {
-	Id   string `json:"id"`
-	Type string `json:"type"`
+	Id    string `json:"id"`
+	Label string `json:"label"`
+	Type  string `json:"type"`
 }
 type DependencyGraphEdge struct {
 	From string `json:"from"`
@@ -40,8 +41,9 @@ type DependencyGraph struct {
 
 func (d *DependencyGraph) AddNode(id, typ string) {
 	d.Nodes = append(d.Nodes, &DependencyGraphNode{
-		Id:   id,
-		Type: typ,
+		Id:    typ + id,
+		Label: id,
+		Type:  typ,
 	})
 }
 func (d *DependencyGraph) AddEdge(from, to, typ string) {
@@ -65,7 +67,7 @@ func GetDependencyGraph(project, name, version string, downstreamFunc Downstream
 		return nil, err
 	}
 	mainId := release.Metadata.GetQualifiedReleaseId()
-	result.AddNode(mainId, "release")
+	result.AddNode(mainId, "main")
 
 	upstream, err := dao.GetDependencies(release)
 	if err != nil {
@@ -86,13 +88,13 @@ func GetDependencyGraph(project, name, version string, downstreamFunc Downstream
 	}
 	for _, dep := range upstream {
 		id := dep.Project + "/" + dep.Application + "-v" + dep.Version
-		result.AddNode(id, "release")
+		result.AddNode(id, "upstream")
 		result.AddEdge(mainId, id, "upstream")
 	}
 	for _, dep := range downstream {
 		id := dep.Project + "/" + dep.Application + "-v" + dep.Version
-		result.AddNode(id, "release")
-		result.AddEdge(mainId, id, "downstream")
+		result.AddNode(id, "downstream")
+		result.AddEdge(id, mainId, "downstream")
 	}
 	return result, nil
 }
