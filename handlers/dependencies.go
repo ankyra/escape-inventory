@@ -37,3 +37,17 @@ func DownstreamHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(200)
 	json.NewEncoder(w).Encode(deps)
 }
+
+func DependencyGraphHandler(w http.ResponseWriter, r *http.Request) {
+	project := mux.Vars(r)["project"]
+	name := mux.Vars(r)["name"]
+	version := mux.Vars(r)["version"]
+	graph, err := model.GetDependencyGraph(project, name, version)
+	if err != nil {
+		HandleError(w, r, err)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	json.NewEncoder(w).Encode(graph)
+}
