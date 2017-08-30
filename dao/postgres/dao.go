@@ -76,7 +76,7 @@ func NewPostgresDAO(url string) (DAO, error) {
 								  FROM application WHERE project = $1`,
 
 		AddReleaseQuery:                                 "INSERT INTO release(project, name, release_id, version, metadata) VALUES($1, $2, $3, $4, $5)",
-		UpdateReleaseQuery:                              `UPDATE release SET processed_dependencies = $1 WHERE project = $2 AND name = $3 AND release_id = $4`,
+		UpdateReleaseQuery:                              `UPDATE release SET processed_dependencies = $1, downloads = $2 WHERE project = $3 AND name = $4 AND release_id = $5`,
 		GetReleaseQuery:                                 `SELECT metadata, processed_dependencies FROM release WHERE project = $1 AND name = $2 AND release_id = $3`,
 		GetAllReleasesQuery:                             "SELECT project, metadata, processed_dependencies FROM release",
 		GetAllReleasesWithoutProcessedDependenciesQuery: `SELECT project, metadata, processed_dependencies FROM release WHERE processed_dependencies = 'false'`,

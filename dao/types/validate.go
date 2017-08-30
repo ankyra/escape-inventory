@@ -400,6 +400,7 @@ func Validate_GetReleasesWithoutProcessedDependencies(dao DAO, c *C) {
 	c.Assert(err, IsNil)
 	c.Assert(releases, HasLen, 1)
 	release.ProcessedDependencies = true
+	release.Downloads = 14
 	c.Assert(dao.UpdateRelease(release), IsNil)
 	releases, err = dao.GetAllReleasesWithoutProcessedDependencies()
 	c.Assert(err, IsNil)
@@ -407,6 +408,7 @@ func Validate_GetReleasesWithoutProcessedDependencies(dao DAO, c *C) {
 	release, err = dao.GetRelease("_", "dao-val", "dao-val-v1")
 	c.Assert(err, IsNil)
 	c.Assert(release.ProcessedDependencies, Equals, true)
+	c.Assert(release.Downloads, Equals, 14)
 }
 
 func Validate_Dependencies(dao DAO, c *C) {

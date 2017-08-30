@@ -18,12 +18,13 @@ package model
 
 import (
 	"fmt"
+	"io"
+	"log"
+
 	"github.com/ankyra/escape-core/parsers"
 	"github.com/ankyra/escape-registry/dao"
 	"github.com/ankyra/escape-registry/dao/types"
 	"github.com/ankyra/escape-registry/storage"
-	"io"
-	"log"
 )
 
 func UploadPackage(project, releaseId string, pkg io.ReadSeeker) error {
@@ -57,7 +58,8 @@ func GetDownloadReadSeeker(project, releaseId string) (io.Reader, error) {
 	for _, uri := range uris {
 		reader, err := storage.Download(project, uri)
 		if err == nil {
-			return reader, nil
+			release.Downloads += 1
+			return reader, dao.UpdateRelease(release)
 		}
 		log.Printf("Warn: %s\n", err.Error())
 	}

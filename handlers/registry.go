@@ -28,28 +28,47 @@ func RegistryHandler(w http.ResponseWriter, r *http.Request) {
 	project := mux.Vars(r)["project"]
 	name := mux.Vars(r)["name"]
 	version := mux.Vars(r)["version"]
-	var bytes []byte
+	full := r.URL.Query().Get("full")
+	releaseId := name + "-" + version
+	var result interface{}
 	if version == "" {
-		result, err := model.GetApplicationVersions(project, name)
+		result_, err := model.GetApplicationVersions(project, name)
 		if err != nil {
 			HandleError(w, r, err)
 			return
 		}
-		bytes, err = json.Marshal(result)
+		result = result_
+	} else if full == "" {
+		result_, err := model.GetReleaseMetadata(project, releaseId)
 		if err != nil {
 			HandleError(w, r, err)
 			return
 		}
+		result = result_
 	} else {
-		releaseId := name + "-" + version
-		metadata, err := model.GetReleaseMetadata(project, releaseId)
+		result_, err := model.GetRelease(project, releaseId)
 		if err != nil {
 			HandleError(w, r, err)
 			return
 		}
-		bytes = []byte(metadata.ToJson())
+		result = result_
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(200)
-	w.Write(bytes)
+	json.NewEncoder(w).Encode(result)
+}
+
+func GetReleaseHandler(w http.ResponseWriter, r *http.Request) {
+	project := mux.Vars(r)["project"]
+	name := mux.Vars(r)["name"]
+	version := mux.Vars(r)["version"]
+	releaseId := name + "-" + version
+	result, err := model.GetRelease(project, releaseId)
+	if err != nil {
+		HandleError(w, r, err)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	json.NewEncoder(w).Encode(result)
 }

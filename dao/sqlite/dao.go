@@ -69,12 +69,12 @@ func NewSQLiteDAO(path string) (DAO, error) {
 								  FROM application WHERE project = ?`,
 
 		AddReleaseQuery: "INSERT INTO release(project, name, release_id, version, metadata) VALUES(?, ?, ?, ?, ?)",
-		GetReleaseQuery: `SELECT metadata, processed_dependencies 
+		GetReleaseQuery: `SELECT metadata, processed_dependencies, downloads 
 						  FROM release 
 						  WHERE project = ? AND name = ? AND release_id = ?`,
-		UpdateReleaseQuery:                              `UPDATE release SET processed_dependencies = ? WHERE project = ? AND name = ? AND release_id = ?`,
-		GetAllReleasesQuery:                             "SELECT project, metadata, processed_dependencies FROM release",
-		GetAllReleasesWithoutProcessedDependenciesQuery: `SELECT project, metadata, processed_dependencies FROM release WHERE processed_dependencies = 'false'`,
+		UpdateReleaseQuery:                              `UPDATE release SET processed_dependencies = ?, downloads = ? WHERE project = ? AND name = ? AND release_id = ?`,
+		GetAllReleasesQuery:                             "SELECT project, metadata, processed_dependencies, downloads FROM release",
+		GetAllReleasesWithoutProcessedDependenciesQuery: `SELECT project, metadata, processed_dependencies, downloads FROM release WHERE processed_dependencies = 'false'`,
 		FindAllVersionsQuery:                            "SELECT version FROM release WHERE project = ? AND name = ?",
 
 		GetPackageURIsQuery: "SELECT uri FROM package WHERE project = ? AND release_id = ?",

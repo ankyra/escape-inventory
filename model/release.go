@@ -145,6 +145,22 @@ func ProcessUnprocessedReleases() error {
 	return nil
 }
 
+type ReleasePayload struct {
+	Release   *core.ReleaseMetadata `json:"release"`
+	Downloads int                   `json:"downloads"`
+}
+
+func GetRelease(project, releaseIdString string) (*ReleasePayload, error) {
+	release, err := ResolveReleaseId(project, releaseIdString)
+	if err != nil {
+		return nil, err
+	}
+	return &ReleasePayload{
+		Release:   release.Metadata,
+		Downloads: release.Downloads,
+	}, nil
+}
+
 func GetReleaseMetadata(project, releaseIdString string) (*core.ReleaseMetadata, error) {
 	release, err := ResolveReleaseId(project, releaseIdString)
 	if err != nil {

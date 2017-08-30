@@ -18,6 +18,7 @@ package types
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/ankyra/escape-core"
 )
@@ -56,11 +57,13 @@ func NewProject(project string) *Project {
 }
 
 type Application struct {
-	Name          string `json:"name"`
-	Project       string `json:"project"`
-	Description   string `json:"description"`
-	LatestVersion string `json:"latest_version"`
-	Logo          string `json:"logo"`
+	Name          string    `json:"name"`
+	Project       string    `json:"project"`
+	Description   string    `json:"description"`
+	LatestVersion string    `json:"latest_version"`
+	Logo          string    `json:"logo"`
+	UploadedBy    string    `json:"uploaded_by"`
+	UploadedAt    time.Time `json:"uploaded_at"`
 }
 
 func NewApplication(project, name string) *Application {
@@ -76,6 +79,9 @@ type Release struct {
 	Version               string
 	Metadata              *core.ReleaseMetadata
 	ProcessedDependencies bool
+	Downloads             int
+	UploadedBy            string
+	UploadedAt            time.Time
 }
 
 type Dependency struct {

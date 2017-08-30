@@ -52,6 +52,7 @@ func (s *SQLHelper) AddRelease(project string, release *core.ReleaseMetadata) (*
 func (s *SQLHelper) UpdateRelease(release *Release) error {
 	return s.PrepareAndExecUpdate(s.UpdateReleaseQuery,
 		release.ProcessedDependencies,
+		release.Downloads,
 		release.Application.Project,
 		release.Application.Name,
 		release.ReleaseId,
@@ -84,7 +85,8 @@ func (s *SQLHelper) AddPackageURI(release *Release, uri string) error {
 func (s *SQLHelper) scanRelease(project, name string, rows *sql.Rows) (*Release, error) {
 	var metadataJson string
 	var processedDependencies bool
-	if err := rows.Scan(&metadataJson, &processedDependencies); err != nil {
+	var downloads int
+	if err := rows.Scan(&metadataJson, &processedDependencies, &downloads); err != nil {
 		return nil, err
 	}
 	metadata, err := core.NewReleaseMetadataFromJsonString(metadataJson)
@@ -93,6 +95,7 @@ func (s *SQLHelper) scanRelease(project, name string, rows *sql.Rows) (*Release,
 	}
 	rel := NewRelease(NewApplication(project, name), metadata)
 	rel.ProcessedDependencies = processedDependencies
+	rel.Downloads = downloads
 	return rel, nil
 }
 
@@ -102,7 +105,8 @@ func (s *SQLHelper) scanReleases(rows *sql.Rows) ([]*Release, error) {
 	for rows.Next() {
 		var project, metadataJson string
 		var processedDependencies bool
-		if err := rows.Scan(&project, &metadataJson, &processedDependencies); err != nil {
+		var downloads int
+		if err := rows.Scan(&project, &metadataJson, &processedDependencies, &downloads); err != nil {
 			return nil, err
 		}
 		metadata, err := core.NewReleaseMetadataFromJsonString(metadataJson)
@@ -111,6 +115,7 @@ func (s *SQLHelper) scanReleases(rows *sql.Rows) ([]*Release, error) {
 		}
 		rel := NewRelease(NewApplication(project, metadata.Name), metadata)
 		rel.ProcessedDependencies = processedDependencies
+		rel.Downloads = downloads
 		result = append(result, rel)
 	}
 	return result, nil
