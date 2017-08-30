@@ -18,11 +18,21 @@ package handlers
 
 import (
 	"fmt"
-	"github.com/ankyra/escape-registry/model"
-	"github.com/gorilla/mux"
 	"io/ioutil"
 	"net/http"
+
+	"github.com/ankyra/escape-registry/model"
+	"github.com/gorilla/mux"
 )
+
+type Membership struct {
+	Group string `json:"name"`
+}
+
+type User struct {
+	Name   string        `json:"username"`
+	Groups []*Membership `json:"groups"`
+}
 
 func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	project := mux.Vars(r)["project"]
@@ -35,7 +45,15 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		HandleError(w, r, err)
 		return
 	}
-	if _, err := model.AddRelease(project, string(metadata)); err != nil {
+	user := r.Context().Value("user")
+	username := ""
+	if user != nil {
+		u, ok := user.(*User)
+		if ok {
+			username = u.Name
+		}
+	}
+	if _, err := model.AddReleaseByUser(project, string(metadata), username); err != nil {
 		HandleError(w, r, err)
 		return
 	}

@@ -20,13 +20,14 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"log"
+	"net/http"
+
 	"github.com/ankyra/escape-registry/cmd"
 	"github.com/ankyra/escape-registry/metrics"
 	"github.com/ankyra/escape-registry/model"
 	"github.com/gorilla/mux"
-	"io/ioutil"
-	"log"
-	"net/http"
 )
 
 func UploadHandler(w http.ResponseWriter, r *http.Request) {
@@ -59,7 +60,15 @@ func RegisterAndUploadHandler(w http.ResponseWriter, r *http.Request) {
 		HandleError(w, r, err)
 		return
 	}
-	release, err := model.AddRelease(project, string(metadata))
+	user := r.Context().Value("user")
+	username := ""
+	if user != nil {
+		u, ok := user.(*User)
+		if ok {
+			username = u.Name
+		}
+	}
+	release, err := model.AddReleaseByUser(project, string(metadata), username)
 	if err != nil {
 		HandleError(w, r, err)
 		return
