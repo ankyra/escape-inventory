@@ -116,7 +116,7 @@ type DAO interface {
 	FindAllVersions(application *Application) ([]string, error)
 
 	GetRelease(project, name, releaseId string) (*Release, error)
-	AddRelease(project string, metadata *core.ReleaseMetadata) (*Release, error)
+	AddRelease(*Release) error
 	UpdateRelease(*Release) error
 	GetAllReleases() ([]*Release, error)
 	GetAllReleasesWithoutProcessedDependencies() ([]*Release, error)

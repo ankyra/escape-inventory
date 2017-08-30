@@ -12,6 +12,7 @@
 // dao/postgres/schemas/6_release_changes.up.sql
 // dao/postgres/schemas/7_reset_dependencies.up.sql
 // dao/postgres/schemas/8_is_extension_on_dependencies.up.sql
+// dao/postgres/schemas/9_change_integer_precision.up.sql
 // DO NOT EDIT!
 
 package postgres
@@ -274,7 +275,7 @@ func _6_release_changesUpSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "6_release_changes.up.sql", size: 606, mode: os.FileMode(436), modTime: time.Unix(1504015019, 0)}
+	info := bindataFileInfo{name: "6_release_changes.up.sql", size: 606, mode: os.FileMode(436), modTime: time.Unix(1504062920, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -315,6 +316,26 @@ func _8_is_extension_on_dependenciesUpSql() (*asset, error) {
 	}
 
 	info := bindataFileInfo{name: "8_is_extension_on_dependencies.up.sql", size: 165, mode: os.FileMode(436), modTime: time.Unix(1504046895, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var __9_change_integer_precisionUpSql = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\xe2\x72\xf4\x09\x71\x0d\x52\x08\x71\x74\xf2\x71\x55\x28\x4a\xcd\x49\x4d\x2c\x4e\x55\x80\x88\x39\xfb\xfb\x84\xfa\xfa\x29\xa4\xe4\x97\xe7\xe5\xe4\x27\xa6\x14\x2b\x84\x44\x06\xb8\x2a\x38\x79\xba\x7b\xfa\x85\x58\x13\xd6\x57\x5a\x00\xd2\x95\x9a\x12\x9f\x58\x82\x5b\x67\x62\x41\x41\x4e\x66\x72\x62\x49\x66\x7e\x1e\x19\xba\x0b\x12\x93\xb3\x13\xd3\xc9\xb1\x17\xab\xce\xb4\xcc\x9c\xd4\xe2\xcc\xaa\x54\x54\x6d\x80\x00\x00\x00\xff\xff\xe0\x40\xf0\xda\x22\x01\x00\x00")
+
+func _9_change_integer_precisionUpSqlBytes() ([]byte, error) {
+	return bindataRead(
+		__9_change_integer_precisionUpSql,
+		"9_change_integer_precision.up.sql",
+	)
+}
+
+func _9_change_integer_precisionUpSql() (*asset, error) {
+	bytes, err := _9_change_integer_precisionUpSqlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "9_change_integer_precision.up.sql", size: 290, mode: os.FileMode(436), modTime: time.Unix(1504063180, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -383,6 +404,7 @@ var _bindata = map[string]func() (*asset, error){
 	"6_release_changes.up.sql": _6_release_changesUpSql,
 	"7_reset_dependencies.up.sql": _7_reset_dependenciesUpSql,
 	"8_is_extension_on_dependencies.up.sql": _8_is_extension_on_dependenciesUpSql,
+	"9_change_integer_precision.up.sql": _9_change_integer_precisionUpSql,
 }
 
 // AssetDir returns the file names below a certain
@@ -437,6 +459,7 @@ var _bintree = &bintree{nil, map[string]*bintree{
 	"6_release_changes.up.sql": &bintree{_6_release_changesUpSql, map[string]*bintree{}},
 	"7_reset_dependencies.up.sql": &bintree{_7_reset_dependenciesUpSql, map[string]*bintree{}},
 	"8_is_extension_on_dependencies.up.sql": &bintree{_8_is_extension_on_dependenciesUpSql, map[string]*bintree{}},
+	"9_change_integer_precision.up.sql": &bintree{_9_change_integer_precisionUpSql, map[string]*bintree{}},
 }}
 
 // RestoreAsset restores an asset under the given directory

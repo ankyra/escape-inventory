@@ -1,7 +1,6 @@
 package mem
 
 import (
-	core "github.com/ankyra/escape-core"
 	. "github.com/ankyra/escape-registry/dao/types"
 )
 
@@ -21,29 +20,28 @@ func (a *dao) GetRelease(project, name, releaseId string) (*Release, error) {
 	return release.Release, nil
 }
 
-func (a *dao) AddRelease(project string, rel *core.ReleaseMetadata) (*Release, error) {
-	apps, ok := a.projects[project]
+func (a *dao) AddRelease(rel *Release) error {
+	apps, ok := a.projects[rel.Application.Project]
 	if !ok {
 		apps = map[string]*application{}
 	}
-	key := rel.GetReleaseId()
-	app, ok := apps[rel.Name]
+	key := rel.Metadata.GetReleaseId()
+	app, ok := apps[rel.Application.Name]
 	if !ok {
-		return nil, NotFound
+		return NotFound
 	}
 	_, alreadyExists := app.Releases[key]
 	if alreadyExists {
-		return nil, AlreadyExists
+		return AlreadyExists
 	}
-	newRelease := NewRelease(app.App, rel)
 	app.Releases[key] = &release{
-		Release:  newRelease,
+		Release:  rel,
 		Packages: []string{},
 	}
-	apps[rel.Name] = app
-	a.projects[project] = apps
-	a.releases[newRelease] = app.Releases[key]
-	return app.Releases[key].Release, nil
+	apps[rel.Application.Name] = app
+	a.projects[rel.Application.Project] = apps
+	a.releases[rel] = app.Releases[key]
+	return nil
 }
 
 func (a *dao) UpdateRelease(r *Release) error {

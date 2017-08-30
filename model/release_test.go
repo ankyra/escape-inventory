@@ -86,10 +86,18 @@ func (s *releaseSuite) Test_AddRelease_Updates_Application_Metadata(c *C) {
 
 	_, err = AddRelease("test", `{"name": "up-test", "version": "0", "description": "testing", "project": "test"}`)
 	c.Assert(err, IsNil)
+
+	app, err := dao.GetApplication("test", "up-test")
+	c.Assert(err, IsNil)
+	c.Assert(app.Name, Equals, "up-test")
+	c.Assert(app.Project, Equals, "test")
+	c.Assert(app.Description, Equals, "testing")
+	c.Assert(app.LatestVersion, Equals, "0")
+
 	_, err = AddRelease("test", `{"name": "up-test", "version": "1", "description": "updated", "project": "test"}`)
 	c.Assert(err, IsNil)
 
-	app, err := dao.GetApplication("test", "up-test")
+	app, err = dao.GetApplication("test", "up-test")
 	c.Assert(err, IsNil)
 	c.Assert(app.Name, Equals, "up-test")
 	c.Assert(app.Project, Equals, "test")

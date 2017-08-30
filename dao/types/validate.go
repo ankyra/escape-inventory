@@ -17,6 +17,8 @@ limitations under the License.
 package types
 
 import (
+	"time"
+
 	"github.com/ankyra/escape-core"
 	. "gopkg.in/check.v1"
 )
@@ -43,14 +45,17 @@ func ValidateDAO(dao func() DAO, c *C) {
 }
 
 func addReleaseToProject(dao DAO, c *C, name, version, project string) *Release {
+	app := NewApplication(project, name)
 	dao.AddProject(NewProject(project))
-	dao.AddApplication(NewApplication(project, name))
+	dao.AddApplication(app)
 	metadataJson := `{"name": "` + name + `", "version": "` + version + `"}`
 	metadata, err := core.NewReleaseMetadataFromJsonString(metadataJson)
 	c.Assert(err, IsNil)
-	result, err := dao.AddRelease(project, metadata)
-	c.Assert(err, IsNil)
-	return result
+	release := NewRelease(app, metadata)
+	release.UploadedBy = "123-123"
+	release.UploadedAt = time.Unix(123, 0)
+	c.Assert(dao.AddRelease(release), IsNil)
+	return release
 }
 
 func addRelease(dao DAO, c *C, name, version string) *Release {
@@ -58,39 +63,32 @@ func addRelease(dao DAO, c *C, name, version string) *Release {
 }
 
 func Validate_AddRelease_Unique(dao DAO, c *C) {
+	app := NewApplication("_", "dao-val")
 	c.Assert(dao.AddProject(NewProject("_")), IsNil)
-	c.Assert(dao.AddApplication(NewApplication("_", "dao-val")), IsNil)
+	c.Assert(dao.AddApplication(app), IsNil)
 	metadataJson := `{"name": "dao-val", "version": "1"}`
 	metadata, err := core.NewReleaseMetadataFromJsonString(metadataJson)
 	c.Assert(err, IsNil)
-	_, err = dao.AddRelease("_", metadata)
-	c.Assert(err, IsNil)
-	_, err = dao.AddRelease("_", metadata)
-	c.Assert(err, Equals, AlreadyExists)
+	c.Assert(dao.AddRelease(NewRelease(app, metadata)), IsNil)
+	c.Assert(dao.AddRelease(NewRelease(app, metadata)), Equals, AlreadyExists)
 }
 
 func Validate_AddRelease_Unique_per_project(dao DAO, c *C) {
+	app1 := NewApplication("_", "dao-val")
+	app2 := NewApplication("my-project", "dao-val")
 	c.Assert(dao.AddProject(NewProject("_")), IsNil)
-	c.Assert(dao.AddApplication(NewApplication("_", "dao-val")), IsNil)
+	c.Assert(dao.AddApplication(app1), IsNil)
 	c.Assert(dao.AddProject(NewProject("my-project")), IsNil)
-	c.Assert(dao.AddApplication(NewApplication("my-project", "dao-val")), IsNil)
+	c.Assert(dao.AddApplication(app2), IsNil)
 	metadataJson := `{"name": "dao-val", "version": "1"}`
 	metadata, err := core.NewReleaseMetadataFromJsonString(metadataJson)
 	c.Assert(err, IsNil)
-	_, err = dao.AddRelease("_", metadata)
-	c.Assert(err, IsNil)
-	_, err = dao.AddRelease("my-project", metadata)
-	c.Assert(err, IsNil)
+	c.Assert(dao.AddRelease(NewRelease(app1, metadata)), IsNil)
+	c.Assert(dao.AddRelease(NewRelease(app2, metadata)), IsNil)
 }
 
 func Validate_GetRelease(dao DAO, c *C) {
-	c.Assert(dao.AddProject(NewProject("_")), IsNil)
-	c.Assert(dao.AddApplication(NewApplication("_", "dao-val")), IsNil)
-	metadataJson := `{"name": "dao-val", "version": "1"}`
-	metadata, err := core.NewReleaseMetadataFromJsonString(metadataJson)
-	c.Assert(err, IsNil)
-	_, err = dao.AddRelease("_", metadata)
-	c.Assert(err, IsNil)
+	addRelease(dao, c, "dao-val", "1")
 	release, err := dao.GetRelease("_", "dao-val", "dao-val-v1")
 	c.Assert(err, IsNil)
 	c.Assert(release.Version, Equals, "1")
@@ -210,6 +208,8 @@ func Validate_ApplicationMetadata(dao DAO, c *C) {
 	app := NewApplication("project", "name")
 	update := NewApplication("project", "name")
 	update.Description = "Test"
+	update.UploadedBy = "123-123"
+	update.UploadedAt = time.Unix(123, 0)
 
 	_, err := dao.GetApplication("project", "name")
 	c.Assert(err, Equals, NotFound)
@@ -232,6 +232,8 @@ func Validate_ApplicationMetadata(dao DAO, c *C) {
 	c.Assert(app.Name, Equals, "name")
 	c.Assert(app.Project, Equals, "project")
 	c.Assert(app.Description, Equals, "Test")
+	c.Assert(app.UploadedBy, Equals, "123-123")
+	c.Assert(app.UploadedAt, Equals, time.Unix(123, 0))
 }
 
 func Validate_GetApplications(dao DAO, c *C) {
@@ -325,17 +327,9 @@ func Validate_GetPackageURIs(dao DAO, c *C) {
 }
 
 func Validate_AddPackageURI_Unique(dao DAO, c *C) {
-	c.Assert(dao.AddProject(NewProject("_")), IsNil)
-	c.Assert(dao.AddApplication(NewApplication("_", "dao-val")), IsNil)
-	metadataJson := `{"name": "dao-val", "version": "1"}`
-	metadata, err := core.NewReleaseMetadataFromJsonString(metadataJson)
-	c.Assert(err, IsNil)
-	release, err := dao.AddRelease("_", metadata)
-	c.Assert(err, IsNil)
-	err = dao.AddPackageURI(release, "file:///test.txt")
-	c.Assert(err, IsNil)
-	err = dao.AddPackageURI(release, "file:///test.txt")
-	c.Assert(err, Equals, AlreadyExists)
+	release := addRelease(dao, c, "dao-val", "1")
+	c.Assert(dao.AddPackageURI(release, "file:///test.txt"), IsNil)
+	c.Assert(dao.AddPackageURI(release, "file:///test.txt"), Equals, AlreadyExists)
 }
 
 func Validate_GetAllReleases(dao DAO, c *C) {
@@ -409,6 +403,8 @@ func Validate_GetReleasesWithoutProcessedDependencies(dao DAO, c *C) {
 	c.Assert(err, IsNil)
 	c.Assert(release.ProcessedDependencies, Equals, true)
 	c.Assert(release.Downloads, Equals, 14)
+	c.Assert(release.UploadedBy, Equals, "123-123")
+	c.Assert(release.UploadedAt, Equals, time.Unix(123, 0))
 }
 
 func Validate_Dependencies(dao DAO, c *C) {
@@ -417,12 +413,13 @@ func Validate_Dependencies(dao DAO, c *C) {
 	c.Assert(err, IsNil)
 	c.Assert(deps, HasLen, 0)
 
-	dao.AddApplication(NewApplication("_", "dao-parent"))
+	app := NewApplication("_", "dao-parent")
+	dao.AddApplication(app)
 	metadataJson := `{"name": "dao-parent", "version": "1", "depends": [{"id": "_/dao-val-v1", "scopes": ["build"]}]}`
 	metadata, err := core.NewReleaseMetadataFromJsonString(metadataJson)
 	c.Assert(err, IsNil)
-	releaseParent, err := dao.AddRelease("_", metadata)
-	c.Assert(err, IsNil)
+	releaseParent := NewRelease(app, metadata)
+	c.Assert(dao.AddRelease(releaseParent), IsNil)
 	dependencies := []*Dependency{
 		&Dependency{
 			Project:     "_",
@@ -460,12 +457,13 @@ func Validate_DependenciesByGroups(dao DAO, c *C) {
 	c.Assert(err, IsNil)
 	c.Assert(deps, HasLen, 0)
 
-	dao.AddApplication(NewApplication("_", "dao-parent"))
+	app := NewApplication("_", "dao-parent")
+	dao.AddApplication(app)
 	metadataJson := `{"name": "dao-parent", "version": "1", "depends": [{"id": "_/dao-val-v1", "scopes": ["build"]}]}`
 	metadata, err := core.NewReleaseMetadataFromJsonString(metadataJson)
 	c.Assert(err, IsNil)
-	releaseParent, err := dao.AddRelease("_", metadata)
-	c.Assert(err, IsNil)
+	releaseParent := NewRelease(app, metadata)
+	c.Assert(dao.AddRelease(releaseParent), IsNil)
 	dependencies := []*Dependency{
 		&Dependency{
 			Project:     "_",

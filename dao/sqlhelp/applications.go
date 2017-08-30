@@ -2,6 +2,7 @@ package sqlhelp
 
 import (
 	"database/sql"
+	"time"
 
 	. "github.com/ankyra/escape-registry/dao/types"
 )
@@ -19,8 +20,11 @@ func (s *SQLHelper) UpdateApplication(app *Application) error {
 		app.Description,
 		app.LatestVersion,
 		app.Logo,
+		app.UploadedBy,
+		app.UploadedAt.Unix(),
 		app.Name,
-		app.Project)
+		app.Project,
+	)
 }
 
 func (s *SQLHelper) GetApplications(project string) (map[string]*Application, error) {
@@ -44,8 +48,9 @@ func (s *SQLHelper) GetApplication(project, name string) (*Application, error) {
 }
 
 func (s *SQLHelper) scanApplication(rows *sql.Rows) (*Application, error) {
-	var name, project, description, latestVersion, logo string
-	if err := rows.Scan(&name, &project, &description, &latestVersion, &logo); err != nil {
+	var name, project, description, latestVersion, logo, uploadedBy string
+	var uploadedAt int64
+	if err := rows.Scan(&name, &project, &description, &latestVersion, &logo, &uploadedBy, &uploadedAt); err != nil {
 		return nil, err
 	}
 	return &Application{
@@ -54,6 +59,8 @@ func (s *SQLHelper) scanApplication(rows *sql.Rows) (*Application, error) {
 		Description:   description,
 		LatestVersion: latestVersion,
 		Logo:          logo,
+		UploadedBy:    uploadedBy,
+		UploadedAt:    time.Unix(uploadedAt, 0),
 	}, nil
 }
 

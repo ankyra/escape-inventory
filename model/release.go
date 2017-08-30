@@ -19,6 +19,7 @@ package model
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/ankyra/escape-core"
 	"github.com/ankyra/escape-core/parsers"
@@ -38,26 +39,37 @@ func ensureProjectExists(project string) error {
 	return dao.AddProject(prj)
 }
 
-func ensureApplicationExists(project string, metadata *core.ReleaseMetadata) error {
-	name := metadata.Name
-	app, err := dao.GetApplication(project, name)
-	if err == nil {
-		app.Description = metadata.Description
-		app.Logo = metadata.Logo
-		app.LatestVersion = metadata.Version
-		return dao.UpdateApplication(app)
-	}
-	if err != NotFound {
-		return err
-	}
-	app = NewApplication(project, name)
+func updateApp(app *Application, metadata *core.ReleaseMetadata, byUser string, uploadedAt time.Time) {
 	app.Description = metadata.Description
 	app.Logo = metadata.Logo
 	app.LatestVersion = metadata.Version
+	if byUser != "" {
+		app.UploadedBy = byUser
+	}
+	if uploadedAt != time.Unix(0, 0) {
+		app.UploadedAt = uploadedAt
+	}
+}
+
+func ensureApplicationExists(project, byUser string, metadata *core.ReleaseMetadata, uploadAt time.Time) error {
+	name := metadata.Name
+	app, err := dao.GetApplication(project, name)
+	if err != nil && err != NotFound {
+		return err
+	} else if err == nil {
+		updateApp(app, metadata, byUser, uploadAt)
+		return dao.UpdateApplication(app)
+	}
+	app = NewApplication(project, name)
+	updateApp(app, metadata, byUser, uploadAt)
 	return dao.AddApplication(app)
 }
 
 func AddRelease(project, metadataJson string) (*core.ReleaseMetadata, error) {
+	return AddReleaseByUser(project, metadataJson, "")
+}
+
+func AddReleaseByUser(project, metadataJson, uploadUser string) (*core.ReleaseMetadata, error) {
 	metadata, err := core.NewReleaseMetadataFromJsonString(metadataJson)
 	if err != nil {
 		return nil, NewUserError(err)
@@ -83,10 +95,13 @@ func AddRelease(project, metadataJson string) (*core.ReleaseMetadata, error) {
 	if err := ensureProjectExists(project); err != nil {
 		return nil, err
 	}
-	if err := ensureApplicationExists(project, metadata); err != nil {
+	result := NewRelease(NewApplication(project, metadata.Name), metadata)
+	result.UploadedBy = uploadUser
+	result.UploadedAt = time.Now()
+	if err := ensureApplicationExists(project, result.UploadedBy, metadata, result.UploadedAt); err != nil {
 		return nil, err
 	}
-	result, err := dao.AddRelease(project, metadata)
+	err = dao.AddRelease(result)
 	if err != nil {
 		return nil, err
 	}
@@ -146,8 +161,10 @@ func ProcessUnprocessedReleases() error {
 }
 
 type ReleasePayload struct {
-	Release   *core.ReleaseMetadata `json:"release"`
-	Downloads int                   `json:"downloads"`
+	Release    *core.ReleaseMetadata `json:"release"`
+	Downloads  int                   `json:"downloads"`
+	UploadedBy string                `json:"uploaded_by"`
+	UploadedAt time.Time             `json:"uploaded_at"`
 }
 
 func GetRelease(project, releaseIdString string) (*ReleasePayload, error) {
@@ -156,8 +173,10 @@ func GetRelease(project, releaseIdString string) (*ReleasePayload, error) {
 		return nil, err
 	}
 	return &ReleasePayload{
-		Release:   release.Metadata,
-		Downloads: release.Downloads,
+		Release:    release.Metadata,
+		Downloads:  release.Downloads,
+		UploadedBy: release.UploadedBy,
+		UploadedAt: release.UploadedAt,
 	}, nil
 }
 

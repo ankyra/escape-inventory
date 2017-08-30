@@ -66,20 +66,24 @@ func NewPostgresDAO(url string) (DAO, error) {
 									 JOIN acl ON p.name = acl.project
 									 WHERE group_name `,
 
-		GetApplicationQuery: `SELECT name, project, description, latest_version, logo 
+		GetApplicationQuery: `SELECT name, project, description, latest_version, logo, uploaded_by, uploaded_at 
 							     FROM application WHERE project = $1 AND name = $2`,
 		AddApplicationQuery: `INSERT INTO application(name, project, description, latest_version, logo)
 						      VALUES ($1, $2, $3, $4, $5)`,
-		UpdateApplicationQuery: `UPDATE application SET description = $1, latest_version = $2, logo = $3
-								 WHERE name = $4 AND project = $5`,
-		GetApplicationsQuery: `SELECT name, project, description, latest_version, logo 
+		UpdateApplicationQuery: `UPDATE application 
+								 SET description = $1, latest_version = $2, logo = $3,
+                                     uploaded_by = $4, uploaded_at = $5
+								 WHERE name = $6 AND project = $7`,
+		GetApplicationsQuery: `SELECT name, project, description, latest_version, logo, uploaded_by, uploaded_at
 								  FROM application WHERE project = $1`,
 
-		AddReleaseQuery:                                 "INSERT INTO release(project, name, release_id, version, metadata) VALUES($1, $2, $3, $4, $5)",
+		AddReleaseQuery: `INSERT INTO 
+                          release(project, name, release_id, version, metadata, uploaded_by, uploaded_at) 
+                          VALUES($1, $2, $3, $4, $5, $6, $7)`,
 		UpdateReleaseQuery:                              `UPDATE release SET processed_dependencies = $1, downloads = $2 WHERE project = $3 AND name = $4 AND release_id = $5`,
-		GetReleaseQuery:                                 `SELECT metadata, processed_dependencies FROM release WHERE project = $1 AND name = $2 AND release_id = $3`,
-		GetAllReleasesQuery:                             "SELECT project, metadata, processed_dependencies FROM release",
-		GetAllReleasesWithoutProcessedDependenciesQuery: `SELECT project, metadata, processed_dependencies FROM release WHERE processed_dependencies = 'false'`,
+		GetReleaseQuery:                                 `SELECT metadata, processed_dependencies, downloads, uploaded_by, uploaded_at FROM release WHERE project = $1 AND name = $2 AND release_id = $3`,
+		GetAllReleasesQuery:                             "SELECT project, metadata, processed_dependencies, downloads, uploaded_by, uploaded_at FROM release",
+		GetAllReleasesWithoutProcessedDependenciesQuery: `SELECT project, metadata, processed_dependencies, downloads, uploaded_by, uploaded_at FROM release WHERE processed_dependencies = 'false'`,
 		FindAllVersionsQuery:                            "SELECT version FROM release WHERE project = $1 AND name = $2",
 
 		InsertDependencyQuery: `INSERT INTO release_dependency(project, name, version,

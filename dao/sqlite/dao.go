@@ -59,22 +59,22 @@ func NewSQLiteDAO(path string) (DAO, error) {
 									 JOIN acl ON p.name = acl.project
 									 WHERE group_name `,
 
-		GetApplicationQuery: `SELECT name, project, description, latest_version, logo 
+		GetApplicationQuery: `SELECT name, project, description, latest_version, logo, uploaded_by, uploaded_at 
 								  FROM application WHERE project = ? AND name = ?`,
 		AddApplicationQuery: `INSERT INTO application(name, project, description, latest_version, logo)
 						      VALUES (?, ?, ?, ?, ?)`,
-		UpdateApplicationQuery: `UPDATE application SET description = ?, latest_version = ?, logo = ? 
+		UpdateApplicationQuery: `UPDATE application SET description = ?, latest_version = ?, logo = ?, uploaded_by = ?, uploaded_at = ? 
 								 WHERE name = ? AND project = ?`,
-		GetApplicationsQuery: `SELECT name, project, description, latest_version, logo 
+		GetApplicationsQuery: `SELECT name, project, description, latest_version, logo, uploaded_by, uploaded_at
 								  FROM application WHERE project = ?`,
 
-		AddReleaseQuery: "INSERT INTO release(project, name, release_id, version, metadata) VALUES(?, ?, ?, ?, ?)",
-		GetReleaseQuery: `SELECT metadata, processed_dependencies, downloads 
+		AddReleaseQuery: "INSERT INTO release(project, name, release_id, version, metadata, uploaded_by, uploaded_at) VALUES(?, ?, ?, ?, ?, ?, ?)",
+		GetReleaseQuery: `SELECT metadata, processed_dependencies, downloads, uploaded_by, uploaded_at
 						  FROM release 
 						  WHERE project = ? AND name = ? AND release_id = ?`,
 		UpdateReleaseQuery:                              `UPDATE release SET processed_dependencies = ?, downloads = ? WHERE project = ? AND name = ? AND release_id = ?`,
-		GetAllReleasesQuery:                             "SELECT project, metadata, processed_dependencies, downloads FROM release",
-		GetAllReleasesWithoutProcessedDependenciesQuery: `SELECT project, metadata, processed_dependencies, downloads FROM release WHERE processed_dependencies = 'false'`,
+		GetAllReleasesQuery:                             "SELECT project, metadata, processed_dependencies, downloads, uploaded_by, uploaded_at FROM release",
+		GetAllReleasesWithoutProcessedDependenciesQuery: `SELECT project, metadata, processed_dependencies, downloads, uploaded_by, uploaded_at FROM release WHERE processed_dependencies = 'false'`,
 		FindAllVersionsQuery:                            "SELECT version FROM release WHERE project = ? AND name = ?",
 
 		GetPackageURIsQuery: "SELECT uri FROM package WHERE project = ? AND release_id = ?",

@@ -59,5 +59,6 @@ func (a *dao) UpdateApplication(app *Application) error {
 		return NotFound
 	}
 	apps[app.Name] = &application{app, proj.Releases}
+	a.apps[app] = apps[app.Name]
 	return nil
 }

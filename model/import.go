@@ -19,9 +19,11 @@ package model
 import (
 	"encoding/json"
 	"fmt"
+	"time"
 
 	"github.com/ankyra/escape-core"
 	"github.com/ankyra/escape-registry/dao"
+	"github.com/ankyra/escape-registry/dao/types"
 )
 
 func Import(releases []map[string]interface{}) error {
@@ -45,10 +47,11 @@ func Import(releases []map[string]interface{}) error {
 		if err := ensureProjectExists(project); err != nil {
 			return err
 		}
-		if err := ensureApplicationExists(project, metadata); err != nil {
+		if err := ensureApplicationExists(project, "", metadata, time.Unix(0, 0)); err != nil {
 			return err
 		}
-		release, err := dao.AddRelease(project, metadata)
+		release := types.NewRelease(types.NewApplication(project, metadata.Name), metadata)
+		err = dao.AddRelease(release)
 		if dao.IsAlreadyExists(err) {
 			continue
 		}

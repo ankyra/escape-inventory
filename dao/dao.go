@@ -19,7 +19,6 @@ package dao
 import (
 	"fmt"
 
-	"github.com/ankyra/escape-core"
 	"github.com/ankyra/escape-registry/config"
 	"github.com/ankyra/escape-registry/dao/mem"
 	"github.com/ankyra/escape-registry/dao/postgres"
@@ -92,8 +91,8 @@ func GetApplication(project, name string) (*Application, error) {
 	return GlobalDAO.GetApplication(project, name)
 }
 
-func AddRelease(project string, metadata *core.ReleaseMetadata) (*Release, error) {
-	return GlobalDAO.AddRelease(project, metadata)
+func AddRelease(release *Release) error {
+	return GlobalDAO.AddRelease(release)
 }
 func UpdateRelease(release *Release) error {
 	return GlobalDAO.UpdateRelease(release)

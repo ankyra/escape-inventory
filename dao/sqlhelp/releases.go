@@ -2,6 +2,7 @@ package sqlhelp
 
 import (
 	"database/sql"
+	"time"
 
 	core "github.com/ankyra/escape-core"
 	. "github.com/ankyra/escape-registry/dao/types"
@@ -35,18 +36,16 @@ func (s *SQLHelper) GetAllReleases() ([]*Release, error) {
 	return s.scanReleases(rows)
 }
 
-func (s *SQLHelper) AddRelease(project string, release *core.ReleaseMetadata) (*Release, error) {
-	err := s.PrepareAndExecInsert(s.AddReleaseQuery,
-		project,
-		release.Name,
-		release.GetReleaseId(),
+func (s *SQLHelper) AddRelease(release *Release) error {
+	return s.PrepareAndExecInsert(s.AddReleaseQuery,
+		release.Application.Project,
+		release.Application.Name,
+		release.Metadata.GetReleaseId(),
 		release.Version,
-		release.ToJson(),
+		release.Metadata.ToJson(),
+		release.UploadedBy,
+		release.UploadedAt.Unix(),
 	)
-	if err != nil {
-		return nil, err
-	}
-	return NewRelease(NewApplication(project, release.Name), release), nil
 }
 
 func (s *SQLHelper) UpdateRelease(release *Release) error {
@@ -83,10 +82,11 @@ func (s *SQLHelper) AddPackageURI(release *Release, uri string) error {
 }
 
 func (s *SQLHelper) scanRelease(project, name string, rows *sql.Rows) (*Release, error) {
-	var metadataJson string
+	var metadataJson, uploadedBy string
 	var processedDependencies bool
 	var downloads int
-	if err := rows.Scan(&metadataJson, &processedDependencies, &downloads); err != nil {
+	var uploadedAt int64
+	if err := rows.Scan(&metadataJson, &processedDependencies, &downloads, &uploadedBy, &uploadedAt); err != nil {
 		return nil, err
 	}
 	metadata, err := core.NewReleaseMetadataFromJsonString(metadataJson)
@@ -96,6 +96,8 @@ func (s *SQLHelper) scanRelease(project, name string, rows *sql.Rows) (*Release,
 	rel := NewRelease(NewApplication(project, name), metadata)
 	rel.ProcessedDependencies = processedDependencies
 	rel.Downloads = downloads
+	rel.UploadedBy = uploadedBy
+	rel.UploadedAt = time.Unix(uploadedAt, 0)
 	return rel, nil
 }
 
@@ -103,10 +105,11 @@ func (s *SQLHelper) scanReleases(rows *sql.Rows) ([]*Release, error) {
 	defer rows.Close()
 	result := []*Release{}
 	for rows.Next() {
-		var project, metadataJson string
+		var project, metadataJson, uploadedBy string
 		var processedDependencies bool
 		var downloads int
-		if err := rows.Scan(&project, &metadataJson, &processedDependencies, &downloads); err != nil {
+		var uploadedAt int64
+		if err := rows.Scan(&project, &metadataJson, &processedDependencies, &downloads, &uploadedBy, &uploadedAt); err != nil {
 			return nil, err
 		}
 		metadata, err := core.NewReleaseMetadataFromJsonString(metadataJson)
@@ -116,6 +119,8 @@ func (s *SQLHelper) scanReleases(rows *sql.Rows) ([]*Release, error) {
 		rel := NewRelease(NewApplication(project, metadata.Name), metadata)
 		rel.ProcessedDependencies = processedDependencies
 		rel.Downloads = downloads
+		rel.UploadedBy = uploadedBy
+		rel.UploadedAt = time.Unix(uploadedAt, 0)
 		result = append(result, rel)
 	}
 	return result, nil
