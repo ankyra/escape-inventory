@@ -18,7 +18,7 @@ func (s *SQLHelper) GetAllReleasesWithoutProcessedDependencies() ([]*Release, er
 
 func (s *SQLHelper) SetDependencies(release *Release, depends []*Dependency) error {
 	for _, dep := range depends {
-		err := s.PrepareAndExecInsert(s.InsertDependencyQuery,
+		err := s.PrepareAndExecInsertIgnoreDups(s.InsertDependencyQuery,
 			release.Application.Project,
 			release.Application.Name,
 			release.Version,

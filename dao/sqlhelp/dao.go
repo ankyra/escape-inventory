@@ -81,6 +81,21 @@ func (s *SQLHelper) PrepareAndExecInsert(query string, arg ...interface{}) error
 	return err
 }
 
+func (s *SQLHelper) PrepareAndExecInsertIgnoreDups(query string, arg ...interface{}) error {
+	stmt, err := s.DB.Prepare(query)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+	_, err = stmt.Exec(arg...)
+	if err != nil {
+		if s.IsUniqueConstraintError(err) {
+			return nil
+		}
+	}
+	return err
+}
+
 func (s *SQLHelper) PrepareAndExecUpdate(query string, arg ...interface{}) error {
 	stmt, err := s.DB.Prepare(query)
 	if err != nil {
