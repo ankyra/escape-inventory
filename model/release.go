@@ -162,6 +162,8 @@ func ProcessUnprocessedReleases() error {
 
 type ReleasePayload struct {
 	Release    *core.ReleaseMetadata `json:"release"`
+	Versions   []string              `json:"versions"`
+	IsLatest   bool                  `json:"is_latest"`
 	Downloads  int                   `json:"downloads"`
 	UploadedBy string                `json:"uploaded_by"`
 	UploadedAt time.Time             `json:"uploaded_at"`
@@ -172,8 +174,16 @@ func GetRelease(project, releaseIdString string) (*ReleasePayload, error) {
 	if err != nil {
 		return nil, err
 	}
+	versions, err := GetApplicationVersions(project, release.Application.Name)
+	if err != nil {
+		return nil, err
+	}
+	maxVersion := getMaxFromVersions(versions, "")
+	isLatest := maxVersion.ToString() == release.Version
 	return &ReleasePayload{
 		Release:    release.Metadata,
+		Versions:   versions,
+		IsLatest:   isLatest,
 		Downloads:  release.Downloads,
 		UploadedBy: release.UploadedBy,
 		UploadedAt: release.UploadedAt,
