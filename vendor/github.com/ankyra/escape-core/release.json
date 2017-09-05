@@ -1,6 +1,6 @@
 {
    "api_version": 6,
-   "built_with_core_version": "0.6.0",
+   "built_with_core_version": "0.6.4",
    "built_with_escape_version": "0.17.0",
    "description": "Core library containing datastructures for working with Release Metadata, State and the Escape Scripting Language.\nPlease see https://escape.ankyra.io for the full documentation.",
    "files": {
@@ -9,17 +9,17 @@
       "build.sh": "59718acf701476b25fdbebc8c76c2b6d",
       "consumer.go": "c81742d72604e3512d69017eb07cc7ec",
       "consumer_test.go": "3ff946e134efa5165c73db7476ffbbb4",
-      "core.go": "37c90c31bfbce8834687e48e5611f020",
+      "core.go": "7b07452c1b80d075c2e4836053f97d7a",
       "core.go.tpl": "4099a7b2c6c7798799ea2819f8cf5c27",
       "dependency.go": "c2fad1fb08026574389ca4ed44be50e1",
-      "dependency_config.go": "e6e3fffecadabf4e38ecb4beb8f9733a",
-      "dependency_config_test.go": "7a033ac7a94be2818f44a162f8da8c58",
+      "dependency_config.go": "9ab20039859c0b7f6bd2e90e2e1a06a6",
+      "dependency_config_test.go": "86bdbfe3d8f37329845277e69ecee32c",
       "dependency_test.go": "141917507d043eed403cfc1493cf32fd",
       "diff.go": "b3e39db6f0b2b4905b0c23cf468f73eb",
       "diff_test.go": "6be1dfb2a485a0ad4052db1968b28111",
       "docs/generate_stdlib_docs.go": "15e02f0835b07edb0ecd7e60d6d3f040",
       "docs/scripting_language.md": "79ffa91ba9dad432b9c3810b474036d8",
-      "docs/stdlib.md": "59aa40f111d8352d9238f02162909f3d",
+      "docs/stdlib.md": "61d4b1e712151b7e88f814a5bb1de7aa",
       "errand.go": "22d56084cdd5088790a285196cf909b6",
       "errand_test.go": "2024729f8621ada8cd3699ec18d5d934",
       "metadata.go": "a2d4a082f35b463908939f90759a9cdb",
@@ -67,8 +67,6 @@
       "util/path.go": "b256d866ccb2c4a155282f1e56c65105",
       "util/process.go": "cef1e12dfcdd4a59c464239e70209275",
       "util/value.go": "7bc9d4f0435b94d3cfa646e04dafbcf9",
-      "variables/.variable.go.swp": "ee74acebd9d48eb1f5f203ac70c7295c",
-      "variables/.variable_test.go.swp": "0020d269babc581161cd085f5d4c326e",
       "variables/variable.go": "46018b10f1f0bc3cfaf404bd6734bb95",
       "variables/variable_test.go": "1659ba1e69eacd9b37eda69fdeed5384",
       "variables/variable_types/bool.go": "86a7d62e5c0fa851ed6998df3b3c3d4c",
@@ -130,13 +128,13 @@
    "name": "escape-core",
    "repository": "git@github.com:ankyra/escape-core.git",
    "branch": "master",
-   "git_revision": "17c319fdd3c05aa794d7dd3143ed8e9b2999c33f",
-   "revision_message": "",
-   "revision_author": "",
+   "git_revision": "2b5c5a72081a350de2b42489050e9028ee022e0f",
+   "revision_message": "Introduce build_mapping and deploy_mapping in dependency config",
+   "revision_author": "Bart Spaans \u003cbart.spaans@gmail.com\u003e",
    "metadata": {
-      "release_metadata_api_version": "6"
+      "release_metadata_api_version": "7"
    },
-   "version": "0.6.3",
+   "version": "0.7.3",
    "consumes": [],
    "depends": [],
    "errands": {},
@@ -179,8 +177,7 @@
          "file": "core.go.tpl",
          "target": "core.go",
          "scopes": [
-            "build",
-            "deploy"
+            "build"
          ],
          "mapping": {
             "branch": "$this.branch",
