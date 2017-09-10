@@ -43,6 +43,14 @@ func GetProject(project string) (*ProjectPayload, error) {
 	}, nil
 }
 
+func GetProjectHooks(project string) (types.Hooks, error) {
+	prj, err := dao.GetProject(project)
+	if err != nil {
+		return nil, err
+	}
+	return dao.GetProjectHooks(prj)
+}
+
 func AddProject(p *types.Project) error {
 	if p.Name == "" {
 		return NewUserError(fmt.Errorf("Missing name"))

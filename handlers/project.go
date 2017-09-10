@@ -38,6 +38,22 @@ func GetProjectsHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(result)
 }
 
+func GetProjectHooksHandler(w http.ResponseWriter, r *http.Request) {
+	project := mux.Vars(r)["project"]
+	getProjectHooksHandler(w, r, project)
+}
+
+func getProjectHooksHandler(w http.ResponseWriter, r *http.Request, project string) {
+	hooks, err := model.GetProjectHooks(project)
+	if err != nil {
+		HandleError(w, r, err)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	json.NewEncoder(w).Encode(hooks)
+}
+
 func GetProjectHandler(w http.ResponseWriter, r *http.Request) {
 	project := mux.Vars(r)["project"]
 	getProjectHandler(w, r, project)
@@ -52,7 +68,6 @@ func getProjectHandler(w http.ResponseWriter, r *http.Request, project string) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(200)
 	json.NewEncoder(w).Encode(proj)
-
 }
 
 func AddProjectHandler(w http.ResponseWriter, r *http.Request) {

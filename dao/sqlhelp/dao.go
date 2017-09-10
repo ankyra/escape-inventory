@@ -16,6 +16,8 @@ type SQLHelper struct {
 	UpdateProjectQuery       string
 	GetProjectsQuery         string
 	GetProjectsByGroupsQuery string
+	GetProjectHooksQuery     string
+	SetProjectHooksQuery     string
 
 	AddApplicationQuery    string
 	UpdateApplicationQuery string

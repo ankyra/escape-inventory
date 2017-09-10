@@ -33,6 +33,7 @@ type release struct {
 
 type dao struct {
 	projectMetadata map[string]*Project
+	projectHooks    map[*Project]Hooks
 	projects        map[string]map[string]*application
 	apps            map[*Application]*application
 	releases        map[*Release]*release
@@ -42,6 +43,7 @@ type dao struct {
 func NewInMemoryDAO() DAO {
 	return &dao{
 		projectMetadata: map[string]*Project{},
+		projectHooks:    map[*Project]Hooks{},
 		projects:        map[string]map[string]*application{},
 		apps:            map[*Application]*application{},
 		releases:        map[*Release]*release{},

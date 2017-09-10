@@ -58,6 +58,8 @@ func NewSQLiteDAO(path string) (DAO, error) {
 								     FROM project AS p
 									 JOIN acl ON p.name = acl.project
 									 WHERE group_name `,
+		GetProjectHooksQuery: `SELECT hooks FROM project WHERE name = ?`,
+		SetProjectHooksQuery: `UPDATE project SET hooks = ? WHERE name = ?`,
 
 		GetApplicationQuery: `SELECT name, project, description, latest_version, logo, uploaded_by, uploaded_at 
 								  FROM application WHERE project = ? AND name = ?`,

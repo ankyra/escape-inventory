@@ -2,6 +2,7 @@ package sqlhelp
 
 import (
 	"database/sql"
+	"encoding/json"
 	"strconv"
 	"strings"
 
@@ -22,6 +23,28 @@ func (s *SQLHelper) UpdateProject(project *Project) error {
 		project.Description,
 		project.OrgURL,
 		project.Logo,
+		project.Name)
+}
+
+func (s *SQLHelper) GetProjectHooks(project *Project) (Hooks, error) {
+	rows, err := s.PrepareAndQuery(s.GetProjectHooksQuery, project.Name)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		return s.scanProjectHooks(rows)
+	}
+	return nil, NotFound
+}
+
+func (s *SQLHelper) SetProjectHooks(project *Project, hooks Hooks) error {
+	bytes, err := json.Marshal(hooks)
+	if err != nil {
+		return err
+	}
+	return s.PrepareAndExecUpdate(s.SetProjectHooksQuery,
+		string(bytes),
 		project.Name)
 }
 
@@ -103,6 +126,18 @@ func (s *SQLHelper) scanProjects(rows *sql.Rows) (map[string]*Project, error) {
 			return nil, err
 		}
 		result[prj.Name] = prj
+	}
+	return result, nil
+}
+
+func (s *SQLHelper) scanProjectHooks(rows *sql.Rows) (Hooks, error) {
+	var hooksString string
+	if err := rows.Scan(&hooksString); err != nil {
+		return nil, err
+	}
+	result := NewHooks()
+	if err := json.Unmarshal([]byte(hooksString), &result); err != nil {
+		return nil, err
 	}
 	return result, nil
 }

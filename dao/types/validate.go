@@ -125,9 +125,13 @@ func Validate_ProjectMetadata(dao DAO, c *C) {
 	update.Description = "yo"
 	_, err := dao.GetProject("test")
 	c.Assert(err, Equals, NotFound)
+	hooks, err := dao.GetProjectHooks(update)
+	c.Assert(err, Equals, NotFound)
 	c.Assert(dao.UpdateProject(update), Equals, NotFound)
 	c.Assert(dao.AddProject(update), IsNil)
 	c.Assert(dao.AddProject(update), Equals, AlreadyExists)
+	hooks, err = dao.GetProjectHooks(update)
+	c.Assert(err, IsNil)
 
 	project, err := dao.GetProject("test")
 	c.Assert(err, IsNil)
@@ -141,6 +145,21 @@ func Validate_ProjectMetadata(dao DAO, c *C) {
 	project, err = dao.GetProject("test")
 	c.Assert(err, IsNil)
 	c.Assert(project.Description, Equals, "new description")
+
+	hooks, err = dao.GetProjectHooks(project)
+	c.Assert(err, IsNil)
+	c.Assert(hooks, HasLen, 0)
+
+	newHooks := NewHooks()
+	newHooks["slack"] = map[string]string{}
+	newHooks["slack"]["url"] = "http://example.com"
+	c.Assert(dao.SetProjectHooks(project, newHooks), IsNil)
+
+	hooks, err = dao.GetProjectHooks(project)
+	c.Assert(err, IsNil)
+	c.Assert(hooks, HasLen, 1)
+	c.Assert(hooks["slack"]["url"], Equals, "http://example.com")
+
 }
 
 func Validate_GetProjectsByGroups(dao DAO, c *C) {

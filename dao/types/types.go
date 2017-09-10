@@ -43,11 +43,18 @@ func (p Permission) String() string {
 	return "???"
 }
 
+type Hooks map[string]map[string]string
+
+func NewHooks() Hooks {
+	return map[string]map[string]string{}
+}
+
 type Project struct {
 	Name        string `json:"name"`
 	Description string `json:"description"`
 	OrgURL      string `json:"org_url"`
 	Logo        string `json:"logo"`
+	Hooks       Hooks  `json:"hooks"` // only used for view purposes
 }
 
 func NewProject(project string) *Project {
@@ -108,6 +115,8 @@ type DAO interface {
 	UpdateProject(*Project) error
 	GetProjects() (map[string]*Project, error)
 	GetProjectsByGroups(readGroups []string) (map[string]*Project, error)
+	GetProjectHooks(*Project) (Hooks, error)
+	SetProjectHooks(*Project, Hooks) error
 
 	GetApplication(project, name string) (*Application, error)
 	AddApplication(app *Application) error

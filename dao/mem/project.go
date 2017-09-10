@@ -56,5 +56,23 @@ func (a *dao) AddProject(project *Project) error {
 		a.projects[project.Name] = map[string]*application{}
 	}
 	a.projectMetadata[project.Name] = project
+	a.projectHooks[project] = NewHooks()
+	return nil
+}
+
+func (a *dao) GetProjectHooks(project *Project) (Hooks, error) {
+	project, ok := a.projectMetadata[project.Name]
+	if !ok {
+		return nil, NotFound
+	}
+	return a.projectHooks[project], nil
+}
+
+func (a *dao) SetProjectHooks(project *Project, hooks Hooks) error {
+	project, ok := a.projectMetadata[project.Name]
+	if !ok {
+		return NotFound
+	}
+	a.projectHooks[project] = hooks
 	return nil
 }

@@ -12,6 +12,7 @@
 // dao/sqlite/schemas/6_release_changes.up.sql
 // dao/sqlite/schemas/7_reset_dependencies.up.sql
 // dao/sqlite/schemas/8_is_extension_on_dependency_table.up.sql
+// dao/sqlite/schemas/9_project_hooks.up.sql
 // DO NOT EDIT!
 
 package sqlite
@@ -319,6 +320,26 @@ func _8_is_extension_on_dependency_tableUpSql() (*asset, error) {
 	return a, nil
 }
 
+var __9_project_hooksUpSql = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x72\xf4\x09\x71\x0d\x52\x08\x71\x74\xf2\x71\x55\x28\x28\xca\xcf\x4a\x4d\x2e\x51\x70\x74\x71\x51\x70\xf6\xf7\x09\xf5\xf5\x53\xc8\xc8\xcf\xcf\x2e\x56\x08\x0e\x09\xf2\xf4\x73\x57\x70\x71\x75\x73\x0c\xf5\x09\x51\x50\xaf\xae\x55\xb7\xe6\x02\x04\x00\x00\xff\xff\x63\x0a\x0c\xe4\x3a\x00\x00\x00")
+
+func _9_project_hooksUpSqlBytes() ([]byte, error) {
+	return bindataRead(
+		__9_project_hooksUpSql,
+		"9_project_hooks.up.sql",
+	)
+}
+
+func _9_project_hooksUpSql() (*asset, error) {
+	bytes, err := _9_project_hooksUpSqlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "9_project_hooks.up.sql", size: 58, mode: os.FileMode(436), modTime: time.Unix(1505018321, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
 // Asset loads and returns the asset for the given name.
 // It returns an error if the asset could not be found or
 // could not be loaded.
@@ -383,6 +404,7 @@ var _bindata = map[string]func() (*asset, error){
 	"6_release_changes.up.sql": _6_release_changesUpSql,
 	"7_reset_dependencies.up.sql": _7_reset_dependenciesUpSql,
 	"8_is_extension_on_dependency_table.up.sql": _8_is_extension_on_dependency_tableUpSql,
+	"9_project_hooks.up.sql": _9_project_hooksUpSql,
 }
 
 // AssetDir returns the file names below a certain
@@ -437,6 +459,7 @@ var _bintree = &bintree{nil, map[string]*bintree{
 	"6_release_changes.up.sql": &bintree{_6_release_changesUpSql, map[string]*bintree{}},
 	"7_reset_dependencies.up.sql": &bintree{_7_reset_dependenciesUpSql, map[string]*bintree{}},
 	"8_is_extension_on_dependency_table.up.sql": &bintree{_8_is_extension_on_dependency_tableUpSql, map[string]*bintree{}},
+	"9_project_hooks.up.sql": &bintree{_9_project_hooksUpSql, map[string]*bintree{}},
 }}
 
 // RestoreAsset restores an asset under the given directory
