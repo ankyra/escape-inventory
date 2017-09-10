@@ -45,7 +45,8 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	metrics.UploadCounter.Inc()
-	go CallWebHook(project, releaseId)
+	username := ReadUsernameFromContext(r)
+	go CallWebHook(project, name, version, releaseId, username)
 	w.WriteHeader(200)
 }
 
@@ -76,19 +77,22 @@ func RegisterAndUploadHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	metrics.UploadCounter.Inc()
-	go CallWebHook(project, release.GetReleaseId())
+	go CallWebHook(project, release.Name, release.Version, release.GetReleaseId(), username)
 	w.WriteHeader(200)
 }
 
-func CallWebHook(project, releaseId string) {
+func CallWebHook(project, unit, version, releaseId, username string) {
 	if cmd.Config.WebHook == "" {
 		return
 	}
 	url := cmd.Config.WebHook
 	data := map[string]interface{}{
-		"event":   "NEW_UPLOAD",
-		"project": project,
-		"release": project + "/" + releaseId,
+		"event":    "NEW_UPLOAD",
+		"project":  project,
+		"unit":     unit,
+		"version":  version,
+		"release":  project + "/" + releaseId,
+		"username": username,
 	}
 	body, err := json.Marshal(data)
 	if err != nil {
