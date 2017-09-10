@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"reflect"
 
 	"github.com/ankyra/escape-registry/model"
 	"github.com/gorilla/mux"
@@ -45,17 +46,19 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		HandleError(w, r, err)
 		return
 	}
-	user := r.Context().Value("user")
-	username := ""
-	if user != nil {
-		u, ok := user.(*User)
-		if ok {
-			username = u.Name
-		}
-	}
+	username := ReadUsernameFromContext(r)
 	if _, err := model.AddReleaseByUser(project, string(metadata), username); err != nil {
 		HandleError(w, r, err)
 		return
 	}
 	w.WriteHeader(200)
+}
+
+func ReadUsernameFromContext(r *http.Request) string {
+	user := r.Context().Value("user")
+	if user != nil {
+		value := reflect.Indirect(reflect.ValueOf(user))
+		return value.FieldByName("Name").String()
+	}
+	return ""
 }

@@ -60,14 +60,7 @@ func RegisterAndUploadHandler(w http.ResponseWriter, r *http.Request) {
 		HandleError(w, r, err)
 		return
 	}
-	user := r.Context().Value("user")
-	username := ""
-	if user != nil {
-		u, ok := user.(*User)
-		if ok {
-			username = u.Name
-		}
-	}
+	username := ReadUsernameFromContext(r)
 	release, err := model.AddReleaseByUser(project, string(metadata), username)
 	if err != nil {
 		HandleError(w, r, err)
