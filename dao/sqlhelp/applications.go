@@ -2,6 +2,7 @@ package sqlhelp
 
 import (
 	"database/sql"
+	"encoding/json"
 	"time"
 
 	. "github.com/ankyra/escape-registry/dao/types"
@@ -45,6 +46,29 @@ func (s *SQLHelper) GetApplication(project, name string) (*Application, error) {
 		return s.scanApplication(rows)
 	}
 	return nil, NotFound
+}
+
+func (s *SQLHelper) GetApplicationHooks(app *Application) (Hooks, error) {
+	rows, err := s.PrepareAndQuery(s.GetApplicationHooksQuery, app.Project, app.Name)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		return s.scanHooks(rows)
+	}
+	return nil, NotFound
+}
+
+func (s *SQLHelper) SetApplicationHooks(app *Application, hooks Hooks) error {
+	bytes, err := json.Marshal(hooks)
+	if err != nil {
+		return err
+	}
+	return s.PrepareAndExecUpdate(s.SetApplicationHooksQuery,
+		string(bytes),
+		app.Project,
+		app.Name)
 }
 
 func (s *SQLHelper) scanApplication(rows *sql.Rows) (*Application, error) {

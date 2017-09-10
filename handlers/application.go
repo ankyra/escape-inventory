@@ -18,8 +18,10 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
+	"github.com/ankyra/escape-registry/dao/types"
 	"github.com/ankyra/escape-registry/model"
 	"github.com/gorilla/mux"
 )
@@ -55,4 +57,40 @@ func getApplicationHandler(w http.ResponseWriter, r *http.Request, project, name
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(200)
 	json.NewEncoder(w).Encode(app)
+}
+
+func GetApplicationHooksHandler(w http.ResponseWriter, r *http.Request) {
+	project := mux.Vars(r)["project"]
+	name := mux.Vars(r)["name"]
+	getApplicationHooksHandler(w, r, project, name)
+}
+
+func getApplicationHooksHandler(w http.ResponseWriter, r *http.Request, project, name string) {
+	hooks, err := model.GetApplicationHooks(project, name)
+	if err != nil {
+		HandleError(w, r, err)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	json.NewEncoder(w).Encode(hooks)
+}
+
+func UpdateApplicationHooksHandler(w http.ResponseWriter, r *http.Request) {
+	project := mux.Vars(r)["project"]
+	name := mux.Vars(r)["name"]
+	if r.Body == nil {
+		HandleError(w, r, model.NewUserError(fmt.Errorf("Empty body")))
+		return
+	}
+	result := types.Hooks{}
+	if err := json.NewDecoder(r.Body).Decode(&result); err != nil {
+		HandleError(w, r, model.NewUserError(fmt.Errorf("Invalid JSON")))
+		return
+	}
+	if err := model.UpdateApplicationHooks(project, name, result); err != nil {
+		HandleError(w, r, err)
+		return
+	}
+	w.WriteHeader(201)
 }

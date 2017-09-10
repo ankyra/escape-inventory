@@ -47,6 +47,7 @@ func (a *dao) AddApplication(app *Application) error {
 	}
 	apps[app.Name] = &application{app, map[string]*release{}}
 	a.apps[app] = apps[app.Name]
+	a.applicationHooks[app] = NewHooks()
 	return nil
 }
 func (a *dao) UpdateApplication(app *Application) error {
@@ -60,5 +61,30 @@ func (a *dao) UpdateApplication(app *Application) error {
 	}
 	apps[app.Name] = &application{app, proj.Releases}
 	a.apps[app] = apps[app.Name]
+	return nil
+}
+
+func (a *dao) GetApplicationHooks(app *Application) (Hooks, error) {
+	apps, ok := a.projects[app.Project]
+	if !ok {
+		return nil, NotFound
+	}
+	unit, ok := apps[app.Name]
+	if !ok {
+		return nil, NotFound
+	}
+	return a.applicationHooks[unit.App], nil
+}
+
+func (a *dao) SetApplicationHooks(app *Application, hooks Hooks) error {
+	apps, ok := a.projects[app.Project]
+	if !ok {
+		return NotFound
+	}
+	unit, ok := apps[app.Name]
+	if !ok {
+		return NotFound
+	}
+	a.applicationHooks[unit.App] = hooks
 	return nil
 }

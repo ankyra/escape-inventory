@@ -232,10 +232,18 @@ func Validate_ApplicationMetadata(dao DAO, c *C) {
 
 	_, err := dao.GetApplication("project", "name")
 	c.Assert(err, Equals, NotFound)
+	hooks, err := dao.GetApplicationHooks(app)
+	c.Assert(err, Equals, NotFound)
 
 	c.Assert(dao.AddProject(NewProject("project")), Equals, nil)
+	hooks, err = dao.GetApplicationHooks(app)
+	c.Assert(err, Equals, NotFound)
+	c.Assert(hooks, HasLen, 0)
 	c.Assert(dao.UpdateApplication(update), Equals, NotFound)
 	c.Assert(dao.AddApplication(app), IsNil)
+	hooks, err = dao.GetApplicationHooks(app)
+	c.Assert(err, IsNil)
+	c.Assert(hooks, HasLen, 0)
 	c.Assert(dao.AddApplication(app), Equals, AlreadyExists)
 
 	app, err = dao.GetApplication("project", "name")
@@ -253,6 +261,17 @@ func Validate_ApplicationMetadata(dao DAO, c *C) {
 	c.Assert(app.Description, Equals, "Test")
 	c.Assert(app.UploadedBy, Equals, "123-123")
 	c.Assert(app.UploadedAt, Equals, time.Unix(123, 0))
+
+	newHooks := NewHooks()
+	newHooks["slack"] = map[string]string{}
+	newHooks["slack"]["url"] = "http://example.com"
+	c.Assert(dao.SetApplicationHooks(app, newHooks), IsNil)
+
+	hooks, err = dao.GetApplicationHooks(app)
+	c.Assert(err, IsNil)
+	c.Assert(hooks, HasLen, 1)
+	c.Assert(hooks["slack"]["url"], Equals, "http://example.com")
+
 }
 
 func Validate_GetApplications(dao DAO, c *C) {

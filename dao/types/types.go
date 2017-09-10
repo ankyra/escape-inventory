@@ -71,6 +71,7 @@ type Application struct {
 	Logo          string    `json:"logo"`
 	UploadedBy    string    `json:"uploaded_by"`
 	UploadedAt    time.Time `json:"uploaded_at"`
+	Hooks         Hooks     `json:"hooks"` // only used for view purposes
 }
 
 func NewApplication(project, name string) *Application {
@@ -123,6 +124,8 @@ type DAO interface {
 	UpdateApplication(app *Application) error
 	GetApplications(project string) (map[string]*Application, error)
 	FindAllVersions(application *Application) ([]string, error)
+	GetApplicationHooks(*Application) (Hooks, error)
+	SetApplicationHooks(*Application, Hooks) error
 
 	GetRelease(project, name, releaseId string) (*Release, error)
 	AddRelease(*Release) error

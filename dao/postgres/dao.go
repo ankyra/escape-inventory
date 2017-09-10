@@ -78,6 +78,8 @@ func NewPostgresDAO(url string) (DAO, error) {
 								 WHERE name = $6 AND project = $7`,
 		GetApplicationsQuery: `SELECT name, project, description, latest_version, logo, uploaded_by, uploaded_at
 								  FROM application WHERE project = $1`,
+		GetApplicationHooksQuery: `SELECT hooks FROM application WHERE project = $1 AND name = $2`,
+		SetApplicationHooksQuery: `UPDATE application SET hooks = $1 WHERE project = $2 AND name = $3`,
 
 		AddReleaseQuery: `INSERT INTO 
                           release(project, name, release_id, version, metadata, uploaded_by, uploaded_at) 

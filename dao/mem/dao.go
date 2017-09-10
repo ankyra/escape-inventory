@@ -32,21 +32,23 @@ type release struct {
 }
 
 type dao struct {
-	projectMetadata map[string]*Project
-	projectHooks    map[*Project]Hooks
-	projects        map[string]map[string]*application
-	apps            map[*Application]*application
-	releases        map[*Release]*release
-	acls            map[string]map[string]Permission
+	projectMetadata  map[string]*Project
+	projectHooks     map[*Project]Hooks
+	projects         map[string]map[string]*application
+	apps             map[*Application]*application
+	applicationHooks map[*Application]Hooks
+	releases         map[*Release]*release
+	acls             map[string]map[string]Permission
 }
 
 func NewInMemoryDAO() DAO {
 	return &dao{
-		projectMetadata: map[string]*Project{},
-		projectHooks:    map[*Project]Hooks{},
-		projects:        map[string]map[string]*application{},
-		apps:            map[*Application]*application{},
-		releases:        map[*Release]*release{},
-		acls:            map[string]map[string]Permission{},
+		projectMetadata:  map[string]*Project{},
+		projectHooks:     map[*Project]Hooks{},
+		projects:         map[string]map[string]*application{},
+		apps:             map[*Application]*application{},
+		applicationHooks: map[*Application]Hooks{},
+		releases:         map[*Release]*release{},
+		acls:             map[string]map[string]Permission{},
 	}
 }

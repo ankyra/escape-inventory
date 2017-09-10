@@ -19,10 +19,12 @@ type SQLHelper struct {
 	GetProjectHooksQuery     string
 	SetProjectHooksQuery     string
 
-	AddApplicationQuery    string
-	UpdateApplicationQuery string
-	GetApplicationsQuery   string
-	GetApplicationQuery    string
+	AddApplicationQuery      string
+	UpdateApplicationQuery   string
+	GetApplicationsQuery     string
+	GetApplicationQuery      string
+	GetApplicationHooksQuery string
+	SetApplicationHooksQuery string
 
 	AddReleaseQuery                                 string
 	UpdateReleaseQuery                              string

@@ -69,6 +69,8 @@ func NewSQLiteDAO(path string) (DAO, error) {
 								 WHERE name = ? AND project = ?`,
 		GetApplicationsQuery: `SELECT name, project, description, latest_version, logo, uploaded_by, uploaded_at
 								  FROM application WHERE project = ?`,
+		GetApplicationHooksQuery: `SELECT hooks FROM application WHERE project = ? AND name = ?`,
+		SetApplicationHooksQuery: `UPDATE application SET hooks = ? WHERE project = ? AND name = ?`,
 
 		AddReleaseQuery: "INSERT INTO release(project, name, release_id, version, metadata, uploaded_by, uploaded_at) VALUES(?, ?, ?, ?, ?, ?, ?)",
 		GetReleaseQuery: `SELECT metadata, processed_dependencies, downloads, uploaded_by, uploaded_at

@@ -34,6 +34,7 @@ var ReadRoutes = map[string]http.HandlerFunc{
 	"/api/v1/registry/{project}/hooks/":                                           handlers.GetProjectHooksHandler,
 	"/api/v1/registry/{project}/units/":                                           handlers.GetApplicationsHandler,
 	"/api/v1/registry/{project}/units/{name}/":                                    handlers.GetApplicationHandler,
+	"/api/v1/registry/{project}/units/{name}/hooks/":                              handlers.GetApplicationHooksHandler,
 	"/api/v1/registry/{project}/units/{name}/versions/":                           handlers.RegistryHandler,
 	"/api/v1/registry/{project}/units/{name}/versions/{version}/":                 handlers.RegistryHandler,
 	"/api/v1/registry/{project}/units/{name}/versions/{version}/downstream":       handlers.DownstreamHandler,
@@ -57,8 +58,9 @@ var WriteRoutes = map[string]http.HandlerFunc{
 }
 
 var UpdateRoutes = map[string]http.HandlerFunc{
-	"/api/v1/registry/{project}/":       handlers.UpdateProjectHandler,
-	"/api/v1/registry/{project}/hooks/": handlers.UpdateProjectHooksHandler,
+	"/api/v1/registry/{project}/":                    handlers.UpdateProjectHandler,
+	"/api/v1/registry/{project}/hooks/":              handlers.UpdateProjectHooksHandler,
+	"/api/v1/registry/{project}/units/{name}/hooks/": handlers.UpdateApplicationHooksHandler,
 }
 
 func HomeHandler(w http.ResponseWriter, r *http.Request) {

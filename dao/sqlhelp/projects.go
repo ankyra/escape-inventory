@@ -33,7 +33,7 @@ func (s *SQLHelper) GetProjectHooks(project *Project) (Hooks, error) {
 	}
 	defer rows.Close()
 	for rows.Next() {
-		return s.scanProjectHooks(rows)
+		return s.scanHooks(rows)
 	}
 	return nil, NotFound
 }
@@ -130,7 +130,7 @@ func (s *SQLHelper) scanProjects(rows *sql.Rows) (map[string]*Project, error) {
 	return result, nil
 }
 
-func (s *SQLHelper) scanProjectHooks(rows *sql.Rows) (Hooks, error) {
+func (s *SQLHelper) scanHooks(rows *sql.Rows) (Hooks, error) {
 	var hooksString string
 	if err := rows.Scan(&hooksString); err != nil {
 		return nil, err

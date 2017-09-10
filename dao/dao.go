@@ -99,6 +99,14 @@ func GetApplication(project, name string) (*Application, error) {
 	return GlobalDAO.GetApplication(project, name)
 }
 
+func GetApplicationHooks(app *Application) (Hooks, error) {
+	return GlobalDAO.GetApplicationHooks(app)
+}
+
+func SetApplicationHooks(app *Application, hooks Hooks) error {
+	return GlobalDAO.SetApplicationHooks(app, hooks)
+}
+
 func AddRelease(release *Release) error {
 	return GlobalDAO.AddRelease(release)
 }
