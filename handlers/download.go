@@ -17,11 +17,12 @@ limitations under the License.
 package handlers
 
 import (
+	"io"
+	"net/http"
+
 	"github.com/ankyra/escape-registry/metrics"
 	"github.com/ankyra/escape-registry/model"
 	"github.com/gorilla/mux"
-	"io"
-	"net/http"
 )
 
 func DownloadHandler(w http.ResponseWriter, r *http.Request) {
@@ -29,6 +30,7 @@ func DownloadHandler(w http.ResponseWriter, r *http.Request) {
 	name := mux.Vars(r)["name"]
 	version := mux.Vars(r)["version"]
 	releaseId := name + "-" + version
+	filename := releaseId + ".tar.gz"
 	reader, err := model.GetDownloadReadSeeker(project, releaseId)
 	if err != nil {
 		HandleError(w, r, err)
@@ -36,6 +38,7 @@ func DownloadHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	metrics.DownloadCounter.Inc()
 	w.Header().Set("Content-Type", "application/gzip")
+	w.Header().Set("Content-Disposition", `attachment; filename="`+filename+`"`)
 	w.WriteHeader(200)
 	io.Copy(w, reader)
 }
