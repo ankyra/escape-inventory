@@ -82,6 +82,12 @@ func UpdateProjectHooks(project string, hooks types.Hooks) error {
 				return err
 			}
 			currentHooks[key] = newValue
+		case "events":
+			newValue, err := parseEventsHookConfig(value)
+			if err != nil {
+				return err
+			}
+			currentHooks[key] = newValue
 		default:
 			return NewUserError(fmt.Errorf("Unknown hook type '%s'", key))
 		}
@@ -96,7 +102,20 @@ func parseSlackHookConfig(values map[string]string) (map[string]string, error) {
 		case "username", "icon_emoji", "url":
 			result[key] = value
 		default:
-			return nil, NewUserError(fmt.Errorf("Unknown Slack configuration key '%s'", key))
+			return nil, NewUserError(fmt.Errorf("Unknown  hook configuration key '%s'", key))
+		}
+	}
+	return result, nil
+}
+
+func parseEventsHookConfig(values map[string]string) (map[string]string, error) {
+	result := map[string]string{}
+	for key, value := range values {
+		switch key {
+		case "url":
+			result[key] = value
+		default:
+			return nil, NewUserError(fmt.Errorf("Unknown hook configuration key '%s'", key))
 		}
 	}
 	return result, nil
