@@ -57,7 +57,8 @@ var WriteRoutes = map[string]http.HandlerFunc{
 }
 
 var UpdateRoutes = map[string]http.HandlerFunc{
-	"/api/v1/registry/{project}/": handlers.UpdateProjectHandler,
+	"/api/v1/registry/{project}/":       handlers.UpdateProjectHandler,
+	"/api/v1/registry/{project}/hooks/": handlers.UpdateProjectHooksHandler,
 }
 
 func HomeHandler(w http.ResponseWriter, r *http.Request) {

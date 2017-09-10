@@ -88,6 +88,11 @@ func AddProjectHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func UpdateProjectHandler(w http.ResponseWriter, r *http.Request) {
+	project := mux.Vars(r)["project"]
+	updateProjectHandler(w, r, project)
+}
+
+func updateProjectHandler(w http.ResponseWriter, r *http.Request, project string) {
 	if r.Body == nil {
 		HandleError(w, r, model.NewUserError(fmt.Errorf("Empty body")))
 		return
@@ -97,7 +102,29 @@ func UpdateProjectHandler(w http.ResponseWriter, r *http.Request) {
 		HandleError(w, r, model.NewUserError(fmt.Errorf("Invalid JSON")))
 		return
 	}
+	if result.Name != project {
+		HandleError(w, r, model.NewUserError(fmt.Errorf("Project 'name' field doesn't correspond with URL")))
+		return
+	}
 	if err := model.UpdateProject(&result); err != nil {
+		HandleError(w, r, err)
+		return
+	}
+	w.WriteHeader(201)
+}
+
+func UpdateProjectHooksHandler(w http.ResponseWriter, r *http.Request) {
+	project := mux.Vars(r)["project"]
+	if r.Body == nil {
+		HandleError(w, r, model.NewUserError(fmt.Errorf("Empty body")))
+		return
+	}
+	result := types.Hooks{}
+	if err := json.NewDecoder(r.Body).Decode(&result); err != nil {
+		HandleError(w, r, model.NewUserError(fmt.Errorf("Invalid JSON")))
+		return
+	}
+	if err := model.UpdateProjectHooks(project, result); err != nil {
 		HandleError(w, r, err)
 		return
 	}

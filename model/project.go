@@ -64,3 +64,40 @@ func UpdateProject(p *types.Project) error {
 	}
 	return dao.UpdateProject(p)
 }
+
+func UpdateProjectHooks(project string, hooks types.Hooks) error {
+	prj, err := dao.GetProject(project)
+	if err != nil {
+		return err
+	}
+	currentHooks, err := dao.GetProjectHooks(prj)
+	if err != nil {
+		return err
+	}
+	for key, value := range hooks {
+		switch key {
+		case "slack":
+			newValue, err := parseSlackHookConfig(value)
+			if err != nil {
+				return err
+			}
+			currentHooks[key] = newValue
+		default:
+			return NewUserError(fmt.Errorf("Unknown hook type '%s'", key))
+		}
+	}
+	return nil
+}
+
+func parseSlackHookConfig(values map[string]string) (map[string]string, error) {
+	result := map[string]string{}
+	for key, value := range values {
+		switch key {
+		case "username", "icon_emoji", "url":
+			result[key] = value
+		default:
+			return nil, NewUserError(fmt.Errorf("Unknown Slack configuration key '%s'", key))
+		}
+	}
+	return result, nil
+}

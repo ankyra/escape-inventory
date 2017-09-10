@@ -155,7 +155,7 @@ func (s *suite) Test_UpdateProject_Missing_Name(c *C) {
 	body := `{}`
 	req := httptest.NewRequest("POST", "/api/v1/registry/update-project", bytes.NewReader([]byte(body)))
 	w := httptest.NewRecorder()
-	UpdateProjectHandler(w, req)
+	updateProjectHandler(w, req, "test")
 
 	resp := w.Result()
 	c.Assert(resp.StatusCode, Equals, 400)
@@ -165,10 +165,21 @@ func (s *suite) Test_UpdateProject_Not_Found(c *C) {
 	body := `{"name": "test"}`
 	req := httptest.NewRequest("POST", "/api/v1/registry/update-project", bytes.NewReader([]byte(body)))
 	w := httptest.NewRecorder()
-	UpdateProjectHandler(w, req)
+	updateProjectHandler(w, req, "test")
 
 	resp := w.Result()
 	c.Assert(resp.StatusCode, Equals, 404)
+}
+
+func (s *suite) Test_UpdateProject_Fails_if_project_names_dont_match(c *C) {
+	s.addProject(c, "test")
+	body := `{"name": "test"}`
+	req := httptest.NewRequest("POST", "/api/v1/registry/update-project", bytes.NewReader([]byte(body)))
+	w := httptest.NewRecorder()
+	updateProjectHandler(w, req, "not-test")
+
+	resp := w.Result()
+	c.Assert(resp.StatusCode, Equals, 400)
 }
 
 func (s *suite) Test_UpdateProject(c *C) {
@@ -176,7 +187,7 @@ func (s *suite) Test_UpdateProject(c *C) {
 	body := `{"name": "test", "description": "test description"}`
 	req := httptest.NewRequest("POST", "/api/v1/registry/update-project", bytes.NewReader([]byte(body)))
 	w := httptest.NewRecorder()
-	UpdateProjectHandler(w, req)
+	updateProjectHandler(w, req, "test")
 
 	resp := w.Result()
 	c.Assert(resp.StatusCode, Equals, 201)
