@@ -25,6 +25,8 @@ import (
 	"net/http"
 
 	"github.com/ankyra/escape-registry/cmd"
+	"github.com/ankyra/escape-registry/dao"
+	"github.com/ankyra/escape-registry/dao/types"
 	"github.com/ankyra/escape-registry/metrics"
 	"github.com/ankyra/escape-registry/model"
 	"github.com/gorilla/mux"
@@ -82,17 +84,31 @@ func RegisterAndUploadHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func CallWebHook(project, unit, version, releaseId, username string) {
+	prj := types.NewProject(project)
+	app := types.NewApplication(project, unit)
+	prjHooks, err := dao.GetProjectHooks(prj)
+	if err != nil {
+		log.Println("ERROR: Failed to get Registry Project Hooks from database:", err)
+		return
+	}
+	unitHooks, err := dao.GetApplicationHooks(app)
+	if err != nil {
+		log.Println("ERROR: Failed to get Registry Application Hooks from database:", err)
+		return
+	}
 	if cmd.Config.WebHook == "" {
 		return
 	}
 	url := cmd.Config.WebHook
 	data := map[string]interface{}{
-		"event":    "NEW_UPLOAD",
-		"project":  project,
-		"unit":     unit,
-		"version":  version,
-		"release":  project + "/" + releaseId,
-		"username": username,
+		"event":         "NEW_UPLOAD",
+		"project":       project,
+		"project_hooks": prjHooks,
+		"unit":          unit,
+		"unit_hooks":    unitHooks,
+		"version":       version,
+		"release":       project + "/" + releaseId,
+		"username":      username,
 	}
 	body, err := json.Marshal(data)
 	if err != nil {
