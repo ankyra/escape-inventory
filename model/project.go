@@ -92,7 +92,7 @@ func UpdateProjectHooks(project string, hooks types.Hooks) error {
 			return NewUserError(fmt.Errorf("Unknown hook type '%s'", key))
 		}
 	}
-	return nil
+	return dao.SetProjectHooks(prj, hooks)
 }
 
 func parseSlackHookConfig(values map[string]string) (map[string]string, error) {
