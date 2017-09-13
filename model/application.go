@@ -111,7 +111,7 @@ func UpdateApplicationHooks(project, name string, hooks types.Hooks) error {
 			return NewUserError(fmt.Errorf("Unknown hook type '%s'", key))
 		}
 	}
-	return nil
+	return dao.SetApplicationHooks(app, hooks)
 }
 
 func parseBuildHookConfig(values map[string]string) (map[string]string, error) {
