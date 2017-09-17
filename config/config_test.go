@@ -17,9 +17,9 @@ limitations under the License.
 package config
 
 import (
-	. "gopkg.in/check.v1"
-	"os"
 	"testing"
+
+	. "gopkg.in/check.v1"
 )
 
 func Test(t *testing.T) { TestingT(t) }
@@ -136,15 +136,6 @@ func (s *configSuite) Test_LoadConfig_fails_if_yaml_malformed(c *C) {
 	conf, err := LoadConfig("testdata/malformed.yaml", env)
 	c.Assert(conf, IsNil)
 	c.Assert(err, Not(IsNil))
-}
-
-func (s *configSuite) Test_LoadConfig_fails_if_file_cant_be_read(c *C) {
-	env := []string{}
-	os.Chmod("testdata/cant_read.json", 0)
-	conf, err := LoadConfig("testdata/cant_read.json", env)
-	c.Assert(conf, IsNil)
-	c.Assert(err, Not(IsNil))
-	os.Chmod("testdata/cant_read.json", 0666)
 }
 
 func (s *configSuite) Test_NewConfig_Uses_EnvironmentVariables(c *C) {

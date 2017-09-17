@@ -7,8 +7,15 @@ cp -r deps/_/escape-core/ vendor/github.com/ankyra/escape-core
 rm -rf vendor/github.com/ankyra/escape-core/vendor/
 
 user_id=$(id -u $(whoami))
-
+docker rm src || true
+docker create -v /go/src/github.com/ankyra/ --name src golang:1.9.0 /bin/true
+docker cp "$PWD" src:/go/src/github.com/ankyra/tmp
+docker run --rm --volumes-from src \
+    -w /go/src/github.com/ankyra/ \
+    golang:1.9.0 mv tmp escape-registry
 docker run --rm \
-    -v "$PWD":/go/src/github.com/ankyra/escape-registry \
+    --volumes-from src \
     -w /go/src/github.com/ankyra/escape-registry \
-    golang:1.9.0 bash -c "(useradd --uid $user_id builder || true) && su builder -p -c \"/usr/local/go/bin/go build -v\""
+    golang:1.9.0 bash -c "go build"
+docker cp src:/go/src/github.com/ankyra/escape-registry/escape-registry escape-registry
+docker rm src

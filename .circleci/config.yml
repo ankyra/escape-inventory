@@ -1,0 +1,30 @@
+version: 2
+
+jobs:
+  build:
+    docker:
+    - image: ankyra/escape:latest
+
+    steps:
+    - checkout
+    - setup_remote_docker
+    - run:
+        name: Install Docker client
+        command: |
+          set -x
+          VER="17.03.0-ce"
+          curl -L -o /tmp/docker-$VER.tgz https://get.docker.com/builds/Linux/x86_64/docker-$VER.tgz
+          tar -xz -C /tmp -f /tmp/docker-$VER.tgz
+          mv /tmp/docker/* /usr/bin
+    - run: 
+        name: Build Escape release
+        command: escape release -v docker_image=test
+    - run:
+        name: Publish binary on GCS
+        command: | 
+          echo $GCLOUD_SERVICE_KEY | base64 --decode -i > ${HOME}/gcloud-service-key.json
+          escape deploy escape-registry-latest -d "latest_binaries"
+          escape errands run upload_to_gcs -v bucket=escape-releases-eu -v credentials=@${HOME}/gcloud-service-key.json -d "latest_binaries"
+    - run:
+        name: Trigger docker-escape-registry build
+        command: curl -f -X POST https://circleci.com/api/v1.1/project/github/ankyra/docker-escape-registry/tree/master?circle-token=${CIRCLE_DOCKER_ESCAPE_TOKEN}
