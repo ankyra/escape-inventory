@@ -16,10 +16,7 @@ jobs:
         command: |
           curl -L -o /tmp/gcloud.tgz https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-171.0.0-linux-x86_64.tar.gz
           tar -xz -C /tmp -f /tmp/gcloud.tgz
-          /tmp/google-cloud-sdk/install.sh
-          gcloud init --console-only
-          gcloud components install docker-credential-gcr
-          echo 'export PATH=/tmp/google-cloud-sdk/bin:$PATH' >> $BASH_ENV
+          /tmp/google-cloud-sdk/install.sh --additional-components docker-credential-gcr --quiet --rc-path $BASH_ENV
 
     - run:
         name: Install Docker client
