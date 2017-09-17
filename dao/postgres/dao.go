@@ -80,6 +80,14 @@ func NewPostgresDAO(url string) (DAO, error) {
 								  FROM application WHERE project = $1`,
 		GetApplicationHooksQuery: `SELECT hooks FROM application WHERE project = $1 AND name = $2`,
 		SetApplicationHooksQuery: `UPDATE application SET hooks = $1 WHERE project = $2 AND name = $3`,
+		DeleteSubscriptionsQuery: `DELETE FROM subscriptions WHERE project = $1 AND name = $2`,
+		AddSubscriptionQuery:     `INSERT INTO subscriptions (project, name, subscription_project, subscription_name) VALUES ($1, $2, $3, $4);`,
+		GetDownstreamSubscriptionsQuery: `SELECT app.hooks FROM 
+								subscriptions AS sub
+								JOIN application AS app 
+								ON sub.project = app.project AND sub.name = app.name
+								WHERE sub.subscription_project = $1 
+								  AND sub.subscription_name = $2`,
 
 		AddReleaseQuery: `INSERT INTO 
                           release(project, name, release_id, version, metadata, uploaded_by, uploaded_at) 

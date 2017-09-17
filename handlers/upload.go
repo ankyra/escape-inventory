@@ -84,6 +84,9 @@ func RegisterAndUploadHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func CallWebHook(project, unit, version, releaseId, username string) {
+	if cmd.Config.WebHook == "" {
+		return
+	}
 	prj := types.NewProject(project)
 	app := types.NewApplication(project, unit)
 	prjHooks, err := dao.GetProjectHooks(prj)
@@ -96,19 +99,27 @@ func CallWebHook(project, unit, version, releaseId, username string) {
 		log.Println("ERROR: Failed to get Registry Application Hooks from database:", err)
 		return
 	}
-	if cmd.Config.WebHook == "" {
+	downstreamHooks, err := dao.GetDownstreamHooks(app)
+	if err != nil {
+		log.Println("ERROR: Failed to get Upstream Hooks from database:", err)
 		return
+	}
+	fmt.Println("Downstream hooks:")
+	fmt.Println(downstreamHooks)
+	for _, hooks := range downstreamHooks {
+		fmt.Println(hooks)
 	}
 	url := cmd.Config.WebHook
 	data := map[string]interface{}{
-		"event":         "NEW_UPLOAD",
-		"project":       project,
-		"project_hooks": prjHooks,
-		"unit":          unit,
-		"unit_hooks":    unitHooks,
-		"version":       version,
-		"release":       project + "/" + releaseId,
-		"username":      username,
+		"event":            "NEW_UPLOAD",
+		"project":          project,
+		"project_hooks":    prjHooks,
+		"unit":             unit,
+		"unit_hooks":       unitHooks,
+		"downstream_hooks": downstreamHooks,
+		"version":          version,
+		"release":          project + "/" + releaseId,
+		"username":         username,
 	}
 	body, err := json.Marshal(data)
 	if err != nil {

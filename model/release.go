@@ -110,6 +110,7 @@ func AddReleaseByUser(project, metadataJson, uploadUser string) (*core.ReleaseMe
 
 func ProcessDependencies(release *Release) error {
 	deps := []*Dependency{}
+	apps := []*Application{}
 	for _, dep := range release.Metadata.Depends {
 		parsed, err := parsers.ParseQualifiedReleaseId(dep.ReleaseId)
 		if err != nil {
@@ -124,6 +125,7 @@ func ProcessDependencies(release *Release) error {
 			IsExtension: false,
 		}
 		deps = append(deps, &d)
+		apps = append(apps, NewApplication(parsed.Project, parsed.Name))
 	}
 	for _, ext := range release.Metadata.Extends {
 		parsed, err := parsers.ParseQualifiedReleaseId(ext.ReleaseId)
@@ -139,8 +141,12 @@ func ProcessDependencies(release *Release) error {
 			IsExtension: true,
 		}
 		deps = append(deps, &d)
+		apps = append(apps, NewApplication(parsed.Project, parsed.Name))
 	}
 	if err := dao.SetDependencies(release, deps); err != nil {
+		return err
+	}
+	if err := dao.SetApplicationSubscribesToUpdatesFrom(release.Application, apps); err != nil {
 		return err
 	}
 	release.ProcessedDependencies = true

@@ -32,6 +32,7 @@ func ValidateDAO(dao func() DAO, c *C) {
 	Validate_ProjectMetadata(dao(), c)
 	Validate_GetProjectsByGroups(dao(), c)
 	Validate_ApplicationMetadata(dao(), c)
+	Validate_GetDownstreamHooks(dao(), c)
 	Validate_GetApplications(dao(), c)
 	Validate_FindAllVersions(dao(), c)
 	Validate_FindAllVersions_Empty(dao(), c)
@@ -271,7 +272,27 @@ func Validate_ApplicationMetadata(dao DAO, c *C) {
 	c.Assert(err, IsNil)
 	c.Assert(hooks, HasLen, 1)
 	c.Assert(hooks["slack"]["url"], Equals, "http://example.com")
+}
 
+func Validate_GetDownstreamHooks(dao DAO, c *C) {
+	app1 := NewApplication("project", "app1")
+	app2 := NewApplication("project", "app2")
+	app3 := NewApplication("project", "app3")
+	c.Assert(dao.AddProject(NewProject("project")), Equals, nil)
+	c.Assert(dao.AddApplication(app1), IsNil)
+	c.Assert(dao.AddApplication(app2), IsNil)
+	c.Assert(dao.AddApplication(app3), IsNil)
+	c.Assert(dao.SetApplicationSubscribesToUpdatesFrom(app1, []*Application{app2, app3}), IsNil)
+	c.Assert(dao.SetApplicationSubscribesToUpdatesFrom(app2, []*Application{app3}), IsNil)
+	hooks1, err := dao.GetDownstreamHooks(app1)
+	c.Assert(err, IsNil)
+	hooks2, err := dao.GetDownstreamHooks(app2)
+	c.Assert(err, IsNil)
+	hooks3, err := dao.GetDownstreamHooks(app3)
+	c.Assert(err, IsNil)
+	c.Assert(hooks1, HasLen, 0)
+	c.Assert(hooks2, HasLen, 1)
+	c.Assert(hooks3, HasLen, 2)
 }
 
 func Validate_GetApplications(dao DAO, c *C) {

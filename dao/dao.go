@@ -107,6 +107,13 @@ func SetApplicationHooks(app *Application, hooks Hooks) error {
 	return GlobalDAO.SetApplicationHooks(app, hooks)
 }
 
+func GetDownstreamHooks(app *Application) ([]*Hooks, error) {
+	return GlobalDAO.GetDownstreamHooks(app)
+}
+func SetApplicationSubscribesToUpdatesFrom(app *Application, upstream []*Application) error {
+	return GlobalDAO.SetApplicationSubscribesToUpdatesFrom(app, upstream)
+}
+
 func AddRelease(release *Release) error {
 	return GlobalDAO.AddRelease(release)
 }

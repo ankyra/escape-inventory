@@ -71,6 +71,14 @@ func NewSQLiteDAO(path string) (DAO, error) {
 								  FROM application WHERE project = ?`,
 		GetApplicationHooksQuery: `SELECT hooks FROM application WHERE project = ? AND name = ?`,
 		SetApplicationHooksQuery: `UPDATE application SET hooks = ? WHERE project = ? AND name = ?`,
+		DeleteSubscriptionsQuery: `DELETE FROM subscriptions WHERE project = ? AND name = ?`,
+		AddSubscriptionQuery:     `INSERT INTO subscriptions (project, name, subscription_project, subscription_name) VALUES (?, ?, ?, ?);`,
+		GetDownstreamSubscriptionsQuery: `SELECT app.hooks FROM 
+								subscriptions AS sub
+								JOIN application AS app 
+								ON sub.project = app.project AND sub.name = app.name
+								WHERE sub.subscription_project = ? 
+								  AND sub.subscription_name = ?`,
 
 		AddReleaseQuery: "INSERT INTO release(project, name, release_id, version, metadata, uploaded_by, uploaded_at) VALUES(?, ?, ?, ?, ?, ?, ?)",
 		GetReleaseQuery: `SELECT metadata, processed_dependencies, downloads, uploaded_by, uploaded_at

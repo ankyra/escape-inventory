@@ -126,6 +126,8 @@ type DAO interface {
 	FindAllVersions(application *Application) ([]string, error)
 	GetApplicationHooks(*Application) (Hooks, error)
 	SetApplicationHooks(*Application, Hooks) error
+	GetDownstreamHooks(*Application) ([]*Hooks, error)
+	SetApplicationSubscribesToUpdatesFrom(*Application, []*Application) error
 
 	GetRelease(project, name, releaseId string) (*Release, error)
 	AddRelease(*Release) error

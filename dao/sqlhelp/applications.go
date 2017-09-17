@@ -71,6 +71,51 @@ func (s *SQLHelper) SetApplicationHooks(app *Application, hooks Hooks) error {
 		app.Name)
 }
 
+func (s *SQLHelper) SetApplicationSubscribesToUpdatesFrom(app *Application, upstream []*Application) error {
+	stmt, err := s.DB.Prepare(s.DeleteSubscriptionsQuery)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+	_, err = stmt.Exec(app.Project, app.Name)
+	if err != nil {
+		return err
+	}
+	for _, upstreamApp := range upstream {
+		err := s.PrepareAndExecInsertIgnoreDups(s.AddSubscriptionQuery,
+			app.Project,
+			app.Name,
+			upstreamApp.Project,
+			upstreamApp.Name,
+		)
+		if err != nil {
+			return err
+		}
+	}
+	return err
+}
+
+func (s *SQLHelper) GetDownstreamHooks(app *Application) ([]*Hooks, error) {
+	rows, err := s.PrepareAndQuery(s.GetDownstreamSubscriptionsQuery, app.Project, app.Name)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	result := []*Hooks{}
+	for rows.Next() {
+		var hooksString string
+		if err := rows.Scan(&hooksString); err != nil {
+			return nil, err
+		}
+		hooks := NewHooks()
+		if err := json.Unmarshal([]byte(hooksString), &hooks); err != nil {
+			return nil, err
+		}
+		result = append(result, &hooks)
+	}
+	return result, nil
+}
+
 func (s *SQLHelper) scanApplication(rows *sql.Rows) (*Application, error) {
 	var name, project, description, latestVersion, logo, uploadedBy string
 	var uploadedAt int64

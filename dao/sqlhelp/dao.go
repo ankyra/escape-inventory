@@ -26,6 +26,10 @@ type SQLHelper struct {
 	GetApplicationHooksQuery string
 	SetApplicationHooksQuery string
 
+	DeleteSubscriptionsQuery        string
+	AddSubscriptionQuery            string
+	GetDownstreamSubscriptionsQuery string
+
 	AddReleaseQuery                                 string
 	UpdateReleaseQuery                              string
 	GetReleaseQuery                                 string

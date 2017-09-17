@@ -37,6 +37,7 @@ type dao struct {
 	projects         map[string]map[string]*application
 	apps             map[*Application]*application
 	applicationHooks map[*Application]Hooks
+	subscriptions    map[*Application][]*Application
 	releases         map[*Release]*release
 	acls             map[string]map[string]Permission
 }
@@ -48,6 +49,7 @@ func NewInMemoryDAO() DAO {
 		projects:         map[string]map[string]*application{},
 		apps:             map[*Application]*application{},
 		applicationHooks: map[*Application]Hooks{},
+		subscriptions:    map[*Application][]*Application{},
 		releases:         map[*Release]*release{},
 		acls:             map[string]map[string]Permission{},
 	}

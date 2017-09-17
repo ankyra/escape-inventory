@@ -88,3 +88,21 @@ func (a *dao) SetApplicationHooks(app *Application, hooks Hooks) error {
 	a.applicationHooks[unit.App] = hooks
 	return nil
 }
+
+func (a *dao) GetDownstreamHooks(app *Application) ([]*Hooks, error) {
+	result := []*Hooks{}
+	for downstream, subs := range a.subscriptions {
+		for _, sub := range subs {
+			if sub.Name == app.Name && sub.Project == app.Project {
+				hooks := a.applicationHooks[downstream]
+				result = append(result, &hooks)
+			}
+		}
+	}
+	return result, nil
+}
+
+func (a *dao) SetApplicationSubscribesToUpdatesFrom(app *Application, upstream []*Application) error {
+	a.subscriptions[app] = upstream
+	return nil
+}
