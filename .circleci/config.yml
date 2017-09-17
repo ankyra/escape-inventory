@@ -22,6 +22,7 @@ jobs:
     - run:
         name: Publish binary on GCS
         command: | 
+          apt-get install gcloud
           echo $GCLOUD_SERVICE_KEY | base64 --decode -i > ${HOME}/gcloud-service-key.json
           escape deploy escape-registry-latest -d "latest_binaries"
           escape errands run upload_to_gcs -v bucket=escape-releases-eu -v credentials=@${HOME}/gcloud-service-key.json -d "latest_binaries"
