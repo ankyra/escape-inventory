@@ -355,11 +355,12 @@ func (s *suite) Test_Diff(c *C) {
 	s.addRelease(c, getVersionProject, "0.0.3")
 	req, _ := http.NewRequest("GET", getDiffEndpoint, nil)
 	testRequest(c, req, http.StatusOK)
-	result := []string{}
+	result := map[string]map[string][]map[string]interface{}{}
 	err := json.Unmarshal([]byte(rr.Body.String()), &result)
 	c.Assert(err, IsNil)
 	c.Assert(result, HasLen, 1)
-	c.Assert(result[0], Equals, "Change Version from '0.0.1' to '0.0.2'")
+	c.Assert(result["Version"]["change"][0]["PreviousValue"], Equals, "0.0.1")
+	c.Assert(result["Version"]["change"][0]["NewValue"], Equals, "0.0.2")
 
 	req, _ = http.NewRequest("GET", getDiffWithEndpoint, nil)
 	rr = httptest.NewRecorder()
@@ -367,7 +368,8 @@ func (s *suite) Test_Diff(c *C) {
 	err = json.Unmarshal([]byte(rr.Body.String()), &result)
 	c.Assert(err, IsNil)
 	c.Assert(result, HasLen, 1)
-	c.Assert(result[0], Equals, "Change Version from '0.0.1' to '0.0.3'")
+	c.Assert(result["Version"]["change"][0]["PreviousValue"], Equals, "0.0.1")
+	c.Assert(result["Version"]["change"][0]["NewValue"], Equals, "0.0.3")
 }
 
 func (s *suite) Test_GetVersion_fails_if_app_doesnt_exist(c *C) {
