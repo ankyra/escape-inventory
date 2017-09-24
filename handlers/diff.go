@@ -18,10 +18,11 @@ package handlers
 
 import (
 	"encoding/json"
+	"net/http"
+
 	"github.com/ankyra/escape-core"
 	"github.com/ankyra/escape-registry/model"
 	"github.com/gorilla/mux"
-	"net/http"
 )
 
 func DiffHandler(w http.ResponseWriter, r *http.Request) {
@@ -48,10 +49,7 @@ func DiffHandler(w http.ResponseWriter, r *http.Request) {
 		HandleError(w, r, err)
 		return
 	}
-	changes := []string{}
-	for _, change := range core.Diff(previousMetadata, metadata) {
-		changes = append(changes, change.ToString())
-	}
+	changes := core.Diff(previousMetadata, metadata).Collapse()
 	bytes, err := json.Marshal(changes)
 	if err != nil {
 		HandleError(w, r, err)
