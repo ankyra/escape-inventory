@@ -13,3 +13,6 @@ fmt:
 update-schema:
 	go-bindata -prefix dao/sqlite/schemas/ -o dao/sqlite/schema.go -pkg sqlite dao/sqlite/schemas
 	go-bindata -prefix dao/postgres/schemas/ -o dao/postgres/schema.go -pkg postgres dao/postgres/schemas
+
+start-dev:
+	WEB_HOOK=http://localhost:10000/api/v1/internal/notification ./escape-registry
