@@ -1,7 +1,7 @@
 # Escape Registry
 
-This is the open source version of the Escape Registry.  Please see
-http://escape.ankyra.io/docs/escape-registry/ for the full documentation.
+This is the open source version of the Escape Registry.  Please see the [Escape
+Docs](https://escape.ankyra.io/docs/) for the full documentation.
 
 ## License
 
