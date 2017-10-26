@@ -1,16 +1,7 @@
 # Escape Registry
 
-Please see http://escape.ankyra.io for the full documentation.
-
-## Features
-
-* Centralized Escape release metadata
-  * Postgres database
-  * SQLite database
-* Upload and download packages
-  * Google Cloud Storage back-end
-  * Local file-system storage back-end
-* Importing and Exporting
+This is the open source version of the Escape Registry.  Please see
+http://escape.ankyra.io/docs/escape-registry/ for the full documentation.
 
 ## License
 
