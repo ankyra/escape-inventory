@@ -22,9 +22,9 @@ import (
 	"log"
 
 	"github.com/ankyra/escape-core/parsers"
-	"github.com/ankyra/escape-registry/dao"
-	"github.com/ankyra/escape-registry/dao/types"
-	"github.com/ankyra/escape-registry/storage"
+	"github.com/ankyra/escape-inventory/dao"
+	"github.com/ankyra/escape-inventory/dao/types"
+	"github.com/ankyra/escape-inventory/storage"
 )
 
 func UploadPackage(project, releaseId string, pkg io.ReadSeeker) error {

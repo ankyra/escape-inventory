@@ -23,8 +23,8 @@ import (
 
 	"github.com/ankyra/escape-core"
 	"github.com/ankyra/escape-core/parsers"
-	"github.com/ankyra/escape-registry/dao"
-	. "github.com/ankyra/escape-registry/dao/types"
+	"github.com/ankyra/escape-inventory/dao"
+	. "github.com/ankyra/escape-inventory/dao/types"
 )
 
 func ensureProjectExists(project string) error {

@@ -20,8 +20,8 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/ankyra/escape-registry/dao/sqlhelp"
-	. "github.com/ankyra/escape-registry/dao/types"
+	"github.com/ankyra/escape-inventory/dao/sqlhelp"
+	. "github.com/ankyra/escape-inventory/dao/types"
 	"github.com/mattes/migrate"
 	sqlite_migrate "github.com/mattes/migrate/database/sqlite3"
 	"github.com/mattes/migrate/source/go-bindata"

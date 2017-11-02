@@ -19,9 +19,9 @@ package storage
 import (
 	"fmt"
 	"github.com/ankyra/escape-core/parsers"
-	"github.com/ankyra/escape-registry/config"
-	"github.com/ankyra/escape-registry/storage/gcs"
-	"github.com/ankyra/escape-registry/storage/local"
+	"github.com/ankyra/escape-inventory/config"
+	"github.com/ankyra/escape-inventory/storage/gcs"
+	"github.com/ankyra/escape-inventory/storage/local"
 	"io"
 	"net/url"
 )

@@ -17,8 +17,8 @@ limitations under the License.
 package model
 
 import (
-	"github.com/ankyra/escape-registry/dao"
-	"github.com/ankyra/escape-registry/dao/types"
+	"github.com/ankyra/escape-inventory/dao"
+	"github.com/ankyra/escape-inventory/dao/types"
 )
 
 func GetPreviousVersion(project, app, version string) (string, error) {

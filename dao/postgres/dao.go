@@ -20,8 +20,8 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/ankyra/escape-registry/dao/sqlhelp"
-	. "github.com/ankyra/escape-registry/dao/types"
+	"github.com/ankyra/escape-inventory/dao/sqlhelp"
+	. "github.com/ankyra/escape-inventory/dao/types"
 	"github.com/lib/pq"
 	"github.com/mattes/migrate"
 	_ "github.com/mattes/migrate/database/postgres"

@@ -20,7 +20,7 @@ import (
 	"encoding/json"
 	"io"
 
-	"github.com/ankyra/escape-registry/dao"
+	"github.com/ankyra/escape-inventory/dao"
 )
 
 func Export(w io.Writer) error {

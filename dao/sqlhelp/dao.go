@@ -3,7 +3,7 @@ package sqlhelp
 import (
 	"database/sql"
 
-	. "github.com/ankyra/escape-registry/dao/types"
+	. "github.com/ankyra/escape-inventory/dao/types"
 )
 
 type SQLHelper struct {

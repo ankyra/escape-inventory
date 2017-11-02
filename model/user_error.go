@@ -17,7 +17,7 @@ limitations under the License.
 package model
 
 import (
-	"github.com/ankyra/escape-registry/dao"
+	"github.com/ankyra/escape-inventory/dao"
 )
 
 type UserError struct {

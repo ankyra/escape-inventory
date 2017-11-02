@@ -21,8 +21,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/ankyra/escape-registry/dao/types"
-	"github.com/ankyra/escape-registry/model"
+	"github.com/ankyra/escape-inventory/dao/types"
+	"github.com/ankyra/escape-inventory/model"
 	"github.com/gorilla/mux"
 )
 

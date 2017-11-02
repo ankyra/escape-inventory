@@ -24,10 +24,10 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/ankyra/escape-registry/cmd"
-	"github.com/ankyra/escape-registry/dao"
-	"github.com/ankyra/escape-registry/dao/types"
-	"github.com/ankyra/escape-registry/model"
+	"github.com/ankyra/escape-inventory/cmd"
+	"github.com/ankyra/escape-inventory/dao"
+	"github.com/ankyra/escape-inventory/dao/types"
+	"github.com/ankyra/escape-inventory/model"
 	. "gopkg.in/check.v1"
 )
 

@@ -1,6 +1,6 @@
 .escape
 escape_state.json
-escape-registry
+escape-inventory
 *.swp
 deps/
 test.db

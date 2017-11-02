@@ -24,11 +24,11 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/ankyra/escape-registry/cmd"
-	"github.com/ankyra/escape-registry/dao"
-	"github.com/ankyra/escape-registry/dao/types"
-	"github.com/ankyra/escape-registry/metrics"
-	"github.com/ankyra/escape-registry/model"
+	"github.com/ankyra/escape-inventory/cmd"
+	"github.com/ankyra/escape-inventory/dao"
+	"github.com/ankyra/escape-inventory/dao/types"
+	"github.com/ankyra/escape-inventory/metrics"
+	"github.com/ankyra/escape-inventory/model"
 	"github.com/gorilla/mux"
 )
 

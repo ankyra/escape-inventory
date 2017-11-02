@@ -24,11 +24,11 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/ankyra/escape-registry/config"
-	"github.com/ankyra/escape-registry/dao"
-	"github.com/ankyra/escape-registry/metrics"
-	"github.com/ankyra/escape-registry/model"
-	"github.com/ankyra/escape-registry/storage"
+	"github.com/ankyra/escape-inventory/config"
+	"github.com/ankyra/escape-inventory/dao"
+	"github.com/ankyra/escape-inventory/metrics"
+	"github.com/ankyra/escape-inventory/model"
+	"github.com/ankyra/escape-inventory/storage"
 	"github.com/gorilla/mux"
 	"github.com/urfave/negroni"
 )

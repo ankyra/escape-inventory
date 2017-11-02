@@ -22,7 +22,7 @@ import (
 	"net/http"
 	"reflect"
 
-	"github.com/ankyra/escape-registry/model"
+	"github.com/ankyra/escape-inventory/model"
 	"github.com/gorilla/mux"
 )
 

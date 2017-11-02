@@ -19,7 +19,7 @@ package local
 import (
 	"fmt"
 	"github.com/ankyra/escape-core/parsers"
-	"github.com/ankyra/escape-registry/config"
+	"github.com/ankyra/escape-inventory/config"
 	"io"
 	"os"
 	"path/filepath"

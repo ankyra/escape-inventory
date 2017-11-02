@@ -19,7 +19,7 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/ankyra/escape-registry/model"
+	"github.com/ankyra/escape-inventory/model"
 	"io/ioutil"
 	"net/http"
 )

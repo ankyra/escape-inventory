@@ -19,8 +19,8 @@ package model
 import (
 	"fmt"
 
-	"github.com/ankyra/escape-registry/dao"
-	"github.com/ankyra/escape-registry/dao/types"
+	"github.com/ankyra/escape-inventory/dao"
+	"github.com/ankyra/escape-inventory/dao/types"
 )
 
 type ProjectPayload struct {

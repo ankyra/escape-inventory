@@ -20,7 +20,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/ankyra/escape-registry/model"
+	"github.com/ankyra/escape-inventory/model"
 	"github.com/gorilla/mux"
 )
 

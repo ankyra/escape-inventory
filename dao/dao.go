@@ -19,11 +19,11 @@ package dao
 import (
 	"fmt"
 
-	"github.com/ankyra/escape-registry/config"
-	"github.com/ankyra/escape-registry/dao/mem"
-	"github.com/ankyra/escape-registry/dao/postgres"
-	"github.com/ankyra/escape-registry/dao/sqlite"
-	. "github.com/ankyra/escape-registry/dao/types"
+	"github.com/ankyra/escape-inventory/config"
+	"github.com/ankyra/escape-inventory/dao/mem"
+	"github.com/ankyra/escape-inventory/dao/postgres"
+	"github.com/ankyra/escape-inventory/dao/sqlite"
+	. "github.com/ankyra/escape-inventory/dao/types"
 )
 
 var GlobalDAO = mem.NewInMemoryDAO()

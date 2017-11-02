@@ -19,8 +19,8 @@ package main
 import (
 	"net/http"
 
-	"github.com/ankyra/escape-registry/cmd"
-	"github.com/ankyra/escape-registry/handlers"
+	"github.com/ankyra/escape-inventory/cmd"
+	"github.com/ankyra/escape-inventory/handlers"
 	"github.com/gorilla/mux"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )

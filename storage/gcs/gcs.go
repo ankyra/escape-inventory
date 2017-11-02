@@ -20,7 +20,7 @@ import (
 	"cloud.google.com/go/storage"
 	"fmt"
 	"github.com/ankyra/escape-core/parsers"
-	"github.com/ankyra/escape-registry/config"
+	"github.com/ankyra/escape-inventory/config"
 	"golang.org/x/net/context"
 	"google.golang.org/api/option"
 	"io"

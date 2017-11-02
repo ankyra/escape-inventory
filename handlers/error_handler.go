@@ -20,8 +20,8 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/ankyra/escape-registry/dao"
-	"github.com/ankyra/escape-registry/model"
+	"github.com/ankyra/escape-inventory/dao"
+	"github.com/ankyra/escape-inventory/model"
 )
 
 func HandleError(w http.ResponseWriter, r *http.Request, err error) {

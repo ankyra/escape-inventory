@@ -17,7 +17,7 @@ limitations under the License.
 package sqlite
 
 import (
-	"github.com/ankyra/escape-registry/dao/types"
+	"github.com/ankyra/escape-inventory/dao/types"
 	. "gopkg.in/check.v1"
 	"os"
 	"testing"

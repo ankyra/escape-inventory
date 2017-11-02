@@ -21,7 +21,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/ankyra/escape-registry/dao/types"
+	"github.com/ankyra/escape-inventory/dao/types"
 	_ "github.com/lib/pq"
 	. "gopkg.in/check.v1"
 )

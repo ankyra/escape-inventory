@@ -1,7 +1,7 @@
 package mem
 
 import (
-	. "github.com/ankyra/escape-registry/dao/types"
+	. "github.com/ankyra/escape-inventory/dao/types"
 )
 
 func (a *dao) GetApplications(project string) (map[string]*Application, error) {

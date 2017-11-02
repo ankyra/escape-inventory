@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	. "github.com/ankyra/escape-registry/dao/types"
+	. "github.com/ankyra/escape-inventory/dao/types"
 )
 
 func (s *SQLHelper) AddProject(project *Project) error {

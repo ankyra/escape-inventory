@@ -17,7 +17,7 @@ limitations under the License.
 package handlers
 
 import (
-	"github.com/ankyra/escape-registry/model"
+	"github.com/ankyra/escape-inventory/model"
 	"net/http"
 )
 

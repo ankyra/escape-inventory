@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"time"
 
-	. "github.com/ankyra/escape-registry/dao/types"
+	. "github.com/ankyra/escape-inventory/dao/types"
 )
 
 func (s *SQLHelper) AddApplication(app *Application) error {

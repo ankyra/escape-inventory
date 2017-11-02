@@ -22,8 +22,8 @@ import (
 	"time"
 
 	"github.com/ankyra/escape-core"
-	"github.com/ankyra/escape-registry/dao"
-	"github.com/ankyra/escape-registry/dao/types"
+	"github.com/ankyra/escape-inventory/dao"
+	"github.com/ankyra/escape-inventory/dao/types"
 )
 
 func Import(releases []map[string]interface{}) error {
