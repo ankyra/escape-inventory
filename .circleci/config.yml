@@ -9,6 +9,7 @@ jobs:
       BASH_ENV: ~/.bashrc
 
     steps:
+    - add_ssh_keys
     - checkout
     - setup_remote_docker
     - run:
