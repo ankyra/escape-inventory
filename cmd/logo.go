@@ -16,7 +16,7 @@ limitations under the License.
 
 package cmd
 
-const EscapeLogo = `Escape Registry v` + RegistryVersion + `
+const EscapeLogo = `Escape Inventory v` + InventoryVersion + `
 Copyright(c) 2017 Ankyra Ltd
 
   @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@

@@ -64,7 +64,7 @@ var UpdateRoutes = map[string]http.HandlerFunc{
 }
 
 func HomeHandler(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Escape Release Registry v" + cmd.RegistryVersion))
+	w.Write([]byte("Escape Release Inventory v" + cmd.InventoryVersion))
 }
 
 func getMux() *mux.Router {
@@ -86,5 +86,5 @@ func getMux() *mux.Router {
 }
 
 func main() {
-	cmd.StartRegistry(getMux())
+	cmd.StartInventory(getMux())
 }

@@ -124,13 +124,13 @@ func LoadConfig() *config.Config {
 	return Config
 }
 
-func StartRegistry(router *mux.Router) {
+func StartInventory(router *mux.Router) {
 	LoadConfig()
 
 	handler := GetHandler(router)
 	http.Handle("/", handler)
 
 	port := Config.Port
-	log.Printf("INFO: Starting Escape Registry v%s on port %s\n", RegistryVersion, port)
+	log.Printf("INFO: Starting Escape Inventory v%s on port %s\n", InventoryVersion, port)
 	log.Fatalln(http.ListenAndServe(":"+port, nil))
 }

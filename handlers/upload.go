@@ -91,12 +91,12 @@ func CallWebHook(project, unit, version, releaseId, username string) {
 	app := types.NewApplication(project, unit)
 	prjHooks, err := dao.GetProjectHooks(prj)
 	if err != nil {
-		log.Println("ERROR: Failed to get Registry Project Hooks from database:", err)
+		log.Println("ERROR: Failed to get Inventory Project Hooks from database:", err)
 		return
 	}
 	unitHooks, err := dao.GetApplicationHooks(app)
 	if err != nil {
-		log.Println("ERROR: Failed to get Registry Application Hooks from database:", err)
+		log.Println("ERROR: Failed to get Inventory Application Hooks from database:", err)
 		return
 	}
 	downstreamHooks, err := dao.GetDownstreamHooks(app)
