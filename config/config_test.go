@@ -34,7 +34,7 @@ func (s *configSuite) Test_NewConfig_uses_Sqlite_and_local_storage_by_default(c 
 	c.Assert(err, IsNil)
 	c.Assert(conf.Port, Equals, "7770")
 	c.Assert(conf.Database, Equals, "sqlite")
-	c.Assert(conf.DatabaseSettings.Path, Equals, "/var/lib/escape/registry.db")
+	c.Assert(conf.DatabaseSettings.Path, Equals, "/var/lib/escape/inventory.db")
 	c.Assert(conf.StorageBackend, Equals, "local")
 	c.Assert(conf.StorageSettings.Path, Equals, "/var/lib/escape/releases")
 }
@@ -60,7 +60,7 @@ func (s *configSuite) Test_LoadConfig_SqliteDb(c *C) {
 	conf, err := LoadConfig("testdata/sqlite_db.json", env)
 	c.Assert(err, IsNil)
 	c.Assert(conf.Database, Equals, "sqlite")
-	c.Assert(conf.DatabaseSettings.Path, Equals, "/var/lib/escape/registry.db")
+	c.Assert(conf.DatabaseSettings.Path, Equals, "/var/lib/escape/inventory.db")
 }
 
 func (s *configSuite) Test_LoadConfig_PostgresDb(c *C) {
@@ -110,7 +110,7 @@ func (s *configSuite) Test_LoadConfig_Parses_Yaml(c *C) {
 	c.Assert(err, IsNil)
 	c.Assert(conf.Port, Equals, "9876")
 	c.Assert(conf.Database, Equals, "sqlite")
-	c.Assert(conf.DatabaseSettings.Path, Equals, "/var/lib/escape/registry.db")
+	c.Assert(conf.DatabaseSettings.Path, Equals, "/var/lib/escape/inventory.db")
 	c.Assert(conf.StorageBackend, Equals, "gcs")
 	c.Assert(conf.StorageSettings.Path, Equals, "")
 	c.Assert(conf.StorageSettings.Bucket, Equals, "gs://escape-releases/")
@@ -124,7 +124,7 @@ func (s *configSuite) Test_LoadConfig_Parses_Yml(c *C) {
 	conf, err := LoadConfig("testdata/yml_config.yml", env)
 	c.Assert(err, IsNil)
 	c.Assert(conf.Database, Equals, "sqlite")
-	c.Assert(conf.DatabaseSettings.Path, Equals, "/var/lib/escape/registry.db")
+	c.Assert(conf.DatabaseSettings.Path, Equals, "/var/lib/escape/inventory.db")
 	c.Assert(conf.StorageBackend, Equals, "gcs")
 	c.Assert(conf.StorageSettings.Path, Equals, "")
 	c.Assert(conf.StorageSettings.Bucket, Equals, "gs://escape-releases/")

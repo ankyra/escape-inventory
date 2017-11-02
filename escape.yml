@@ -1,13 +1,13 @@
-name: escape-registry
+name: escape-inventory
 version: '0.12.@'
-description: "A Go build for the Escape Registry"
+description: "A Go build for the Escape Inventory"
 logo: logo.png
 
 depends:
 - escape-core-latest as core
 
 includes: 
-- escape-registry
+- escape-inventory
 - LICENSE
 - Makefile
 - README.md
@@ -38,7 +38,7 @@ errands:
       description: "The target bucket"
     - id: credentials
       description: "Service account credentials"
-    - id: registry_version
+    - id: inventory_version
       default: $this.version
   publish_binaries:
     description: Create binaries for all platforms and upload to a GCS bucket
@@ -47,7 +47,7 @@ errands:
       description: "The target bucket"
     - id: credentials
       description: "Service account credentials"
-    - id: registry_version
+    - id: inventory_version
       default: $this.version
     script: scripts/publish-binaries.sh
 

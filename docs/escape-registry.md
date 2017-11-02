@@ -1,6 +1,6 @@
 ---
-title: "Escape Registry"
-slug: escape-registry 
+title: "Escape Inventory"
+slug: escape-inventory 
 type: "docs"
 toc: true
 ---
@@ -8,11 +8,11 @@ toc: true
 # Usage
 
 ```
-escape-registry [CONFIG_FILE]
+escape-inventory [CONFIG_FILE]
 ```
 
-The Escape Registry can be configured using a simple JSON or YAML file (default
-`/etc/escape-registry/config.json`), and/or environment variables. If the
+The Escape Inventory can be configured using a simple JSON or YAML file (default
+`/etc/escape-inventory/config.json`), and/or environment variables. If the
 provided configuration file does not exist the program falls back to the
 following default configuration: 
 
@@ -21,7 +21,7 @@ following default configuration:
   "port": "7770",
   "database": "sqlite",
   "database_settings": {
-    "path": "/var/lib/escape/registry.db"
+    "path": "/var/lib/escape/inventory.db"
   },
   "storage_backend": "local",
   "storage_settings": {
@@ -30,7 +30,7 @@ following default configuration:
 }
 ```
 
-This configures the Registry with an SQLite database and a local file system
+This configures the Inventory with an SQLite database and a local file system
 storage backend.
 
 # Environment Variables
@@ -81,7 +81,7 @@ STORAGE_SETTINGS_PATH=/var/lib/escape/releases
 Stores uploaded packages in Google Cloud Storage.  The `credentials` variable
 is optional, but should point to an existing service account json file if
 provided. The service account should have the "Storage -> Storage Admin" role.
-If no credentials are provided the Registry is assumed to be running in GCP 
+If no credentials are provided the Inventory is assumed to be running in GCP 
 under the `storage-rw` scope.
 
 ### JSON
@@ -117,7 +117,7 @@ is accessible).
 {
   "database": "sqlite",
   "database_settings": {
-    "path": "/var/lib/escape/registry.db"
+    "path": "/var/lib/escape/inventory.db"
   }
 }
 ```
@@ -126,7 +126,7 @@ is accessible).
 
 ```
 DATABASE=sqlite
-DATABASE_SETTINGS_PATH=/var/lib/escape/registry.db
+DATABASE_SETTINGS_PATH=/var/lib/escape/inventory.db
 ```
 
 

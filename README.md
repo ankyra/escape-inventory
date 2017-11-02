@@ -1,6 +1,6 @@
-# Escape Registry
+# Escape Inventory
 
-This is the open source version of the Escape Registry.  Please see the [Escape
+This is the open source version of the Escape Inventory.  Please see the [Escape
 Docs](https://escape.ankyra.io/docs/) for the full documentation.
 
 ## License

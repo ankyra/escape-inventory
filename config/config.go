@@ -19,10 +19,11 @@ package config
 import (
 	"encoding/json"
 	"fmt"
-	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"os"
 	"strings"
+
+	"gopkg.in/yaml.v2"
 )
 
 type DatabaseSettings struct {
@@ -60,7 +61,7 @@ func replaceMissingValuesWithDefaults(config *Config) {
 		config.Database = "sqlite"
 	}
 	if config.DatabaseSettings.Path == "" && config.Database == "sqlite" {
-		config.DatabaseSettings.Path = "/var/lib/escape/registry.db"
+		config.DatabaseSettings.Path = "/var/lib/escape/inventory.db"
 	}
 	if config.StorageBackend == "" {
 		config.StorageBackend = "local"

@@ -1,7 +1,7 @@
 port: 9876
 database: sqlite
 database_settings:
-  path: /var/lib/escape/registry.db
+  path: /var/lib/escape/inventory.db
 user_service_url: "http://user-service.com"
 storage_backend: gcs
 storage_settings:

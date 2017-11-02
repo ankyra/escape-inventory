@@ -1,3 +1,3 @@
 package cmd
 
-const RegistryVersion = "0.12.8"
+const RegistryVersion = "0.12.0"

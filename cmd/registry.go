@@ -36,7 +36,7 @@ import (
 var Config *config.Config
 
 const (
-	defaultConfigFile = "/etc/escape-registry/config.json"
+	defaultConfigFile = "/etc/escape-inventory/config.json"
 )
 
 func getConfigLocation(args []string) string {
@@ -47,7 +47,7 @@ func getConfigLocation(args []string) string {
 		log.Println("INFO: Using configuration file location:", args[1])
 		return args[1]
 	}
-	log.Fatalln("Error: too many arguments given. Usage: escape-registry [CONFIG_FILE]")
+	log.Fatalln("Error: too many arguments given. Usage: escape-inventory [CONFIG_FILE]")
 	return ""
 }
 

@@ -1,6 +1,6 @@
 {
     "database": "sqlite",
     "database_settings": {
-        "path": "/var/lib/escape/registry.db"
+        "path": "/var/lib/escape/inventory.db"
     }
 }

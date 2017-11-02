@@ -29,10 +29,10 @@ jobs:
 
             # Publish binary
             echo $GCLOUD_SERVICE_KEY | base64 --decode -i > ${HOME}/gcloud-service-key.json
-            escape deploy escape-registry-latest -d "latest_binaries"
+            escape deploy escape-inventory-latest -d "latest_binaries"
             escape errands run upload_to_gcs -v bucket=escape-releases-eu -v credentials=@${HOME}/gcloud-service-key.json -d "latest_binaries"
 
-            # Trigger docker-escape-registry
-            curl -f -X POST https://circleci.com/api/v1.1/project/github/ankyra/docker-escape-registry/tree/master?circle-token=${CIRCLE_DOCKER_ESCAPE_TOKEN}
+            # Trigger docker-escape-inventory
+            curl -f -X POST https://circleci.com/api/v1.1/project/github/ankyra/docker-escape-inventory/tree/master?circle-token=${CIRCLE_DOCKER_ESCAPE_TOKEN}
           fi
 
