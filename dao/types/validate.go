@@ -43,6 +43,7 @@ func ValidateDAO(dao func() DAO, c *C) {
 	Validate_GetReleasesWithoutProcessedDependencies(dao(), c)
 	Validate_Dependencies(dao(), c)
 	Validate_DependenciesByGroups(dao(), c)
+	Validate_WipeDatabase(dao(), c)
 }
 
 func addReleaseToProject(dao DAO, c *C, name, version, project string) *Release {
@@ -540,6 +541,14 @@ func Validate_DependenciesByGroups(dao DAO, c *C) {
 	ds, err = dao.GetDownstreamDependenciesByGroups(release, []string{"cheeky-group"})
 	c.Assert(err, IsNil)
 	c.Assert(ds, HasLen, 1)
+}
+
+func Validate_WipeDatabase(dao DAO, c *C) {
+	addReleaseToProject(dao, c, "test", "1.0.0", "test-project")
+	dao.WipeDatabase()
+
+	projects, _ := dao.GetProjects()
+	c.Assert(projects, HasLen, 0)
 }
 
 type hasItemChecker struct{}

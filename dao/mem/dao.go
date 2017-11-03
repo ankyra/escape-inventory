@@ -54,3 +54,16 @@ func NewInMemoryDAO() DAO {
 		acls:             map[string]map[string]Permission{},
 	}
 }
+
+func (a *dao) WipeDatabase() error {
+	a.projectMetadata = map[string]*Project{}
+	a.projectHooks = map[*Project]Hooks{}
+	a.projects = map[string]map[string]*application{}
+	a.apps = map[*Application]*application{}
+	a.applicationHooks = map[*Application]Hooks{}
+	a.subscriptions = map[*Application][]*Application{}
+	a.releases = map[*Release]*release{}
+	a.acls = map[string]map[string]Permission{}
+
+	return nil
+}

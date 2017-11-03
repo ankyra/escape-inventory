@@ -125,6 +125,31 @@ func NewPostgresDAO(url string) (DAO, error) {
 		UpdateACLQuery:          "UPDATE acl SET permission = $1 WHERE project = $2 AND group_name = $3",
 		DeleteACLQuery:          "DELETE FROM acl WHERE project = $1 AND group_name = $2",
 		GetPermittedGroupsQuery: "SELECT group_name FROM acl WHERE project = $1 AND (permission >= $2)",
+		WipeDatabaseFunc: func(s *sqlhelp.SQLHelper) error {
+			url := "postgres://postgres:@localhost/postgres?sslmode=disable"
+			db, err := sql.Open("postgres", url)
+			if err != nil {
+				return err
+			}
+			queries := []string{
+				`TRUNCATE release CASCADE`,
+				`TRUNCATE package CASCADE`,
+				`TRUNCATE acl CASCADE`,
+				`TRUNCATE application CASCADE`,
+				`TRUNCATE project CASCADE`,
+				`TRUNCATE release_dependency CASCADE`,
+				`TRUNCATE subscriptions CASCADE`,
+			}
+
+			for _, query := range queries {
+				_, err := db.Exec(query)
+				if err != nil {
+					return err
+				}
+			}
+
+			return nil
+		},
 		IsUniqueConstraintError: func(err error) bool {
 			_, typeOk := err.(*pq.Error)
 			return typeOk && err.(*pq.Error).Code.Name() == "unique_violation"

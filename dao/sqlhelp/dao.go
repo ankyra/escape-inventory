@@ -9,6 +9,7 @@ import (
 type SQLHelper struct {
 	DB                      *sql.DB
 	UseNumericInsertMarks   bool
+	WipeDatabaseFunc        func(*SQLHelper) error
 	IsUniqueConstraintError func(error) bool
 
 	GetProjectQuery          string
@@ -122,4 +123,8 @@ func (s *SQLHelper) PrepareAndExecUpdate(query string, arg ...interface{}) error
 		return NotFound
 	}
 	return err
+}
+
+func (s *SQLHelper) WipeDatabase() error {
+	return s.WipeDatabaseFunc(s)
 }

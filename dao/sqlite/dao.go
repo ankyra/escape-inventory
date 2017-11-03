@@ -19,6 +19,7 @@ package sqlite
 import (
 	"database/sql"
 	"fmt"
+	"os"
 
 	"github.com/ankyra/escape-inventory/dao/sqlhelp"
 	. "github.com/ankyra/escape-inventory/dao/types"
@@ -115,6 +116,28 @@ func NewSQLiteDAO(path string) (DAO, error) {
 		UpdateACLQuery:          "UPDATE acl SET permission = ? WHERE project = ? AND group_name = ?",
 		DeleteACLQuery:          "DELETE FROM acl WHERE project = ? AND group_name = ?",
 		GetPermittedGroupsQuery: "SELECT group_name FROM acl WHERE project = ? AND (permission >= ?)",
+		WipeDatabaseFunc: func(s *sqlhelp.SQLHelper) error {
+			os.RemoveAll(path)
+			NewSQLiteDAO(path)
+			queries := []string{
+				`DELETE FROM release`,
+				`DELETE FROM package`,
+				`DELETE FROM acl`,
+				`DELETE FROM application`,
+				`DELETE FROM project`,
+				`DELETE FROM release_dependency`,
+				`DELETE FROM subscriptions`,
+			}
+
+			for _, query := range queries {
+				_, err := s.PrepareAndQuery(query)
+				if err != nil {
+					return err
+				}
+			}
+
+			return nil
+		},
 		IsUniqueConstraintError: func(err error) bool {
 			return err.(sqlite3.Error).Code == sqlite3.ErrConstraint
 		},

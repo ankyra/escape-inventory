@@ -147,6 +147,8 @@ type DAO interface {
 	GetACL(project string) (map[string]Permission, error)
 	DeleteACL(project, group string) error
 	GetPermittedGroups(project string, perm Permission) ([]string, error)
+
+	WipeDatabase() error
 }
 
 var NotFound = fmt.Errorf("Not found")

@@ -18,8 +18,11 @@ package handlers
 
 import (
 	"net/http"
+
+	"github.com/ankyra/escape-inventory/dao"
 )
 
 func WipeDatabaseHandler(w http.ResponseWriter, r *http.Request) {
+	dao.GlobalDAO.WipeDatabase()
 	w.WriteHeader(200)
 }

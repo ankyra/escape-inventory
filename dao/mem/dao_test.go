@@ -17,9 +17,10 @@ limitations under the License.
 package mem
 
 import (
+	"testing"
+
 	"github.com/ankyra/escape-inventory/dao/types"
 	. "gopkg.in/check.v1"
-	"testing"
 )
 
 func Test(t *testing.T) { TestingT(t) }
