@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"strconv"
 	"strings"
 
 	"gopkg.in/yaml.v2"
@@ -45,6 +46,7 @@ type Config struct {
 	StorageSettings  StorageSettings  `json:"storage_settings" yaml:"storage_settings"`
 	UserServiceURL   string           `json:"user_service_url" yaml:"user_service_url"`
 	WebHook          string           `json:"web_hook" yaml:"web_hook"`
+	Dev              bool             `json:"dev" yaml:"dev"`
 }
 
 func NewConfig(env []string) (*Config, error) {
@@ -121,6 +123,9 @@ func processEnvironmentOverrides(config *Config, env []string) *Config {
 			config.WebHook = value
 		} else if key == "USER_SERVICE_URL" {
 			config.UserServiceURL = value
+		} else if key == "DEV" {
+			valueBool, _ := strconv.ParseBool(value)
+			config.Dev = valueBool
 		}
 	}
 	return config

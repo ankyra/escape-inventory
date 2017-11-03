@@ -88,6 +88,5 @@ func getMux(cfg *config.Config) *mux.Router {
 
 func main() {
 	cfg := cmd.LoadConfig()
-
 	cmd.StartInventory(getMux(cfg))
 }
