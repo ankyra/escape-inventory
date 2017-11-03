@@ -64,6 +64,12 @@ var UpdateRoutes = map[string]http.HandlerFunc{
 	"/api/v1/registry/{project}/units/{name}/hooks/": handlers.UpdateApplicationHooksHandler,
 }
 
+var DevRoutes = map[string]map[string]http.HandlerFunc{
+	"/api/v1/internal/database": {
+		"DELETE": handlers.WipeDatabaseHandler,
+	},
+}
+
 func HomeHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Escape Release Inventory v" + cmd.InventoryVersion))
 }
@@ -82,6 +88,15 @@ func getMux(cfg *config.Config) *mux.Router {
 	for url, handler := range UpdateRoutes {
 		putRouter.Handle(url, handler)
 	}
+
+	if cfg.Dev {
+		for url, methodHandlers := range DevRoutes {
+			for method, handler := range methodHandlers {
+				r.Methods(method).Subrouter().Handle(url, handler)
+			}
+		}
+	}
+
 	r.Handle("/metrics", promhttp.Handler())
 	return r
 }

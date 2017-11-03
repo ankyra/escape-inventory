@@ -25,6 +25,7 @@ import (
 	"testing"
 
 	"github.com/ankyra/escape-inventory/cmd"
+	"github.com/ankyra/escape-inventory/config"
 	"github.com/ankyra/escape-inventory/dao"
 	"github.com/ankyra/escape-inventory/dao/types"
 	"github.com/ankyra/escape-inventory/model"
@@ -42,7 +43,8 @@ var rr *httptest.ResponseRecorder
 
 func (s *suite) SetUpTest(c *C) {
 	dao.TestSetup()
-	handler = cmd.GetHandler(getMux(nil))
+	config, _ := config.NewConfig([]string{})
+	handler = cmd.GetHandler(getMux(config))
 	rr = httptest.NewRecorder()
 }
 
