@@ -20,6 +20,7 @@ import (
 	"net/http"
 
 	"github.com/ankyra/escape-inventory/cmd"
+	"github.com/ankyra/escape-inventory/config"
 	"github.com/ankyra/escape-inventory/handlers"
 	"github.com/gorilla/mux"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -67,7 +68,7 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Escape Release Inventory v" + cmd.InventoryVersion))
 }
 
-func getMux() *mux.Router {
+func getMux(cfg *config.Config) *mux.Router {
 	r := mux.NewRouter()
 	getRouter := r.Methods("GET").Subrouter()
 	for url, handler := range ReadRoutes {
@@ -86,5 +87,7 @@ func getMux() *mux.Router {
 }
 
 func main() {
-	cmd.StartInventory(getMux())
+	cfg := cmd.LoadConfig()
+
+	cmd.StartInventory(getMux(cfg))
 }

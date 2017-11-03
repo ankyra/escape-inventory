@@ -125,8 +125,6 @@ func LoadConfig() *config.Config {
 }
 
 func StartInventory(router *mux.Router) {
-	LoadConfig()
-
 	handler := GetHandler(router)
 	http.Handle("/", handler)
 

@@ -42,7 +42,7 @@ var rr *httptest.ResponseRecorder
 
 func (s *suite) SetUpTest(c *C) {
 	dao.TestSetup()
-	handler = cmd.GetHandler(getMux())
+	handler = cmd.GetHandler(getMux(nil))
 	rr = httptest.NewRecorder()
 }
 
