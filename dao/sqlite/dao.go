@@ -19,7 +19,6 @@ package sqlite
 import (
 	"database/sql"
 	"fmt"
-	"os"
 
 	"github.com/ankyra/escape-inventory/dao/sqlhelp"
 	. "github.com/ankyra/escape-inventory/dao/types"
@@ -117,8 +116,6 @@ func NewSQLiteDAO(path string) (DAO, error) {
 		DeleteACLQuery:          "DELETE FROM acl WHERE project = ? AND group_name = ?",
 		GetPermittedGroupsQuery: "SELECT group_name FROM acl WHERE project = ? AND (permission >= ?)",
 		WipeDatabaseFunc: func(s *sqlhelp.SQLHelper) error {
-			os.RemoveAll(path)
-			NewSQLiteDAO(path)
 			queries := []string{
 				`DELETE FROM release`,
 				`DELETE FROM package`,
@@ -130,8 +127,7 @@ func NewSQLiteDAO(path string) (DAO, error) {
 			}
 
 			for _, query := range queries {
-				_, err := s.PrepareAndQuery(query)
-				if err != nil {
+				if err := s.PrepareAndExec(query); err != nil {
 					return err
 				}
 			}

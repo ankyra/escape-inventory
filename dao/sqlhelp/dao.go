@@ -75,6 +75,16 @@ func (s *SQLHelper) PrepareAndQuery(query string, arg ...interface{}) (*sql.Rows
 	return stmt.Query(arg...)
 }
 
+func (s *SQLHelper) PrepareAndExec(query string, arg ...interface{}) error {
+	stmt, err := s.DB.Prepare(query)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+	_, err = stmt.Exec(arg...)
+	return err
+}
+
 func (s *SQLHelper) PrepareAndExecInsert(query string, arg ...interface{}) error {
 	stmt, err := s.DB.Prepare(query)
 	if err != nil {

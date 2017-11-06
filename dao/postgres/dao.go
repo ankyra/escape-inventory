@@ -126,11 +126,6 @@ func NewPostgresDAO(url string) (DAO, error) {
 		DeleteACLQuery:          "DELETE FROM acl WHERE project = $1 AND group_name = $2",
 		GetPermittedGroupsQuery: "SELECT group_name FROM acl WHERE project = $1 AND (permission >= $2)",
 		WipeDatabaseFunc: func(s *sqlhelp.SQLHelper) error {
-			url := "postgres://postgres:@localhost/postgres?sslmode=disable"
-			db, err := sql.Open("postgres", url)
-			if err != nil {
-				return err
-			}
 			queries := []string{
 				`TRUNCATE release CASCADE`,
 				`TRUNCATE package CASCADE`,
@@ -142,8 +137,7 @@ func NewPostgresDAO(url string) (DAO, error) {
 			}
 
 			for _, query := range queries {
-				_, err := db.Exec(query)
-				if err != nil {
+				if err := s.PrepareAndExec(query); err != nil {
 					return err
 				}
 			}
