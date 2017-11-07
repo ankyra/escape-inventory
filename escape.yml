@@ -40,7 +40,7 @@ errands:
     - id: credentials
       description: Google Cloud Storage service account credentials (json)
       default: ""
-    - id: escape_version
+    - id: inventory_version
       default: $this.version
       visible: false
     - id: do_upload
