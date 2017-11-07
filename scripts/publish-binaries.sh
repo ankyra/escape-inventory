@@ -8,6 +8,8 @@ ARCHS="amd64"
 
 BASE_DIR=$(dirname "$(readlink -f "$0")")
 SRC_DIR=$(readlink -f "${BASE_DIR}/../")
+GOLANG_VERSION=1.9.0
+BUILD_IMAGE="golang:${GOLANG_VERSION}"
 
 echo "$INPUT_credentials" > service_account.json
 
@@ -21,12 +23,22 @@ for GOOS in $PLATFORMS; do
         target="${SRC_DIR}/${filename}"
         echo "Building $target"
         if [ ! -f $target ] ; then
-            docker run --rm -v "$SRC_DIR":/go/src/github.com/ankyra/escape-inventory \
-                            -w /go/src/github.com/ankyra/escape-inventory \
-                            -e GOOS=$GOOS \
-                            -e GOARCH=$ARCH \
-                            golang:1.8 go build -v -o escape-inventory-$GOOS-$ARCH
-            mv escape-inventory-${GOOS}-${ARCH} "${SRC_DIR}/escape-inventory"
+            echo "Building for $GOOS-$ARCH from ${SRC_DIR}"
+            docker rm src || true
+            docker create -v /go/src/github.com/ankyra/ --name src ${BUILD_IMAGE} /bin/true
+            docker cp "$SRC_DIR" src:/go/src/github.com/ankyra/tmp
+            docker run --rm --volumes-from src \
+                -w /go/src/github.com/ankyra/ \
+                ${BUILD_IMAGE} mv tmp escape-inventory
+            docker run --rm \
+                --volumes-from src \
+                -w /go/src/github.com/ankyra/escape-inventory \
+                -e GOOS=$GOOS \
+                -e GOARCH=$ARCH \
+                ${BUILD_IMAGE} bash -c "go build -v -o escape-inventory-$GOOS-$ARCH"
+            docker cp src:/go/src/github.com/ankyra/escape-inventory/escape-inventory-${GOOS}-${ARCH} ${SRC_DIR}/escape-inventory
+            docker rm src
+            echo "Creating archive: ${target}"
             tar -C "${SRC_DIR}" -cvzf ${target} escape-inventory
             rm "${SRC_DIR}/escape-inventory"
         else
