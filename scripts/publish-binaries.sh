@@ -33,7 +33,7 @@ for GOOS in $PLATFORMS; do
             echo "File $target already exists"
         fi
         if [ "$INPUT_do_upload" = "1" ] ; then 
-            gcs_target="gs://$INPUT_bucket/escape-inventory/$INPUT_inventory_version/$target"
+            gcs_target="gs://$INPUT_bucket/escape-inventory/$INPUT_inventory_version/$filename"
             echo "Copying to $gcs_target"
             gsutil cp "$target" "$gcs_target"
             echo "Setting ACL on $gcs_target"
