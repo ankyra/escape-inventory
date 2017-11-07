@@ -30,26 +30,25 @@ post_build: scripts/build.sh
 test: scripts/test.sh
 
 errands:
-  upload_to_gcs:
-    description: "Upload the produced linux/amd64 binary to a GCS bucket"
-    script: scripts/upload_to_gcs.sh
-    inputs:
-    - id: bucket
-      description: "The target bucket"
-    - id: credentials
-      description: "Service account credentials"
-    - id: inventory_version
-      default: $this.version
   publish_binaries:
-    description: Create binaries for all platforms and upload to a GCS bucket
+    script: scripts/publish-binaries.sh
+    description: Create binaries for all supported platforms and upload to a GCS bucket
     inputs:
     - id: bucket
-      description: "The target bucket"
+      description: The target bucket
+      default: ""
     - id: credentials
-      description: "Service account credentials"
-    - id: inventory_version
+      description: Google Cloud Storage service account credentials (json)
+      default: ""
+    - id: escape_version
       default: $this.version
-    script: scripts/publish-binaries.sh
+      visible: false
+    - id: do_upload
+      type: bool
+      default: true
+      description: |
+        Should this errand upload to GCS? If not, then this errand will only
+        build the binaries.
 
 templates:
 - cmd/metadata.go.tpl

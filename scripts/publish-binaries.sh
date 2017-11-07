@@ -3,11 +3,14 @@
 set -e -o pipefail
 
 
-PLATFORMS="darwin linux"
-ARCHS="386 amd64"
+PLATFORMS="linux"
+ARCHS="amd64"
 
 echo "$INPUT_credentials" > service_account.json
-gcloud auth activate-service-account --key-file service_account.json
+
+if [ "$INPUT_do_upload" = "1" ] ; then 
+    gcloud auth activate-service-account --key-file service_account.json
+fi
 
 for GOOS in $PLATFORMS; do
     for ARCH in $ARCHS; do
@@ -25,10 +28,12 @@ for GOOS in $PLATFORMS; do
         else
             echo "File $target already exists"
         fi
-        gcs_target="gs://$INPUT_bucket/escape-inventory/$INPUT_inventory_version/$target"
-        echo "Copying to $gcs_target"
-        gsutil cp "$target" "$gcs_target"
-        echo "Setting ACL on $gcs_target"
-        gsutil acl ch -u AllUsers:R "$gcs_target"
+        if [ "$INPUT_do_upload" = "1" ] ; then 
+            gcs_target="gs://$INPUT_bucket/escape-inventory/$INPUT_inventory_version/$target"
+            echo "Copying to $gcs_target"
+            gsutil cp "$target" "$gcs_target"
+            echo "Setting ACL on $gcs_target"
+            gsutil acl ch -u AllUsers:R "$gcs_target"
+        fi
     done
 done
