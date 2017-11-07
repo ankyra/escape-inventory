@@ -120,6 +120,11 @@ func GetHandler(router *mux.Router) http.Handler {
 
 func LoadConfig() *config.Config {
 	fmt.Println(EscapeLogo)
+	for _, arg := range os.Args[1:] {
+		if arg == "--version" {
+			os.Exit(0)
+		}
+	}
 	Config = loadAndActivateConfig()
 	return Config
 }
