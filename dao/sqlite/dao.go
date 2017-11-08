@@ -169,18 +169,26 @@ func startupCheckDir(path string) error {
 
 	var chars = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 
-	b := make([]rune, 6)
-	for i := range b {
-		b[i] = chars[rand.Intn(len(chars))]
-	}
-	permissionTestFileName := string(b)
+	permissionTestFileName := ""
 
-	err = ioutil.WriteFile(escapeDir+permissionTestFileName, []byte(""), 0644)
+	for len(permissionTestFileName) == 0 {
+		b := make([]rune, 6)
+		for i := range b {
+			b[i] = chars[rand.Intn(len(chars))]
+		}
+		fileName := escapeDir + "." + string(b)
+		_, err = os.Stat(fileName)
+		if os.IsNotExist(err) {
+			permissionTestFileName = fileName
+		}
+	}
+
+	err = ioutil.WriteFile(permissionTestFileName, []byte(""), 0644)
 	if err != nil {
 		return fmt.Errorf("Couldn't write to %s : %s ", escapeDir, err.Error())
 	}
 
-	err = os.Remove(escapeDir + permissionTestFileName)
+	err = os.Remove(permissionTestFileName)
 	if err != nil {
 		return fmt.Errorf("Couldn't remove file from %s : %s ", escapeDir, err.Error())
 	}
