@@ -154,9 +154,13 @@ func NewSQLiteDAO(path string) (DAO, error) {
 }
 
 func startupCheckDir(path string) error {
-	escapeDir, _ := filepath.Split(path)
+	absPath, err := filepath.Abs(path)
+	if err != nil {
+		return fmt.Errorf("Could not build absolute path from %s :%s", path, err.Error())
+	}
 
-	_, err := os.Stat(escapeDir)
+	escapeDir, _ := filepath.Split(absPath)
+	_, err = os.Stat(escapeDir)
 	if os.IsNotExist(err) {
 		return fmt.Errorf("Directory does not exist %s :%s", escapeDir, err.Error())
 	}
