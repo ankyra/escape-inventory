@@ -49,6 +49,7 @@ func LoadFromConfig(conf *config.Config) error {
 		GlobalDAO = dao
 		return nil
 	}
+
 	return fmt.Errorf("Unknown database backend: %s", conf.Database)
 }
 func TestSetup() {

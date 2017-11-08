@@ -19,6 +19,11 @@ package sqlite
 import (
 	"database/sql"
 	"fmt"
+	"io/ioutil"
+	"math/rand"
+	"os"
+	"path/filepath"
+	"time"
 
 	"github.com/ankyra/escape-inventory/dao/sqlhelp"
 	. "github.com/ankyra/escape-inventory/dao/types"
@@ -29,10 +34,17 @@ import (
 )
 
 func NewSQLiteDAO(path string) (DAO, error) {
+
+	err := startupCheckDir(path)
+	if err != nil {
+		return nil, err
+	}
+
 	db, err := sql.Open("sqlite3", path)
 	if err != nil {
 		return nil, fmt.Errorf("Couldn't open SQLite storage backend '%s': %s", path, err.Error())
 	}
+
 	driver, err := sqlite_migrate.WithInstance(db, &sqlite_migrate.Config{})
 	s, err := bindata.WithInstance(bindata.Resource(AssetNames(),
 		func(name string) ([]byte, error) {
@@ -48,6 +60,7 @@ func NewSQLiteDAO(path string) (DAO, error) {
 	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
 		return nil, fmt.Errorf("Couldn't apply migrations to SQLite storage backend '%s' [1]: %s", path, err.Error())
 	}
+
 	return &sqlhelp.SQLHelper{
 		DB:                 db,
 		GetProjectQuery:    `SELECT name, description, orgURL, logo FROM project WHERE name = ?`,
@@ -138,4 +151,35 @@ func NewSQLiteDAO(path string) (DAO, error) {
 			return err.(sqlite3.Error).Code == sqlite3.ErrConstraint
 		},
 	}, nil
+}
+
+func startupCheckDir(path string) error {
+	escapeDir, _ := filepath.Split(path)
+
+	_, err := os.Stat(escapeDir)
+	if os.IsNotExist(err) {
+		return fmt.Errorf("Directory does not exist %s :%s", escapeDir, err.Error())
+	}
+
+	rand.Seed(time.Now().UnixNano())
+
+	var chars = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+
+	b := make([]rune, 6)
+	for i := range b {
+		b[i] = chars[rand.Intn(len(chars))]
+	}
+	permissionTestFileName := string(b)
+
+	err = ioutil.WriteFile(escapeDir+permissionTestFileName, []byte(""), 0644)
+	if err != nil {
+		return fmt.Errorf("Couldn't write to %s : %s ", escapeDir, err.Error())
+	}
+
+	err = os.Remove(escapeDir + permissionTestFileName)
+	if err != nil {
+		return fmt.Errorf("Couldn't remove file from %s : %s ", escapeDir, err.Error())
+	}
+
+	return nil
 }
