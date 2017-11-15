@@ -196,6 +196,12 @@
 			"revisionTime": "2017-08-29T14:50:39Z"
 		},
 		{
+			"checksumSHA1": "/zeOOjyZpzAOAs7OhWTycaNfZsg=",
+			"path": "github.com/cznic/ql/driver",
+			"revision": "8c32ff10fdc2810e93a6e127119d95545497909e",
+			"revisionTime": "2017-09-05T15:03:23Z"
+		},
+		{
 			"checksumSHA1": "kBeNcaKk56FguvPSUCEaH6AxpRc=",
 			"path": "github.com/golang/protobuf/proto",
 			"revision": "18c9bb3261723cd5401db4d0c9fbc5c3b6c70fe8",
@@ -260,6 +266,12 @@
 			"path": "github.com/mattes/migrate/database/postgres",
 			"revision": "50068870a15f7c56518b5d7652dc799adb79183e",
 			"revisionTime": "2017-06-10T17:25:06Z"
+		},
+		{
+			"checksumSHA1": "8+oN0Tj4+wcWJ77AK1q0AihpyRw=",
+			"path": "github.com/mattes/migrate/database/ql",
+			"revision": "69472d5f5cdca0fb2766d8d86f63cb2e78e1d869",
+			"revisionTime": "2017-10-24T18:00:00Z"
 		},
 		{
 			"checksumSHA1": "wXPn7mDehT7MjrBgzi0M1sduuLA=",
@@ -634,5 +646,5 @@
 			"revisionTime": "2017-07-13T20:15:20Z"
 		}
 	],
-	"rootPath": "github.com/ankyra/escape-registry"
+	"rootPath": "github.com/ankyra/escape-inventory"
 }
