@@ -5,12 +5,12 @@ import (
 )
 
 func (s *SQLHelper) SetACL(project, group string, perm Permission) error {
-	stmt, err := s.DB.Prepare(s.InsertACLQuery)
+	tx, err := s.DB.Begin()
 	if err != nil {
 		return err
 	}
-	defer stmt.Close()
-	_, err = stmt.Exec(project, group, int(perm))
+
+	_, err = tx.Exec(s.InsertACLQuery, project, group, int(perm))
 	if err != nil {
 		if s.IsUniqueConstraintError(err) {
 			stmt, err := s.DB.Prepare(s.UpdateACLQuery)
@@ -22,7 +22,7 @@ func (s *SQLHelper) SetACL(project, group string, perm Permission) error {
 		}
 		return err
 	}
-	return nil
+	return tx.Commit()
 }
 
 func (s *SQLHelper) GetACL(project string) (map[string]Permission, error) {
@@ -44,13 +44,17 @@ func (s *SQLHelper) GetACL(project string) (map[string]Permission, error) {
 }
 
 func (s *SQLHelper) DeleteACL(project, group string) error {
-	stmt, err := s.DB.Prepare(s.DeleteACLQuery)
+	tx, err := s.DB.Begin()
 	if err != nil {
 		return err
 	}
-	defer stmt.Close()
-	_, err = stmt.Exec(project, group)
-	return err
+
+	_, err = tx.Exec(s.DeleteACLQuery, project, group)
+	if err != nil {
+		return err
+	}
+
+	return tx.Commit()
 }
 
 func (s *SQLHelper) GetPermittedGroups(project string, perm Permission) ([]string, error) {

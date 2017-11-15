@@ -67,18 +67,18 @@ func (s *SQLHelper) GetPackageURIs(release *Release) ([]string, error) {
 }
 
 func (s *SQLHelper) AddPackageURI(release *Release, uri string) error {
-	stmt, err := s.DB.Prepare(s.AddPackageURIQuery)
+	tx, err := s.DB.Begin()
 	if err != nil {
 		return err
 	}
-	_, err = stmt.Exec(release.Application.Project, release.ReleaseId, uri)
+	_, err = tx.Exec(s.AddPackageURIQuery, release.Application.Project, release.ReleaseId, uri)
 	if err != nil {
 		if s.IsUniqueConstraintError(err) {
 			return AlreadyExists
 		}
 		return err
 	}
-	return nil
+	return tx.Commit()
 }
 
 func (s *SQLHelper) scanRelease(project, name string, rows *sql.Rows) (*Release, error) {

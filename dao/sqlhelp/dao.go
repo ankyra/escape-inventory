@@ -76,22 +76,28 @@ func (s *SQLHelper) PrepareAndQuery(query string, arg ...interface{}) (*sql.Rows
 }
 
 func (s *SQLHelper) PrepareAndExec(query string, arg ...interface{}) error {
-	stmt, err := s.DB.Prepare(query)
+	tx, err := s.DB.Begin()
 	if err != nil {
 		return err
 	}
-	defer stmt.Close()
-	_, err = stmt.Exec(arg...)
-	return err
+
+	_, err = tx.Exec(query, arg...)
+	if err != nil {
+		return err
+	}
+
+	return tx.Commit()
 }
 
 func (s *SQLHelper) PrepareAndExecInsert(query string, arg ...interface{}) error {
-	stmt, err := s.DB.Prepare(query)
+	tx, err := s.DB.Begin()
 	if err != nil {
 		return err
 	}
-	defer stmt.Close()
-	_, err = stmt.Exec(arg...)
+	defer tx.Commit()
+
+	_, err = tx.Exec(query, arg...)
+
 	if err != nil {
 		if s.IsUniqueConstraintError(err) {
 			return AlreadyExists
@@ -101,27 +107,28 @@ func (s *SQLHelper) PrepareAndExecInsert(query string, arg ...interface{}) error
 }
 
 func (s *SQLHelper) PrepareAndExecInsertIgnoreDups(query string, arg ...interface{}) error {
-	stmt, err := s.DB.Prepare(query)
+	tx, err := s.DB.Begin()
 	if err != nil {
 		return err
 	}
-	defer stmt.Close()
-	_, err = stmt.Exec(arg...)
+
+	_, err = tx.Exec(query, arg...)
 	if err != nil {
 		if s.IsUniqueConstraintError(err) {
 			return nil
 		}
 	}
-	return err
+	return tx.Commit()
 }
 
 func (s *SQLHelper) PrepareAndExecUpdate(query string, arg ...interface{}) error {
-	stmt, err := s.DB.Prepare(query)
+	tx, err := s.DB.Begin()
 	if err != nil {
 		return err
 	}
-	defer stmt.Close()
-	result, err := stmt.Exec(arg...)
+	defer tx.Commit()
+
+	result, err := tx.Exec(query, arg...)
 	if err != nil {
 		return err
 	}

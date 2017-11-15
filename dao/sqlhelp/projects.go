@@ -97,6 +97,7 @@ func (s *SQLHelper) GetProjectsByGroups(readGroups []string) (map[string]*Projec
 	for _, g := range readGroups {
 		interfaceGroups = append(interfaceGroups, g)
 	}
+
 	rows, err := s.PrepareAndQuery(query, interfaceGroups...)
 	if err != nil {
 		return nil, err

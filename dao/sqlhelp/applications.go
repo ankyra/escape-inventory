@@ -72,15 +72,20 @@ func (s *SQLHelper) SetApplicationHooks(app *Application, hooks Hooks) error {
 }
 
 func (s *SQLHelper) SetApplicationSubscribesToUpdatesFrom(app *Application, upstream []*Application) error {
-	stmt, err := s.DB.Prepare(s.DeleteSubscriptionsQuery)
+	tx, err := s.DB.Begin()
 	if err != nil {
 		return err
 	}
-	defer stmt.Close()
-	_, err = stmt.Exec(app.Project, app.Name)
+
+	_, err = tx.Exec(s.DeleteSubscriptionsQuery, app.Project, app.Name)
 	if err != nil {
 		return err
 	}
+	err = tx.Commit()
+	if err != nil {
+		return err
+	}
+
 	for _, upstreamApp := range upstream {
 		err := s.PrepareAndExecInsertIgnoreDups(s.AddSubscriptionQuery,
 			app.Project,
@@ -92,7 +97,7 @@ func (s *SQLHelper) SetApplicationSubscribesToUpdatesFrom(app *Application, upst
 			return err
 		}
 	}
-	return err
+	return nil
 }
 
 func (s *SQLHelper) GetDownstreamHooks(app *Application) ([]*Hooks, error) {
