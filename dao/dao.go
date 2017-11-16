@@ -47,8 +47,6 @@ func LoadFromConfig(conf *config.Config) error {
 		if err != nil {
 			return err
 		}
-		fmt.Println("here")
-
 		GlobalDAO = dao
 		return nil
 	} else if conf.Database == "postgres" {
