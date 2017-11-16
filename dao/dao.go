@@ -22,6 +22,7 @@ import (
 	"github.com/ankyra/escape-inventory/config"
 	"github.com/ankyra/escape-inventory/dao/mem"
 	"github.com/ankyra/escape-inventory/dao/postgres"
+	"github.com/ankyra/escape-inventory/dao/ql"
 	"github.com/ankyra/escape-inventory/dao/sqlite"
 	. "github.com/ankyra/escape-inventory/dao/types"
 )
@@ -39,6 +40,15 @@ func LoadFromConfig(conf *config.Config) error {
 		if err != nil {
 			return err
 		}
+		GlobalDAO = dao
+		return nil
+	} else if conf.Database == "ql" {
+		dao, err := ql.NewQLDAO(conf.DatabaseSettings.Path)
+		if err != nil {
+			return err
+		}
+		fmt.Println("here")
+
 		GlobalDAO = dao
 		return nil
 	} else if conf.Database == "postgres" {
