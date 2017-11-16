@@ -135,12 +135,6 @@
 			"revisionTime": "2017-05-27T21:44:04Z"
 		},
 		{
-			"checksumSHA1": "qe8jJYJ159c4UlCc5tXrjuA3gHw=",
-			"path": "github.com/ankyra/escape-registry/dao/sqlite",
-			"revision": "396e64bb618face7afa958b0c7565b0d0bd759f7",
-			"revisionTime": "2017-05-27T21:44:04Z"
-		},
-		{
 			"checksumSHA1": "ByzlxvAlo4Xo4+BGNH4nuAOedXk=",
 			"path": "github.com/ankyra/escape-registry/dao/types",
 			"revision": "396e64bb618face7afa958b0c7565b0d0bd759f7",
@@ -347,12 +341,6 @@
 			"revisionTime": "2017-10-24T18:00:00Z"
 		},
 		{
-			"checksumSHA1": "wXPn7mDehT7MjrBgzi0M1sduuLA=",
-			"path": "github.com/mattes/migrate/database/sqlite3",
-			"revision": "50068870a15f7c56518b5d7652dc799adb79183e",
-			"revisionTime": "2017-06-10T17:25:06Z"
-		},
-		{
 			"checksumSHA1": "kIHQkF+Nm0LBPppYbchll3njidY=",
 			"path": "github.com/mattes/migrate/source",
 			"revision": "50068870a15f7c56518b5d7652dc799adb79183e",
@@ -363,12 +351,6 @@
 			"path": "github.com/mattes/migrate/source/go-bindata",
 			"revision": "50068870a15f7c56518b5d7652dc799adb79183e",
 			"revisionTime": "2017-06-10T17:25:06Z"
-		},
-		{
-			"checksumSHA1": "CmknXrMVBRJrx4LsIA9jEOmsLQQ=",
-			"path": "github.com/mattn/go-sqlite3",
-			"revision": "47fc4e5e9153645da45af6a86a5bce95e63a0f9e",
-			"revisionTime": "2017-07-10T14:00:56Z"
 		},
 		{
 			"checksumSHA1": "bKMZjd2wPw13VwoE7mBeSv5djFA=",

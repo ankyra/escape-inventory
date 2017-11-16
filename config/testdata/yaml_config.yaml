@@ -1,5 +1,5 @@
 port: 9876
-database: sqlite
+database: ql
 database_settings:
   path: /var/lib/escape/inventory.db
 user_service_url: "http://user-service.com"

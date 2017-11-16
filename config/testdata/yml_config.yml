@@ -1,4 +1,4 @@
-database: sqlite
+database: ql
 database_settings:
   path: /var/lib/escape/inventory.db
 storage_backend: gcs
