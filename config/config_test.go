@@ -33,7 +33,7 @@ func (s *configSuite) Test_NewConfig_uses_Sqlite_and_local_storage_by_default(c 
 	conf, err := NewConfig(env)
 	c.Assert(err, IsNil)
 	c.Assert(conf.Port, Equals, "7770")
-	c.Assert(conf.Database, Equals, "sqlite")
+	c.Assert(conf.Database, Equals, "ql")
 	c.Assert(conf.DatabaseSettings.Path, Equals, "/var/lib/escape/inventory.db")
 	c.Assert(conf.StorageBackend, Equals, "local")
 	c.Assert(conf.StorageSettings.Path, Equals, "/var/lib/escape/releases")
@@ -55,11 +55,11 @@ func (s *configSuite) Test_LoadConfig_Uses_Default_Storage_Backend_If_Not_Config
 	c.Assert(conf.StorageSettings.Path, Equals, "/var/lib/escape/releases")
 }
 
-func (s *configSuite) Test_LoadConfig_SqliteDb(c *C) {
+func (s *configSuite) Test_LoadConfig_QLDb(c *C) {
 	env := []string{}
-	conf, err := LoadConfig("testdata/sqlite_db.json", env)
+	conf, err := LoadConfig("testdata/ql_db.json", env)
 	c.Assert(err, IsNil)
-	c.Assert(conf.Database, Equals, "sqlite")
+	c.Assert(conf.Database, Equals, "ql")
 	c.Assert(conf.DatabaseSettings.Path, Equals, "/var/lib/escape/inventory.db")
 }
 
@@ -109,7 +109,7 @@ func (s *configSuite) Test_LoadConfig_Parses_Yaml(c *C) {
 	conf, err := LoadConfig("testdata/yaml_config.yaml", env)
 	c.Assert(err, IsNil)
 	c.Assert(conf.Port, Equals, "9876")
-	c.Assert(conf.Database, Equals, "sqlite")
+	c.Assert(conf.Database, Equals, "ql")
 	c.Assert(conf.DatabaseSettings.Path, Equals, "/var/lib/escape/inventory.db")
 	c.Assert(conf.StorageBackend, Equals, "gcs")
 	c.Assert(conf.StorageSettings.Path, Equals, "")
@@ -123,7 +123,7 @@ func (s *configSuite) Test_LoadConfig_Parses_Yml(c *C) {
 	env := []string{}
 	conf, err := LoadConfig("testdata/yml_config.yml", env)
 	c.Assert(err, IsNil)
-	c.Assert(conf.Database, Equals, "sqlite")
+	c.Assert(conf.Database, Equals, "ql")
 	c.Assert(conf.DatabaseSettings.Path, Equals, "/var/lib/escape/inventory.db")
 	c.Assert(conf.StorageBackend, Equals, "gcs")
 	c.Assert(conf.StorageSettings.Path, Equals, "")

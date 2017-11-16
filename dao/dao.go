@@ -23,7 +23,6 @@ import (
 	"github.com/ankyra/escape-inventory/dao/mem"
 	"github.com/ankyra/escape-inventory/dao/postgres"
 	"github.com/ankyra/escape-inventory/dao/ql"
-	"github.com/ankyra/escape-inventory/dao/sqlite"
 	. "github.com/ankyra/escape-inventory/dao/types"
 )
 
@@ -34,13 +33,6 @@ func LoadFromConfig(conf *config.Config) error {
 		return fmt.Errorf("Missing database configuration variable")
 	} else if conf.Database == "memory" {
 		GlobalDAO = mem.NewInMemoryDAO()
-		return nil
-	} else if conf.Database == "sqlite" {
-		dao, err := sqlite.NewSQLiteDAO(conf.DatabaseSettings.Path)
-		if err != nil {
-			return err
-		}
-		GlobalDAO = dao
 		return nil
 	} else if conf.Database == "ql" {
 		dao, err := ql.NewQLDAO(conf.DatabaseSettings.Path)

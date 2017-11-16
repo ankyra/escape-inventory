@@ -60,9 +60,9 @@ func replaceMissingValuesWithDefaults(config *Config) {
 		config.Port = "7770"
 	}
 	if config.Database == "" {
-		config.Database = "sqlite"
+		config.Database = "ql"
 	}
-	if config.DatabaseSettings.Path == "" && config.Database == "sqlite" {
+	if config.DatabaseSettings.Path == "" && config.Database == "ql" {
 		config.DatabaseSettings.Path = "/var/lib/escape/inventory.db"
 	}
 	if config.StorageBackend == "" {
