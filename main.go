@@ -17,6 +17,7 @@ limitations under the License.
 package main
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/ankyra/escape-inventory/cmd"
@@ -55,7 +56,7 @@ var WriteRoutes = map[string]http.HandlerFunc{
 	"/api/v1/registry/{project}/register":                               handlers.RegisterHandler,
 	"/api/v1/registry/{project}/units/{name}/versions/{version}/upload": handlers.UploadHandler,
 
-	"/api/v1/internal/import": handlers.ImportReleasesHandler,
+	"/api/v1/internal/import": handlers.NewImportHandler().ImportReleases,
 }
 
 var UpdateRoutes = map[string]http.HandlerFunc{
@@ -66,7 +67,7 @@ var UpdateRoutes = map[string]http.HandlerFunc{
 
 var DevRoutes = map[string]map[string]http.HandlerFunc{
 	"/api/v1/internal/database": {
-		"DELETE": handlers.WipeDatabaseHandler,
+		"DELETE": handlers.NewDevHandler().WipeDatabase,
 	},
 }
 
@@ -103,5 +104,6 @@ func getMux(cfg *config.Config) *mux.Router {
 
 func main() {
 	cfg := cmd.LoadConfig()
+	fmt.Println(cfg.Dev)
 	cmd.StartInventory(getMux(cfg))
 }

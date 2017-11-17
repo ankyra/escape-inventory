@@ -19,12 +19,25 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/ankyra/escape-inventory/model"
 	"io/ioutil"
 	"net/http"
+
+	"github.com/ankyra/escape-inventory/model"
 )
 
-func ImportReleasesHandler(w http.ResponseWriter, r *http.Request) {
+type ImportHandler struct {
+	ImportReleasesFunc func([]map[string]interface{}) error
+}
+
+func NewImportHandler() *ImportHandler {
+	return &ImportHandler{
+		ImportReleasesFunc: func(releases []map[string]interface{}) error {
+			return model.Import(releases)
+		},
+	}
+}
+
+func (h ImportHandler) ImportReleases(w http.ResponseWriter, r *http.Request) {
 	if r.Body == nil {
 		HandleError(w, r, model.NewUserError(fmt.Errorf("Empty body")))
 		return
@@ -39,7 +52,7 @@ func ImportReleasesHandler(w http.ResponseWriter, r *http.Request) {
 		HandleError(w, r, model.NewUserError(err))
 		return
 	}
-	if err := model.Import(releasesList); err != nil {
+	if err := h.ImportReleasesFunc(releasesList); err != nil {
 		HandleError(w, r, err)
 		return
 	}

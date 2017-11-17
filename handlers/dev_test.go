@@ -17,24 +17,25 @@ limitations under the License.
 package handlers
 
 import (
-	"net/http"
+	"net/http/httptest"
 
-	"github.com/ankyra/escape-inventory/dao"
+	. "gopkg.in/check.v1"
 )
 
-type DevHandler struct {
-	WipeDatabaseFunc func() error
-}
+func (s *suite) Test_DevHandler_WipeDatabase_CallsFunc(c *C) {
+	req := httptest.NewRequest("GET", "/url", nil)
+	w := httptest.NewRecorder()
 
-func NewDevHandler() *DevHandler {
-	return &DevHandler{
+	var called bool
+
+	DevHandler{
 		WipeDatabaseFunc: func() error {
-			return dao.GlobalDAO.WipeDatabase()
+			called = true
+			return nil
 		},
-	}
-}
+	}.WipeDatabase(w, req)
 
-func (h DevHandler) WipeDatabase(w http.ResponseWriter, r *http.Request) {
-	h.WipeDatabaseFunc()
-	w.WriteHeader(200)
+	c.Assert(called, Equals, true)
+
+	c.Assert(w.Result().StatusCode, Equals, 200)
 }
