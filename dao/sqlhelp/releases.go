@@ -42,7 +42,7 @@ func (s *SQLHelper) AddRelease(release *Release) error {
 		release.Application.Name,
 		release.Metadata.GetReleaseId(),
 		release.Version,
-		release.Metadata.ToJson(),
+		[]byte(release.Metadata.ToJson()),
 		release.UploadedBy,
 		release.UploadedAt.Unix(),
 	)

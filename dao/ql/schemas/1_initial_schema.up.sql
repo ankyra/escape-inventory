@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS release (
     name string, 
     release_id string,
     version string,
-    metadata string,
+    metadata blob,
     project string,
     processed_dependencies bool DEFAULT false,
     downloads int DEFAULT 0,

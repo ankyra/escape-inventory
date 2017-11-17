@@ -20,12 +20,14 @@ import (
 	"time"
 
 	"github.com/ankyra/escape-core"
+	"github.com/ankyra/escape-core/util"
 	. "gopkg.in/check.v1"
 )
 
 func ValidateDAO(dao func() DAO, c *C) {
 	Validate_AddRelease_Unique(dao(), c)
 	Validate_AddRelease_Unique_per_project(dao(), c)
+	Validate_AddRelease_Big_Metadata(dao(), c)
 	Validate_GetRelease(dao(), c)
 	Validate_GetRelease_NotFound(dao(), c)
 	Validate_GetProjects(dao(), c)
@@ -87,6 +89,20 @@ func Validate_AddRelease_Unique_per_project(dao DAO, c *C) {
 	c.Assert(err, IsNil)
 	c.Assert(dao.AddRelease(NewRelease(app1, metadata)), IsNil)
 	c.Assert(dao.AddRelease(NewRelease(app2, metadata)), IsNil)
+}
+
+func Validate_AddRelease_Big_Metadata(dao DAO, c *C) {
+	app1 := NewApplication("_", "dao-val")
+	c.Assert(dao.AddProject(NewProject("_")), IsNil)
+	c.Assert(dao.AddApplication(app1), IsNil)
+	longValue := util.RandomString(70000)
+	metadataJson := `{"name": "dao-val", "metadata": {"key": "` + longValue + `"}, "version": "1"}`
+	metadata, err := core.NewReleaseMetadataFromJsonString(metadataJson)
+	c.Assert(err, IsNil)
+	c.Assert(dao.AddRelease(NewRelease(app1, metadata)), IsNil)
+	release, err := dao.GetRelease("_", "dao-val", "dao-val-v1")
+	c.Assert(err, IsNil)
+	c.Assert(release.Metadata.Metadata["key"], Equals, longValue)
 }
 
 func Validate_GetRelease(dao DAO, c *C) {
