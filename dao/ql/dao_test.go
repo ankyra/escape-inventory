@@ -18,11 +18,10 @@ package ql
 
 import (
 	"fmt"
-	"math/rand"
 	"os"
 	"testing"
-	"time"
 
+	"github.com/ankyra/escape-core/util"
 	"github.com/ankyra/escape-inventory/dao/types"
 	. "gopkg.in/check.v1"
 )
@@ -37,7 +36,7 @@ func (s *qlSuite) Test_DAO(c *C) {
 	os.Mkdir("testdata", os.ModePerm)
 	var dbName string
 	types.ValidateDAO(func() types.DAO {
-		dbName := fmt.Sprintf("./testdata/%s.db", randomString())
+		dbName := fmt.Sprintf("./testdata/%s.db", util.RandomString(6))
 		os.RemoveAll(dbName)
 		dao, err := NewQLDAO(dbName)
 		c.Assert(err, IsNil)
@@ -45,16 +44,4 @@ func (s *qlSuite) Test_DAO(c *C) {
 	}, c)
 	os.RemoveAll(dbName)
 	os.RemoveAll("testdata")
-}
-
-func randomString() string {
-	rand.Seed(time.Now().UnixNano())
-
-	var chars = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
-
-	b := make([]rune, 6)
-	for i := range b {
-		b[i] = chars[rand.Intn(len(chars))]
-	}
-	return string(b)
 }

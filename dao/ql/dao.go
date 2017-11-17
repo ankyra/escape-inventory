@@ -20,12 +20,11 @@ import (
 	"database/sql"
 	"fmt"
 	"io/ioutil"
-	"math/rand"
 	"os"
 	"path/filepath"
 	"strings"
-	"time"
 
+	"github.com/ankyra/escape-core/util"
 	"github.com/ankyra/escape-inventory/dao/sqlhelp"
 	. "github.com/ankyra/escape-inventory/dao/types"
 	_ "github.com/cznic/ql/driver"
@@ -169,18 +168,10 @@ func startupCheckDir(path string) error {
 		return fmt.Errorf("Directory does not exist %s :%s", escapeDir, err.Error())
 	}
 
-	rand.Seed(time.Now().UnixNano())
-
-	var chars = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
-
 	permissionTestFileName := ""
 
 	for len(permissionTestFileName) == 0 {
-		b := make([]rune, 6)
-		for i := range b {
-			b[i] = chars[rand.Intn(len(chars))]
-		}
-		fileName := escapeDir + "." + string(b)
+		fileName := escapeDir + "." + util.RandomString(6)
 		_, err = os.Stat(fileName)
 		if os.IsNotExist(err) {
 			permissionTestFileName = fileName
