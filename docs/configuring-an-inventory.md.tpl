@@ -4,7 +4,7 @@ slug: quickstart-configure-inventory
 type: "docs"
 toc: true
 
-back: /installation/
+back: /docs/installation/
 backLabel: Installation
 next: /docs/quickstart-building-a-package
 nextLabel: Building a Package
