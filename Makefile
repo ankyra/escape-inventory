@@ -20,3 +20,5 @@ start-dev:
 postgres-dev:
 	(docker kill pg-test || docker rm pg-test || true) && docker run --name pg-test -t --rm -p 5432:5432 postgres
 
+docs-build:
+	escape run release -f --skip-tests --skip-deploy && cd ../escape-integration-tests && escape run release --skip-build --skip-deploy && cd -

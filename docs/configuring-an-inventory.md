@@ -4,7 +4,7 @@ slug: quickstart-configure-inventory
 type: "docs"
 toc: true
 
-back: /installation/
+back: /docs/installation/
 backLabel: Installation
 next: /docs/quickstart-building-a-package
 nextLabel: Building a Package
@@ -23,8 +23,8 @@ the pre-built binaries or run a Docker container.
 ### Linux
 
 ```
-curl -O https://storage.googleapis.com/escape-releases-eu/escape-inventory/0.12.4/escape-inventory-v0.12.4-linux-amd64.tgz
-tar -xvzf escape-v0.12.4-linux-amd64.tgz
+curl -O https://storage.googleapis.com/escape-releases-eu/escape-inventory/0.12.9/escape-inventory-v0.12.9-linux-amd64.tgz
+tar -xvzf escape-v0.12.9-linux-amd64.tgz
 sudo mv escape-inventory /usr/bin/escape-inventory
 escape-inventory
 ```
@@ -32,8 +32,8 @@ escape-inventory
 ### MacOS
 
 ```
-curl -O https://storage.googleapis.com/escape-releases-eu/escape-inventory/0.12.4/escape-inventory-v0.12.4-darwin-amd64.tgz
-tar -xvzf escape-v0.12.4-darwin-amd64.tgz
+curl -O https://storage.googleapis.com/escape-releases-eu/escape-inventory/0.12.9/escape-inventory-v0.12.9-darwin-amd64.tgz
+tar -xvzf escape-v0.12.9-darwin-amd64.tgz
 sudo mv escape-inventory /usr/bin/escape-inventory
 escape-inventory
 ```
@@ -41,7 +41,7 @@ escape-inventory
 ### Docker
 
 ```
-docker run -P -it ankyra/escape-inventory:v0.12.4
+docker run -P -it ankyra/escape-inventory:v0.12.9
 ```
 
 ## Configuring the Inventory
