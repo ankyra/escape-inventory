@@ -24,20 +24,20 @@ import (
 	. "gopkg.in/check.v1"
 )
 
-func (s *suite) Test_ImportHandler_ImportReleases_CallsFunc(c *C) {
+func (s *suite) Test_importReleases_CallsFunc(c *C) {
 	req := httptest.NewRequest("GET", "/url", strings.NewReader(`[{"test": 1}]`))
 	w := httptest.NewRecorder()
 
 	var called bool
 	var input []map[string]interface{}
 
-	ImportHandler{
+	importHandlerProvider{
 		ImportReleasesFunc: func(releases []map[string]interface{}) error {
 			called = true
 			input = releases
 			return nil
 		},
-	}.ImportReleases(w, req)
+	}.importReleases(w, req)
 
 	c.Assert(called, Equals, true)
 	c.Assert(input, NotNil)
@@ -51,15 +51,15 @@ func (s *suite) Test_ImportHandler_ImportReleases_CallsFunc(c *C) {
 
 }
 
-func (s *suite) Test_ImportHandler_ImportReleases_Errors_NoBody(c *C) {
+func (s *suite) Test_importReleases_Errors_NoBody(c *C) {
 	req := httptest.NewRequest("GET", "/url", nil)
 	w := httptest.NewRecorder()
 
-	ImportHandler{
+	importHandlerProvider{
 		ImportReleasesFunc: func(releases []map[string]interface{}) error {
 			return nil
 		},
-	}.ImportReleases(w, req)
+	}.importReleases(w, req)
 
 	c.Assert(w.Result().StatusCode, Equals, 400)
 
@@ -67,15 +67,15 @@ func (s *suite) Test_ImportHandler_ImportReleases_Errors_NoBody(c *C) {
 	c.Assert(string(body), Equals, "unexpected end of JSON input")
 }
 
-func (s *suite) Test_ImportHandler_ImportReleases_Errors_IncorrectBodySchema(c *C) {
+func (s *suite) Test_importHandler_ImportReleases_Errors_IncorrectBodySchema(c *C) {
 	req := httptest.NewRequest("GET", "/url", strings.NewReader(`{}`))
 	w := httptest.NewRecorder()
 
-	ImportHandler{
+	importHandlerProvider{
 		ImportReleasesFunc: func(releases []map[string]interface{}) error {
 			return nil
 		},
-	}.ImportReleases(w, req)
+	}.importReleases(w, req)
 
 	c.Assert(w.Result().StatusCode, Equals, 400)
 

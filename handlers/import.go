@@ -25,19 +25,21 @@ import (
 	"github.com/ankyra/escape-inventory/model"
 )
 
-type ImportHandler struct {
+type importHandlerProvider struct {
 	ImportReleasesFunc func([]map[string]interface{}) error
 }
 
-func NewImportHandler() *ImportHandler {
-	return &ImportHandler{
-		ImportReleasesFunc: func(releases []map[string]interface{}) error {
-			return model.Import(releases)
-		},
+func newImportHandlerProvider() *importHandlerProvider {
+	return &importHandlerProvider{
+		ImportReleasesFunc: model.Import,
 	}
 }
 
-func (h ImportHandler) ImportReleases(w http.ResponseWriter, r *http.Request) {
+func ImportReleasesHandler(w http.ResponseWriter, r *http.Request) {
+	newImportHandlerProvider().importReleases(w, r)
+}
+
+func (h importHandlerProvider) importReleases(w http.ResponseWriter, r *http.Request) {
 	if r.Body == nil {
 		HandleError(w, r, model.NewUserError(fmt.Errorf("Empty body")))
 		return

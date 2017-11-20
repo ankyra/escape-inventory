@@ -22,19 +22,21 @@ import (
 	"github.com/ankyra/escape-inventory/dao"
 )
 
-type DevHandler struct {
+type devHandlerProvider struct {
 	WipeDatabaseFunc func() error
 }
 
-func NewDevHandler() *DevHandler {
-	return &DevHandler{
-		WipeDatabaseFunc: func() error {
-			return dao.GlobalDAO.WipeDatabase()
-		},
+func NewDevHandlerProvider() *devHandlerProvider {
+	return &devHandlerProvider{
+		WipeDatabaseFunc: dao.GlobalDAO.WipeDatabase,
 	}
 }
 
-func (h DevHandler) WipeDatabase(w http.ResponseWriter, r *http.Request) {
+func WipeDatabaseHandler(w http.ResponseWriter, r *http.Request) {
+	NewDevHandlerProvider().wipeDatabase(w, r)
+}
+
+func (h devHandlerProvider) wipeDatabase(w http.ResponseWriter, r *http.Request) {
 	h.WipeDatabaseFunc()
 	w.WriteHeader(200)
 }

@@ -20,6 +20,16 @@ import (
 	"net/http"
 )
 
+type healthCheckHandlerProvider struct{}
+
+func newhealthCheckHandlerProvider() *healthCheckHandlerProvider {
+	return &healthCheckHandlerProvider{}
+}
+
 func HealthCheckHandler(w http.ResponseWriter, r *http.Request) {
+	newhealthCheckHandlerProvider().healthCheck(w, r)
+}
+
+func (h healthCheckHandlerProvider) healthCheck(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(200)
 }

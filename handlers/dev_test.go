@@ -22,18 +22,18 @@ import (
 	. "gopkg.in/check.v1"
 )
 
-func (s *suite) Test_DevHandler_WipeDatabase_CallsFunc(c *C) {
+func (s *suite) Test_wipeDatabase_CallsFunc(c *C) {
 	req := httptest.NewRequest("GET", "/url", nil)
 	w := httptest.NewRecorder()
 
 	var called bool
 
-	DevHandler{
+	devHandlerProvider{
 		WipeDatabaseFunc: func() error {
 			called = true
 			return nil
 		},
-	}.WipeDatabase(w, req)
+	}.wipeDatabase(w, req)
 
 	c.Assert(called, Equals, true)
 

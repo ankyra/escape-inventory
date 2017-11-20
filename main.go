@@ -56,7 +56,7 @@ var WriteRoutes = map[string]http.HandlerFunc{
 	"/api/v1/registry/{project}/register":                               handlers.RegisterHandler,
 	"/api/v1/registry/{project}/units/{name}/versions/{version}/upload": handlers.UploadHandler,
 
-	"/api/v1/internal/import": handlers.NewImportHandler().ImportReleases,
+	"/api/v1/internal/import": handlers.ImportReleasesHandler,
 }
 
 var UpdateRoutes = map[string]http.HandlerFunc{
@@ -67,7 +67,7 @@ var UpdateRoutes = map[string]http.HandlerFunc{
 
 var DevRoutes = map[string]map[string]http.HandlerFunc{
 	"/api/v1/internal/database": {
-		"DELETE": handlers.NewDevHandler().WipeDatabase,
+		"DELETE": handlers.WipeDatabaseHandler,
 	},
 }
 
