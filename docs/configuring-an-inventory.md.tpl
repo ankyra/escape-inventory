@@ -3,6 +3,12 @@ title: "Configuring an Inventory"
 slug: quickstart-configure-inventory 
 type: "docs"
 toc: true
+
+back: /installation/
+backLabel: Installation
+next: /docs/quickstart-building-a-package
+nextLabel: Building a Package
+contributeLink: https://example.com/
 ---
 
 Before we can truly kick off we need to configure an Escape Inventory. The
