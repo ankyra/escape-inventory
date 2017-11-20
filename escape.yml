@@ -50,5 +50,10 @@ errands:
         Should this errand upload to GCS? If not, then this errand will only
         build the binaries.
 
-templates:
-- cmd/metadata.go.tpl
+build_templates:
+- file: cmd/metadata.go.tpl
+  mapping:
+    version: $this.version
+- file: docs/configuring-an-inventory.md.tpl
+  mapping:
+    version: $this.version
