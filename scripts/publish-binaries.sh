@@ -3,8 +3,8 @@
 set -e -o pipefail
 
 
-PLATFORMS="linux"
-ARCHS="amd64"
+PLATFORMS="darwin linux"
+ARCHS="386 amd64"
 
 BASE_DIR=$(dirname "$(readlink -f "$0")")
 SRC_DIR=$(readlink -f "${BASE_DIR}/../")
