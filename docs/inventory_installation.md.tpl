@@ -1,13 +1,13 @@
 ---
-title: "Configuring an Inventory"
-slug: quickstart-configure-inventory 
+title: "Installing Inventory"
+slug: inventory-installation
 type: "docs"
 toc: true
 
-back: /docs/installation/
+back: /docs/escape-installation/
 backLabel: Installation
-next: /docs/quickstart-building-a-package/
-nextLabel: Building a Package
+next: /docs/quickstart-configure-escape/
+nextLabel: Configuring Escape
 contributeLink: https://example.com/
 ---
 
@@ -65,29 +65,3 @@ Volume](https://docs.docker.com/engine/admin/volumes/volumes/) for the
 docker create -v /var/lib/escape/ --name inventory ankyra/escape-inventory:v{{version}}
 docker run --volumes-from inventory -P -it ankyra/escape-inventory:v{{version}}
 ```
-
-# Configuring Escape
-
-We have our own instance of the Inventory running now, but we need to tell
-Escape to use it, because our default configuration profile is set up to go the
-central Ankyra repository:
-
-```
-escape config profile
-```
-
-We can "login" to our local instance and create and activate a new profile 
-using the [escape login](/docs/escape_login/) command:
-
-```
-escape login --url http://localhost:7770/ --target-profile local
-```
-
-If everything is working correctly we should now be able to query our empty repository 
-from the command line using:
-
-```
-escape inventory query --json
-```
-
-Beautiful, let's build something!
