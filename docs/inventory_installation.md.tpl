@@ -50,16 +50,16 @@ escape-inventory
 
 ## Docker
 
-We also provide a Docker image on the public [Docker
-Hub](https://hub.docker.com/r/ankyra/escape-inventory/):
+We also provide a Docker image on the public 
+<a href='https://hub.docker.com/r/ankyra/escape-inventory/' target='_blank'>Docker Hub</a>
 
 ```
 docker run -P -it ankyra/escape-inventory:v{{version}}
 ```
 
-We can use a [Docker
-Volume](https://docs.docker.com/engine/admin/volumes/volumes/) for the
-`/var/lib/escape/` directory to make sure our data is persisted:
+We can use a 
+<a href='https://docs.docker.com/engine/admin/volumes/volumes/' target="_blank">Docker Volume</a>
+for the `/var/lib/escape/` directory to make sure our data is persisted:
 
 ```
 docker create -v /var/lib/escape/ --name inventory ankyra/escape-inventory:v{{version}}

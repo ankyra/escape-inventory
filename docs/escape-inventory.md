@@ -36,7 +36,7 @@ following default configuration:
 }
 ```
 
-This configures the Inventory with an [ql](https://github.com/cznic/ql)
+This configures the Inventory with an <a href='https://github.com/cznic/ql' target='_blank'>ql</a>
 database and a local file system storage backend, which is the recommended way
 to run the Inventory for development purposes. For production use we currently
 support a Google Cloud Storage backend and a Postgresql database.
@@ -137,7 +137,7 @@ export DATABASE_SETTINGS_PATH=/var/lib/escape/inventory.db
 ## Postgresql
 
 Postgresql can be configured using the `postgres_url` variable. Please see 
-https://godoc.org/github.com/lib/pq for the full connection string parameters.
+<a href='https://godoc.org/github.com/lib/pq' target='_blank'>pq</a> for the full connection string parameters.
 
 ```json
 {
