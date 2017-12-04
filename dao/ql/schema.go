@@ -84,7 +84,7 @@ func _1_initial_schemaDownSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "1_initial_schema.down.sql", size: 156, mode: os.FileMode(420), modTime: time.Unix(1510843988, 0)}
+	info := bindataFileInfo{name: "1_initial_schema.down.sql", size: 156, mode: os.FileMode(436), modTime: time.Unix(1511172530, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -104,7 +104,7 @@ func _1_initial_schemaUpSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "1_initial_schema.up.sql", size: 2050, mode: os.FileMode(420), modTime: time.Unix(1510931879, 0)}
+	info := bindataFileInfo{name: "1_initial_schema.up.sql", size: 2050, mode: os.FileMode(436), modTime: time.Unix(1511174326, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }

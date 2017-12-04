@@ -83,6 +83,7 @@ func (s *SQLHelper) PrepareAndExec(query string, arg ...interface{}) error {
 
 	_, err = tx.Exec(query, arg...)
 	if err != nil {
+		tx.Rollback()
 		return err
 	}
 
@@ -94,16 +95,17 @@ func (s *SQLHelper) PrepareAndExecInsert(query string, arg ...interface{}) error
 	if err != nil {
 		return err
 	}
-	defer tx.Commit()
 
 	_, err = tx.Exec(query, arg...)
 
 	if err != nil {
+		tx.Rollback()
 		if s.IsUniqueConstraintError(err) {
 			return AlreadyExists
 		}
+		return err
 	}
-	return err
+	return tx.Commit()
 }
 
 func (s *SQLHelper) PrepareAndExecInsertIgnoreDups(query string, arg ...interface{}) error {
@@ -114,9 +116,11 @@ func (s *SQLHelper) PrepareAndExecInsertIgnoreDups(query string, arg ...interfac
 
 	_, err = tx.Exec(query, arg...)
 	if err != nil {
+		tx.Rollback()
 		if s.IsUniqueConstraintError(err) {
 			return nil
 		}
+		return err
 	}
 	return tx.Commit()
 }
@@ -126,20 +130,25 @@ func (s *SQLHelper) PrepareAndExecUpdate(query string, arg ...interface{}) error
 	if err != nil {
 		return err
 	}
-	defer tx.Commit()
 
 	result, err := tx.Exec(query, arg...)
 	if err != nil {
+		tx.Rollback()
+		if s.IsUniqueConstraintError(err) {
+			return AlreadyExists
+		}
 		return err
 	}
 	rowsAffected, err := result.RowsAffected()
 	if err != nil {
+		tx.Rollback()
 		return err
 	}
 	if rowsAffected == 0 {
+		tx.Rollback()
 		return NotFound
 	}
-	return err
+	return tx.Commit()
 }
 
 func (s *SQLHelper) WipeDatabase() error {

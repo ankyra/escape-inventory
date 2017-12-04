@@ -14,6 +14,7 @@ func (s *SQLHelper) SetACL(project, group string, perm Permission) error {
 		return s.PrepareAndExecUpdate(s.UpdateACLQuery,
 			int(perm), project, group)
 	}
+	return err
 }
 
 func (s *SQLHelper) GetACL(project string) (map[string]Permission, error) {
