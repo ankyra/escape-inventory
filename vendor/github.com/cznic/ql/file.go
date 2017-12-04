@@ -1114,7 +1114,7 @@ func walName(dbname string) (r string) {
 	base := filepath.Base(filepath.Clean(dbname))
 	h := sha1.New()
 	io.WriteString(h, base)
-	return filepath.Join(filepath.Dir(dbname), fmt.Sprintf(".r%x", h.Sum(nil)))
+	return filepath.Join(filepath.Dir(dbname), fmt.Sprintf(".%x", h.Sum(nil)))
 }
 
 type fileIndex struct {

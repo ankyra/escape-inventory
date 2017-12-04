@@ -2,7 +2,6 @@ package sqlhelp
 
 import (
 	. "github.com/ankyra/escape-inventory/dao/types"
-	"github.com/ankyra/escape-middleware/errors"
 )
 
 func (s *SQLHelper) SetACL(project, group string, perm Permission) error {
@@ -10,7 +9,7 @@ func (s *SQLHelper) SetACL(project, group string, perm Permission) error {
 		project,
 		group,
 		int(perm))
-	if err == errors.AlreadyExists {
+	if err == AlreadyExists {
 		return s.PrepareAndExecUpdate(s.UpdateACLQuery,
 			int(perm), project, group)
 	}
