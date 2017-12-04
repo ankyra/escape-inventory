@@ -54,6 +54,3 @@ build_templates:
 - file: cmd/metadata.go.tpl
   mapping:
     version: $this.version
-- file: docs/inventory_installation.md.tpl
-  mapping:
-    version: $this.version
