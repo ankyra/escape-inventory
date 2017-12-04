@@ -8,6 +8,35 @@ import (
 	. "github.com/ankyra/escape-inventory/dao/types"
 )
 
+func (s *SQLHelper) AddRelease(release *Release) error {
+	return s.PrepareAndExecInsert(s.AddReleaseQuery,
+		release.Application.Project,
+		release.Application.Name,
+		release.Metadata.GetReleaseId(),
+		release.Version,
+		[]byte(release.Metadata.ToJson()),
+		release.UploadedBy,
+		release.UploadedAt.Unix(),
+	)
+}
+
+func (s *SQLHelper) UpdateRelease(release *Release) error {
+	return s.PrepareAndExecUpdate(s.UpdateReleaseQuery,
+		release.ProcessedDependencies,
+		release.Downloads,
+		release.Application.Project,
+		release.Application.Name,
+		release.ReleaseId,
+	)
+}
+
+func (s *SQLHelper) AddPackageURI(release *Release, uri string) error {
+	return s.PrepareAndExecInsert(s.AddPackageURIQuery,
+		release.Application.Project,
+		release.ReleaseId,
+		uri)
+}
+
 func (s *SQLHelper) FindAllVersions(app *Application) ([]string, error) {
 	rows, err := s.PrepareAndQuery(s.FindAllVersionsQuery, app.Project, app.Name)
 	if err != nil {
@@ -36,49 +65,12 @@ func (s *SQLHelper) GetAllReleases() ([]*Release, error) {
 	return s.scanReleases(rows)
 }
 
-func (s *SQLHelper) AddRelease(release *Release) error {
-	return s.PrepareAndExecInsert(s.AddReleaseQuery,
-		release.Application.Project,
-		release.Application.Name,
-		release.Metadata.GetReleaseId(),
-		release.Version,
-		[]byte(release.Metadata.ToJson()),
-		release.UploadedBy,
-		release.UploadedAt.Unix(),
-	)
-}
-
-func (s *SQLHelper) UpdateRelease(release *Release) error {
-	return s.PrepareAndExecUpdate(s.UpdateReleaseQuery,
-		release.ProcessedDependencies,
-		release.Downloads,
-		release.Application.Project,
-		release.Application.Name,
-		release.ReleaseId,
-	)
-}
-
 func (s *SQLHelper) GetPackageURIs(release *Release) ([]string, error) {
 	rows, err := s.PrepareAndQuery(s.GetPackageURIsQuery, release.Application.Project, release.ReleaseId)
 	if err != nil {
 		return nil, err
 	}
 	return s.ReadRowsIntoStringArray(rows)
-}
-
-func (s *SQLHelper) AddPackageURI(release *Release, uri string) error {
-	tx, err := s.DB.Begin()
-	if err != nil {
-		return err
-	}
-	_, err = tx.Exec(s.AddPackageURIQuery, release.Application.Project, release.ReleaseId, uri)
-	if err != nil {
-		if s.IsUniqueConstraintError(err) {
-			return AlreadyExists
-		}
-		return err
-	}
-	return tx.Commit()
 }
 
 func (s *SQLHelper) scanRelease(project, name string, rows *sql.Rows) (*Release, error) {

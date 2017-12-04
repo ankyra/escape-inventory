@@ -2,27 +2,18 @@ package sqlhelp
 
 import (
 	. "github.com/ankyra/escape-inventory/dao/types"
+	"github.com/ankyra/escape-middleware/errors"
 )
 
 func (s *SQLHelper) SetACL(project, group string, perm Permission) error {
-	tx, err := s.DB.Begin()
-	if err != nil {
-		return err
+	err := s.PrepareAndExecInsert(s.InsertACLQuery,
+		project,
+		group,
+		int(perm))
+	if err == errors.AlreadyExists {
+		return s.PrepareAndExecUpdate(s.UpdateACLQuery,
+			int(perm), project, group)
 	}
-
-	_, err = tx.Exec(s.InsertACLQuery, project, group, int(perm))
-	if err != nil {
-		if s.IsUniqueConstraintError(err) {
-			stmt, err := s.DB.Prepare(s.UpdateACLQuery)
-			if err != nil {
-				return err
-			}
-			_, err = stmt.Exec(int(perm), project, group)
-			return err
-		}
-		return err
-	}
-	return tx.Commit()
 }
 
 func (s *SQLHelper) GetACL(project string) (map[string]Permission, error) {
@@ -44,17 +35,9 @@ func (s *SQLHelper) GetACL(project string) (map[string]Permission, error) {
 }
 
 func (s *SQLHelper) DeleteACL(project, group string) error {
-	tx, err := s.DB.Begin()
-	if err != nil {
-		return err
-	}
-
-	_, err = tx.Exec(s.DeleteACLQuery, project, group)
-	if err != nil {
-		return err
-	}
-
-	return tx.Commit()
+	return s.PrepareAndExec(s.DeleteACLQuery,
+		project,
+		group)
 }
 
 func (s *SQLHelper) GetPermittedGroups(project string, perm Permission) ([]string, error) {
