@@ -1,2 +1,1 @@
-ALTER TABLE release DROP COLUMN metadata;
-ALTER TABLE release ADD COLUMN metadata bytea;
+ALTER TABLE release ALTER COLUMN metadata TYPE bytea USING metadata::bytea;

@@ -18,6 +18,7 @@ package postgres
 
 import (
 	"database/sql"
+	"io/ioutil"
 	"os"
 	"testing"
 
@@ -61,5 +62,45 @@ func (s *memSuite) Test_DAO(c *C) {
 		}, c)
 	} else {
 		println("Postgres tests have not been enabled. Use ENABLE_POSTGRES_TESTS=1 to do so")
+	}
+}
+
+func (s *memSuite) Test_DAO_migrate(c *C) {
+	enableTest := false
+	for _, e := range os.Environ() {
+		if e == "ENABLE_POSTGRES_TESTS=1" {
+			enableTest = true
+		}
+	}
+	if !enableTest {
+		return
+	}
+	testfiles := []string{"testdata/migration_test_dump.sql"}
+	for _, file := range testfiles {
+		// Empty database
+		url := "postgres://postgres:@localhost/postgres?sslmode=disable"
+		db, err := sql.Open("postgres", url)
+		c.Assert(err, IsNil)
+		_, err = db.Exec(`DROP TABLE release CASCADE`)
+		_, err = db.Exec(`DROP TABLE package CASCADE`)
+		_, err = db.Exec(`DROP TABLE acl CASCADE`)
+		_, err = db.Exec(`DROP TABLE application CASCADE`)
+		_, err = db.Exec(`DROP TABLE project CASCADE`)
+		_, err = db.Exec(`DROP TABLE release_dependency CASCADE`)
+		_, err = db.Exec(`DROP TABLE subscriptions CASCADE`)
+		_, err = db.Exec(`DROP TABLE schema_migrations CASCADE`)
+
+		bytes, err := ioutil.ReadFile(file)
+		c.Assert(err, IsNil)
+		_, err = db.Exec(string(bytes))
+		c.Assert(err, IsNil)
+		// Create unit
+		dao, err := NewPostgresDAO(url)
+		c.Assert(err, IsNil)
+
+		release, err := dao.GetRelease("project", "test", "project/test-v1.0")
+		c.Assert(err, IsNil)
+		c.Assert(release.Metadata, Not(IsNil))
+		c.Assert(release.Metadata.Description, Equals, "yo")
 	}
 }
