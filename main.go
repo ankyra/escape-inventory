@@ -17,7 +17,7 @@ limitations under the License.
 package main
 
 import (
-	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/ankyra/escape-inventory/cmd"
@@ -104,6 +104,8 @@ func getMux(cfg *config.Config) *mux.Router {
 
 func main() {
 	cfg := cmd.LoadConfig()
-	fmt.Println(cfg.Dev)
+	if cfg.Dev {
+		log.Println("INFO: Starting in Dev mode.")
+	}
 	cmd.StartInventory(getMux(cfg))
 }
