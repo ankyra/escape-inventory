@@ -51,6 +51,10 @@ type SQLHelper struct {
 	UpdateACLQuery          string
 	DeleteACLQuery          string
 	GetPermittedGroupsQuery string
+
+	CreateUsernameMetricsQuery   string
+	GetMetricsByUsernameQuery    string
+	SetProjectCountMetricForUser string
 }
 
 func (s *SQLHelper) ReadRowsIntoStringArray(rows *sql.Rows) ([]string, error) {

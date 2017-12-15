@@ -45,6 +45,7 @@ func ValidateDAO(dao func() DAO, c *C) {
 	Validate_GetReleasesWithoutProcessedDependencies(dao(), c)
 	Validate_Dependencies(dao(), c)
 	Validate_DependenciesByGroups(dao(), c)
+	Validate_Metrics(dao(), c)
 	Validate_WipeDatabase(dao(), c)
 }
 
@@ -557,6 +558,26 @@ func Validate_DependenciesByGroups(dao DAO, c *C) {
 	ds, err = dao.GetDownstreamDependenciesByGroups(release, []string{"cheeky-group"})
 	c.Assert(err, IsNil)
 	c.Assert(ds, HasLen, 1)
+}
+
+func Validate_Metrics(dao DAO, c *C) {
+	metrics, err := dao.GetUserMetrics("test-user")
+	c.Assert(err, IsNil)
+	c.Assert(metrics, Not(IsNil))
+	c.Assert(metrics.ProjectCount, Equals, 0)
+
+	newMetrics := Metrics{
+		ProjectCount: 3,
+	}
+	err = dao.SetUserMetrics("test-user", metrics, &newMetrics)
+	c.Assert(err, IsNil)
+	obtained, err := dao.GetUserMetrics("test-user")
+	c.Assert(err, IsNil)
+	c.Assert(obtained, Not(IsNil))
+	c.Assert(obtained.ProjectCount, Equals, 3)
+
+	err = dao.SetUserMetrics("yo-i-dont-exist", metrics, &newMetrics)
+	c.Assert(err, Equals, NotFound)
 }
 
 func Validate_WipeDatabase(dao DAO, c *C) {

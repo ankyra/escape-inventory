@@ -40,6 +40,7 @@ type dao struct {
 	subscriptions    map[*Application][]*Application
 	releases         map[*Release]*release
 	acls             map[string]map[string]Permission
+	metrics          map[string]*Metrics
 }
 
 func NewInMemoryDAO() DAO {
@@ -52,6 +53,7 @@ func NewInMemoryDAO() DAO {
 		subscriptions:    map[*Application][]*Application{},
 		releases:         map[*Release]*release{},
 		acls:             map[string]map[string]Permission{},
+		metrics:          map[string]*Metrics{},
 	}
 }
 

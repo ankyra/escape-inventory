@@ -176,6 +176,14 @@ func GetAllReleasesWithoutProcessedDependencies() ([]*Release, error) {
 	return GlobalDAO.GetAllReleasesWithoutProcessedDependencies()
 }
 
+func GetUserMetrics(username string) (*Metrics, error) {
+	return GlobalDAO.GetUserMetrics(username)
+}
+
+func SetUserMetrics(username string, previous, new *Metrics) error {
+	return GlobalDAO.SetUserMetrics(username, previous, new)
+}
+
 func IsNotFound(err error) bool {
 	return err == NotFound
 }

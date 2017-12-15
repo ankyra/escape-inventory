@@ -110,6 +110,16 @@ func NewRelease(app *Application, metadata *core.ReleaseMetadata) *Release {
 	}
 }
 
+type Metrics struct {
+	ProjectCount int
+}
+
+func NewMetrics(projectCount int) *Metrics {
+	return &Metrics{
+		ProjectCount: projectCount,
+	}
+}
+
 type DAO interface {
 	GetProject(project string) (*Project, error)
 	AddProject(*Project) error
@@ -147,6 +157,9 @@ type DAO interface {
 	GetACL(project string) (map[string]Permission, error)
 	DeleteACL(project, group string) error
 	GetPermittedGroups(project string, perm Permission) ([]string, error)
+
+	GetUserMetrics(username string) (*Metrics, error)
+	SetUserMetrics(username string, previous, new *Metrics) error
 
 	WipeDatabase() error
 }

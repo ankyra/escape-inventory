@@ -2,6 +2,8 @@
 // sources:
 // dao/ql/schemas/1_initial_schema.down.sql
 // dao/ql/schemas/1_initial_schema.up.sql
+// dao/ql/schemas/2_metrics.down.sql
+// dao/ql/schemas/2_metrics.up.sql
 // DO NOT EDIT!
 
 package ql
@@ -109,6 +111,46 @@ func _1_initial_schemaUpSql() (*asset, error) {
 	return a, nil
 }
 
+var __2_metricsDownSql = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x72\x09\xf2\x0f\x50\x08\x71\x74\xf2\x71\x55\xc8\x4d\x2d\x29\xca\x4c\x2e\xb6\xe6\x02\x8b\x79\xfa\xb9\xb8\x46\xc0\xc4\xe2\x0b\xb2\xad\xb9\x00\x01\x00\x00\xff\xff\x18\x02\x28\x6c\x2b\x00\x00\x00")
+
+func _2_metricsDownSqlBytes() ([]byte, error) {
+	return bindataRead(
+		__2_metricsDownSql,
+		"2_metrics.down.sql",
+	)
+}
+
+func _2_metricsDownSql() (*asset, error) {
+	bytes, err := _2_metricsDownSqlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "2_metrics.down.sql", size: 43, mode: os.FileMode(436), modTime: time.Unix(1513361884, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var __2_metricsUpSql = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x44\xcd\xb1\x0a\x83\x30\x14\x46\xe1\x3d\x4f\xf1\x8f\x15\x1c\xba\x3b\xa5\xf5\x0a\x01\x89\xb4\xde\x80\x9b\x94\x10\x4a\x5a\x8c\x92\x5c\xdf\xbf\x50\x2a\x5d\xcf\x70\xbe\xeb\x9d\x34\x13\x58\x5f\x7a\xc2\x12\x24\x47\x5f\x70\x52\x00\xb0\x97\x90\xd3\x63\x09\x28\x92\x63\x7a\xd6\xdf\xb8\xe5\xf5\x15\xbc\xcc\x7e\xdd\x93\x20\x26\x41\x4b\x9d\x76\x3d\xe3\x5c\xab\xaa\x51\xea\x37\x74\xd6\xdc\x1c\xc1\xd8\x96\x26\x98\x0e\x76\x60\xd0\x64\x46\x1e\x0f\x65\xde\xde\x18\xec\xdf\x3c\xb8\xaa\x51\x9f\x00\x00\x00\xff\xff\x1c\x82\x9d\xbd\x95\x00\x00\x00")
+
+func _2_metricsUpSqlBytes() ([]byte, error) {
+	return bindataRead(
+		__2_metricsUpSql,
+		"2_metrics.up.sql",
+	)
+}
+
+func _2_metricsUpSql() (*asset, error) {
+	bytes, err := _2_metricsUpSqlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "2_metrics.up.sql", size: 149, mode: os.FileMode(436), modTime: time.Unix(1513361866, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
 // Asset loads and returns the asset for the given name.
 // It returns an error if the asset could not be found or
 // could not be loaded.
@@ -163,6 +205,8 @@ func AssetNames() []string {
 var _bindata = map[string]func() (*asset, error){
 	"1_initial_schema.down.sql": _1_initial_schemaDownSql,
 	"1_initial_schema.up.sql": _1_initial_schemaUpSql,
+	"2_metrics.down.sql": _2_metricsDownSql,
+	"2_metrics.up.sql": _2_metricsUpSql,
 }
 
 // AssetDir returns the file names below a certain
@@ -207,6 +251,8 @@ type bintree struct {
 var _bintree = &bintree{nil, map[string]*bintree{
 	"1_initial_schema.down.sql": &bintree{_1_initial_schemaDownSql, map[string]*bintree{}},
 	"1_initial_schema.up.sql": &bintree{_1_initial_schemaUpSql, map[string]*bintree{}},
+	"2_metrics.down.sql": &bintree{_2_metricsDownSql, map[string]*bintree{}},
+	"2_metrics.up.sql": &bintree{_2_metricsUpSql, map[string]*bintree{}},
 }}
 
 // RestoreAsset restores an asset under the given directory
