@@ -23,11 +23,23 @@ includes:
 - storage/
 - vendor/
 
+extends:
+- extension-golang-binary-latest
+
+inputs:
+- id: package_name
+  default: "github.com/ankyra/escape-inventory"
+  visible: false
+- id: binary_name
+  default: "escape-inventory"
+  visible: false
+- id: escape_go_dependencies
+  type: list[string]
+  default: 
+  - _/escape-core:github.com/ankyra/escape-core
+
 metadata:
   release_metadata_api_version: $core.metadata.release_metadata_api_version
-
-post_build: scripts/build.sh
-test: scripts/test.sh
 
 errands:
   publish_binaries:
