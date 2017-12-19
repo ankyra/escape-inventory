@@ -22,6 +22,7 @@ import (
 	"testing"
 
 	"github.com/ankyra/escape-core/parsers"
+	"github.com/ankyra/escape-inventory/config"
 	"github.com/ankyra/escape-inventory/dao/types"
 
 	. "gopkg.in/check.v1"
@@ -36,6 +37,7 @@ var _ = Suite(&suite{})
 func (s *suite) Test_InMemoryStorageBackend(c *C) {
 	uri := "mem://prj/name-v1.0.tgz"
 	unit := NewInMemoryStorageBackend()
+	unit.Init(config.StorageSettings{})
 
 	_, err := unit.Download("project", uri)
 	c.Assert(err, Equals, types.NotFound)

@@ -43,6 +43,10 @@ var storageBackends = map[string]StorageBackend{
 
 var uploadBackend = "local"
 
+func TestSetup() {
+	uploadBackend = "memory"
+}
+
 func LoadFromConfig(conf *config.Config) error {
 	switch conf.StorageBackend {
 	case "":
