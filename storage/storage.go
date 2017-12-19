@@ -18,12 +18,14 @@ package storage
 
 import (
 	"fmt"
+	"io"
+	"net/url"
+
 	"github.com/ankyra/escape-core/parsers"
 	"github.com/ankyra/escape-inventory/config"
 	"github.com/ankyra/escape-inventory/storage/gcs"
 	"github.com/ankyra/escape-inventory/storage/local"
-	"io"
-	"net/url"
+	"github.com/ankyra/escape-inventory/storage/memory"
 )
 
 type StorageBackend interface {
@@ -33,9 +35,10 @@ type StorageBackend interface {
 }
 
 var storageBackends = map[string]StorageBackend{
-	"local": local.NewLocalStorageBackend(),
-	"file":  local.NewLocalStorageBackend(),
-	"gcs":   gcs.NewGoogleCloudStorageBackend(),
+	"local":  local.NewLocalStorageBackend(),
+	"file":   local.NewLocalStorageBackend(),
+	"memory": memory.NewInMemoryStorageBackend(),
+	"gcs":    gcs.NewGoogleCloudStorageBackend(),
 }
 
 var uploadBackend = "local"
