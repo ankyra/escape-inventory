@@ -20,6 +20,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -32,7 +33,21 @@ import (
 	"github.com/gorilla/mux"
 )
 
+type uploadHandlerProvider struct {
+	UploadPackage func(project, releaseId string, pkg io.ReadSeeker) error
+}
+
+func newUploadHandlerProvider() *uploadHandlerProvider {
+	return &uploadHandlerProvider{
+		UploadPackage: model.UploadPackage,
+	}
+}
+
 func UploadHandler(w http.ResponseWriter, r *http.Request) {
+	newUploadHandlerProvider().UploadHandler(w, r)
+}
+
+func (h *uploadHandlerProvider) UploadHandler(w http.ResponseWriter, r *http.Request) {
 	project := mux.Vars(r)["project"]
 	name := mux.Vars(r)["name"]
 	version := mux.Vars(r)["version"]
@@ -42,7 +57,7 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 		HandleError(w, r, model.NewUserError(err))
 		return
 	}
-	if err := model.UploadPackage(project, releaseId, f); err != nil {
+	if err := h.UploadPackage(project, releaseId, f); err != nil {
 		HandleError(w, r, err)
 		return
 	}

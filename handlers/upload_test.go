@@ -26,7 +26,7 @@ import (
 	"net/http/httptest"
 	"os"
 
-	"github.com/ankyra/escape-inventory/storage"
+	"github.com/ankyra/escape-inventory/dao/types"
 	"github.com/gorilla/mux"
 	. "gopkg.in/check.v1"
 )
@@ -37,10 +37,12 @@ const (
 )
 
 func (s *suite) loginMux() *mux.Router {
-	storage.TestSetup()
+	return s.loginMuxWithProvider(newUploadHandlerProvider())
+}
+func (s *suite) loginMuxWithProvider(provider *uploadHandlerProvider) *mux.Router {
 	r := mux.NewRouter()
 	postRouter := r.Methods("POST").Subrouter()
-	postRouter.Handle(LoginURL, http.HandlerFunc(UploadHandler))
+	postRouter.Handle(LoginURL, http.HandlerFunc(provider.UploadHandler))
 	return r
 }
 
@@ -79,7 +81,33 @@ func (s *suite) testPOST_file(c *C, r *mux.Router, url, path string) *http.Respo
 	return w.Result()
 }
 
-func (s *suite) Test_UploadHandler_fails_if_projet_does_not_exist(c *C) {
+/*
+	UploadHandler
+*/
+
+func (s *suite) Test_UploadHandler_fails_if_upload_fails(c *C) {
+	content := "package content"
+	file := "my-package.tgz"
+	os.RemoveAll(file)
+	err := ioutil.WriteFile(file, []byte(content), 0644)
+	c.Assert(err, IsNil)
+
+	provider := &uploadHandlerProvider{
+		UploadPackage: func(project, releaseId string, pkg io.ReadSeeker) error {
+			return types.AlreadyExists
+		},
+	}
+
+	resp := s.testPOST_file(c, s.loginMuxWithProvider(provider), loginTestURL, file)
+	c.Assert(resp.StatusCode, Equals, 409)
+	body, err := ioutil.ReadAll(resp.Body)
+	c.Assert(err, IsNil)
+	c.Assert(string(body), Equals, "Resource already exists")
+
+	os.RemoveAll(file)
+}
+
+func (s *suite) Test_UploadHandler_fails_if_project_does_not_exist(c *C) {
 	content := "package content"
 	file := "my-package.tgz"
 	os.RemoveAll(file)
