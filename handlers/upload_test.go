@@ -32,17 +32,17 @@ import (
 )
 
 const (
-	LoginURL     = "/api/v1/registry/{project}/units/{name}/versions/{version}/upload"
-	loginTestURL = "/api/v1/registry/project/units/name/versions/v1.0.0/upload"
+	UploadURL     = "/api/v1/registry/{project}/units/{name}/versions/{version}/upload"
+	uploadTestURL = "/api/v1/registry/project/units/name/versions/v1.0.0/upload"
 )
 
-func (s *suite) loginMux() *mux.Router {
-	return s.loginMuxWithProvider(newUploadHandlerProvider())
+func (s *suite) uploadMux() *mux.Router {
+	return s.uploadMuxWithProvider(newUploadHandlerProvider())
 }
-func (s *suite) loginMuxWithProvider(provider *uploadHandlerProvider) *mux.Router {
+func (s *suite) uploadMuxWithProvider(provider *uploadHandlerProvider) *mux.Router {
 	r := mux.NewRouter()
 	postRouter := r.Methods("POST").Subrouter()
-	postRouter.Handle(LoginURL, http.HandlerFunc(provider.UploadHandler))
+	postRouter.Handle(UploadURL, http.HandlerFunc(provider.UploadHandler))
 	return r
 }
 
@@ -85,6 +85,28 @@ func (s *suite) testPOST_file(c *C, r *mux.Router, url, path string) *http.Respo
 	UploadHandler
 */
 
+func (s *suite) Test_UploadHandler(c *C) {
+	content := "package content"
+	file := "my-package.tgz"
+	os.RemoveAll(file)
+	err := ioutil.WriteFile(file, []byte(content), 0644)
+	c.Assert(err, IsNil)
+
+	provider := &uploadHandlerProvider{
+		UploadPackage: func(project, releaseId string, pkg io.ReadSeeker) error {
+			return nil
+		},
+	}
+
+	resp := s.testPOST_file(c, s.uploadMuxWithProvider(provider), uploadTestURL, file)
+	c.Assert(resp.StatusCode, Equals, 200)
+	body, err := ioutil.ReadAll(resp.Body)
+	c.Assert(err, IsNil)
+	c.Assert(string(body), Equals, "")
+
+	os.RemoveAll(file)
+}
+
 func (s *suite) Test_UploadHandler_fails_if_upload_fails(c *C) {
 	content := "package content"
 	file := "my-package.tgz"
@@ -98,7 +120,7 @@ func (s *suite) Test_UploadHandler_fails_if_upload_fails(c *C) {
 		},
 	}
 
-	resp := s.testPOST_file(c, s.loginMuxWithProvider(provider), loginTestURL, file)
+	resp := s.testPOST_file(c, s.uploadMuxWithProvider(provider), uploadTestURL, file)
 	c.Assert(resp.StatusCode, Equals, 409)
 	body, err := ioutil.ReadAll(resp.Body)
 	c.Assert(err, IsNil)
@@ -114,7 +136,7 @@ func (s *suite) Test_UploadHandler_fails_if_project_does_not_exist(c *C) {
 	err := ioutil.WriteFile(file, []byte(content), 0644)
 	c.Assert(err, IsNil)
 
-	resp := s.testPOST_file(c, s.loginMux(), loginTestURL, file)
+	resp := s.testPOST_file(c, s.uploadMux(), uploadTestURL, file)
 	c.Assert(resp.StatusCode, Equals, 404)
 	body, err := ioutil.ReadAll(resp.Body)
 	c.Assert(err, IsNil)
@@ -124,7 +146,7 @@ func (s *suite) Test_UploadHandler_fails_if_project_does_not_exist(c *C) {
 }
 
 func (s *suite) Test_UploadHandler_fails_if_not_multipart_request(c *C) {
-	resp := s.testPOST(c, s.loginMux(), loginTestURL, nil)
+	resp := s.testPOST(c, s.uploadMux(), uploadTestURL, nil)
 	c.Assert(resp.StatusCode, Equals, 400)
 	body, err := ioutil.ReadAll(resp.Body)
 	c.Assert(err, IsNil)
@@ -132,7 +154,7 @@ func (s *suite) Test_UploadHandler_fails_if_not_multipart_request(c *C) {
 }
 
 func (s *suite) Test_UploadHandler_fails_if_file_form_field_missing(c *C) {
-	resp := s.testPOST_file(c, s.loginMux(), loginTestURL, "")
+	resp := s.testPOST_file(c, s.uploadMux(), uploadTestURL, "")
 	c.Assert(resp.StatusCode, Equals, 400)
 	body, err := ioutil.ReadAll(resp.Body)
 	c.Assert(err, IsNil)

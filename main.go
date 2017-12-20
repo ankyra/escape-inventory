@@ -52,7 +52,6 @@ var ReadRoutes = map[string]http.HandlerFunc{
 
 var WriteRoutes = map[string]http.HandlerFunc{
 	"/api/v1/registry/{project}/add-project":                            handlers.AddProjectHandler,
-	"/api/v1/registry/{project}/upload":                                 handlers.RegisterAndUploadHandler,
 	"/api/v1/registry/{project}/register":                               handlers.RegisterHandler,
 	"/api/v1/registry/{project}/units/{name}/versions/{version}/upload": handlers.UploadHandler,
 

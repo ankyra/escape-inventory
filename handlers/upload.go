@@ -21,7 +21,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 
@@ -67,39 +66,8 @@ func (h *uploadHandlerProvider) UploadHandler(w http.ResponseWriter, r *http.Req
 	w.WriteHeader(200)
 }
 
-func RegisterAndUploadHandler(w http.ResponseWriter, r *http.Request) {
-	project := mux.Vars(r)["project"]
-	if r.Body == nil {
-		HandleError(w, r, model.NewUserError(fmt.Errorf("Empty body")))
-		return
-	}
-	metadata, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		HandleError(w, r, err)
-		return
-	}
-	username := ReadUsernameFromContext(r)
-	release, err := model.AddReleaseByUser(project, string(metadata), username)
-	if err != nil {
-		HandleError(w, r, err)
-		return
-	}
-	f, _, err := r.FormFile("file")
-	if err != nil {
-		HandleError(w, r, model.NewUserError(err))
-		return
-	}
-	if err := model.UploadPackage(project, release.GetReleaseId(), f); err != nil {
-		HandleError(w, r, err)
-		return
-	}
-	metrics.UploadCounter.Inc()
-	go CallWebHook(project, release.Name, release.Version, release.GetReleaseId(), username)
-	w.WriteHeader(200)
-}
-
 func CallWebHook(project, unit, version, releaseId, username string) {
-	if cmd.Config.WebHook == "" {
+	if cmd.Config == nil || cmd.Config.WebHook == "" {
 		return
 	}
 	prj := types.NewProject(project)
