@@ -34,8 +34,8 @@ const (
 
 func (s *suite) downloadMuxWithProvider(provider *downloadHandlerProvider) *mux.Router {
 	r := mux.NewRouter()
-	postRouter := r.Methods("GET").Subrouter()
-	postRouter.Handle(DownloadURL, http.HandlerFunc(provider.DownloadHandler))
+	router := r.Methods("GET").Subrouter()
+	router.Handle(DownloadURL, http.HandlerFunc(provider.DownloadHandler))
 	return r
 }
 

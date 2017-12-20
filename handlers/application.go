@@ -18,7 +18,6 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/ankyra/escape-inventory/dao/types"
@@ -26,13 +25,28 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func GetApplicationsHandler(w http.ResponseWriter, r *http.Request) {
-	project := mux.Vars(r)["project"]
-	getApplicationsHandler(w, r, project)
+type applicationHandlerProvider struct {
+	GetApplications func(project string) (map[string]*types.Application, error)
+	GetApplication  func(project, name string) (*model.ApplicationPayload, error)
 }
 
-func getApplicationsHandler(w http.ResponseWriter, r *http.Request, project string) {
-	apps, err := model.GetApplications(project)
+func newApplicationHandlerProvider() *applicationHandlerProvider {
+	return &applicationHandlerProvider{
+		GetApplications: model.GetApplications,
+		GetApplication:  model.GetApplication,
+	}
+}
+
+func GetApplicationsHandler(w http.ResponseWriter, r *http.Request) {
+	newApplicationHandlerProvider().GetApplicationsHandler(w, r)
+}
+func GetApplicationHandler(w http.ResponseWriter, r *http.Request) {
+	newApplicationHandlerProvider().GetApplicationHandler(w, r)
+}
+
+func (h *applicationHandlerProvider) GetApplicationsHandler(w http.ResponseWriter, r *http.Request) {
+	project := mux.Vars(r)["project"]
+	apps, err := h.GetApplications(project)
 	if err != nil {
 		HandleError(w, r, err)
 		return
@@ -42,14 +56,10 @@ func getApplicationsHandler(w http.ResponseWriter, r *http.Request, project stri
 	json.NewEncoder(w).Encode(apps)
 }
 
-func GetApplicationHandler(w http.ResponseWriter, r *http.Request) {
+func (h *applicationHandlerProvider) GetApplicationHandler(w http.ResponseWriter, r *http.Request) {
 	project := mux.Vars(r)["project"]
 	name := mux.Vars(r)["name"]
-	getApplicationHandler(w, r, project, name)
-}
-
-func getApplicationHandler(w http.ResponseWriter, r *http.Request, project, name string) {
-	app, err := model.GetApplication(project, name)
+	app, err := h.GetApplication(project, name)
 	if err != nil {
 		HandleError(w, r, err)
 		return
@@ -57,40 +67,4 @@ func getApplicationHandler(w http.ResponseWriter, r *http.Request, project, name
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(200)
 	json.NewEncoder(w).Encode(app)
-}
-
-func GetApplicationHooksHandler(w http.ResponseWriter, r *http.Request) {
-	project := mux.Vars(r)["project"]
-	name := mux.Vars(r)["name"]
-	getApplicationHooksHandler(w, r, project, name)
-}
-
-func getApplicationHooksHandler(w http.ResponseWriter, r *http.Request, project, name string) {
-	hooks, err := model.GetApplicationHooks(project, name)
-	if err != nil {
-		HandleError(w, r, err)
-		return
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
-	json.NewEncoder(w).Encode(hooks)
-}
-
-func UpdateApplicationHooksHandler(w http.ResponseWriter, r *http.Request) {
-	project := mux.Vars(r)["project"]
-	name := mux.Vars(r)["name"]
-	if r.Body == nil {
-		HandleError(w, r, model.NewUserError(fmt.Errorf("Empty body")))
-		return
-	}
-	result := types.Hooks{}
-	if err := json.NewDecoder(r.Body).Decode(&result); err != nil {
-		HandleError(w, r, model.NewUserError(fmt.Errorf("Invalid JSON")))
-		return
-	}
-	if err := model.UpdateApplicationHooks(project, name, result); err != nil {
-		HandleError(w, r, err)
-		return
-	}
-	w.WriteHeader(201)
 }

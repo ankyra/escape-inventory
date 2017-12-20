@@ -17,9 +17,20 @@ limitations under the License.
 package handlers
 
 import (
+	"io/ioutil"
 	"net/http"
+
+	"github.com/gorilla/mux"
+	. "gopkg.in/check.v1"
 )
 
-func HealthCheckHandler(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(200)
+func (s *suite) Test_HealthCheckHandler(c *C) {
+	r := mux.NewRouter()
+	router := r.Methods("GET").Subrouter()
+	router.Handle("/", http.HandlerFunc(HealthCheckHandler))
+	resp := s.testGET(c, r, "/")
+	c.Assert(resp.StatusCode, Equals, 200)
+	body, err := ioutil.ReadAll(resp.Body)
+	c.Assert(err, IsNil)
+	c.Assert(string(body), Equals, "")
 }
