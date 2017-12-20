@@ -17,13 +17,9 @@ limitations under the License.
 package handlers
 
 import (
-	"bytes"
-	"encoding/json"
 	"io"
 	"io/ioutil"
-	"mime/multipart"
 	"net/http"
-	"net/http/httptest"
 	"os"
 
 	"github.com/ankyra/escape-inventory/dao/types"
@@ -39,46 +35,12 @@ const (
 func (s *suite) uploadMux() *mux.Router {
 	return s.uploadMuxWithProvider(newUploadHandlerProvider())
 }
+
 func (s *suite) uploadMuxWithProvider(provider *uploadHandlerProvider) *mux.Router {
 	r := mux.NewRouter()
 	postRouter := r.Methods("POST").Subrouter()
 	postRouter.Handle(UploadURL, http.HandlerFunc(provider.UploadHandler))
 	return r
-}
-
-func (s *suite) testPOST(c *C, r *mux.Router, url string, data interface{}) *http.Response {
-	var reader io.Reader = nil
-	if data != nil {
-		payload, err := json.Marshal(data)
-		c.Assert(err, IsNil)
-		reader = bytes.NewReader(payload)
-	}
-	req := httptest.NewRequest("POST", url, reader)
-	w := httptest.NewRecorder()
-	r.ServeHTTP(w, req)
-	return w.Result()
-}
-
-func (s *suite) testPOST_file(c *C, r *mux.Router, url, path string) *http.Response {
-	bodyBuf := &bytes.Buffer{}
-	bodyWriter := multipart.NewWriter(bodyBuf)
-	if path != "" {
-		fileWriter, err := bodyWriter.CreateFormFile("file", path)
-		c.Assert(err, IsNil)
-		fh, err := os.Open(path)
-		c.Assert(err, IsNil)
-		_, err = io.Copy(fileWriter, fh)
-		c.Assert(err, IsNil)
-	}
-	contentType := bodyWriter.FormDataContentType()
-	bodyWriter.Close()
-
-	req, err := http.NewRequest("POST", url, bodyBuf)
-	c.Assert(err, IsNil)
-	req.Header.Add("Content-Type", contentType)
-	w := httptest.NewRecorder()
-	r.ServeHTTP(w, req)
-	return w.Result()
 }
 
 /*

@@ -25,13 +25,27 @@ import (
 	"github.com/gorilla/mux"
 )
 
+type downloadHandlerProvider struct {
+	GetDownloadReadSeeker func(project, releaseId string) (io.Reader, error)
+}
+
+func newDownloadHandlerProvider() *downloadHandlerProvider {
+	return &downloadHandlerProvider{
+		GetDownloadReadSeeker: model.GetDownloadReadSeeker,
+	}
+}
+
 func DownloadHandler(w http.ResponseWriter, r *http.Request) {
+	newDownloadHandlerProvider().DownloadHandler(w, r)
+}
+
+func (h *downloadHandlerProvider) DownloadHandler(w http.ResponseWriter, r *http.Request) {
 	project := mux.Vars(r)["project"]
 	name := mux.Vars(r)["name"]
 	version := mux.Vars(r)["version"]
 	releaseId := name + "-" + version
-	filename := releaseId + ".tar.gz"
-	reader, err := model.GetDownloadReadSeeker(project, releaseId)
+	filename := releaseId + ".tgz"
+	reader, err := h.GetDownloadReadSeeker(project, releaseId)
 	if err != nil {
 		HandleError(w, r, err)
 		return
