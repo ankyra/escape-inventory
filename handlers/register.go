@@ -17,37 +17,41 @@ limitations under the License.
 package handlers
 
 import (
-	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"reflect"
 
+	core "github.com/ankyra/escape-core"
 	"github.com/ankyra/escape-inventory/model"
 	"github.com/gorilla/mux"
 )
 
-type Membership struct {
-	Group string `json:"name"`
+type registerHandlerProvider struct {
+	AddReleaseByUser func(project, metadata, username string) (*core.ReleaseMetadata, error)
+	ReadRequestBody  func(body io.Reader) ([]byte, error)
 }
 
-type User struct {
-	Name   string        `json:"username"`
-	Groups []*Membership `json:"groups"`
+func newRegisterHandlerProvider() *registerHandlerProvider {
+	return &registerHandlerProvider{
+		AddReleaseByUser: model.AddReleaseByUser,
+		ReadRequestBody:  ioutil.ReadAll,
+	}
 }
 
 func RegisterHandler(w http.ResponseWriter, r *http.Request) {
+	newRegisterHandlerProvider().RegisterHandler(w, r)
+}
+
+func (h *registerHandlerProvider) RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	project := mux.Vars(r)["project"]
-	if r.Body == nil {
-		HandleError(w, r, model.NewUserError(fmt.Errorf("Empty body")))
-		return
-	}
-	metadata, err := ioutil.ReadAll(r.Body)
+	metadata, err := h.ReadRequestBody(r.Body)
 	if err != nil {
 		HandleError(w, r, err)
 		return
 	}
 	username := ReadUsernameFromContext(r)
-	if _, err := model.AddReleaseByUser(project, string(metadata), username); err != nil {
+	if _, err := h.AddReleaseByUser(project, string(metadata), username); err != nil {
 		HandleError(w, r, err)
 		return
 	}

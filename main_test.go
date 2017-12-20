@@ -111,11 +111,6 @@ func (s *suite) Test_UpdateProject_fails_with_empty_body(c *C) {
 	testRequest(c, req, 400)
 }
 
-func (s *suite) Test_Register_fails_with_empty_body(c *C) {
-	req, _ := http.NewRequest("POST", registerEndpoint, nil)
-	testRequest(c, req, 400)
-}
-
 func (s *suite) Test_Register_fails_with_invalid_json(c *C) {
 	body := bytes.NewReader([]byte("hello"))
 	req, _ := http.NewRequest("POST", registerEndpoint, body)

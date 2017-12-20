@@ -32,10 +32,6 @@ const (
 	downloadTestURL = "/api/v1/registry/project/units/name/versions/v1.0.0/download"
 )
 
-func (s *suite) downloadMux() *mux.Router {
-	return s.downloadMuxWithProvider(newDownloadHandlerProvider())
-}
-
 func (s *suite) downloadMuxWithProvider(provider *downloadHandlerProvider) *mux.Router {
 	r := mux.NewRouter()
 	postRouter := r.Methods("GET").Subrouter()
