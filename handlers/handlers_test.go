@@ -25,6 +25,7 @@ import (
 	"net/http/httptest"
 	"os"
 
+	"github.com/ankyra/escape-inventory/dao/types"
 	"github.com/gorilla/mux"
 	. "gopkg.in/check.v1"
 )
@@ -83,4 +84,28 @@ func (s *suite) testPOST_file(c *C, r *mux.Router, url, path string) *http.Respo
 	w := httptest.NewRecorder()
 	r.ServeHTTP(w, req)
 	return w.Result()
+}
+
+func (s *suite) Test_JsonSuccess(c *C) {
+	rr := httptest.NewRecorder()
+	result := map[string]string{"test": "yo"}
+	JsonSuccess(rr, result)
+	c.Assert(rr.Code, Equals, 200)
+	c.Assert(rr.Body.String(), Equals, "{\"test\":\"yo\"}\n")
+}
+
+func (s *suite) Test_ErrorOrJsonSuccess_success(c *C) {
+	rr := httptest.NewRecorder()
+	result := map[string]string{"test": "yo"}
+	ErrorOrJsonSuccess(rr, nil, result, nil)
+	c.Assert(rr.Code, Equals, 200)
+	c.Assert(rr.Body.String(), Equals, "{\"test\":\"yo\"}\n")
+}
+
+func (s *suite) Test_ErrorOrJsonSuccess_error(c *C) {
+	rr := httptest.NewRecorder()
+	result := map[string]string{"test": "yo"}
+	ErrorOrJsonSuccess(rr, nil, result, types.AlreadyExists)
+	c.Assert(rr.Code, Equals, 409)
+	c.Assert(rr.Body.String(), Equals, "Resource already exists")
 }

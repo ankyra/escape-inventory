@@ -58,39 +58,21 @@ func UpdateApplicationHooksHandler(w http.ResponseWriter, r *http.Request) {
 func (h *applicationHandlerProvider) GetApplicationsHandler(w http.ResponseWriter, r *http.Request) {
 	project := mux.Vars(r)["project"]
 	apps, err := h.GetApplications(project)
-	if err != nil {
-		HandleError(w, r, err)
-		return
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
-	json.NewEncoder(w).Encode(apps)
+	ErrorOrJsonSuccess(w, r, apps, err)
 }
 
 func (h *applicationHandlerProvider) GetApplicationHandler(w http.ResponseWriter, r *http.Request) {
 	project := mux.Vars(r)["project"]
 	name := mux.Vars(r)["name"]
 	app, err := h.GetApplication(project, name)
-	if err != nil {
-		HandleError(w, r, err)
-		return
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
-	json.NewEncoder(w).Encode(app)
+	ErrorOrJsonSuccess(w, r, app, err)
 }
 
 func (h *applicationHandlerProvider) GetApplicationHooksHandler(w http.ResponseWriter, r *http.Request) {
 	project := mux.Vars(r)["project"]
 	name := mux.Vars(r)["name"]
 	hooks, err := h.GetApplicationHooks(project, name)
-	if err != nil {
-		HandleError(w, r, err)
-		return
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
-	json.NewEncoder(w).Encode(hooks)
+	ErrorOrJsonSuccess(w, r, hooks, err)
 }
 
 func (h *applicationHandlerProvider) UpdateApplicationHooksHandler(w http.ResponseWriter, r *http.Request) {
