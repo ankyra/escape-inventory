@@ -37,6 +37,19 @@ func (s *suite) testGET(c *C, r *mux.Router, url string) *http.Response {
 	return w.Result()
 }
 
+func (s *suite) testPUT(c *C, r *mux.Router, url string, data interface{}) *http.Response {
+	var reader io.Reader = nil
+	if data != nil {
+		payload, err := json.Marshal(data)
+		c.Assert(err, IsNil)
+		reader = bytes.NewReader(payload)
+	}
+	req := httptest.NewRequest("PUT", url, reader)
+	w := httptest.NewRecorder()
+	r.ServeHTTP(w, req)
+	return w.Result()
+}
+
 func (s *suite) testPOST(c *C, r *mux.Router, url string, data interface{}) *http.Response {
 	var reader io.Reader = nil
 	if data != nil {
