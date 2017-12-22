@@ -17,9 +17,23 @@ limitations under the License.
 package model
 
 import (
+	core "github.com/ankyra/escape-core"
 	"github.com/ankyra/escape-inventory/dao"
 	"github.com/ankyra/escape-inventory/dao/types"
 )
+
+func GetPreviousReleaseMetadata(project, name, version string) (*core.ReleaseMetadata, error) {
+	metadata, err := GetReleaseMetadata(project, name+"-"+version)
+	if err != nil {
+		return nil, err
+	}
+	prev, err := GetPreviousVersion(project, name, metadata.Version)
+	if err != nil {
+		return nil, err
+	}
+	releaseId := name + "-v" + prev
+	return GetReleaseMetadata(project, releaseId)
+}
 
 func GetPreviousVersion(project, app, version string) (string, error) {
 	prev, err := getPreviousVersion(project, app, version)

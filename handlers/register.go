@@ -20,7 +20,6 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
-	"reflect"
 
 	core "github.com/ankyra/escape-core"
 	"github.com/ankyra/escape-inventory/model"
@@ -56,13 +55,4 @@ func (h *registerHandlerProvider) RegisterHandler(w http.ResponseWriter, r *http
 		return
 	}
 	w.WriteHeader(200)
-}
-
-func ReadUsernameFromContext(r *http.Request) string {
-	user := r.Context().Value("user")
-	if user != nil {
-		value := reflect.Indirect(reflect.ValueOf(user))
-		return value.FieldByName("Name").String()
-	}
-	return ""
 }
