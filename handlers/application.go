@@ -29,6 +29,7 @@ import (
 type applicationHandlerProvider struct {
 	GetApplications        func(project string) (map[string]*types.Application, error)
 	GetApplication         func(project, name string) (*model.ApplicationPayload, error)
+	GetApplicationVersions func(project, name string) ([]string, error)
 	GetApplicationHooks    func(project, name string) (types.Hooks, error)
 	UpdateApplicationHooks func(project, name string, hooks types.Hooks) error
 }
@@ -38,6 +39,7 @@ func newApplicationHandlerProvider() *applicationHandlerProvider {
 		GetApplications:        model.GetApplications,
 		GetApplication:         model.GetApplication,
 		GetApplicationHooks:    model.GetApplicationHooks,
+		GetApplicationVersions: model.GetApplicationVersions,
 		UpdateApplicationHooks: model.UpdateApplicationHooks,
 	}
 }
@@ -47,6 +49,9 @@ func GetApplicationsHandler(w http.ResponseWriter, r *http.Request) {
 }
 func GetApplicationHandler(w http.ResponseWriter, r *http.Request) {
 	newApplicationHandlerProvider().GetApplicationHandler(w, r)
+}
+func GetApplicationVersionsHandler(w http.ResponseWriter, r *http.Request) {
+	newApplicationHandlerProvider().GetApplicationVersionsHandler(w, r)
 }
 func GetApplicationHooksHandler(w http.ResponseWriter, r *http.Request) {
 	newApplicationHandlerProvider().GetApplicationHooksHandler(w, r)
@@ -66,6 +71,13 @@ func (h *applicationHandlerProvider) GetApplicationHandler(w http.ResponseWriter
 	name := mux.Vars(r)["name"]
 	app, err := h.GetApplication(project, name)
 	ErrorOrJsonSuccess(w, r, app, err)
+}
+
+func (h *applicationHandlerProvider) GetApplicationVersionsHandler(w http.ResponseWriter, r *http.Request) {
+	project := mux.Vars(r)["project"]
+	name := mux.Vars(r)["name"]
+	versions, err := h.GetApplicationVersions(project, name)
+	ErrorOrJsonSuccess(w, r, versions, err)
 }
 
 func (h *applicationHandlerProvider) GetApplicationHooksHandler(w http.ResponseWriter, r *http.Request) {

@@ -40,7 +40,7 @@ func (s *importSuite) Test_Import(c *C) {
 	}
 	err := Import(releases)
 	c.Assert(err, IsNil)
-	metadata, err := GetReleaseMetadata("_", "import-test-v1")
+	metadata, err := GetReleaseMetadata("_", "import-test", "v1")
 	c.Assert(err, IsNil)
 	c.Assert(metadata.Name, Equals, "import-test")
 }
@@ -60,7 +60,7 @@ func (s *importSuite) Test_Import_Ignore_Existing(c *C) {
 	}
 	err := Import(releases)
 	c.Assert(err, IsNil)
-	metadata, err := GetReleaseMetadata("_", "import-exists-test-v1")
+	metadata, err := GetReleaseMetadata("_", "import-exists-test", "v1")
 	c.Assert(err, IsNil)
 	c.Assert(metadata.Name, Equals, "import-exists-test")
 }

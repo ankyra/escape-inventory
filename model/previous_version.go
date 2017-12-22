@@ -23,7 +23,7 @@ import (
 )
 
 func GetPreviousReleaseMetadata(project, name, version string) (*core.ReleaseMetadata, error) {
-	metadata, err := GetReleaseMetadata(project, name+"-"+version)
+	metadata, err := GetReleaseMetadata(project, name, version)
 	if err != nil {
 		return nil, err
 	}
@@ -31,8 +31,7 @@ func GetPreviousReleaseMetadata(project, name, version string) (*core.ReleaseMet
 	if err != nil {
 		return nil, err
 	}
-	releaseId := name + "-v" + prev
-	return GetReleaseMetadata(project, releaseId)
+	return GetReleaseMetadata(project, name, prev)
 }
 
 func GetPreviousVersion(project, app, version string) (string, error) {

@@ -393,10 +393,10 @@ func (s *suite) Test_GetVersion_fails_if_version_doesnt_exist(c *C) {
 
 func (s *suite) Test_GetVersion_fails_if_version_format_invalid(c *C) {
 	versions := []string{
-		"1",
+		"asd1@",
 		"v12asdpokasdk",
 		"null",
-		"1.0",
+		"1.-",
 	}
 	for _, v := range versions {
 		req, _ := http.NewRequest("GET", "/api/v1/registry/"+getVersionProject+"/units/my-app/versions/"+v+"/", nil)

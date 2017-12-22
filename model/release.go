@@ -175,7 +175,8 @@ type ReleasePayload struct {
 	UploadedAt time.Time             `json:"uploaded_at"`
 }
 
-func GetRelease(project, releaseIdString string) (*ReleasePayload, error) {
+func GetRelease(project, name, version string) (*ReleasePayload, error) {
+	releaseIdString := name + "-" + version
 	release, err := ResolveReleaseId(project, releaseIdString)
 	if err != nil {
 		return nil, err
@@ -196,7 +197,11 @@ func GetRelease(project, releaseIdString string) (*ReleasePayload, error) {
 	}, nil
 }
 
-func GetReleaseMetadata(project, releaseIdString string) (*core.ReleaseMetadata, error) {
+func GetReleaseMetadata(project, name, version string) (*core.ReleaseMetadata, error) {
+	releaseIdString := name + "-v" + version
+	if strings.HasPrefix(version, "v") || version == "latest" {
+		releaseIdString = name + "-" + version
+	}
 	release, err := ResolveReleaseId(project, releaseIdString)
 	if err != nil {
 		return nil, err

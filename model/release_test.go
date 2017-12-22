@@ -43,13 +43,13 @@ func (s *releaseSuite) Test_AddRelease_Missing_Field_Version(c *C) {
 func (s *releaseSuite) Test_AddRelease_GetMetadata(c *C) {
 	_, err := AddRelease("_", `{"name": "rel-test", "version": "0"}`)
 	c.Assert(err, IsNil)
-	metadata, err := GetReleaseMetadata("_", "rel-test-v0")
+	metadata, err := GetReleaseMetadata("_", "rel-test", "v0")
 	c.Assert(err, IsNil)
 	c.Assert(metadata.GetReleaseId(), Equals, "rel-test-v0")
 }
 
 func (s *releaseSuite) Test_GetMetadataNotFound(c *C) {
-	_, err := GetReleaseMetadata("_", "whatiojasdiofjasd-test-v0")
+	_, err := GetReleaseMetadata("_", "whatiojasdiofjasd-test", "v0")
 	c.Assert(dao.IsNotFound(err), Equals, true)
 }
 

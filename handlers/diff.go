@@ -25,31 +25,30 @@ import (
 	"github.com/gorilla/mux"
 )
 
+type diffHandlerProvider struct {
+	Diff func(project, name, version, diffWithVersion string) (map[string]map[string]core.Changes, error)
+}
+
+func newDiffHandlerProvider() *diffHandlerProvider {
+	return &diffHandlerProvider{
+		Diff: model.Diff,
+	}
+}
 func DiffHandler(w http.ResponseWriter, r *http.Request) {
+	newDiffHandlerProvider().DiffHandler(w, r)
+}
+
+func (h *diffHandlerProvider) DiffHandler(w http.ResponseWriter, r *http.Request) {
 	project := mux.Vars(r)["project"]
 	name := mux.Vars(r)["name"]
 	version := mux.Vars(r)["version"]
 	diffWith := mux.Vars(r)["diffWith"]
-	metadata, err := model.GetReleaseMetadata(project, name+"-"+version)
+
+	changes, err := h.Diff(project, name, version, diffWith)
 	if err != nil {
 		HandleError(w, r, err)
 		return
 	}
-	releaseId := name + "-" + diffWith
-	if diffWith == "" {
-		prev, err := model.GetPreviousVersion(project, name, metadata.Version)
-		if err != nil {
-			HandleError(w, r, err)
-			return
-		}
-		releaseId = name + "-v" + prev
-	}
-	previousMetadata, err := model.GetReleaseMetadata(project, releaseId)
-	if err != nil {
-		HandleError(w, r, err)
-		return
-	}
-	changes := core.Diff(previousMetadata, metadata).Collapse()
 	bytes, err := json.Marshal(changes)
 	if err != nil {
 		HandleError(w, r, err)

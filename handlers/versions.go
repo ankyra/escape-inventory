@@ -17,7 +17,6 @@ limitations under the License.
 package handlers
 
 import (
-	"encoding/json"
 	"net/http"
 
 	core "github.com/ankyra/escape-core"
@@ -26,15 +25,23 @@ import (
 )
 
 type versionHandlerProvider struct {
+	GetReleaseMetadata func(project, name, version string) (*core.ReleaseMetadata, error)
+	GetRelease         func(project, name, version string) (*model.ReleasePayload, error)
 	GetNextVersion     func(project, name, prefix string) (string, error)
 	GetPreviousVersion func(project, name, version string) (*core.ReleaseMetadata, error)
 }
 
 func newVersionHandlerProvider() *versionHandlerProvider {
 	return &versionHandlerProvider{
+		GetReleaseMetadata: model.GetReleaseMetadata,
+		GetRelease:         model.GetRelease,
 		GetNextVersion:     model.GetNextVersion,
 		GetPreviousVersion: model.GetPreviousReleaseMetadata,
 	}
+}
+
+func GetVersionHandler(w http.ResponseWriter, r *http.Request) {
+	newVersionHandlerProvider().GetVersionHandler(w, r)
 }
 
 func NextVersionHandler(w http.ResponseWriter, r *http.Request) {
@@ -42,6 +49,21 @@ func NextVersionHandler(w http.ResponseWriter, r *http.Request) {
 }
 func PreviousVersionHandler(w http.ResponseWriter, r *http.Request) {
 	newVersionHandlerProvider().PreviousVersionHandler(w, r)
+}
+
+func (h *versionHandlerProvider) GetVersionHandler(w http.ResponseWriter, r *http.Request) {
+	project := mux.Vars(r)["project"]
+	name := mux.Vars(r)["name"]
+	version := mux.Vars(r)["version"]
+	full := r.URL.Query().Get("full")
+	var result interface{}
+	var err error
+	if full != "" {
+		result, err = h.GetRelease(project, name, version)
+	} else {
+		result, err = h.GetReleaseMetadata(project, name, version)
+	}
+	ErrorOrJsonSuccess(w, r, result, err)
 }
 
 func (h *versionHandlerProvider) NextVersionHandler(w http.ResponseWriter, r *http.Request) {
@@ -61,16 +83,5 @@ func (h *versionHandlerProvider) PreviousVersionHandler(w http.ResponseWriter, r
 	name := mux.Vars(r)["name"]
 	version := mux.Vars(r)["version"]
 	metadata, err := h.GetPreviousVersion(project, name, version)
-	if err != nil {
-		HandleError(w, r, err)
-		return
-	}
-	bytes, err := json.Marshal(metadata)
-	if err != nil {
-		HandleError(w, r, err)
-		return
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
-	w.Write(bytes)
+	ErrorOrJsonSuccess(w, r, metadata, err)
 }

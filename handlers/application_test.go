@@ -31,11 +31,16 @@ import (
 const (
 	GetApplicationsURL     = "/api/v1/registry/{project}/units/"
 	getApplicationsTestURL = "/api/v1/registry/project/units/"
-	GetApplicationURL      = "/api/v1/registry/{project}/units/"
-	getApplicationTestURL  = "/api/v1/registry/project/units/"
 
-	GetApplicationHooksURL        = "/api/v1/registry/{project}/units/{name}/hooks/"
-	getApplicationHooksTestURL    = "/api/v1/registry/project/units/name/hooks/"
+	GetApplicationURL     = "/api/v1/registry/{project}/units/{name}/"
+	getApplicationTestURL = "/api/v1/registry/project/units/name/"
+
+	GetApplicationVersionsURL     = "/api/v1/registry/{project}/units/{name}/versions/"
+	getApplicationVersionsTestURL = "/api/v1/registry/project/units/name/versions/"
+
+	GetApplicationHooksURL     = "/api/v1/registry/{project}/units/{name}/hooks/"
+	getApplicationHooksTestURL = "/api/v1/registry/project/units/name/hooks/"
+
 	UpdateApplicationHooksURL     = "/api/v1/registry/{project}/units/{name}/hooks/"
 	updateApplicationHooksTestURL = "/api/v1/registry/project/units/name/hooks/"
 )
@@ -100,10 +105,11 @@ func (s *suite) getApplicationMuxWithProvider(provider *applicationHandlerProvid
 }
 
 func (s *suite) Test_GetApplicationHandler_happy_path(c *C) {
-	var capturedProject string
+	var capturedProject, capturedName string
 	provider := &applicationHandlerProvider{
 		GetApplication: func(project, name string) (*model.ApplicationPayload, error) {
 			capturedProject = project
+			capturedName = name
 			result := model.ApplicationPayload{
 				Application: types.NewApplication("project", "name"),
 				Versions:    []string{"1.0", "1.1"},
@@ -114,6 +120,7 @@ func (s *suite) Test_GetApplicationHandler_happy_path(c *C) {
 	resp := s.testGET(c, s.getApplicationMuxWithProvider(provider), getApplicationTestURL)
 	c.Assert(resp.StatusCode, Equals, 200)
 	c.Assert(capturedProject, Equals, "project")
+	c.Assert(capturedName, Equals, "name")
 	c.Assert(resp.Header.Get("Content-Type"), Equals, "application/json")
 	result := model.ApplicationPayload{}
 	c.Assert(json.NewDecoder(resp.Body).Decode(&result), IsNil)
@@ -132,6 +139,49 @@ func (s *suite) Test_GetApplicationHandler_fails_if_get_application_fails(c *C) 
 	resp := s.testGET(c, s.getApplicationMuxWithProvider(provider), getApplicationTestURL)
 	c.Assert(resp.StatusCode, Equals, 404)
 	c.Assert(capturedProject, Equals, "project")
+	body, err := ioutil.ReadAll(resp.Body)
+	c.Assert(err, IsNil)
+	c.Assert(string(body), Equals, "")
+}
+
+/*
+	GetApplicationVersionsHandler
+
+*/
+
+func (s *suite) getApplicationVersionsMuxWithProvider(provider *applicationHandlerProvider) *mux.Router {
+	r := mux.NewRouter()
+	router := r.Methods("GET").Subrouter()
+	router.Handle(GetApplicationVersionsURL, http.HandlerFunc(provider.GetApplicationVersionsHandler))
+	return r
+}
+
+func (s *suite) Test_GetApplicationVersionsHandler_happy_path(c *C) {
+	var capturedProject, capturedName string
+	provider := &applicationHandlerProvider{
+		GetApplicationVersions: func(project, name string) ([]string, error) {
+			capturedProject = project
+			capturedName = name
+			return []string{"1.0", "1.1"}, nil
+		},
+	}
+	resp := s.testGET(c, s.getApplicationVersionsMuxWithProvider(provider), getApplicationVersionsTestURL)
+	c.Assert(resp.StatusCode, Equals, 200)
+	c.Assert(capturedProject, Equals, "project")
+	c.Assert(capturedName, Equals, "name")
+	result := []string{}
+	c.Assert(json.NewDecoder(resp.Body).Decode(&result), IsNil)
+	c.Assert(result, DeepEquals, []string{"1.0", "1.1"})
+}
+
+func (s *suite) Test_GetApplicationVersionsHandler_fails_if_GetApplicationVersions_fails(c *C) {
+	provider := &applicationHandlerProvider{
+		GetApplicationVersions: func(project, name string) ([]string, error) {
+			return nil, types.NotFound
+		},
+	}
+	resp := s.testGET(c, s.getApplicationVersionsMuxWithProvider(provider), getApplicationVersionsTestURL)
+	c.Assert(resp.StatusCode, Equals, 404)
 	body, err := ioutil.ReadAll(resp.Body)
 	c.Assert(err, IsNil)
 	c.Assert(string(body), Equals, "")

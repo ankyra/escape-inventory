@@ -20,7 +20,7 @@ import (
 	. "gopkg.in/check.v1"
 )
 
-func (s *appSuite) Test_GetPre(c *C) {
+func (s *appSuite) Test_GetPrevVersion(c *C) {
 	versions := []string{"0", "0.0", "0.0.0", "0.1", "0.1.0", "0.1.1", "0.1.2"}
 	testCases := map[string]string{
 		"12.10.11": "0.1.2",

@@ -23,16 +23,102 @@ import (
 
 	core "github.com/ankyra/escape-core"
 	"github.com/ankyra/escape-inventory/dao/types"
+	"github.com/ankyra/escape-inventory/model"
 	"github.com/gorilla/mux"
 	. "gopkg.in/check.v1"
 )
 
 const (
+	GetVersionURL          = "/api/v1/registry/{project}/units/{name}/versions/{version}/"
+	getVersionTestURL      = "/api/v1/registry/project/units/name/versions/v1.0/"
 	NextVersionURL         = "/api/v1/registry/{project}/units/{name}/next-version"
 	nextVersionTestURL     = "/api/v1/registry/project/units/name/next-version?prefix=0.1"
 	PreviousVersionURL     = "/api/v1/registry/{project}/units/{name}/versions/{version}/previous/"
 	previousVersionTestURL = "/api/v1/registry/project/units/name/versions/v1.0/previous/"
 )
+
+/*
+	GetVersionHandler
+
+*/
+
+func (s *suite) getVersionMuxWithProvider(provider *versionHandlerProvider) *mux.Router {
+	r := mux.NewRouter()
+	router := r.Methods("GET").Subrouter()
+	router.Handle(GetVersionURL, http.HandlerFunc(provider.GetVersionHandler))
+	return r
+}
+
+func (s *suite) Test_GetVersionHandler_happy_path(c *C) {
+	var capturedProject, capturedName, capturedVersion string
+	provider := &versionHandlerProvider{
+		GetReleaseMetadata: func(project, name, version string) (*core.ReleaseMetadata, error) {
+			capturedProject = project
+			capturedName = name
+			capturedVersion = version
+			return core.NewReleaseMetadata("name", "v10.0"), nil
+		},
+	}
+	resp := s.testGET(c, s.getVersionMuxWithProvider(provider), getVersionTestURL)
+	c.Assert(resp.StatusCode, Equals, 200)
+	c.Assert(resp.Header.Get("Content-Type"), Equals, "application/json")
+	c.Assert(capturedProject, Equals, "project")
+	c.Assert(capturedName, Equals, "name")
+	c.Assert(capturedVersion, Equals, "v1.0")
+
+	result := core.ReleaseMetadata{}
+	c.Assert(json.NewDecoder(resp.Body).Decode(&result), IsNil)
+	c.Assert(result.Name, Equals, "name")
+	c.Assert(result.Version, Equals, "v10.0")
+}
+
+func (s *suite) Test_GetVersionHandler_happy_path_full(c *C) {
+	var capturedProject, capturedName, capturedVersion string
+	provider := &versionHandlerProvider{
+		GetRelease: func(project, name, version string) (*model.ReleasePayload, error) {
+			capturedProject = project
+			capturedName = name
+			capturedVersion = version
+			return &model.ReleasePayload{Downloads: 2000}, nil
+		},
+	}
+	resp := s.testGET(c, s.getVersionMuxWithProvider(provider), getVersionTestURL+"?full=true")
+	c.Assert(resp.StatusCode, Equals, 200)
+	c.Assert(resp.Header.Get("Content-Type"), Equals, "application/json")
+	c.Assert(capturedProject, Equals, "project")
+	c.Assert(capturedName, Equals, "name")
+	c.Assert(capturedVersion, Equals, "v1.0")
+
+	result := model.ReleasePayload{}
+	c.Assert(json.NewDecoder(resp.Body).Decode(&result), IsNil)
+	c.Assert(result.Downloads, Equals, 2000)
+}
+
+func (s *suite) Test_GetVersionHandler_fails_if_full_and_GetRelease_fails(c *C) {
+	provider := &versionHandlerProvider{
+		GetRelease: func(project, name, version string) (*model.ReleasePayload, error) {
+			return nil, types.NotFound
+		},
+	}
+	resp := s.testGET(c, s.getVersionMuxWithProvider(provider), getVersionTestURL+"?full=true")
+	c.Assert(resp.StatusCode, Equals, 404)
+	body, err := ioutil.ReadAll(resp.Body)
+	c.Assert(err, IsNil)
+	c.Assert(string(body), Equals, "")
+}
+
+func (s *suite) Test_GetVersionHandler_fails_if_not_full_and_GetReleaseMetadata_fails(c *C) {
+	provider := &versionHandlerProvider{
+		GetReleaseMetadata: func(project, name, version string) (*core.ReleaseMetadata, error) {
+			return nil, types.NotFound
+		},
+	}
+	resp := s.testGET(c, s.getVersionMuxWithProvider(provider), getVersionTestURL)
+	c.Assert(resp.StatusCode, Equals, 404)
+	body, err := ioutil.ReadAll(resp.Body)
+	c.Assert(err, IsNil)
+	c.Assert(string(body), Equals, "")
+}
 
 /*
 	NextVersionHandler
@@ -103,6 +189,7 @@ func (s *suite) Test_PreviousVersionHandler_happy_path(c *C) {
 	}
 	resp := s.testGET(c, s.previousVersionMuxWithProvider(provider), previousVersionTestURL)
 	c.Assert(resp.StatusCode, Equals, 200)
+	c.Assert(resp.Header.Get("Content-Type"), Equals, "application/json")
 	c.Assert(capturedProject, Equals, "project")
 	c.Assert(capturedName, Equals, "name")
 	c.Assert(capturedVersion, Equals, "v1.0")
