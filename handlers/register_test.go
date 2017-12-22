@@ -33,6 +33,10 @@ const (
 	registerTestURL = "/api/v1/registry/project/register"
 )
 
+/*
+	RegisterHandler
+*/
+
 func (s *suite) registerMuxWithProvider(provider *registerHandlerProvider) *mux.Router {
 	r := mux.NewRouter()
 	postRouter := r.Methods("POST").Subrouter()

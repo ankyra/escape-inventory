@@ -17,178 +17,323 @@ limitations under the License.
 package handlers
 
 import (
-	"bytes"
 	"encoding/json"
+	"io/ioutil"
 	"net/http"
-	"net/http/httptest"
-	"testing"
 
-	"github.com/ankyra/escape-inventory/dao"
+	"github.com/ankyra/escape-inventory/dao/types"
 	"github.com/ankyra/escape-inventory/model"
+	"github.com/gorilla/mux"
 
 	. "gopkg.in/check.v1"
 )
 
-func Test(t *testing.T) { TestingT(t) }
+const (
+	GetProjectsURL = "/api/v1/registry/"
 
-type suite struct{}
+	GetProjectURL     = "/api/v1/registry/{project}/"
+	getProjectTestURL = "/api/v1/registry/project/"
 
-var _ = Suite(&suite{})
+	AddProjectURL     = "/api/v1/registry/{project}/add-project"
+	addProjectTestURL = "/api/v1/registry/project/add-project"
 
-func (s *suite) SetUpTest(c *C) {
-	dao.TestSetup()
-}
+	UpdateProjectURL     = "/api/v1/registry/{project}/"
+	updateProjectTestURL = "/api/v1/registry/project/"
 
-/*
-	JSON TEST HELPERS
-*/
+	GetProjectHooksURL     = "/api/v1/registry/{project}/hooks/"
+	getProjectHooksTestURL = "/api/v1/registry/project/hooks/"
 
-func (s *suite) JsonNilBodyTest(c *C, handler http.HandlerFunc) {
-	req := httptest.NewRequest("POST", "/url", nil)
-	req.Body = nil
-	w := httptest.NewRecorder()
-	handler(w, req)
-	resp := w.Result()
-	c.Assert(resp.StatusCode, Equals, 400, Commentf("nil body should fail"))
-}
-
-func (s *suite) JsonEmptyBodyTest(c *C, handler http.HandlerFunc) {
-	req := httptest.NewRequest("POST", "/api/v1/registry/add-project", nil)
-	w := httptest.NewRecorder()
-	handler(w, req)
-	resp := w.Result()
-	c.Assert(resp.StatusCode, Equals, 400, Commentf("empty body should fail"))
-}
-
-func (s *suite) JsonParseTesting(c *C, handler http.HandlerFunc) {
-	s.JsonNilBodyTest(c, handler)
-	s.JsonEmptyBodyTest(c, handler)
-}
+	UpdateProjectHooksURL     = "/api/v1/registry/{project}/hooks/"
+	updateProjectHooksTestURL = "/api/v1/registry/project/hooks/"
+)
 
 /*
-	GET PROJECT
+	GetProjectsHandler
+
 */
 
-func (s *suite) Test_GetProject_Not_Found(c *C) {
-	req := httptest.NewRequest("GET", "/url", nil)
-	w := httptest.NewRecorder()
-	getProjectHandler(w, req, "test")
-
-	resp := w.Result()
-	c.Assert(resp.StatusCode, Equals, 404)
+func (s *suite) getProjectsMuxWithProvider(provider *projectHandlerProvider) *mux.Router {
+	r := mux.NewRouter()
+	router := r.Methods("GET").Subrouter()
+	router.Handle(GetProjectsURL, http.HandlerFunc(provider.GetProjectsHandler))
+	return r
 }
 
-func (s *suite) Test_GetProject(c *C) {
-	s.addProject(c, "test")
-	req := httptest.NewRequest("GET", "/get", nil)
-	w := httptest.NewRecorder()
-	getProjectHandler(w, req, "test")
-
-	resp := w.Result()
+func (s *suite) Test_GetProjectsHandler_happy_path(c *C) {
+	provider := &projectHandlerProvider{
+		GetProjects: func() (map[string]*types.Project, error) {
+			return map[string]*types.Project{
+				"test": types.NewProject("test"),
+			}, nil
+		},
+	}
+	resp := s.testGET(c, s.getProjectsMuxWithProvider(provider), GetProjectsURL)
 	c.Assert(resp.StatusCode, Equals, 200)
+	c.Assert(resp.Header.Get("Content-Type"), Equals, "application/json")
+	result := map[string]*types.Project{}
+	c.Assert(json.NewDecoder(resp.Body).Decode(&result), IsNil)
+	c.Assert(result, HasLen, 1)
+	c.Assert(result["test"].Name, Equals, "test")
+}
 
+func (s *suite) Test_GetProjectsHandler_fails_if_GetProjects_fails(c *C) {
+	provider := &projectHandlerProvider{
+		GetProjects: func() (map[string]*types.Project, error) {
+			return nil, types.NotFound
+		},
+	}
+	resp := s.testGET(c, s.getProjectsMuxWithProvider(provider), GetProjectsURL)
+	c.Assert(resp.StatusCode, Equals, 404)
+	body, err := ioutil.ReadAll(resp.Body)
+	c.Assert(err, IsNil)
+	c.Assert(string(body), Equals, "")
+}
+
+/*
+	GetProjectHandler
+
+*/
+
+func (s *suite) getProjectMuxWithProvider(provider *projectHandlerProvider) *mux.Router {
+	r := mux.NewRouter()
+	router := r.Methods("GET").Subrouter()
+	router.Handle(GetProjectURL, http.HandlerFunc(provider.GetProjectHandler))
+	return r
+}
+
+func (s *suite) Test_GetProjectHandler_happy_path(c *C) {
+	var capturedProject string
+	provider := &projectHandlerProvider{
+		GetProject: func(project string) (*model.ProjectPayload, error) {
+			capturedProject = project
+			return &model.ProjectPayload{
+				Project: types.NewProject("test"),
+			}, nil
+		},
+	}
+	resp := s.testGET(c, s.getProjectMuxWithProvider(provider), getProjectTestURL)
+	c.Assert(resp.StatusCode, Equals, 200)
+	c.Assert(capturedProject, Equals, "project")
+	c.Assert(resp.Header.Get("Content-Type"), Equals, "application/json")
 	result := model.ProjectPayload{}
 	c.Assert(json.NewDecoder(resp.Body).Decode(&result), IsNil)
-
-	c.Assert(result.Name, Equals, "test")
-	c.Assert(result.Description, Equals, "")
-	c.Assert(result.Units, HasLen, 0)
+	c.Assert(result.Project.Name, Equals, "test")
 }
 
-/*
-	ADD PROJECT
-*/
-
-func (s *suite) Test_AddProject_Json_Tests(c *C) {
-	s.JsonParseTesting(c, AddProjectHandler)
-}
-
-func (s *suite) Test_AddProject_Missing_Name(c *C) {
-	body := `{}`
-	req := httptest.NewRequest("POST", "/api/v1/registry/add-project", bytes.NewReader([]byte(body)))
-	w := httptest.NewRecorder()
-	AddProjectHandler(w, req)
-
-	resp := w.Result()
-	c.Assert(resp.StatusCode, Equals, 400)
-}
-
-func (s *suite) Test_AddProject_Already_Exists(c *C) {
-	body := `{"name": "test"}`
-	req := httptest.NewRequest("POST", "/api/v1/registry/add-project", bytes.NewReader([]byte(body)))
-	w := httptest.NewRecorder()
-	AddProjectHandler(w, req)
-
-	resp := w.Result()
-	c.Assert(resp.StatusCode, Equals, 200)
-
-	req = httptest.NewRequest("POST", "/api/v1/registry/add-project", bytes.NewReader([]byte(body)))
-	w = httptest.NewRecorder()
-	AddProjectHandler(w, req)
-
-	resp = w.Result()
-	c.Assert(resp.StatusCode, Equals, 409)
-}
-
-/*
-	ADD PROJECT HELPER
-*/
-
-func (s *suite) addProject(c *C, name string) {
-	body := `{"name": "` + name + `"}`
-	req := httptest.NewRequest("POST", "/api/v1/registry/add-project", bytes.NewReader([]byte(body)))
-	w := httptest.NewRecorder()
-	AddProjectHandler(w, req)
-	resp := w.Result()
-	c.Assert(resp.StatusCode, Equals, 200)
-}
-
-/*
-	UPDATE PROJECT
-*/
-
-func (s *suite) Test_UpdateProject_Json_Test(c *C) {
-	s.JsonParseTesting(c, UpdateProjectHandler)
-}
-
-func (s *suite) Test_UpdateProject_Missing_Name(c *C) {
-	body := `{}`
-	req := httptest.NewRequest("POST", "/api/v1/registry/update-project", bytes.NewReader([]byte(body)))
-	w := httptest.NewRecorder()
-	updateProjectHandler(w, req, "test")
-
-	resp := w.Result()
-	c.Assert(resp.StatusCode, Equals, 400)
-}
-
-func (s *suite) Test_UpdateProject_Not_Found(c *C) {
-	body := `{"name": "test"}`
-	req := httptest.NewRequest("POST", "/api/v1/registry/update-project", bytes.NewReader([]byte(body)))
-	w := httptest.NewRecorder()
-	updateProjectHandler(w, req, "test")
-
-	resp := w.Result()
+func (s *suite) Test_GetProjectHandler_fails_if_GetProject_fails(c *C) {
+	provider := &projectHandlerProvider{
+		GetProject: func(project string) (*model.ProjectPayload, error) {
+			return nil, types.NotFound
+		},
+	}
+	resp := s.testGET(c, s.getProjectMuxWithProvider(provider), getProjectTestURL)
 	c.Assert(resp.StatusCode, Equals, 404)
+	body, err := ioutil.ReadAll(resp.Body)
+	c.Assert(err, IsNil)
+	c.Assert(string(body), Equals, "")
 }
 
-func (s *suite) Test_UpdateProject_Fails_if_project_names_dont_match(c *C) {
-	s.addProject(c, "test")
-	body := `{"name": "test"}`
-	req := httptest.NewRequest("POST", "/api/v1/registry/update-project", bytes.NewReader([]byte(body)))
-	w := httptest.NewRecorder()
-	updateProjectHandler(w, req, "not-test")
+/*
+	GetProjectHooksHandler
 
-	resp := w.Result()
+*/
+
+func (s *suite) getProjectHooksMuxWithProvider(provider *projectHandlerProvider) *mux.Router {
+	r := mux.NewRouter()
+	router := r.Methods("GET").Subrouter()
+	router.Handle(GetProjectHooksURL, http.HandlerFunc(provider.GetProjectHooksHandler))
+	return r
+}
+
+func (s *suite) Test_GetProjectHooksHandler_happy_path(c *C) {
+	var capturedProject string
+	provider := &projectHandlerProvider{
+		GetProjectHooks: func(project string) (types.Hooks, error) {
+			capturedProject = project
+			return types.Hooks{
+				"test": map[string]string{},
+			}, nil
+		},
+	}
+	resp := s.testGET(c, s.getProjectHooksMuxWithProvider(provider), getProjectHooksTestURL)
+	c.Assert(resp.StatusCode, Equals, 200)
+	c.Assert(capturedProject, Equals, "project")
+	c.Assert(resp.Header.Get("Content-Type"), Equals, "application/json")
+	result := types.Hooks{}
+	c.Assert(json.NewDecoder(resp.Body).Decode(&result), IsNil)
+	c.Assert(result, HasLen, 1)
+}
+
+func (s *suite) Test_GetProjectHooksHandler_fails_if_GetProject_fails(c *C) {
+	provider := &projectHandlerProvider{
+		GetProjectHooks: func(project string) (types.Hooks, error) {
+			return nil, types.NotFound
+		},
+	}
+	resp := s.testGET(c, s.getProjectHooksMuxWithProvider(provider), getProjectHooksTestURL)
+	c.Assert(resp.StatusCode, Equals, 404)
+	body, err := ioutil.ReadAll(resp.Body)
+	c.Assert(err, IsNil)
+	c.Assert(string(body), Equals, "")
+}
+
+/*
+	AddProjectHandler
+
+*/
+
+func (s *suite) addProjectMuxWithProvider(provider *projectHandlerProvider) *mux.Router {
+	r := mux.NewRouter()
+	router := r.Methods("POST").Subrouter()
+	router.Handle(AddProjectURL, http.HandlerFunc(provider.AddProjectHandler))
+	return r
+}
+
+func (s *suite) Test_AddProjectHandler_happy_path(c *C) {
+	provider := &projectHandlerProvider{
+		AddProject: func(project *types.Project) error {
+			return nil
+		},
+	}
+	data := types.NewProject("test")
+	resp := s.testPOST(c, s.addProjectMuxWithProvider(provider), addProjectTestURL, data)
+	c.Assert(resp.StatusCode, Equals, 200)
+	body, err := ioutil.ReadAll(resp.Body)
+	c.Assert(err, IsNil)
+	c.Assert(string(body), Equals, "")
+}
+
+func (s *suite) Test_AddProjectHandler_fails_if_invalid_json(c *C) {
+	provider := &projectHandlerProvider{}
+	resp := s.testPOST(c, s.addProjectMuxWithProvider(provider), addProjectTestURL, nil)
 	c.Assert(resp.StatusCode, Equals, 400)
+	body, err := ioutil.ReadAll(resp.Body)
+	c.Assert(err, IsNil)
+	c.Assert(string(body), Equals, "Invalid JSON")
 }
 
-func (s *suite) Test_UpdateProject(c *C) {
-	s.addProject(c, "test")
-	body := `{"name": "test", "description": "test description"}`
-	req := httptest.NewRequest("POST", "/api/v1/registry/update-project", bytes.NewReader([]byte(body)))
-	w := httptest.NewRecorder()
-	updateProjectHandler(w, req, "test")
+func (s *suite) Test_AddProjectHandler_fails_if_AddProject_fails(c *C) {
+	provider := &projectHandlerProvider{
+		AddProject: func(project *types.Project) error {
+			return types.AlreadyExists
+		},
+	}
+	data := types.NewProject("test")
+	resp := s.testPOST(c, s.addProjectMuxWithProvider(provider), addProjectTestURL, data)
+	c.Assert(resp.StatusCode, Equals, 409)
+	body, err := ioutil.ReadAll(resp.Body)
+	c.Assert(err, IsNil)
+	c.Assert(string(body), Equals, "Resource already exists")
+}
 
-	resp := w.Result()
+/*
+	UpdateProjectHandler
+
+*/
+
+func (s *suite) updateProjectMuxWithProvider(provider *projectHandlerProvider) *mux.Router {
+	r := mux.NewRouter()
+	router := r.Methods("PUT").Subrouter()
+	router.Handle(UpdateProjectURL, http.HandlerFunc(provider.UpdateProjectHandler))
+	return r
+}
+
+func (s *suite) Test_UpdateProjectHandler_happy_path(c *C) {
+	provider := &projectHandlerProvider{
+		UpdateProject: func(project *types.Project) error {
+			return nil
+		},
+	}
+	data := types.NewProject("project")
+	resp := s.testPUT(c, s.updateProjectMuxWithProvider(provider), updateProjectTestURL, data)
 	c.Assert(resp.StatusCode, Equals, 201)
+	body, err := ioutil.ReadAll(resp.Body)
+	c.Assert(err, IsNil)
+	c.Assert(string(body), Equals, "")
+}
+
+func (s *suite) Test_UpdateProjectHandler_fails_if_invalid_json(c *C) {
+	provider := &projectHandlerProvider{}
+	resp := s.testPUT(c, s.updateProjectMuxWithProvider(provider), updateProjectTestURL, nil)
+	c.Assert(resp.StatusCode, Equals, 400)
+	body, err := ioutil.ReadAll(resp.Body)
+	c.Assert(err, IsNil)
+	c.Assert(string(body), Equals, "Invalid JSON")
+}
+
+func (s *suite) Test_UpdateProjectHandler_fails_if_mux_name_doesnt_match_payload_name(c *C) {
+	provider := &projectHandlerProvider{
+		UpdateProject: func(project *types.Project) error {
+			return types.AlreadyExists
+		},
+	}
+	data := types.NewProject("wrong-name")
+	resp := s.testPUT(c, s.updateProjectMuxWithProvider(provider), updateProjectTestURL, data)
+	c.Assert(resp.StatusCode, Equals, 400)
+	body, err := ioutil.ReadAll(resp.Body)
+	c.Assert(err, IsNil)
+	c.Assert(string(body), Equals, "Project 'name' field doesn't correspond with URL")
+}
+
+func (s *suite) Test_UpdateProjectHandler_fails_if_UpdateProject_fails(c *C) {
+	provider := &projectHandlerProvider{
+		UpdateProject: func(project *types.Project) error {
+			return types.AlreadyExists
+		},
+	}
+	data := types.NewProject("project")
+	resp := s.testPUT(c, s.updateProjectMuxWithProvider(provider), updateProjectTestURL, data)
+	c.Assert(resp.StatusCode, Equals, 409)
+	body, err := ioutil.ReadAll(resp.Body)
+	c.Assert(err, IsNil)
+	c.Assert(string(body), Equals, "Resource already exists")
+}
+
+/*
+	UpdateProjectHooksHandler
+
+*/
+
+func (s *suite) updateProjectHooksMuxWithProvider(provider *projectHandlerProvider) *mux.Router {
+	r := mux.NewRouter()
+	router := r.Methods("PUT").Subrouter()
+	router.Handle(UpdateProjectHooksURL, http.HandlerFunc(provider.UpdateProjectHooksHandler))
+	return r
+}
+
+func (s *suite) Test_UpdateProjectHooksHandler_happy_path(c *C) {
+	provider := &projectHandlerProvider{
+		UpdateProjectHooks: func(project string, hooks types.Hooks) error {
+			return nil
+		},
+	}
+	data := types.Hooks{}
+	resp := s.testPUT(c, s.updateProjectHooksMuxWithProvider(provider), updateProjectHooksTestURL, data)
+	c.Assert(resp.StatusCode, Equals, 201)
+	body, err := ioutil.ReadAll(resp.Body)
+	c.Assert(err, IsNil)
+	c.Assert(string(body), Equals, "")
+}
+
+func (s *suite) Test_UpdateProjectHooksHandler_fails_if_invalid_json(c *C) {
+	provider := &projectHandlerProvider{}
+	resp := s.testPUT(c, s.updateProjectHooksMuxWithProvider(provider), updateProjectHooksTestURL, nil)
+	c.Assert(resp.StatusCode, Equals, 400)
+	body, err := ioutil.ReadAll(resp.Body)
+	c.Assert(err, IsNil)
+	c.Assert(string(body), Equals, "Invalid JSON")
+}
+
+func (s *suite) Test_UpdateProjectHooksHandler_fails_if_UpdateProjectHooks_fails(c *C) {
+	provider := &projectHandlerProvider{
+		UpdateProjectHooks: func(project string, hooks types.Hooks) error {
+			return types.NotFound
+		},
+	}
+	data := types.Hooks{}
+	resp := s.testPUT(c, s.updateProjectHooksMuxWithProvider(provider), updateProjectHooksTestURL, data)
+	c.Assert(resp.StatusCode, Equals, 404)
+	body, err := ioutil.ReadAll(resp.Body)
+	c.Assert(err, IsNil)
+	c.Assert(string(body), Equals, "")
 }

@@ -25,12 +25,24 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"testing"
 
+	"github.com/ankyra/escape-inventory/dao"
 	"github.com/ankyra/escape-inventory/dao/types"
 	"github.com/ankyra/escape-inventory/model"
 	"github.com/gorilla/mux"
 	. "gopkg.in/check.v1"
 )
+
+func Test(t *testing.T) { TestingT(t) }
+
+type suite struct{}
+
+var _ = Suite(&suite{})
+
+func (s *suite) SetUpTest(c *C) {
+	dao.TestSetup()
+}
 
 func (s *suite) testGET(c *C, r *mux.Router, url string) *http.Response {
 	var reader io.Reader = nil
