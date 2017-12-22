@@ -34,6 +34,11 @@ func ReadUsernameFromContext(r *http.Request) string {
 }
 
 func HandleError(w http.ResponseWriter, r *http.Request, err error) {
+	if err == nil {
+		log.Println("Received nil error")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 	if dao.IsNotFound(err) {
 		w.WriteHeader(http.StatusNotFound)
 		return

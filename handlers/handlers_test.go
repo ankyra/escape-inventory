@@ -19,6 +19,7 @@ package handlers
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"io"
 	"mime/multipart"
 	"net/http"
@@ -26,6 +27,7 @@ import (
 	"os"
 
 	"github.com/ankyra/escape-inventory/dao/types"
+	"github.com/ankyra/escape-inventory/model"
 	"github.com/gorilla/mux"
 	. "gopkg.in/check.v1"
 )
@@ -108,4 +110,39 @@ func (s *suite) Test_ErrorOrJsonSuccess_error(c *C) {
 	ErrorOrJsonSuccess(rr, nil, result, types.AlreadyExists)
 	c.Assert(rr.Code, Equals, 409)
 	c.Assert(rr.Body.String(), Equals, "Resource already exists")
+}
+
+func (s *suite) Test_HandleError_nil_error(c *C) {
+	rr := httptest.NewRecorder()
+	HandleError(rr, nil, nil)
+	c.Assert(rr.Code, Equals, 500)
+	c.Assert(rr.Body.String(), Equals, "")
+}
+
+func (s *suite) Test_HandleError_not_found(c *C) {
+	rr := httptest.NewRecorder()
+	HandleError(rr, nil, types.NotFound)
+	c.Assert(rr.Code, Equals, 404)
+	c.Assert(rr.Body.String(), Equals, "")
+}
+
+func (s *suite) Test_HandleError_already_exists(c *C) {
+	rr := httptest.NewRecorder()
+	HandleError(rr, nil, types.AlreadyExists)
+	c.Assert(rr.Code, Equals, 409)
+	c.Assert(rr.Body.String(), Equals, "Resource already exists")
+}
+
+func (s *suite) Test_HandleError_user_error(c *C) {
+	rr := httptest.NewRecorder()
+	HandleError(rr, nil, model.NewUserError(errors.New("ouch")))
+	c.Assert(rr.Code, Equals, 400)
+	c.Assert(rr.Body.String(), Equals, "ouch")
+}
+
+func (s *suite) Test_HandleError_server_error(c *C) {
+	rr := httptest.NewRecorder()
+	HandleError(rr, nil, errors.New("server error"))
+	c.Assert(rr.Code, Equals, 500)
+	c.Assert(rr.Body.String(), Equals, "")
 }

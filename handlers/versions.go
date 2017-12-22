@@ -43,7 +43,6 @@ func newVersionHandlerProvider() *versionHandlerProvider {
 func GetVersionHandler(w http.ResponseWriter, r *http.Request) {
 	newVersionHandlerProvider().GetVersionHandler(w, r)
 }
-
 func NextVersionHandler(w http.ResponseWriter, r *http.Request) {
 	newVersionHandlerProvider().NextVersionHandler(w, r)
 }

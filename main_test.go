@@ -405,63 +405,6 @@ func (s *suite) Test_GetVersion_fails_if_version_format_invalid(c *C) {
 	}
 }
 
-func (s *suite) Test_Import(c *C) {
-	body := bytes.NewReader([]byte(`[
-        {"name": "my-app", "version": "1", "project": "_"},
-        {"name": "my-app", "version": "1", "project": "ankyra"},
-        {"name": "my-app", "version": "2", "project": "ankyra"}
-    ]
-    `))
-	req, _ := http.NewRequest("POST", importEndpoint, body)
-	testRequest(c, req, 200)
-	rr = httptest.NewRecorder()
-	req, _ = http.NewRequest("GET", importGetVersionEndpoint, nil)
-	testRequest(c, req, http.StatusOK)
-}
-
-func (s *suite) Test_Import_fails_with_malformed_json(c *C) {
-	body := []string{
-		"{}",
-		"[{}]",
-		"12",
-		`"string"`,
-	}
-	for _, b := range body {
-		req, _ := http.NewRequest("POST", importEndpoint, bytes.NewReader([]byte(b)))
-		testRequest(c, req, 400)
-		rr = httptest.NewRecorder()
-	}
-}
-func (s *suite) Test_Import_fails_with_empty_body(c *C) {
-	req, _ := http.NewRequest("POST", importEndpoint, nil)
-	testRequest(c, req, 400)
-}
-
-func (s *suite) Test_Export(c *C) {
-	s.addRelease(c, exportProject, "1")
-	s.addRelease(c, exportProject, "2")
-	req, _ := http.NewRequest("GET", exportEndpoint, nil)
-	testRequest(c, req, http.StatusOK)
-	result := []map[string]interface{}{}
-	err := json.Unmarshal([]byte(rr.Body.String()), &result)
-	c.Assert(err, IsNil)
-	c.Assert(result, HasLen, 2)
-	var first, second map[string]interface{}
-	for _, release := range result {
-		if release["version"].(string) == "1" {
-			first = release
-		}
-		if release["version"].(string) == "2" {
-			second = release
-		}
-	}
-	c.Assert(first, Not(IsNil))
-	c.Assert(second, Not(IsNil))
-	c.Assert(first["name"], DeepEquals, "my-app")
-	c.Assert(first["project"], DeepEquals, exportProject)
-	c.Assert(first["URI"], DeepEquals, []interface{}{})
-}
-
 func (s *suite) Test_Metrics(c *C) {
 	req, _ := http.NewRequest("GET", metricsEndpoint, nil)
 	testRequest(c, req, 200)

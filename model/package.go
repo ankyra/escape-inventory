@@ -27,13 +27,6 @@ import (
 	"github.com/ankyra/escape-inventory/storage"
 )
 
-func UploadPackage(project, releaseId string, pkg io.ReadSeeker) error {
-	return newStorageProvider().UploadPackage(project, releaseId, pkg)
-}
-func GetDownloadReadSeeker(project, releaseId string) (io.Reader, error) {
-	return newStorageProvider().GetDownloadReadSeeker(project, releaseId)
-}
-
 type storageProvider struct {
 	Upload   func(project, releaseId string, pkg io.ReadSeeker) (string, error)
 	Download func(project, uri string) (io.Reader, error)
@@ -44,6 +37,14 @@ func newStorageProvider() *storageProvider {
 		Upload:   storage.Upload,
 		Download: storage.Download,
 	}
+}
+
+func UploadPackage(project, releaseId string, pkg io.ReadSeeker) error {
+	return newStorageProvider().UploadPackage(project, releaseId, pkg)
+}
+
+func GetDownloadReadSeeker(project, releaseId string) (io.Reader, error) {
+	return newStorageProvider().GetDownloadReadSeeker(project, releaseId)
 }
 
 func (s *storageProvider) UploadPackage(project, releaseId string, pkg io.ReadSeeker) error {

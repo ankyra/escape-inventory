@@ -46,16 +46,12 @@ var ReadRoutes = map[string]http.HandlerFunc{
 	"/api/v1/registry/{project}/units/{name}/versions/{version}/download":         handlers.DownloadHandler,
 	"/api/v1/registry/{project}/units/{name}/versions/{version}/previous/":        handlers.PreviousVersionHandler,
 	"/api/v1/registry/{project}/units/{name}/next-version":                        handlers.NextVersionHandler,
-
-	"/api/v1/internal/export": handlers.ExportReleasesHandler,
 }
 
 var WriteRoutes = map[string]http.HandlerFunc{
 	"/api/v1/registry/{project}/add-project":                            handlers.AddProjectHandler,
 	"/api/v1/registry/{project}/register":                               handlers.RegisterHandler,
 	"/api/v1/registry/{project}/units/{name}/versions/{version}/upload": handlers.UploadHandler,
-
-	"/api/v1/internal/import": handlers.ImportReleasesHandler,
 }
 
 var UpdateRoutes = map[string]http.HandlerFunc{

@@ -17,7 +17,6 @@ limitations under the License.
 package handlers
 
 import (
-	"encoding/json"
 	"net/http"
 
 	"github.com/ankyra/escape-core"
@@ -49,12 +48,5 @@ func (h *diffHandlerProvider) DiffHandler(w http.ResponseWriter, r *http.Request
 		HandleError(w, r, err)
 		return
 	}
-	bytes, err := json.Marshal(changes)
-	if err != nil {
-		HandleError(w, r, err)
-		return
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
-	w.Write(bytes)
+	ErrorOrJsonSuccess(w, r, changes, err)
 }
