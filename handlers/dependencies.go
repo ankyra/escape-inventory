@@ -17,7 +17,6 @@ limitations under the License.
 package handlers
 
 import (
-	"encoding/json"
 	"net/http"
 
 	"github.com/ankyra/escape-inventory/model"
@@ -29,13 +28,7 @@ func DownstreamHandler(w http.ResponseWriter, r *http.Request) {
 	name := mux.Vars(r)["name"]
 	version := mux.Vars(r)["version"]
 	deps, err := model.GetDownstreamDependencies(project, name, version)
-	if err != nil {
-		HandleError(w, r, err)
-		return
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
-	json.NewEncoder(w).Encode(deps)
+	ErrorOrJsonSuccess(w, r, deps, err)
 }
 
 func DependencyGraphHandler(w http.ResponseWriter, r *http.Request) {
@@ -43,11 +36,5 @@ func DependencyGraphHandler(w http.ResponseWriter, r *http.Request) {
 	name := mux.Vars(r)["name"]
 	version := mux.Vars(r)["version"]
 	graph, err := model.GetDependencyGraph(project, name, version, nil)
-	if err != nil {
-		HandleError(w, r, err)
-		return
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
-	json.NewEncoder(w).Encode(graph)
+	ErrorOrJsonSuccess(w, r, graph, err)
 }

@@ -35,6 +35,8 @@ const (
 	nextVersionTestURL     = "/api/v1/registry/project/units/name/next-version?prefix=0.1"
 	PreviousVersionURL     = "/api/v1/registry/{project}/units/{name}/versions/{version}/previous/"
 	previousVersionTestURL = "/api/v1/registry/project/units/name/versions/v1.0/previous/"
+	DiffURL                = "/api/v1/registry/{project}/units/{name}/versions/{version}/diff/{diffWith}/"
+	diffTestURL            = "/api/v1/registry/project/units/name/versions/v1.0/diff/v1.1/"
 )
 
 /*
@@ -167,7 +169,6 @@ func (s *suite) Test_NextVersionHandler_fails_if_GetNextVersion_fails(c *C) {
 
 /*
 	PreviousVersionHandler
-
 */
 
 func (s *suite) previousVersionMuxWithProvider(provider *versionHandlerProvider) *mux.Router {
@@ -207,6 +208,56 @@ func (s *suite) Test_PreviousVersionHandler_fails_if_GetNextVersion_fails(c *C) 
 		},
 	}
 	resp := s.testGET(c, s.previousVersionMuxWithProvider(provider), previousVersionTestURL)
+	c.Assert(resp.StatusCode, Equals, 404)
+	body, err := ioutil.ReadAll(resp.Body)
+	c.Assert(err, IsNil)
+	c.Assert(string(body), Equals, "")
+}
+
+/*
+	DiffHandler
+*/
+
+func (s *suite) diffMuxWithProvider(provider *versionHandlerProvider) *mux.Router {
+	r := mux.NewRouter()
+	router := r.Methods("GET").Subrouter()
+	router.Handle(DiffURL, http.HandlerFunc(provider.DiffHandler))
+	return r
+}
+
+func (s *suite) Test_DiffHandler_happy_path(c *C) {
+	var capturedProject, capturedName, capturedVersion, capturedDiffWithVersion string
+	provider := &versionHandlerProvider{
+		Diff: func(project, name, version, diffWithVersion string) (map[string]map[string]core.Changes, error) {
+			capturedProject = project
+			capturedName = name
+			capturedVersion = version
+			capturedDiffWithVersion = diffWithVersion
+			changes := map[string]map[string]core.Changes{
+				"test": map[string]core.Changes{},
+			}
+			return changes, nil
+		},
+	}
+	resp := s.testGET(c, s.diffMuxWithProvider(provider), diffTestURL)
+	c.Assert(resp.StatusCode, Equals, 200)
+	c.Assert(capturedProject, Equals, "project")
+	c.Assert(capturedName, Equals, "name")
+	c.Assert(capturedVersion, Equals, "v1.0")
+	c.Assert(capturedDiffWithVersion, Equals, "v1.1")
+
+	result := map[string]map[string]core.Changes{}
+	c.Assert(json.NewDecoder(resp.Body).Decode(&result), IsNil)
+	c.Assert(result, HasLen, 1)
+}
+
+func (s *suite) Test_DiffHandler_fails_if_Diff_fails(c *C) {
+	provider := &versionHandlerProvider{
+		Diff: func(project, name, version, diffWithVersion string) (map[string]map[string]core.Changes, error) {
+			return nil, types.NotFound
+		},
+	}
+	resp := s.testGET(c, s.diffMuxWithProvider(provider), diffTestURL)
 	c.Assert(resp.StatusCode, Equals, 404)
 	body, err := ioutil.ReadAll(resp.Body)
 	c.Assert(err, IsNil)

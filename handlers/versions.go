@@ -29,6 +29,7 @@ type versionHandlerProvider struct {
 	GetRelease         func(project, name, version string) (*model.ReleasePayload, error)
 	GetNextVersion     func(project, name, prefix string) (string, error)
 	GetPreviousVersion func(project, name, version string) (*core.ReleaseMetadata, error)
+	Diff               func(project, name, version, diffWithVersion string) (map[string]map[string]core.Changes, error)
 }
 
 func newVersionHandlerProvider() *versionHandlerProvider {
@@ -37,6 +38,7 @@ func newVersionHandlerProvider() *versionHandlerProvider {
 		GetRelease:         model.GetRelease,
 		GetNextVersion:     model.GetNextVersion,
 		GetPreviousVersion: model.GetPreviousReleaseMetadata,
+		Diff:               model.Diff,
 	}
 }
 
@@ -48,6 +50,9 @@ func NextVersionHandler(w http.ResponseWriter, r *http.Request) {
 }
 func PreviousVersionHandler(w http.ResponseWriter, r *http.Request) {
 	newVersionHandlerProvider().PreviousVersionHandler(w, r)
+}
+func DiffHandler(w http.ResponseWriter, r *http.Request) {
+	newVersionHandlerProvider().DiffHandler(w, r)
 }
 
 func (h *versionHandlerProvider) GetVersionHandler(w http.ResponseWriter, r *http.Request) {
@@ -83,4 +88,18 @@ func (h *versionHandlerProvider) PreviousVersionHandler(w http.ResponseWriter, r
 	version := mux.Vars(r)["version"]
 	metadata, err := h.GetPreviousVersion(project, name, version)
 	ErrorOrJsonSuccess(w, r, metadata, err)
+}
+
+func (h *versionHandlerProvider) DiffHandler(w http.ResponseWriter, r *http.Request) {
+	project := mux.Vars(r)["project"]
+	name := mux.Vars(r)["name"]
+	version := mux.Vars(r)["version"]
+	diffWith := mux.Vars(r)["diffWith"]
+
+	changes, err := h.Diff(project, name, version, diffWith)
+	if err != nil {
+		HandleError(w, r, err)
+		return
+	}
+	ErrorOrJsonSuccess(w, r, changes, err)
 }
