@@ -49,38 +49,38 @@ func (s *suite) SetUpTest(c *C) {
 }
 
 const (
-	registerEndpoint = "/api/v1/registry/my-project/register"
+	registerEndpoint = "/api/v1/inventory/my-project/register"
 
-	getProjectEndpoint    = "/api/v1/registry/" + applicationsTestProject + "/"
-	addProjectEndpoint    = "/api/v1/registry/test/add-project"
-	updateProjectEndpoint = "/api/v1/registry/test/"
-	getProjectsEndpoints  = "/api/v1/registry/"
+	getProjectEndpoint    = "/api/v1/inventory/" + applicationsTestProject + "/"
+	addProjectEndpoint    = "/api/v1/inventory/test/add-project"
+	updateProjectEndpoint = "/api/v1/inventory/test/"
+	getProjectsEndpoints  = "/api/v1/inventory/"
 
-	getProjectUnitsEndpoint       = "/api/v1/registry/" + applicationsTestProject + "/units/"
-	getProjectUnitEndpoint        = "/api/v1/registry/" + applicationsTestProject + "/units/my-app/"
+	getProjectUnitsEndpoint       = "/api/v1/inventory/" + applicationsTestProject + "/units/"
+	getProjectUnitEndpoint        = "/api/v1/inventory/" + applicationsTestProject + "/units/my-app/"
 	applicationsTestProject       = "applications-test-prj"
-	applicationsEndpointNoProject = "/api/v1/registry/doesnt-exist/"
+	applicationsEndpointNoProject = "/api/v1/inventory/doesnt-exist/"
 
 	applicationVersionsTestProject = "versions-test-prj"
-	applicationVersionsEndpoint    = "/api/v1/registry/" + applicationVersionsTestProject + "/units/my-app/versions/"
-	applicationVersionsNoProject   = "/api/v1/registry/doesnt-exist/units/my-app/"
-	applicationVersionsNoApp       = "/api/v1/registry/versions-test/units/doesnt-exist/"
+	applicationVersionsEndpoint    = "/api/v1/inventory/" + applicationVersionsTestProject + "/units/my-app/versions/"
+	applicationVersionsNoProject   = "/api/v1/inventory/doesnt-exist/units/my-app/"
+	applicationVersionsNoApp       = "/api/v1/inventory/versions-test/units/doesnt-exist/"
 
 	nextVersionProject  = "next-version-prj"
-	nextVersionEndpoint = "/api/v1/registry/" + nextVersionProject + "/units/my-app/next-version"
+	nextVersionEndpoint = "/api/v1/inventory/" + nextVersionProject + "/units/my-app/next-version"
 
 	getVersionProject        = "get-version-prj"
-	getVersionEndpoint       = "/api/v1/registry/" + getVersionProject + "/units/my-app/versions/v1/"
-	getLatestVersionEndpoint = "/api/v1/registry/" + getVersionProject + "/units/my-app/versions/latest/"
-	getAutoVersionEndpoint   = "/api/v1/registry/" + getVersionProject + "/units/my-app/versions/v0.0.@/"
-	getPreviousEndpoint      = "/api/v1/registry/" + getVersionProject + "/units/my-app/versions/v0.0.2/previous/"
-	getPreviousEndpoint2     = "/api/v1/registry/" + getVersionProject + "/units/my-app/versions/v0.0.1/previous/"
-	getPreviousEndpoint3     = "/api/v1/registry/" + getVersionProject + "/units/my-app/versions/v0.0.@/previous/"
-	getDiffEndpoint          = "/api/v1/registry/" + getVersionProject + "/units/my-app/versions/v0.0.2/diff/"
-	getDiffWithEndpoint      = "/api/v1/registry/" + getVersionProject + "/units/my-app/versions/v0.0.3/diff/v0.0.1/"
+	getVersionEndpoint       = "/api/v1/inventory/" + getVersionProject + "/units/my-app/versions/v1/"
+	getLatestVersionEndpoint = "/api/v1/inventory/" + getVersionProject + "/units/my-app/versions/latest/"
+	getAutoVersionEndpoint   = "/api/v1/inventory/" + getVersionProject + "/units/my-app/versions/v0.0.@/"
+	getPreviousEndpoint      = "/api/v1/inventory/" + getVersionProject + "/units/my-app/versions/v0.0.2/previous/"
+	getPreviousEndpoint2     = "/api/v1/inventory/" + getVersionProject + "/units/my-app/versions/v0.0.1/previous/"
+	getPreviousEndpoint3     = "/api/v1/inventory/" + getVersionProject + "/units/my-app/versions/v0.0.@/previous/"
+	getDiffEndpoint          = "/api/v1/inventory/" + getVersionProject + "/units/my-app/versions/v0.0.2/diff/"
+	getDiffWithEndpoint      = "/api/v1/inventory/" + getVersionProject + "/units/my-app/versions/v0.0.3/diff/v0.0.1/"
 
 	importEndpoint           = "/api/v1/internal/import"
-	importGetVersionEndpoint = "/api/v1/registry/_/units/my-app/versions/v1/"
+	importGetVersionEndpoint = "/api/v1/inventory/_/units/my-app/versions/v1/"
 	exportProject            = "export-prj"
 	exportEndpoint           = "/api/v1/internal/export"
 
@@ -96,7 +96,7 @@ func testRequest(c *C, req *http.Request, expectedStatus int) {
 func (s *suite) addRelease(c *C, project, version string) {
 	rr = httptest.NewRecorder()
 	body := bytes.NewReader([]byte(`{"name": "my-app", "version": "` + version + `", "project": "` + project + `"}`))
-	req, _ := http.NewRequest("POST", "/api/v1/registry/"+project+"/register", body)
+	req, _ := http.NewRequest("POST", "/api/v1/inventory/"+project+"/register", body)
 	testRequest(c, req, 200)
 	rr = httptest.NewRecorder()
 }
@@ -375,7 +375,7 @@ func (s *suite) Test_GetVersion_fails_if_version_doesnt_exist(c *C) {
 		"v0.0.@",
 	}
 	for _, v := range versions {
-		req, _ := http.NewRequest("GET", "/api/v1/registry/"+getVersionProject+"/units/my-app/versions/"+v+"/", nil)
+		req, _ := http.NewRequest("GET", "/api/v1/inventory/"+getVersionProject+"/units/my-app/versions/"+v+"/", nil)
 		testRequest(c, req, 404)
 		rr = httptest.NewRecorder()
 	}
@@ -389,7 +389,7 @@ func (s *suite) Test_GetVersion_fails_if_version_format_invalid(c *C) {
 		"1.-",
 	}
 	for _, v := range versions {
-		req, _ := http.NewRequest("GET", "/api/v1/registry/"+getVersionProject+"/units/my-app/versions/"+v+"/", nil)
+		req, _ := http.NewRequest("GET", "/api/v1/inventory/"+getVersionProject+"/units/my-app/versions/"+v+"/", nil)
 		testRequest(c, req, 400)
 		rr = httptest.NewRecorder()
 	}

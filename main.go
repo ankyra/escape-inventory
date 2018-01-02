@@ -31,6 +31,23 @@ var ReadRoutes = map[string]http.HandlerFunc{
 	"/":       HomeHandler,
 	"/health": handlers.HealthCheckHandler,
 
+	"/api/v1/inventory/":                                                           handlers.GetProjectsHandler,
+	"/api/v1/inventory/{project}/":                                                 handlers.GetProjectHandler,
+	"/api/v1/inventory/{project}/hooks/":                                           handlers.GetProjectHooksHandler,
+	"/api/v1/inventory/{project}/units/":                                           handlers.GetApplicationsHandler,
+	"/api/v1/inventory/{project}/units/{name}/":                                    handlers.GetApplicationHandler,
+	"/api/v1/inventory/{project}/units/{name}/hooks/":                              handlers.GetApplicationHooksHandler,
+	"/api/v1/inventory/{project}/units/{name}/versions/":                           handlers.GetApplicationVersionsHandler,
+	"/api/v1/inventory/{project}/units/{name}/versions/{version}/":                 handlers.GetVersionHandler,
+	"/api/v1/inventory/{project}/units/{name}/versions/{version}/downstream":       handlers.DownstreamHandler,
+	"/api/v1/inventory/{project}/units/{name}/versions/{version}/dependency-graph": handlers.DependencyGraphHandler,
+	"/api/v1/inventory/{project}/units/{name}/versions/{version}/diff/":            handlers.DiffHandler,
+	"/api/v1/inventory/{project}/units/{name}/versions/{version}/diff/{diffWith}/": handlers.DiffHandler,
+	"/api/v1/inventory/{project}/units/{name}/versions/{version}/download":         handlers.DownloadHandler,
+	"/api/v1/inventory/{project}/units/{name}/versions/{version}/previous/":        handlers.PreviousVersionHandler,
+	"/api/v1/inventory/{project}/units/{name}/next-version":                        handlers.NextVersionHandler,
+
+	/* DEPRECATED HANDLERS */
 	"/api/v1/registry/":                                                           handlers.GetProjectsHandler,
 	"/api/v1/registry/{project}/":                                                 handlers.GetProjectHandler,
 	"/api/v1/registry/{project}/hooks/":                                           handlers.GetProjectHooksHandler,
@@ -49,12 +66,22 @@ var ReadRoutes = map[string]http.HandlerFunc{
 }
 
 var WriteRoutes = map[string]http.HandlerFunc{
+	"/api/v1/inventory/{project}/add-project":                            handlers.AddProjectHandler,
+	"/api/v1/inventory/{project}/register":                               handlers.RegisterHandler,
+	"/api/v1/inventory/{project}/units/{name}/versions/{version}/upload": handlers.UploadHandler,
+
+	/* DEPRECATED HANDLERS */
 	"/api/v1/registry/{project}/add-project":                            handlers.AddProjectHandler,
 	"/api/v1/registry/{project}/register":                               handlers.RegisterHandler,
 	"/api/v1/registry/{project}/units/{name}/versions/{version}/upload": handlers.UploadHandler,
 }
 
 var UpdateRoutes = map[string]http.HandlerFunc{
+	"/api/v1/inventory/{project}/":                    handlers.UpdateProjectHandler,
+	"/api/v1/inventory/{project}/hooks/":              handlers.UpdateProjectHooksHandler,
+	"/api/v1/inventory/{project}/units/{name}/hooks/": handlers.UpdateApplicationHooksHandler,
+
+	/* DEPRECATED HANDLERS */
 	"/api/v1/registry/{project}/":                    handlers.UpdateProjectHandler,
 	"/api/v1/registry/{project}/hooks/":              handlers.UpdateProjectHooksHandler,
 	"/api/v1/registry/{project}/units/{name}/hooks/": handlers.UpdateApplicationHooksHandler,
