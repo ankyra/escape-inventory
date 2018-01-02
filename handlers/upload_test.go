@@ -28,8 +28,8 @@ import (
 )
 
 const (
-	UploadURL     = "/api/v1/registry/{project}/units/{name}/versions/{version}/upload"
-	uploadTestURL = "/api/v1/registry/project/units/name/versions/v1.0.0/upload"
+	UploadURL     = "/api/v1/inventory/{project}/units/{name}/versions/{version}/upload"
+	uploadTestURL = "/api/v1/inventory/project/units/name/versions/v1.0.0/upload"
 )
 
 func (s *suite) uploadMux() *mux.Router {

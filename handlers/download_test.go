@@ -28,8 +28,8 @@ import (
 )
 
 const (
-	DownloadURL     = "/api/v1/registry/{project}/units/{name}/versions/{version}/download"
-	downloadTestURL = "/api/v1/registry/project/units/name/versions/v1.0.0/download"
+	DownloadURL     = "/api/v1/inventory/{project}/units/{name}/versions/{version}/download"
+	downloadTestURL = "/api/v1/inventory/project/units/name/versions/v1.0.0/download"
 )
 
 func (s *suite) downloadMuxWithProvider(provider *downloadHandlerProvider) *mux.Router {

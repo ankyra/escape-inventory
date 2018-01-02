@@ -29,22 +29,22 @@ import (
 )
 
 const (
-	GetProjectsURL = "/api/v1/registry/"
+	GetProjectsURL = "/api/v1/inventory/"
 
-	GetProjectURL     = "/api/v1/registry/{project}/"
-	getProjectTestURL = "/api/v1/registry/project/"
+	GetProjectURL     = "/api/v1/inventory/{project}/"
+	getProjectTestURL = "/api/v1/inventory/project/"
 
-	AddProjectURL     = "/api/v1/registry/{project}/add-project"
-	addProjectTestURL = "/api/v1/registry/project/add-project"
+	AddProjectURL     = "/api/v1/inventory/{project}/add-project"
+	addProjectTestURL = "/api/v1/inventory/project/add-project"
 
-	UpdateProjectURL     = "/api/v1/registry/{project}/"
-	updateProjectTestURL = "/api/v1/registry/project/"
+	UpdateProjectURL     = "/api/v1/inventory/{project}/"
+	updateProjectTestURL = "/api/v1/inventory/project/"
 
-	GetProjectHooksURL     = "/api/v1/registry/{project}/hooks/"
-	getProjectHooksTestURL = "/api/v1/registry/project/hooks/"
+	GetProjectHooksURL     = "/api/v1/inventory/{project}/hooks/"
+	getProjectHooksTestURL = "/api/v1/inventory/project/hooks/"
 
-	UpdateProjectHooksURL     = "/api/v1/registry/{project}/hooks/"
-	updateProjectHooksTestURL = "/api/v1/registry/project/hooks/"
+	UpdateProjectHooksURL     = "/api/v1/inventory/{project}/hooks/"
+	updateProjectHooksTestURL = "/api/v1/inventory/project/hooks/"
 )
 
 /*

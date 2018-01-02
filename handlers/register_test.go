@@ -29,8 +29,8 @@ import (
 )
 
 const (
-	RegisterURL     = "/api/v1/registry/{project}/register"
-	registerTestURL = "/api/v1/registry/project/register"
+	RegisterURL     = "/api/v1/inventory/{project}/register"
+	registerTestURL = "/api/v1/inventory/project/register"
 )
 
 /*

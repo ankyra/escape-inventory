@@ -29,14 +29,14 @@ import (
 )
 
 const (
-	GetVersionURL          = "/api/v1/registry/{project}/units/{name}/versions/{version}/"
-	getVersionTestURL      = "/api/v1/registry/project/units/name/versions/v1.0/"
-	NextVersionURL         = "/api/v1/registry/{project}/units/{name}/next-version"
-	nextVersionTestURL     = "/api/v1/registry/project/units/name/next-version?prefix=0.1"
-	PreviousVersionURL     = "/api/v1/registry/{project}/units/{name}/versions/{version}/previous/"
-	previousVersionTestURL = "/api/v1/registry/project/units/name/versions/v1.0/previous/"
-	DiffURL                = "/api/v1/registry/{project}/units/{name}/versions/{version}/diff/{diffWith}/"
-	diffTestURL            = "/api/v1/registry/project/units/name/versions/v1.0/diff/v1.1/"
+	GetVersionURL          = "/api/v1/inventory/{project}/units/{name}/versions/{version}/"
+	getVersionTestURL      = "/api/v1/inventory/project/units/name/versions/v1.0/"
+	NextVersionURL         = "/api/v1/inventory/{project}/units/{name}/next-version"
+	nextVersionTestURL     = "/api/v1/inventory/project/units/name/next-version?prefix=0.1"
+	PreviousVersionURL     = "/api/v1/inventory/{project}/units/{name}/versions/{version}/previous/"
+	previousVersionTestURL = "/api/v1/inventory/project/units/name/versions/v1.0/previous/"
+	DiffURL                = "/api/v1/inventory/{project}/units/{name}/versions/{version}/diff/{diffWith}/"
+	diffTestURL            = "/api/v1/inventory/project/units/name/versions/v1.0/diff/v1.1/"
 )
 
 /*

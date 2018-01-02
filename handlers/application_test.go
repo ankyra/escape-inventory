@@ -29,25 +29,24 @@ import (
 )
 
 const (
-	GetApplicationsURL     = "/api/v1/registry/{project}/units/"
-	getApplicationsTestURL = "/api/v1/registry/project/units/"
+	GetApplicationsURL     = "/api/v1/inventory/{project}/units/"
+	getApplicationsTestURL = "/api/v1/inventory/project/units/"
 
-	GetApplicationURL     = "/api/v1/registry/{project}/units/{name}/"
-	getApplicationTestURL = "/api/v1/registry/project/units/name/"
+	GetApplicationURL     = "/api/v1/inventory/{project}/units/{name}/"
+	getApplicationTestURL = "/api/v1/inventory/project/units/name/"
 
-	GetApplicationVersionsURL     = "/api/v1/registry/{project}/units/{name}/versions/"
-	getApplicationVersionsTestURL = "/api/v1/registry/project/units/name/versions/"
+	GetApplicationVersionsURL     = "/api/v1/inventory/{project}/units/{name}/versions/"
+	getApplicationVersionsTestURL = "/api/v1/inventory/project/units/name/versions/"
 
-	GetApplicationHooksURL     = "/api/v1/registry/{project}/units/{name}/hooks/"
-	getApplicationHooksTestURL = "/api/v1/registry/project/units/name/hooks/"
+	GetApplicationHooksURL     = "/api/v1/inventory/{project}/units/{name}/hooks/"
+	getApplicationHooksTestURL = "/api/v1/inventory/project/units/name/hooks/"
 
-	UpdateApplicationHooksURL     = "/api/v1/registry/{project}/units/{name}/hooks/"
-	updateApplicationHooksTestURL = "/api/v1/registry/project/units/name/hooks/"
+	UpdateApplicationHooksURL     = "/api/v1/inventory/{project}/units/{name}/hooks/"
+	updateApplicationHooksTestURL = "/api/v1/inventory/project/units/name/hooks/"
 )
 
 /*
 	GetApplicationsHandler
-
 */
 
 func (s *suite) getApplicationsMuxWithProvider(provider *applicationHandlerProvider) *mux.Router {
