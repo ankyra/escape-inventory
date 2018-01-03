@@ -145,6 +145,13 @@ func (s *suite) Test_HandleError_already_exists(c *C) {
 	c.Assert(rr.Body.String(), Equals, "Resource already exists")
 }
 
+func (s *suite) Test_HandleError_limit_reached(c *C) {
+	rr := httptest.NewRecorder()
+	HandleError(rr, nil, types.LimitError)
+	c.Assert(rr.Code, Equals, 402)
+	c.Assert(rr.Body.String(), Equals, "Plan limit exceeded")
+}
+
 func (s *suite) Test_HandleError_user_error(c *C) {
 	rr := httptest.NewRecorder()
 	HandleError(rr, nil, model.NewUserError(errors.New("ouch")))
