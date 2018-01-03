@@ -190,3 +190,6 @@ func IsNotFound(err error) bool {
 func IsAlreadyExists(err error) bool {
 	return err == AlreadyExists
 }
+func IsLimitError(err error) bool {
+	return err == LimitError
+}

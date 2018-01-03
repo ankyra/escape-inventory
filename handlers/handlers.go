@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"errors"
 	"log"
 	"net/http"
 	"reflect"
@@ -50,7 +51,25 @@ func HandleError(w http.ResponseWriter, r *http.Request, err error) {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(err.Error()))
 		return
+	} else if dao.IsLimitError(err) {
+		w.WriteHeader(402)
+		w.Write([]byte(err.Error()))
+		return
 	}
 	log.Println("Error:", err.Error())
 	w.WriteHeader(http.StatusInternalServerError)
+}
+
+func ReadJsonBodyOrFail(w http.ResponseWriter, r *http.Request, result interface{}) error {
+	if r.Body == nil {
+		err := model.NewUserError(errors.New("Empty body"))
+		HandleError(w, r, err)
+		return err
+	}
+	if err := json.NewDecoder(r.Body).Decode(&result); err != nil {
+		err := model.NewUserError(errors.New("Invalid JSON"))
+		HandleError(w, r, err)
+		return err
+	}
+	return nil
 }

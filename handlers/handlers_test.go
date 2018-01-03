@@ -158,3 +158,34 @@ func (s *suite) Test_HandleError_server_error(c *C) {
 	c.Assert(rr.Code, Equals, 500)
 	c.Assert(rr.Body.String(), Equals, "")
 }
+
+func (s *suite) Test_ReadJsonBodyOrFail(c *C) {
+	rr := httptest.NewRecorder()
+	body := []byte(`{"test": "uh"}`)
+	req, err := http.NewRequest("POST", "something", bytes.NewReader(body))
+	c.Assert(err, IsNil)
+	var result struct{ Test string }
+	ReadJsonBodyOrFail(rr, req, &result)
+	c.Assert(rr.Code, Equals, 200)
+	c.Assert(result.Test, Equals, "uh")
+}
+
+func (s *suite) Test_ReadJsonBodyOrFail_empty_body(c *C) {
+	rr := httptest.NewRecorder()
+	req, err := http.NewRequest("POST", "something", nil)
+	c.Assert(err, IsNil)
+	ReadJsonBodyOrFail(rr, req, nil)
+	c.Assert(rr.Code, Equals, 400)
+	c.Assert(rr.Body.String(), Equals, "Empty body")
+}
+
+func (s *suite) Test_ReadJsonBodyOrFail_decode_failure(c *C) {
+	rr := httptest.NewRecorder()
+	body := []byte(`{"test": "uh"}`)
+	req, err := http.NewRequest("POST", "something", bytes.NewReader(body))
+	c.Assert(err, IsNil)
+	var result string
+	ReadJsonBodyOrFail(rr, req, &result)
+	c.Assert(rr.Code, Equals, 400)
+	c.Assert(rr.Body.String(), Equals, "Invalid JSON")
+}
