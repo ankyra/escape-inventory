@@ -115,3 +115,10 @@ func GetDependencyGraph(project, name, version string, downstreamFunc Downstream
 	}
 	return result, nil
 }
+
+func GetDependencyGraphByGroups(project, name, version string, groups []string) (*DependencyGraph, error) {
+	resolver := func(release *types.Release) ([]*types.Dependency, error) {
+		return dao.GetDownstreamDependenciesByGroups(release, groups)
+	}
+	return GetDependencyGraph(project, name, version, resolver)
+}
