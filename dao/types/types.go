@@ -101,6 +101,14 @@ type Dependency struct {
 	IsExtension bool   `json:"is_extension"`
 }
 
+func NewDependency(project, name, version string) *Dependency {
+	return &Dependency{
+		Project:     project,
+		Application: name,
+		Version:     version,
+	}
+}
+
 func NewRelease(app *Application, metadata *core.ReleaseMetadata) *Release {
 	return &Release{
 		Application: app,

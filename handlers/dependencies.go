@@ -19,22 +19,42 @@ package handlers
 import (
 	"net/http"
 
+	"github.com/ankyra/escape-inventory/dao/types"
 	"github.com/ankyra/escape-inventory/model"
 	"github.com/gorilla/mux"
 )
 
+type dependencyHandlerProvider struct {
+	GetDownstreamDependencies func(project, name, version string) ([]*types.Dependency, error)
+	GetDependencyGraph        func(project, name, version string, downstreamFunc model.DownstreamDependenciesResolver) (*model.DependencyGraph, error)
+}
+
+func newDependencyHandlerProvider() *dependencyHandlerProvider {
+	return &dependencyHandlerProvider{
+		GetDownstreamDependencies: model.GetDownstreamDependencies,
+		GetDependencyGraph:        model.GetDependencyGraph,
+	}
+}
+
 func DownstreamHandler(w http.ResponseWriter, r *http.Request) {
+	newDependencyHandlerProvider().DownstreamHandler(w, r)
+}
+func DependencyGraphHandler(w http.ResponseWriter, r *http.Request) {
+	newDependencyHandlerProvider().DependencyGraphHandler(w, r)
+}
+
+func (h *dependencyHandlerProvider) DownstreamHandler(w http.ResponseWriter, r *http.Request) {
 	project := mux.Vars(r)["project"]
 	name := mux.Vars(r)["name"]
 	version := mux.Vars(r)["version"]
-	deps, err := model.GetDownstreamDependencies(project, name, version)
+	deps, err := h.GetDownstreamDependencies(project, name, version)
 	ErrorOrJsonSuccess(w, r, deps, err)
 }
 
-func DependencyGraphHandler(w http.ResponseWriter, r *http.Request) {
+func (h *dependencyHandlerProvider) DependencyGraphHandler(w http.ResponseWriter, r *http.Request) {
 	project := mux.Vars(r)["project"]
 	name := mux.Vars(r)["name"]
 	version := mux.Vars(r)["version"]
-	graph, err := model.GetDependencyGraph(project, name, version, nil)
+	graph, err := h.GetDependencyGraph(project, name, version, nil)
 	ErrorOrJsonSuccess(w, r, graph, err)
 }
