@@ -18,6 +18,7 @@ package handlers
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"io"
@@ -98,6 +99,34 @@ func (s *suite) testPOST_file(c *C, r *mux.Router, url, path string) *http.Respo
 	w := httptest.NewRecorder()
 	r.ServeHTTP(w, req)
 	return w.Result()
+}
+
+func (s *suite) Test_ReadUsernameFromContext(c *C) {
+	req := httptest.NewRequest("GET", "/", nil)
+	user := struct{ Name string }{Name: "test"}
+	ctx := context.WithValue(req.Context(), "user", user)
+	req = req.WithContext(ctx)
+	c.Assert(ReadUsernameFromContext(req), Equals, "test")
+}
+
+func (s *suite) Test_ReadUsernameFromContext_empty_username(c *C) {
+	req := httptest.NewRequest("GET", "/", nil)
+	user := struct{ Name string }{Name: ""}
+	ctx := context.WithValue(req.Context(), "user", user)
+	req = req.WithContext(ctx)
+	c.Assert(ReadUsernameFromContext(req), Equals, "")
+}
+
+func (s *suite) Test_ReadUsernameFromContext_nil_user(c *C) {
+	req := httptest.NewRequest("GET", "/", nil)
+	ctx := context.WithValue(req.Context(), "user", nil)
+	req = req.WithContext(ctx)
+	c.Assert(ReadUsernameFromContext(req), Equals, "")
+}
+
+func (s *suite) Test_ReadUsernameFromContext_no_user(c *C) {
+	req := httptest.NewRequest("GET", "/", nil)
+	c.Assert(ReadUsernameFromContext(req), Equals, "")
 }
 
 func (s *suite) Test_JsonSuccess(c *C) {
