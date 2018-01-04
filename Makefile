@@ -7,6 +7,9 @@ install: update-schema
 go-test: update-schema
 	go test -cover -v $$(go list ./... | grep -v -E 'vendor' )
 
+postgres-test: update-schema
+	ENABLE_POSTGRES_TESTS=1 go test -cover -v $$(go list ./... | grep -v -E 'vendor' )
+
 fmt:
 	find -name '*.go' | grep -v .escape | grep -v vendor | xargs -n 1 go fmt
 
