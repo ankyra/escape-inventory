@@ -117,6 +117,30 @@ func (s *suite) Test_ReadUsernameFromContext_empty_username(c *C) {
 	c.Assert(ReadUsernameFromContext(req), Equals, "")
 }
 
+func (s *suite) Test_ReadUsernameFromContext_no_Name_in_struct(c *C) {
+	req := httptest.NewRequest("GET", "/", nil)
+	user := struct{ ID string }{ID: ""}
+	ctx := context.WithValue(req.Context(), "user", user)
+	req = req.WithContext(ctx)
+	c.Assert(ReadUsernameFromContext(req), Equals, "")
+}
+
+func (s *suite) Test_ReadUsernameFromContext_wrong_type_in_struct(c *C) {
+	req := httptest.NewRequest("GET", "/", nil)
+	user := struct{ Name int }{Name: 12}
+	ctx := context.WithValue(req.Context(), "user", user)
+	req = req.WithContext(ctx)
+	c.Assert(ReadUsernameFromContext(req), Equals, "")
+}
+
+func (s *suite) Test_ReadUsernameFromContext_not_a_struct(c *C) {
+	req := httptest.NewRequest("GET", "/", nil)
+	user := 12
+	ctx := context.WithValue(req.Context(), "user", user)
+	req = req.WithContext(ctx)
+	c.Assert(ReadUsernameFromContext(req), Equals, "")
+}
+
 func (s *suite) Test_ReadUsernameFromContext_nil_user(c *C) {
 	req := httptest.NewRequest("GET", "/", nil)
 	ctx := context.WithValue(req.Context(), "user", nil)

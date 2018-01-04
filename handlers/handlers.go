@@ -29,7 +29,12 @@ func ReadUsernameFromContext(r *http.Request) string {
 	user := r.Context().Value("user")
 	if user != nil {
 		value := reflect.Indirect(reflect.ValueOf(user))
-		return value.FieldByName("Name").String()
+		if value.Kind() == reflect.Struct {
+			f := value.FieldByName("Name")
+			if f.IsValid() && f.Kind() == reflect.String {
+				return f.String()
+			}
+		}
 	}
 	return ""
 }
