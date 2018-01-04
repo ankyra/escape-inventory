@@ -125,9 +125,9 @@ func NewPostgresDAO(url string) (DAO, error) {
 		UpdateACLQuery:               "UPDATE acl SET permission = $1 WHERE project = $2 AND group_name = $3",
 		DeleteACLQuery:               "DELETE FROM acl WHERE project = $1 AND group_name = $2",
 		GetPermittedGroupsQuery:      "SELECT group_name FROM acl WHERE project = $1 AND (permission >= $2)",
-		CreateUsernameMetricsQuery:   `INSERT INTO metrics(username) VALUES($1)`,
-		GetMetricsByUsernameQuery:    `SELECT project_count FROM metrics WHERE username = $1`,
-		SetProjectCountMetricForUser: `UPDATE metrics SET project_count = $3 WHERE username = $1 AND project_count = $2`,
+		CreateUserIDMetricsQuery:     `INSERT INTO metrics(user_id) VALUES($1)`,
+		GetMetricsByUserIDQuery:      `SELECT project_count FROM metrics WHERE user_id = $1`,
+		SetProjectCountMetricForUser: `UPDATE metrics SET project_count = $3 WHERE user_id = $1 AND project_count = $2`,
 		WipeDatabaseFunc: func(s *sqlhelp.SQLHelper) error {
 			queries := []string{
 				`TRUNCATE release CASCADE`,

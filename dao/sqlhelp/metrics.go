@@ -4,12 +4,12 @@ import (
 	. "github.com/ankyra/escape-inventory/dao/types"
 )
 
-func (s *SQLHelper) GetUserMetrics(username string) (*Metrics, error) {
-	err := s.PrepareAndExecInsertIgnoreDups(s.CreateUsernameMetricsQuery, username)
+func (s *SQLHelper) GetUserMetrics(userID string) (*Metrics, error) {
+	err := s.PrepareAndExecInsertIgnoreDups(s.CreateUserIDMetricsQuery, userID)
 	if err != nil {
 		return nil, err
 	}
-	rows, err := s.PrepareAndQuery(s.GetMetricsByUsernameQuery, username)
+	rows, err := s.PrepareAndQuery(s.GetMetricsByUserIDQuery, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -24,9 +24,9 @@ func (s *SQLHelper) GetUserMetrics(username string) (*Metrics, error) {
 	return nil, NotFound
 }
 
-func (s *SQLHelper) SetUserMetrics(username string, previous, new *Metrics) error {
+func (s *SQLHelper) SetUserMetrics(userID string, previous, new *Metrics) error {
 	if previous.ProjectCount != new.ProjectCount {
-		return s.PrepareAndExecUpdate(s.SetProjectCountMetricForUser, username, previous.ProjectCount, new.ProjectCount)
+		return s.PrepareAndExecUpdate(s.SetProjectCountMetricForUser, userID, previous.ProjectCount, new.ProjectCount)
 	}
 	return nil
 }

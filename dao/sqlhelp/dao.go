@@ -52,8 +52,8 @@ type SQLHelper struct {
 	DeleteACLQuery          string
 	GetPermittedGroupsQuery string
 
-	CreateUsernameMetricsQuery   string
-	GetMetricsByUsernameQuery    string
+	CreateUserIDMetricsQuery     string
+	GetMetricsByUserIDQuery      string
 	SetProjectCountMetricForUser string
 }
 
