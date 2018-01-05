@@ -137,6 +137,11 @@ func Validate_GetProjects(dao DAO, c *C) {
 	c.Assert(projects["_"].Name, Equals, "_")
 	c.Assert(projects["project1"].Name, Equals, "project1")
 	c.Assert(projects["project2"].Name, Equals, "project2")
+
+	// default permission
+	c.Assert(projects["_"].Permission, Equals, "admin")
+	c.Assert(projects["project1"].Permission, Equals, "admin")
+	c.Assert(projects["project2"].Permission, Equals, "admin")
 }
 
 func Validate_ProjectMetadata(dao DAO, c *C) {
@@ -204,6 +209,7 @@ func Validate_GetProjectsByGroups(dao DAO, c *C) {
 		c.Assert(err, IsNil)
 		c.Assert(projects, HasLen, 1, Commentf("%s should have one group, got %v", testCase, projects))
 		c.Assert(projects["_"].Name, Equals, "_")
+		c.Assert(projects["_"].Permission, Equals, "admin")
 		c.Assert(projects["_"].MatchingGroups, DeepEquals, []string{"*"})
 	}
 
@@ -223,6 +229,8 @@ func Validate_GetProjectsByGroups(dao DAO, c *C) {
 	c.Assert(projects["_"].MatchingGroups, HasItem, "*")
 	c.Assert(projects["project1"].Name, Equals, "project1")
 	c.Assert(projects["project1"].MatchingGroups, DeepEquals, []string{"project1"})
+	c.Assert(projects["_"].Permission, Equals, "admin")
+	c.Assert(projects["project1"].Permission, Equals, "admin")
 
 	projects, err = dao.GetProjectsByGroups(allGroups)
 	c.Assert(err, IsNil)
@@ -233,6 +241,8 @@ func Validate_GetProjectsByGroups(dao DAO, c *C) {
 	c.Assert(projects["_"].MatchingGroups, HasItem, "*")
 	c.Assert(projects["project1"].Name, Equals, "project1")
 	c.Assert(projects["project1"].MatchingGroups, DeepEquals, []string{"project1"})
+	c.Assert(projects["_"].Permission, Equals, "admin")
+	c.Assert(projects["project1"].Permission, Equals, "admin")
 
 	c.Assert(dao.SetACL("project1", "project2", WritePermission), IsNil)
 	c.Assert(dao.SetACL("project1", "project2", ReadPermission), IsNil)
@@ -259,6 +269,9 @@ func Validate_GetProjectsByGroups(dao DAO, c *C) {
 	c.Assert(projects["project1"].MatchingGroups, HasItem, "project1")
 	c.Assert(projects["project1"].MatchingGroups, HasItem, "project2")
 	c.Assert(projects["project2"].MatchingGroups, DeepEquals, []string{"project2"})
+	c.Assert(projects["_"].Permission, Equals, "admin")
+	c.Assert(projects["project1"].Permission, Equals, "admin")
+	c.Assert(projects["project2"].Permission, Equals, "admin")
 }
 
 func Validate_ApplicationMetadata(dao DAO, c *C) {

@@ -54,9 +54,9 @@ type Project struct {
 	Description    string   `json:"description"`
 	OrgURL         string   `json:"org_url"`
 	Logo           string   `json:"logo"`
-	Hooks          Hooks    `json:"hooks,omitempty"`           // only used for view purposes
-	MatchingGroups []string `json:"matching_groups,omitempty"` // only used for view purposes
-	Permission     string   `json:"permission,omitempty"`      // only used for view purposes
+	Hooks          Hooks    `json:"hooks,omitempty"` // only used for view purposes
+	Permission     string   `json:"permission"`      // only used for view purposes
+	MatchingGroups []string `json:"-"`               // used to work out highest permission in model
 }
 
 func NewProject(project string) *Project {

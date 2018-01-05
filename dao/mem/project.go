@@ -54,6 +54,7 @@ func (a *dao) GetProject(project string) (*Project, error) {
 }
 
 func (a *dao) AddProject(project *Project) error {
+	project.Permission = "admin"
 	_, exists := a.projectMetadata[project.Name]
 	if exists {
 		return AlreadyExists

@@ -117,6 +117,7 @@ func (s *SQLHelper) GetProjectsByGroups(readGroups []string) (map[string]*Projec
 				Description:    description,
 				OrgURL:         orgURL,
 				Logo:           logo,
+				Permission:     "admin", // default permission for open source
 				MatchingGroups: []string{matchedGroup},
 			}
 			groups[name] = map[string]bool{
@@ -144,6 +145,7 @@ func (s *SQLHelper) scanProject(rows *sql.Rows) (*Project, error) {
 		Description: description,
 		OrgURL:      orgURL,
 		Logo:        logo,
+		Permission:  "admin", // default permission for open source
 	}, nil
 }
 
