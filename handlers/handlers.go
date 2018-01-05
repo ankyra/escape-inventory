@@ -65,6 +65,14 @@ func HandleError(w http.ResponseWriter, r *http.Request, err error) {
 	w.WriteHeader(http.StatusInternalServerError)
 }
 
+func ErrorOrSuccess(w http.ResponseWriter, r *http.Request, err error) {
+	if err != nil {
+		HandleError(w, r, err)
+	} else {
+		w.WriteHeader(200)
+	}
+}
+
 func ReadJsonBodyOrFail(w http.ResponseWriter, r *http.Request, result interface{}) error {
 	if r.Body == nil {
 		err := model.NewUserError(errors.New("Empty body"))

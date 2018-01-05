@@ -153,6 +153,20 @@ func (s *suite) Test_ReadUsernameFromContext_no_user(c *C) {
 	c.Assert(ReadUsernameFromContext(req), Equals, "")
 }
 
+func (s *suite) Test_ErrorOrSuccess_nil(c *C) {
+	rr := httptest.NewRecorder()
+	ErrorOrSuccess(rr, nil, nil)
+	c.Assert(rr.Code, Equals, 200)
+	c.Assert(rr.Body.String(), Equals, "")
+}
+
+func (s *suite) Test_ErrorOrSuccess_error(c *C) {
+	rr := httptest.NewRecorder()
+	ErrorOrSuccess(rr, nil, types.AlreadyExists)
+	c.Assert(rr.Code, Equals, 409)
+	c.Assert(rr.Body.String(), Equals, "Resource already exists")
+}
+
 func (s *suite) Test_JsonSuccess(c *C) {
 	rr := httptest.NewRecorder()
 	result := map[string]string{"test": "yo"}
