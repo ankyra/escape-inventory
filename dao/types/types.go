@@ -61,8 +61,7 @@ type Project struct {
 
 func NewProject(project string) *Project {
 	return &Project{
-		Name:           project,
-		MatchingGroups: []string{},
+		Name: project,
 	}
 }
 
