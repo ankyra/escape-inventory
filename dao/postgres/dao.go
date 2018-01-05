@@ -61,7 +61,7 @@ func NewPostgresDAO(url string) (DAO, error) {
 		AddProjectQuery:       `INSERT INTO project(name, description, orgURL, logo) VALUES ($1, $2, $3, $4)`,
 		UpdateProjectQuery:    `UPDATE project SET name = $1, description = $2, orgURL = $3, logo = $4 WHERE name = $5`,
 		GetProjectsQuery:      `SELECT name, description, orgURL, logo FROM project`,
-		GetProjectsByGroupsQuery: `SELECT p.name, p.description, p.orgURL, p.logo 
+		GetProjectsByGroupsQuery: `SELECT p.name, p.description, p.orgURL, p.logo, group_name
 								     FROM project AS p
 									 JOIN acl ON p.name = acl.project
 									 WHERE group_name `,

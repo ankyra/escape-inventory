@@ -50,16 +50,19 @@ func NewHooks() Hooks {
 }
 
 type Project struct {
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	OrgURL      string `json:"org_url"`
-	Logo        string `json:"logo"`
-	Hooks       Hooks  `json:"hooks"` // only used for view purposes
+	Name           string   `json:"name"`
+	Description    string   `json:"description"`
+	OrgURL         string   `json:"org_url"`
+	Logo           string   `json:"logo"`
+	Hooks          Hooks    `json:"hooks,omitempty"`           // only used for view purposes
+	MatchingGroups []string `json:"matching_groups,omitempty"` // only used for view purposes
+	Permission     string   `json:"permission,omitempty"`      // only used for view purposes
 }
 
 func NewProject(project string) *Project {
 	return &Project{
-		Name: project,
+		Name:           project,
+		MatchingGroups: []string{},
 	}
 }
 

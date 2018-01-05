@@ -204,9 +204,11 @@ func Validate_GetProjectsByGroups(dao DAO, c *C) {
 		c.Assert(err, IsNil)
 		c.Assert(projects, HasLen, 1, Commentf("%s should have one group, got %v", testCase, projects))
 		c.Assert(projects["_"].Name, Equals, "_")
+		c.Assert(projects["_"].MatchingGroups, DeepEquals, []string{"*"})
 	}
 
 	c.Assert(dao.SetACL("project1", "project1", ReadPermission), IsNil)
+	c.Assert(dao.SetACL("_", "project1", WritePermission), IsNil)
 
 	projects, err := dao.GetProjectsByGroups(anon)
 	c.Assert(err, IsNil)
@@ -216,14 +218,24 @@ func Validate_GetProjectsByGroups(dao DAO, c *C) {
 	c.Assert(err, IsNil)
 	c.Assert(projects, HasLen, 2)
 	c.Assert(projects["_"].Name, Equals, "_")
+	c.Assert(projects["_"].MatchingGroups, HasLen, 2)
+	c.Assert(projects["_"].MatchingGroups, HasItem, "project1")
+	c.Assert(projects["_"].MatchingGroups, HasItem, "*")
 	c.Assert(projects["project1"].Name, Equals, "project1")
+	c.Assert(projects["project1"].MatchingGroups, DeepEquals, []string{"project1"})
 
 	projects, err = dao.GetProjectsByGroups(allGroups)
 	c.Assert(err, IsNil)
 	c.Assert(projects, HasLen, 2)
 	c.Assert(projects["_"].Name, Equals, "_")
+	c.Assert(projects["_"].MatchingGroups, HasLen, 2)
+	c.Assert(projects["_"].MatchingGroups, HasItem, "project1")
+	c.Assert(projects["_"].MatchingGroups, HasItem, "*")
 	c.Assert(projects["project1"].Name, Equals, "project1")
+	c.Assert(projects["project1"].MatchingGroups, DeepEquals, []string{"project1"})
 
+	c.Assert(dao.SetACL("project1", "project2", WritePermission), IsNil)
+	c.Assert(dao.SetACL("project1", "project2", ReadPermission), IsNil)
 	c.Assert(dao.SetACL("project2", "project2", ReadPermission), IsNil)
 
 	projects, err = dao.GetProjectsByGroups(anon)
@@ -240,6 +252,13 @@ func Validate_GetProjectsByGroups(dao DAO, c *C) {
 	c.Assert(projects["_"].Name, Equals, "_")
 	c.Assert(projects["project1"].Name, Equals, "project1")
 	c.Assert(projects["project2"].Name, Equals, "project2")
+	c.Assert(projects["_"].MatchingGroups, HasLen, 2)
+	c.Assert(projects["_"].MatchingGroups, HasItem, "project1")
+	c.Assert(projects["_"].MatchingGroups, HasItem, "*")
+	c.Assert(projects["project1"].MatchingGroups, HasLen, 2)
+	c.Assert(projects["project1"].MatchingGroups, HasItem, "project1")
+	c.Assert(projects["project1"].MatchingGroups, HasItem, "project2")
+	c.Assert(projects["project2"].MatchingGroups, DeepEquals, []string{"project2"})
 }
 
 func Validate_ApplicationMetadata(dao DAO, c *C) {

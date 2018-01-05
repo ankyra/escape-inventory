@@ -22,15 +22,22 @@ func (a *dao) GetProjectsByGroups(readGroups []string) (map[string]*Project, err
 	for name, project := range a.projectMetadata {
 		allowedGroups, found := a.acls[name]
 		if found {
+			project.MatchingGroups = []string{}
+			matchedGroups := map[string]bool{}
 			for _, g := range readGroups {
 				_, found := allowedGroups[g]
 				if found {
-					result[name] = project
-					break
+					matchedGroups[g] = true
 				}
 			}
 			_, found := allowedGroups["*"]
 			if found {
+				matchedGroups["*"] = true
+			}
+			if len(matchedGroups) > 0 {
+				for key, _ := range matchedGroups {
+					project.MatchingGroups = append(project.MatchingGroups, key)
+				}
 				result[name] = project
 			}
 		}

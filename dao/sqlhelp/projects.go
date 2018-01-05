@@ -102,7 +102,36 @@ func (s *SQLHelper) GetProjectsByGroups(readGroups []string) (map[string]*Projec
 	if err != nil {
 		return nil, err
 	}
-	return s.scanProjects(rows)
+	defer rows.Close()
+	result := map[string]*Project{}
+	groups := map[string]map[string]bool{}
+	for rows.Next() {
+		var name, description, orgURL, logo, matchedGroup string
+		if err := rows.Scan(&name, &description, &orgURL, &logo, &matchedGroup); err != nil {
+			return nil, err
+		}
+		prj, ok := result[name]
+		if !ok {
+			prj = &Project{
+				Name:           name,
+				Description:    description,
+				OrgURL:         orgURL,
+				Logo:           logo,
+				MatchingGroups: []string{matchedGroup},
+			}
+			groups[name] = map[string]bool{
+				matchedGroup: true,
+			}
+		} else {
+			_, added := groups[name][matchedGroup]
+			if !added {
+				prj.MatchingGroups = append(prj.MatchingGroups, matchedGroup)
+				groups[name][matchedGroup] = true
+			}
+		}
+		result[prj.Name] = prj
+	}
+	return result, nil
 }
 
 func (s *SQLHelper) scanProject(rows *sql.Rows) (*Project, error) {
