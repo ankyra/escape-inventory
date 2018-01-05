@@ -48,6 +48,9 @@ func HandleError(w http.ResponseWriter, r *http.Request, err error) {
 	if dao.IsNotFound(err) {
 		w.WriteHeader(http.StatusNotFound)
 		return
+	} else if dao.IsUnauthorized(err) {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
 	} else if dao.IsAlreadyExists(err) {
 		w.WriteHeader(http.StatusConflict)
 		w.Write([]byte("Resource already exists"))

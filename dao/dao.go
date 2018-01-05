@@ -193,3 +193,6 @@ func IsAlreadyExists(err error) bool {
 func IsLimitError(err error) bool {
 	return err == LimitError
 }
+func IsUnauthorized(err error) bool {
+	return err == Unauthorized
+}

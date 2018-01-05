@@ -177,3 +177,4 @@ type DAO interface {
 var NotFound = fmt.Errorf("Not found")
 var AlreadyExists = fmt.Errorf("Already exists")
 var LimitError = fmt.Errorf("Plan limit exceeded")
+var Unauthorized = fmt.Errorf("Unauthorized")

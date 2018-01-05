@@ -219,6 +219,13 @@ func (s *suite) Test_HandleError_limit_reached(c *C) {
 	c.Assert(rr.Body.String(), Equals, "Plan limit exceeded")
 }
 
+func (s *suite) Test_HandleError_unauthorized(c *C) {
+	rr := httptest.NewRecorder()
+	HandleError(rr, nil, types.Unauthorized)
+	c.Assert(rr.Code, Equals, 401)
+	c.Assert(rr.Body.String(), Equals, "")
+}
+
 func (s *suite) Test_HandleError_user_error(c *C) {
 	rr := httptest.NewRecorder()
 	HandleError(rr, nil, model.NewUserError(errors.New("ouch")))
