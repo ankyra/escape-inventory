@@ -22,6 +22,7 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
+	"io/ioutil"
 	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
@@ -43,6 +44,33 @@ var _ = Suite(&suite{})
 
 func (s *suite) SetUpTest(c *C) {
 	dao.TestSetup()
+}
+
+func (s *suite) GetMuxForHandler(method, url string, handler http.HandlerFunc) *mux.Router {
+	r := mux.NewRouter()
+	router := r.Methods(method).Subrouter()
+	router.Handle(url, http.HandlerFunc(handler))
+	return r
+}
+
+func (s *suite) ExpectErrorResponse(c *C, resp *http.Response, statusCode int, expectedBody string) {
+	c.Assert(resp.StatusCode, Equals, statusCode)
+	body, err := ioutil.ReadAll(resp.Body)
+	c.Assert(err, IsNil)
+	c.Assert(string(body), Equals, expectedBody)
+}
+
+func (s *suite) ExpectSuccessResponse(c *C, resp *http.Response, expectedBody string) {
+	c.Assert(resp.StatusCode, Equals, 200)
+	body, err := ioutil.ReadAll(resp.Body)
+	c.Assert(err, IsNil)
+	c.Assert(string(body), Equals, expectedBody)
+}
+
+func (s *suite) ExpectSuccessResponse_with_JSON(c *C, resp *http.Response, expectedPayload interface{}) {
+	expectedBody, err := json.Marshal(expectedPayload)
+	c.Assert(err, IsNil)
+	s.ExpectSuccessResponse(c, resp, string(expectedBody)+"\n")
 }
 
 func (s *suite) testGET(c *C, r *mux.Router, url string) *http.Response {

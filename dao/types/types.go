@@ -130,6 +130,40 @@ func NewMetrics(projectCount int) *Metrics {
 	}
 }
 
+type FeedEvent struct {
+	Type      string                 `json:"type"`
+	Project   string                 `json:"project"`
+	Timestamp time.Time              `json:"time"`
+	Data      map[string]interface{} `json:"data"`
+}
+
+func NewEvent(typ, project string) *FeedEvent {
+	return &FeedEvent{
+		Type:      typ,
+		Project:   project,
+		Timestamp: time.Now(),
+		Data:      map[string]interface{}{},
+	}
+}
+func NewEventWithData(typ, project string, data map[string]interface{}) *FeedEvent {
+	ev := NewEvent(typ, project)
+	ev.Data = data
+	return ev
+}
+
+func NewCreateProjectEvent(project string) *FeedEvent {
+	return NewEvent("CREATE_PROJECT", project)
+}
+
+func NewReleaseEvent(project, name, version, uploadedBy string) *FeedEvent {
+	data := map[string]interface{}{
+		"name":        name,
+		"version":     version,
+		"uploaded_by": uploadedBy,
+	}
+	return NewEventWithData("NEW_RELEASE", project, data)
+}
+
 type DAO interface {
 	GetProject(project string) (*Project, error)
 	AddProject(*Project) error
