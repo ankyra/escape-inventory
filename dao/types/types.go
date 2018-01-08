@@ -130,6 +130,8 @@ func NewMetrics(projectCount int) *Metrics {
 	}
 }
 
+const FeedPageSize = 7
+
 type FeedEvent struct {
 	Type      string                 `json:"type"`
 	Project   string                 `json:"project"`
@@ -204,6 +206,11 @@ type DAO interface {
 
 	GetUserMetrics(username string) (*Metrics, error)
 	SetUserMetrics(username string, previous, new *Metrics) error
+
+	GetFeedPage() ([]*FeedEvent, error)
+	GetProjectFeedPage(project string) ([]*FeedEvent, error)
+	GetFeedPageByGroups(readGroups []string) ([]*FeedEvent, error)
+	AddFeedEvent(event *FeedEvent) error
 
 	WipeDatabase() error
 }
