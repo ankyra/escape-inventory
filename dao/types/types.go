@@ -134,6 +134,7 @@ const FeedPageSize = 7
 
 type FeedEvent struct {
 	Type      string                 `json:"type"`
+	Username  string                 `json:"username"`
 	Project   string                 `json:"project"`
 	Timestamp time.Time              `json:"time"`
 	Data      map[string]interface{} `json:"data"`

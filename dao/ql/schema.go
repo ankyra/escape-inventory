@@ -6,6 +6,7 @@
 // dao/ql/schemas/2_metrics.up.sql
 // dao/ql/schemas/3_metrics_user_id.down.sql
 // dao/ql/schemas/3_metrics_user_id.up.sql
+// dao/ql/schemas/4_feeds.up.sql
 // DO NOT EDIT!
 
 package ql
@@ -193,6 +194,26 @@ func _3_metrics_user_idUpSql() (*asset, error) {
 	return a, nil
 }
 
+var __4_feedsUpSql = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x74\x8e\x41\xcb\x82\x40\x10\x86\xef\xfb\x2b\x5e\x3c\x29\x7c\x87\xef\xee\xc9\x72\x04\x41\x14\x72\x03\x6f\xb2\xe4\x14\x06\x6e\xb2\x3b\x05\xfd\xfb\x40\xb7\xf0\x50\xc7\x79\x1e\x86\xf7\xd9\x1f\x28\xd3\x04\x9d\xed\x2a\xc2\x99\x79\xe8\xf9\xc1\x56\x3c\x62\x05\x00\xcb\xd1\xcb\x73\x66\x78\x71\xa3\xbd\xfc\x2d\xf8\xee\xd9\x59\x33\xbd\x21\x72\x2a\xb2\x63\xa5\x11\x45\xab\x9f\xdd\xed\xca\x27\xf9\xa5\x65\x9c\xd8\x8b\x99\x66\x8c\x56\x3e\xf6\x7f\x95\x83\x11\xf3\xed\x31\x49\x95\x0a\xb5\x65\x9d\x53\x87\xb2\x40\xdd\x68\x50\x57\xb6\xba\xdd\xb6\xf7\x61\xde\xa3\xa9\xb7\x3c\x0e\x3c\x49\xd5\x2b\x00\x00\xff\xff\x2a\xca\xc3\xbb\xf7\x00\x00\x00")
+
+func _4_feedsUpSqlBytes() ([]byte, error) {
+	return bindataRead(
+		__4_feedsUpSql,
+		"4_feeds.up.sql",
+	)
+}
+
+func _4_feedsUpSql() (*asset, error) {
+	bytes, err := _4_feedsUpSqlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "4_feeds.up.sql", size: 247, mode: os.FileMode(436), modTime: time.Unix(1515432718, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
 // Asset loads and returns the asset for the given name.
 // It returns an error if the asset could not be found or
 // could not be loaded.
@@ -251,6 +272,7 @@ var _bindata = map[string]func() (*asset, error){
 	"2_metrics.up.sql": _2_metricsUpSql,
 	"3_metrics_user_id.down.sql": _3_metrics_user_idDownSql,
 	"3_metrics_user_id.up.sql": _3_metrics_user_idUpSql,
+	"4_feeds.up.sql": _4_feedsUpSql,
 }
 
 // AssetDir returns the file names below a certain
@@ -299,6 +321,7 @@ var _bintree = &bintree{nil, map[string]*bintree{
 	"2_metrics.up.sql": &bintree{_2_metricsUpSql, map[string]*bintree{}},
 	"3_metrics_user_id.down.sql": &bintree{_3_metrics_user_idDownSql, map[string]*bintree{}},
 	"3_metrics_user_id.up.sql": &bintree{_3_metrics_user_idUpSql, map[string]*bintree{}},
+	"4_feeds.up.sql": &bintree{_4_feedsUpSql, map[string]*bintree{}},
 }}
 
 // RestoreAsset restores an asset under the given directory
