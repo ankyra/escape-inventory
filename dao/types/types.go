@@ -207,9 +207,9 @@ type DAO interface {
 	GetUserMetrics(username string) (*Metrics, error)
 	SetUserMetrics(username string, previous, new *Metrics) error
 
-	GetFeedPage() ([]*FeedEvent, error)
-	GetProjectFeedPage(project string) ([]*FeedEvent, error)
-	GetFeedPageByGroups(readGroups []string) ([]*FeedEvent, error)
+	GetFeedPage(pageSize int) ([]*FeedEvent, error)
+	GetProjectFeedPage(project string, pageSize int) ([]*FeedEvent, error)
+	GetFeedPageByGroups(readGroups []string, pageSize int) ([]*FeedEvent, error)
 	AddFeedEvent(event *FeedEvent) error
 
 	WipeDatabase() error

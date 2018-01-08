@@ -4,17 +4,17 @@ import (
 	. "github.com/ankyra/escape-inventory/dao/types"
 )
 
-func (a *dao) GetFeedPage() ([]*FeedEvent, error) {
+func (a *dao) GetFeedPage(pageSize int) ([]*FeedEvent, error) {
 	result := []*FeedEvent{}
-	for i := len(a.events) - 1; i >= 0 && len(result) < FeedPageSize; i-- {
+	for i := len(a.events) - 1; i >= 0 && len(result) < pageSize; i-- {
 		result = append(result, a.events[i])
 	}
 	return result, nil
 }
 
-func (a *dao) GetProjectFeedPage(project string) ([]*FeedEvent, error) {
+func (a *dao) GetProjectFeedPage(project string, pageSize int) ([]*FeedEvent, error) {
 	result := []*FeedEvent{}
-	for i := len(a.events) - 1; i >= 0 && len(result) < FeedPageSize; i-- {
+	for i := len(a.events) - 1; i >= 0 && len(result) < pageSize; i-- {
 		if a.events[i].Project == project {
 			result = append(result, a.events[i])
 		}
@@ -22,9 +22,9 @@ func (a *dao) GetProjectFeedPage(project string) ([]*FeedEvent, error) {
 	return result, nil
 }
 
-func (a *dao) GetFeedPageByGroups(readGroups []string) ([]*FeedEvent, error) {
+func (a *dao) GetFeedPageByGroups(readGroups []string, pageSize int) ([]*FeedEvent, error) {
 	result := []*FeedEvent{}
-	for i := len(a.events) - 1; i >= 0 && len(result) < FeedPageSize; i-- {
+	for i := len(a.events) - 1; i >= 0 && len(result) < pageSize; i-- {
 		allowedGroups, found := a.acls[a.events[i].Project]
 		if !found {
 			continue
