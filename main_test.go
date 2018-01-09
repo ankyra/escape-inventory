@@ -404,3 +404,26 @@ func (s *suite) Test_HealthCheck(c *C) {
 	req, _ := http.NewRequest("GET", healthEndpoint, nil)
 	testRequest(c, req, 200)
 }
+
+func (s *suite) feed(c *C) []*types.FeedEvent {
+	req, _ := http.NewRequest("GET", "/api/v1/inventory/__feed", nil)
+	rr = httptest.NewRecorder()
+	testRequest(c, req, 200)
+	result := []*types.FeedEvent{}
+	c.Assert(json.Unmarshal([]byte(rr.Body.String()), &result), IsNil)
+	return result
+}
+
+func (s *suite) Test_Feed(c *C) {
+	result := s.feed(c)
+	c.Assert(result, HasLen, 0)
+
+	s.addRelease(c, "project1", "1")
+	s.addRelease(c, "project2", "2")
+
+	result = s.feed(c)
+	c.Assert(result, HasLen, 2)
+	c.Assert(result[0].Project, Equals, "project2")
+	c.Assert(result[1].Project, Equals, "project1")
+
+}
