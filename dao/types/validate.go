@@ -628,22 +628,27 @@ func Validate_Feed(dao DAO, c *C) {
 	received, err := dao.GetFeedPage(4)
 	c.Assert(err, IsNil)
 	c.Assert(received, HasLen, 4)
-	c.Assert(received[0], DeepEquals, events[5])
-	c.Assert(received[1], DeepEquals, events[4])
-	c.Assert(received[2], DeepEquals, events[3])
-	c.Assert(received[3], DeepEquals, events[2])
+	expected := [][]*FeedEvent{
+		[]*FeedEvent{received[0], events[5]},
+		[]*FeedEvent{received[1], events[4]},
+		[]*FeedEvent{received[2], events[3]},
+		[]*FeedEvent{received[3], events[2]},
+	}
+	for i, exp := range expected {
+		c.Assert(exp[0].Equals(exp[1]), Equals, true, Commentf("%d item '%s' expected; was '%s'", i, exp[1], exp[0]))
+	}
 
 	c.Assert(dao.SetACL("test1", "test1", ReadPermission), IsNil)
 	received, err = dao.GetFeedPageByGroups([]string{"test1"}, 4)
 	c.Assert(err, IsNil)
 	c.Assert(received, HasLen, 1)
-	c.Assert(received[0], DeepEquals, events[0])
+	c.Assert(received[0].Equals(events[0]), Equals, true, Commentf("expected '%s'; was '%s'", events[0], received[0]))
 
 	received, err = dao.GetProjectFeedPage("test2", 4)
 	c.Assert(err, IsNil)
 	c.Assert(received, HasLen, 2)
-	c.Assert(received[0], DeepEquals, events[2])
-	c.Assert(received[1], DeepEquals, events[1])
+	c.Assert(received[0].Equals(events[2]), Equals, true, Commentf("expected '%s'; was '%s'", events[2], received[0]))
+	c.Assert(received[1].Equals(events[1]), Equals, true, Commentf("expected '%s'; was '%s'", events[1], received[1]))
 }
 
 func Validate_WipeDatabase(dao DAO, c *C) {

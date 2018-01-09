@@ -18,6 +18,7 @@ package types
 
 import (
 	"fmt"
+	"reflect"
 	"time"
 
 	"github.com/ankyra/escape-core"
@@ -165,6 +166,16 @@ func NewReleaseEvent(project, name, version, uploadedBy string) *FeedEvent {
 		"uploaded_by": uploadedBy,
 	}
 	return NewEventWithData("NEW_RELEASE", project, data)
+}
+
+func (f *FeedEvent) Equals(other *FeedEvent) bool {
+	fTimestamp := f.Timestamp.Truncate(time.Second)
+	otherTimestamp := other.Timestamp.Truncate(time.Second)
+	return f.Type == other.Type &&
+		f.Username == other.Username &&
+		f.Project == other.Project &&
+		fTimestamp == otherTimestamp &&
+		reflect.DeepEqual(f.Data, other.Data)
 }
 
 type DAO interface {

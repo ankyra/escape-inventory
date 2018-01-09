@@ -5,30 +5,64 @@ import (
 	"encoding/json"
 	"fmt"
 	"strconv"
+	"strings"
 	"time"
 
 	. "github.com/ankyra/escape-inventory/dao/types"
 )
 
 func (s *SQLHelper) GetFeedPage(pageSize int) ([]*FeedEvent, error) {
-	fmt.Println(pageSize)
-	rows, err := s.PrepareAndQuery(s.FeedEventPageQuery + strconv.Itoa(pageSize))
+	rows, err := s.PrepareAndQuery(s.FeedEventPageQuery, pageSize)
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
-	for rows.Next() {
-		return s.scanFeedEvents(rows)
-	}
-	return []*FeedEvent{}, nil
+	return s.scanFeedEvents(rows)
 }
 
 func (s *SQLHelper) GetProjectFeedPage(project string, pageSize int) ([]*FeedEvent, error) {
-	return nil, nil
+	rows, err := s.PrepareAndQuery(s.ProjectFeedEventPageQuery, project, pageSize)
+	if err != nil {
+		return nil, err
+	}
+	return s.scanFeedEvents(rows)
 }
 
 func (s *SQLHelper) GetFeedPageByGroups(readGroups []string, pageSize int) ([]*FeedEvent, error) {
-	return nil, nil
+	starFound := false
+	for _, g := range readGroups {
+		if g == "*" {
+			starFound = true
+			break
+		}
+	}
+	if !starFound {
+		readGroups = append(readGroups, "*")
+	}
+	insertMarks := []string{}
+	for i, _ := range readGroups {
+		if s.UseNumericInsertMarks {
+			insertMarks = append(insertMarks, "$"+strconv.Itoa(i+1))
+		} else {
+			insertMarks = append(insertMarks, "?")
+		}
+	}
+	query := s.FeedEventsByGroupsPageQuery
+	if len(readGroups) == 1 {
+		query += " = " + insertMarks[0]
+	} else {
+		query += "IN (" + strings.Join(insertMarks, ", ") + ")"
+	}
+	interfaceGroups := []interface{}{}
+	for _, g := range readGroups {
+		interfaceGroups = append(interfaceGroups, g)
+	}
+	query += " ORDER BY id DESC LIMIT " + strconv.Itoa(pageSize)
+	fmt.Println(query)
+	rows, err := s.PrepareAndQuery(query, interfaceGroups...)
+	if err != nil {
+		return nil, err
+	}
+	return s.scanFeedEvents(rows)
 }
 
 func (s *SQLHelper) AddFeedEvent(event *FeedEvent) error {
@@ -53,7 +87,9 @@ func (s *SQLHelper) scanFeedEvents(rows *sql.Rows) ([]*FeedEvent, error) {
 		if err := rows.Scan(&eventType, &username, &project, &uploadedAt, &data); err != nil {
 			return nil, err
 		}
-		ev := NewEvent(eventType, project)
+		ev := &FeedEvent{}
+		ev.Type = eventType
+		ev.Project = project
 		ev.Username = username
 		ev.Timestamp = time.Unix(uploadedAt, 0)
 		ev.Data = map[string]interface{}{}
@@ -61,7 +97,6 @@ func (s *SQLHelper) scanFeedEvents(rows *sql.Rows) ([]*FeedEvent, error) {
 			return nil, err
 		}
 		result = append(result, ev)
-		fmt.Println(result)
 	}
 	return result, nil
 }

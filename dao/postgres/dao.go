@@ -128,6 +128,16 @@ func NewPostgresDAO(url string) (DAO, error) {
 		CreateUserIDMetricsQuery:     `INSERT INTO metrics(user_id) VALUES($1)`,
 		GetMetricsByUserIDQuery:      `SELECT project_count FROM metrics WHERE user_id = $1`,
 		SetProjectCountMetricForUser: `UPDATE metrics SET project_count = $3 WHERE user_id = $1 AND project_count = $2`,
+		AddFeedEventQuery:            `INSERT INTO feed_events(event_type, username, project, timestamp, data) VALUES ($1, $2, $3, $4, $5)`,
+		FeedEventPageQuery: `SELECT event_type, username, project, timestamp, data 
+							 FROM feed_events ORDER BY id DESC LIMIT $1`,
+		ProjectFeedEventPageQuery: `SELECT event_type, username, project, timestamp, data 
+									 FROM feed_events WHERE project = $1 ORDER BY id DESC LIMIT $2`,
+		FeedEventsByGroupsPageQuery: `SELECT f.event_type, f.username, f.project, f.timestamp, f.data 
+									  FROM feed_events AS f
+									  JOIN acl ON f.project = acl.project
+									  WHERE group_name `,
+
 		WipeDatabaseFunc: func(s *sqlhelp.SQLHelper) error {
 			queries := []string{
 				`TRUNCATE release CASCADE`,
@@ -138,6 +148,7 @@ func NewPostgresDAO(url string) (DAO, error) {
 				`TRUNCATE release_dependency CASCADE`,
 				`TRUNCATE subscriptions CASCADE`,
 				`TRUNCATE metrics CASCADE`,
+				`TRUNCATE feed_events CASCADE`,
 			}
 
 			for _, query := range queries {

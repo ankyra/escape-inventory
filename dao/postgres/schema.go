@@ -7,6 +7,7 @@
 // dao/postgres/schemas/14_metrics.up.sql
 // dao/postgres/schemas/15_metrics_user_id.down.sql
 // dao/postgres/schemas/15_metrics_user_id.up.sql
+// dao/postgres/schemas/16_feeds.up.sql
 // dao/postgres/schemas/1_initial_schema.down.sql
 // dao/postgres/schemas/1_initial_schema.up.sql
 // dao/postgres/schemas/2_project_metadata.down.sql
@@ -223,6 +224,26 @@ func _15_metrics_user_idUpSql() (*asset, error) {
 	}
 
 	info := bindataFileInfo{name: "15_metrics_user_id.up.sql", size: 125, mode: os.FileMode(436), modTime: time.Unix(1515082092, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var __16_feedsUpSql = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x64\xcb\x31\xcb\x82\x50\x14\x87\xf1\xdd\x4f\xf1\xdf\x54\x78\x87\x97\x8a\x96\xa6\xa3\x9d\x4a\xb2\x88\xd3\x2d\x70\x92\x4b\x9e\xc0\x40\x13\xef\x2d\xe8\xdb\x07\x1a\x34\x34\xff\x9e\x27\x15\x26\xc3\x30\x94\xe4\x8c\xab\x6a\x55\xea\x53\x5b\xef\x10\x05\x00\x50\x57\x38\xb2\x64\x94\xe3\x20\xd9\x8e\xa4\xc0\x96\x8b\xbf\x81\x86\xae\xf4\xaf\x4e\x71\x26\x49\x37\x24\xd1\x74\x12\x8f\xf6\x70\xda\xb7\xb6\xf9\xca\x7c\xf6\x91\xae\xbf\xdf\xf4\xe2\x7f\x17\x5f\x37\xea\xbc\x6d\x3a\x64\x7b\xc3\x6b\x16\x2c\x79\x45\xa7\xdc\x20\xfc\x0f\xc7\xa4\xb2\xde\x22\x29\x0c\x53\x10\x2f\x82\x77\x00\x00\x00\xff\xff\xc0\xa4\xe2\xa1\xba\x00\x00\x00")
+
+func _16_feedsUpSqlBytes() ([]byte, error) {
+	return bindataRead(
+		__16_feedsUpSql,
+		"16_feeds.up.sql",
+	)
+}
+
+func _16_feedsUpSql() (*asset, error) {
+	bytes, err := _16_feedsUpSqlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "16_feeds.up.sql", size: 186, mode: os.FileMode(436), modTime: time.Unix(1515498904, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -546,6 +567,7 @@ var _bindata = map[string]func() (*asset, error){
 	"14_metrics.up.sql": _14_metricsUpSql,
 	"15_metrics_user_id.down.sql": _15_metrics_user_idDownSql,
 	"15_metrics_user_id.up.sql": _15_metrics_user_idUpSql,
+	"16_feeds.up.sql": _16_feedsUpSql,
 	"1_initial_schema.down.sql": _1_initial_schemaDownSql,
 	"1_initial_schema.up.sql": _1_initial_schemaUpSql,
 	"2_project_metadata.down.sql": _2_project_metadataDownSql,
@@ -608,6 +630,7 @@ var _bintree = &bintree{nil, map[string]*bintree{
 	"14_metrics.up.sql": &bintree{_14_metricsUpSql, map[string]*bintree{}},
 	"15_metrics_user_id.down.sql": &bintree{_15_metrics_user_idDownSql, map[string]*bintree{}},
 	"15_metrics_user_id.up.sql": &bintree{_15_metrics_user_idUpSql, map[string]*bintree{}},
+	"16_feeds.up.sql": &bintree{_16_feedsUpSql, map[string]*bintree{}},
 	"1_initial_schema.down.sql": &bintree{_1_initial_schemaDownSql, map[string]*bintree{}},
 	"1_initial_schema.up.sql": &bintree{_1_initial_schemaUpSql, map[string]*bintree{}},
 	"2_project_metadata.down.sql": &bintree{_2_project_metadataDownSql, map[string]*bintree{}},

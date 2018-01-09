@@ -56,8 +56,10 @@ type SQLHelper struct {
 	GetMetricsByUserIDQuery      string
 	SetProjectCountMetricForUser string
 
-	FeedEventPageQuery string
-	AddFeedEventQuery  string
+	FeedEventPageQuery          string
+	ProjectFeedEventPageQuery   string
+	FeedEventsByGroupsPageQuery string
+	AddFeedEventQuery           string
 }
 
 func (s *SQLHelper) ReadRowsIntoStringArray(rows *sql.Rows) ([]string, error) {
