@@ -37,6 +37,21 @@ func (s *configSuite) Test_NewConfig_uses_Sqlite_and_local_storage_by_default(c 
 	c.Assert(conf.DatabaseSettings.Path, Equals, "/var/lib/escape/inventory.db")
 	c.Assert(conf.StorageBackend, Equals, "local")
 	c.Assert(conf.StorageSettings.Path, Equals, "/var/lib/escape/releases")
+	c.Assert(conf.DatabaseSettings.PostgresUrl, Equals, "")
+}
+
+func (s *configSuite) Test_NewConfig_SetsPostgresSettingsUrlToDefault_IfPostgresIsSetAndUrlEmpty(c *C) {
+	env := []string{
+		"DATABASE=postgres",
+	}
+	conf, err := NewConfig(env)
+	c.Assert(err, IsNil)
+	c.Assert(conf.Port, Equals, "7770")
+	c.Assert(conf.Database, Equals, "postgres")
+	c.Assert(conf.DatabaseSettings.Path, Equals, "")
+	c.Assert(conf.StorageBackend, Equals, "local")
+	c.Assert(conf.StorageSettings.Path, Equals, "/var/lib/escape/releases")
+	c.Assert(conf.DatabaseSettings.PostgresUrl, Equals, "postgres://postgres:@localhost/postgres?sslmode=disable")
 }
 
 func (s *configSuite) Test_LoadConfig_InMemoryDb(c *C) {

@@ -51,8 +51,9 @@ type Config struct {
 
 func NewConfig(env []string) (*Config, error) {
 	result := &Config{}
+	processEnvironmentOverrides(result, env)
 	replaceMissingValuesWithDefaults(result)
-	return processEnvironmentOverrides(result, env), nil
+	return result, nil
 }
 
 func replaceMissingValuesWithDefaults(config *Config) {
@@ -70,6 +71,9 @@ func replaceMissingValuesWithDefaults(config *Config) {
 	}
 	if config.StorageSettings.Path == "" && config.StorageBackend == "local" {
 		config.StorageSettings.Path = "/var/lib/escape/releases"
+	}
+	if config.DatabaseSettings.PostgresUrl == "" && config.Database == "postgres" {
+		config.DatabaseSettings.PostgresUrl = "postgres://postgres:@localhost/postgres?sslmode=disable"
 	}
 }
 
