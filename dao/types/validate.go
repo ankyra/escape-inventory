@@ -47,6 +47,7 @@ func ValidateDAO(dao func() DAO, c *C) {
 	Validate_DependenciesByGroups(dao(), c)
 	Validate_Metrics(dao(), c)
 	Validate_WipeDatabase(dao(), c)
+	Validate_Feed(dao(), c)
 }
 
 func addReleaseToProject(dao DAO, c *C, name, version, project string) *Release {
@@ -610,6 +611,44 @@ func Validate_Metrics(dao DAO, c *C) {
 
 	err = dao.SetUserMetrics("yo-i-dont-exist", metrics, &newMetrics)
 	c.Assert(err, Equals, NotFound)
+}
+
+func Validate_Feed(dao DAO, c *C) {
+	events := []*FeedEvent{
+		NewCreateProjectEvent("test1"),
+		NewReleaseEvent("test2", "app", "1.0", "user"),
+		NewCreateProjectEvent("test2"),
+		NewCreateProjectEvent("test3"),
+		NewCreateProjectEvent("test4"),
+		NewCreateProjectEvent("test5"),
+	}
+	for _, ev := range events {
+		c.Assert(dao.AddFeedEvent(ev), IsNil)
+	}
+	received, err := dao.GetFeedPage(4)
+	c.Assert(err, IsNil)
+	c.Assert(received, HasLen, 4)
+	expected := [][]*FeedEvent{
+		[]*FeedEvent{received[0], events[5]},
+		[]*FeedEvent{received[1], events[4]},
+		[]*FeedEvent{received[2], events[3]},
+		[]*FeedEvent{received[3], events[2]},
+	}
+	for i, exp := range expected {
+		c.Assert(exp[0].Equals(exp[1]), Equals, true, Commentf("%d item '%s' expected; was '%s'", i, exp[1], exp[0]))
+	}
+
+	received, err = dao.GetProjectFeedPage("test2", 4)
+	c.Assert(err, IsNil)
+	c.Assert(received, HasLen, 2)
+	c.Assert(received[0].Equals(events[2]), Equals, true, Commentf("expected '%s'; was '%s'", events[2], received[0]))
+	c.Assert(received[1].Equals(events[1]), Equals, true, Commentf("expected '%s'; was '%s'", events[1], received[1]))
+
+	c.Assert(dao.SetACL("test1", "test1", ReadPermission), IsNil)
+	received, err = dao.GetFeedPageByGroups([]string{"test1"}, 4)
+	c.Assert(err, IsNil)
+	c.Assert(received, HasLen, 1)
+	c.Assert(received[0].Equals(events[0]), Equals, true, Commentf("expected '%s'; was '%s'", events[0], received[0]))
 }
 
 func Validate_WipeDatabase(dao DAO, c *C) {

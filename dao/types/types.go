@@ -18,6 +18,7 @@ package types
 
 import (
 	"fmt"
+	"reflect"
 	"time"
 
 	"github.com/ankyra/escape-core"
@@ -130,8 +131,12 @@ func NewMetrics(projectCount int) *Metrics {
 	}
 }
 
+const FeedPageSize = 7
+
 type FeedEvent struct {
+	ID        string                 `json:"id"` // set by DAO
 	Type      string                 `json:"type"`
+	Username  string                 `json:"username"`
 	Project   string                 `json:"project"`
 	Timestamp time.Time              `json:"time"`
 	Data      map[string]interface{} `json:"data"`
@@ -162,6 +167,16 @@ func NewReleaseEvent(project, name, version, uploadedBy string) *FeedEvent {
 		"uploaded_by": uploadedBy,
 	}
 	return NewEventWithData("NEW_RELEASE", project, data)
+}
+
+func (f *FeedEvent) Equals(other *FeedEvent) bool {
+	fTimestamp := f.Timestamp.Truncate(time.Second)
+	otherTimestamp := other.Timestamp.Truncate(time.Second)
+	return f.Type == other.Type &&
+		f.Username == other.Username &&
+		f.Project == other.Project &&
+		fTimestamp == otherTimestamp &&
+		reflect.DeepEqual(f.Data, other.Data)
 }
 
 type DAO interface {
@@ -204,6 +219,11 @@ type DAO interface {
 
 	GetUserMetrics(username string) (*Metrics, error)
 	SetUserMetrics(username string, previous, new *Metrics) error
+
+	GetFeedPage(pageSize int) ([]*FeedEvent, error)
+	GetProjectFeedPage(project string, pageSize int) ([]*FeedEvent, error)
+	GetFeedPageByGroups(readGroups []string, pageSize int) ([]*FeedEvent, error)
+	AddFeedEvent(event *FeedEvent) error
 
 	WipeDatabase() error
 }

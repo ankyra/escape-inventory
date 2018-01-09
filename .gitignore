@@ -4,3 +4,4 @@ escape-inventory
 *.swp
 deps/
 test.db
+dao/ql/testdata/
