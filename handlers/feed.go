@@ -18,22 +18,21 @@ package handlers
 
 import (
 	"net/http"
-	"strconv"
 
+	"github.com/ankyra/escape-inventory/dao"
 	"github.com/ankyra/escape-inventory/dao/types"
-	"github.com/ankyra/escape-inventory/model"
 	"github.com/gorilla/mux"
 )
 
 type feedHandlerProvider struct {
-	GetFeedPage    func(page int) ([]*types.FeedEvent, error)
-	GetProjectFeed func(project string, page int) ([]*types.FeedEvent, error)
+	GetFeedPage        func(pageSize int) ([]*types.FeedEvent, error)
+	GetProjectFeedPage func(project string, pageSize int) ([]*types.FeedEvent, error)
 }
 
 func newFeedHandlerProvider() *feedHandlerProvider {
 	return &feedHandlerProvider{
-		GetFeedPage:    model.GetFeedPage,
-		GetProjectFeed: model.GetProjectFeed,
+		GetFeedPage:        dao.GetFeedPage,
+		GetProjectFeedPage: dao.GetProjectFeedPage,
 	}
 }
 
@@ -45,30 +44,12 @@ func ProjectFeedHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *feedHandlerProvider) FeedHandler(w http.ResponseWriter, r *http.Request) {
-	page := 0
-	pageStr := r.URL.Query().Get("page")
-	if pageStr != "" {
-		var err error
-		page, err = strconv.Atoi(pageStr)
-		if err != nil {
-			page = 0
-		}
-	}
-	feed, err := h.GetFeedPage(page)
+	feed, err := h.GetFeedPage(types.FeedPageSize)
 	ErrorOrJsonSuccess(w, r, feed, err)
 }
 
 func (h *feedHandlerProvider) ProjectFeedHandler(w http.ResponseWriter, r *http.Request) {
-	page := 0
-	pageStr := r.URL.Query().Get("page")
-	if pageStr != "" {
-		var err error
-		page, err = strconv.Atoi(pageStr)
-		if err != nil {
-			page = 0
-		}
-	}
 	project := mux.Vars(r)["project"]
-	feed, err := h.GetProjectFeed(project, page)
+	feed, err := h.GetProjectFeedPage(project, types.FeedPageSize)
 	ErrorOrJsonSuccess(w, r, feed, err)
 }
