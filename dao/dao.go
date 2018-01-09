@@ -184,6 +184,22 @@ func SetUserMetrics(username string, previous, new *Metrics) error {
 	return GlobalDAO.SetUserMetrics(username, previous, new)
 }
 
+func GetFeedPage(pageSize int) ([]*FeedEvent, error) {
+	return GlobalDAO.GetFeedPage(pageSize)
+}
+
+func GetProjectFeedPage(project string, pageSize int) ([]*FeedEvent, error) {
+	return GlobalDAO.GetProjectFeedPage(project, pageSize)
+}
+
+func GetFeedPageByGroups(readGroups []string, pageSize int) ([]*FeedEvent, error) {
+	return GlobalDAO.GetFeedPageByGroups(readGroups, pageSize)
+}
+
+func AddFeedEvent(event *FeedEvent) error {
+	return GlobalDAO.AddFeedEvent(event)
+}
+
 func IsNotFound(err error) bool {
 	return err == NotFound
 }

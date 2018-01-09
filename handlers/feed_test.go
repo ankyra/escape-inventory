@@ -21,59 +21,25 @@ func (s *suite) feedMuxWithProvider(provider *feedHandlerProvider) *mux.Router {
 }
 
 func (s *suite) Test_FeedHandler_happy_path(c *C) {
-	var capturedPage int
+	var capturedPageSize int
 	feedPayload := []*types.FeedEvent{
-		types.NewCreateProjectEvent("project"),
+		types.NewCreateProjectEvent("project", "test-user"),
 		types.NewReleaseEvent("project", "name", "1.0", "test-user"),
 	}
 	provider := &feedHandlerProvider{
-		GetFeedPage: func(page int) ([]*types.FeedEvent, error) {
-			capturedPage = page
+		GetFeedPage: func(pageSize int) ([]*types.FeedEvent, error) {
+			capturedPageSize = pageSize
 			return feedPayload, nil
 		},
 	}
 	resp := s.testGET(c, s.feedMuxWithProvider(provider), FeedURL)
 	s.ExpectSuccessResponse_with_JSON(c, resp, feedPayload)
-	c.Assert(capturedPage, Equals, 0)
-}
-
-func (s *suite) Test_FeedHandler_happy_path_with_page(c *C) {
-	var capturedPage int
-	feedPayload := []*types.FeedEvent{
-		types.NewCreateProjectEvent("project"),
-		types.NewReleaseEvent("project", "name", "1.0", "test-user"),
-	}
-	provider := &feedHandlerProvider{
-		GetFeedPage: func(page int) ([]*types.FeedEvent, error) {
-			capturedPage = page
-			return feedPayload, nil
-		},
-	}
-	resp := s.testGET(c, s.feedMuxWithProvider(provider), FeedURL+"?page=100")
-	s.ExpectSuccessResponse_with_JSON(c, resp, feedPayload)
-	c.Assert(capturedPage, Equals, 100)
-}
-
-func (s *suite) Test_FeedHandler_happy_path_invalid_page(c *C) {
-	var capturedPage int
-	feedPayload := []*types.FeedEvent{
-		types.NewCreateProjectEvent("project"),
-		types.NewReleaseEvent("project", "name", "1.0", "test-user"),
-	}
-	provider := &feedHandlerProvider{
-		GetFeedPage: func(page int) ([]*types.FeedEvent, error) {
-			capturedPage = page
-			return feedPayload, nil
-		},
-	}
-	resp := s.testGET(c, s.feedMuxWithProvider(provider), FeedURL+"?page=asbasd")
-	s.ExpectSuccessResponse_with_JSON(c, resp, feedPayload)
-	c.Assert(capturedPage, Equals, 0)
+	c.Assert(capturedPageSize, Equals, types.FeedPageSize)
 }
 
 func (s *suite) Test_FeedHandler_fails_if_GetFeedPage_fails(c *C) {
 	provider := &feedHandlerProvider{
-		GetFeedPage: func(page int) ([]*types.FeedEvent, error) {
+		GetFeedPage: func(pageSize int) ([]*types.FeedEvent, error) {
 			return nil, types.Unauthorized
 		},
 	}
@@ -90,48 +56,28 @@ func (s *suite) projectFeedMuxWithProvider(provider *feedHandlerProvider) *mux.R
 }
 
 func (s *suite) Test_ProjectFeedHandler_happy_path(c *C) {
-	var capturedPage int
+	var capturedPageSize int
 	var capturedProject string
 	feedPayload := []*types.FeedEvent{
-		types.NewCreateProjectEvent("project"),
+		types.NewCreateProjectEvent("project", "test-user"),
 		types.NewReleaseEvent("project", "name", "1.0", "test-user"),
 	}
 	provider := &feedHandlerProvider{
-		GetProjectFeed: func(project string, page int) ([]*types.FeedEvent, error) {
+		GetProjectFeedPage: func(project string, pageSize int) ([]*types.FeedEvent, error) {
 			capturedProject = project
-			capturedPage = page
+			capturedPageSize = pageSize
 			return feedPayload, nil
 		},
 	}
 	resp := s.testGET(c, s.projectFeedMuxWithProvider(provider), projectFeedTestURL)
 	s.ExpectSuccessResponse_with_JSON(c, resp, feedPayload)
-	c.Assert(capturedPage, Equals, 0)
-	c.Assert(capturedProject, Equals, "project")
-}
-
-func (s *suite) Test_ProjectFeedHandler_happy_path_with_page(c *C) {
-	var capturedPage int
-	var capturedProject string
-	feedPayload := []*types.FeedEvent{
-		types.NewCreateProjectEvent("project"),
-		types.NewReleaseEvent("project", "name", "1.0", "test-user"),
-	}
-	provider := &feedHandlerProvider{
-		GetProjectFeed: func(project string, page int) ([]*types.FeedEvent, error) {
-			capturedProject = project
-			capturedPage = page
-			return feedPayload, nil
-		},
-	}
-	resp := s.testGET(c, s.projectFeedMuxWithProvider(provider), projectFeedTestURL+"?page=100")
-	s.ExpectSuccessResponse_with_JSON(c, resp, feedPayload)
-	c.Assert(capturedPage, Equals, 100)
+	c.Assert(capturedPageSize, Equals, types.FeedPageSize)
 	c.Assert(capturedProject, Equals, "project")
 }
 
 func (s *suite) Test_ProjectFeedHandler_fails_if_GetProjectFeed_fails(c *C) {
 	provider := &feedHandlerProvider{
-		GetProjectFeed: func(project string, page int) ([]*types.FeedEvent, error) {
+		GetProjectFeedPage: func(project string, pageSize int) ([]*types.FeedEvent, error) {
 			return nil, types.Unauthorized
 		},
 	}

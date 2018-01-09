@@ -30,7 +30,7 @@ import (
 type projectHandlerProvider struct {
 	GetProjects   func() (map[string]*types.Project, error)
 	GetProject    func(project string) (*model.ProjectPayload, error)
-	AddProject    func(project *types.Project) error
+	AddProject    func(project *types.Project, username string) error
 	UpdateProject func(project *types.Project) error
 
 	GetProjectHooks    func(project string) (types.Hooks, error)
@@ -84,7 +84,7 @@ func (h *projectHandlerProvider) AddProjectHandler(w http.ResponseWriter, r *htt
 		HandleError(w, r, model.NewUserError(fmt.Errorf("Invalid JSON")))
 		return
 	}
-	if err := h.AddProject(&result); err != nil {
+	if err := h.AddProject(&result, ""); err != nil {
 		HandleError(w, r, err)
 		return
 	}

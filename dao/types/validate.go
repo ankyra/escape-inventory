@@ -615,12 +615,12 @@ func Validate_Metrics(dao DAO, c *C) {
 
 func Validate_Feed(dao DAO, c *C) {
 	events := []*FeedEvent{
-		NewCreateProjectEvent("test1"),
+		NewCreateProjectEvent("test1", "user"),
 		NewReleaseEvent("test2", "app", "1.0", "user"),
-		NewCreateProjectEvent("test2"),
-		NewCreateProjectEvent("test3"),
-		NewCreateProjectEvent("test4"),
-		NewCreateProjectEvent("test5"),
+		NewCreateProjectEvent("test2", "user"),
+		NewCreateProjectEvent("test3", "user"),
+		NewCreateProjectEvent("test4", "user"),
+		NewCreateProjectEvent("test5", "user"),
 	}
 	for _, ev := range events {
 		c.Assert(dao.AddFeedEvent(ev), IsNil)

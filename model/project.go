@@ -51,11 +51,15 @@ func GetProjectHooks(project string) (types.Hooks, error) {
 	return dao.GetProjectHooks(prj)
 }
 
-func AddProject(p *types.Project) error {
+func AddProject(p *types.Project, username string) error {
 	if p.Name == "" {
 		return NewUserError(fmt.Errorf("Missing name"))
 	}
-	return dao.AddProject(p)
+	err := dao.AddProject(p)
+	if err != nil {
+		return err
+	}
+	return AddCreateProjectFeedEvent(p.Name, username)
 }
 
 func UpdateProject(p *types.Project) error {

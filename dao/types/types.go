@@ -136,28 +136,29 @@ const FeedPageSize = 7
 type FeedEvent struct {
 	ID        string                 `json:"id"` // set by DAO
 	Type      string                 `json:"type"`
-	Username  string                 `json:"username"`
+	Username  string                 `json:"user"`
 	Project   string                 `json:"project"`
 	Timestamp time.Time              `json:"time"`
 	Data      map[string]interface{} `json:"data"`
 }
 
-func NewEvent(typ, project string) *FeedEvent {
+func NewEvent(typ, project, username string) *FeedEvent {
 	return &FeedEvent{
 		Type:      typ,
 		Project:   project,
+		Username:  username,
 		Timestamp: time.Now(),
 		Data:      map[string]interface{}{},
 	}
 }
-func NewEventWithData(typ, project string, data map[string]interface{}) *FeedEvent {
-	ev := NewEvent(typ, project)
+func NewEventWithData(typ, project, username string, data map[string]interface{}) *FeedEvent {
+	ev := NewEvent(typ, project, username)
 	ev.Data = data
 	return ev
 }
 
-func NewCreateProjectEvent(project string) *FeedEvent {
-	return NewEvent("CREATE_PROJECT", project)
+func NewCreateProjectEvent(project, username string) *FeedEvent {
+	return NewEvent("CREATE_PROJECT", project, username)
 }
 
 func NewReleaseEvent(project, name, version, uploadedBy string) *FeedEvent {
@@ -166,7 +167,7 @@ func NewReleaseEvent(project, name, version, uploadedBy string) *FeedEvent {
 		"version":     version,
 		"uploaded_by": uploadedBy,
 	}
-	return NewEventWithData("NEW_RELEASE", project, data)
+	return NewEventWithData("NEW_RELEASE", project, uploadedBy, data)
 }
 
 func (f *FeedEvent) Equals(other *FeedEvent) bool {
