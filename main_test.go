@@ -425,5 +425,4 @@ func (s *suite) Test_Feed(c *C) {
 	c.Assert(result, HasLen, 2)
 	c.Assert(result[0].Project, Equals, "project2")
 	c.Assert(result[1].Project, Equals, "project1")
-
 }

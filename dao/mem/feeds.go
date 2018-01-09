@@ -30,7 +30,7 @@ func (a *dao) GetFeedPageByGroups(readGroups []string, pageSize int) ([]*FeedEve
 			continue
 		}
 		for group, _ := range allowedGroups {
-			found := false
+			found := group == "*"
 			for _, g := range readGroups {
 				if g == group {
 					found = true
