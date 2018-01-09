@@ -129,11 +129,11 @@ func NewPostgresDAO(url string) (DAO, error) {
 		GetMetricsByUserIDQuery:      `SELECT project_count FROM metrics WHERE user_id = $1`,
 		SetProjectCountMetricForUser: `UPDATE metrics SET project_count = $3 WHERE user_id = $1 AND project_count = $2`,
 		AddFeedEventQuery:            `INSERT INTO feed_events(event_type, username, project, timestamp, data) VALUES ($1, $2, $3, $4, $5)`,
-		FeedEventPageQuery: `SELECT event_type, username, project, timestamp, data 
+		FeedEventPageQuery: `SELECT id, event_type, username, project, timestamp, data 
 							 FROM feed_events ORDER BY id DESC LIMIT $1`,
-		ProjectFeedEventPageQuery: `SELECT event_type, username, project, timestamp, data 
+		ProjectFeedEventPageQuery: `SELECT id, event_type, username, project, timestamp, data 
 									 FROM feed_events WHERE project = $1 ORDER BY id DESC LIMIT $2`,
-		FeedEventsByGroupsPageQuery: `SELECT f.event_type, f.username, f.project, f.timestamp, f.data 
+		FeedEventsByGroupsPageQuery: `SELECT f.id, f.event_type, f.username, f.project, f.timestamp, f.data 
 									  FROM feed_events AS f
 									  JOIN acl ON f.project = acl.project
 									  WHERE group_name `,

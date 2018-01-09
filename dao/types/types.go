@@ -134,6 +134,7 @@ func NewMetrics(projectCount int) *Metrics {
 const FeedPageSize = 7
 
 type FeedEvent struct {
+	ID        string                 `json:"id"` // set by DAO
 	Type      string                 `json:"type"`
 	Username  string                 `json:"username"`
 	Project   string                 `json:"project"`

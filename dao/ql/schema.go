@@ -209,7 +209,7 @@ func _4_feedsUpSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "4_feeds.up.sql", size: 247, mode: os.FileMode(436), modTime: time.Unix(1515432718, 0)}
+	info := bindataFileInfo{name: "4_feeds.up.sql", size: 247, mode: os.FileMode(436), modTime: time.Unix(1515501738, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }

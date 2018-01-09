@@ -3,7 +3,6 @@ package sqlhelp
 import (
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"strconv"
 	"strings"
 	"time"
@@ -57,7 +56,6 @@ func (s *SQLHelper) GetFeedPageByGroups(readGroups []string, pageSize int) ([]*F
 		interfaceGroups = append(interfaceGroups, g)
 	}
 	query += " ORDER BY id DESC LIMIT " + strconv.Itoa(pageSize)
-	fmt.Println(query)
 	rows, err := s.PrepareAndQuery(query, interfaceGroups...)
 	if err != nil {
 		return nil, err
@@ -82,12 +80,13 @@ func (s *SQLHelper) scanFeedEvents(rows *sql.Rows) ([]*FeedEvent, error) {
 	defer rows.Close()
 	result := []*FeedEvent{}
 	for rows.Next() {
-		var eventType, username, project, data string
+		var id, eventType, username, project, data string
 		var uploadedAt int64
-		if err := rows.Scan(&eventType, &username, &project, &uploadedAt, &data); err != nil {
+		if err := rows.Scan(&id, &eventType, &username, &project, &uploadedAt, &data); err != nil {
 			return nil, err
 		}
 		ev := &FeedEvent{}
+		ev.ID = id
 		ev.Type = eventType
 		ev.Project = project
 		ev.Username = username

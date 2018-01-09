@@ -134,7 +134,14 @@ func NewQLDAO(path string) (DAO, error) {
 		GetMetricsByUserIDQuery:      `SELECT project_count FROM metrics WHERE user_id = $1`,
 		SetProjectCountMetricForUser: `UPDATE metrics SET project_count = $3 WHERE user_id = $1 AND project_count = $2`,
 		AddFeedEventQuery:            `INSERT INTO feed_events(event_type, username, project, timestamp, data) VALUES ($1, $2, $3, $4, $5)`,
-		FeedEventPageQuery:           `SELECT event_type, username, project, timestamp, data FROM feed_events ORDER BY timestamp DESC LIMIT `,
+		FeedEventPageQuery: `SELECT id() as id, event_type, username, project, timestamp, data 
+							 FROM feed_events ORDER BY id DESC LIMIT $1`,
+		ProjectFeedEventPageQuery: `SELECT id() as id, event_type, username, project, timestamp, data 
+									 FROM feed_events WHERE project = $1 ORDER BY id DESC LIMIT $2`,
+		FeedEventsByGroupsPageQuery: `SELECT id(f) as id, f.event_type, f.username, f.project, f.timestamp, f.data 
+									  FROM feed_events AS f, acl
+									  WHERE f.project = acl.project
+									  AND acl.group_name `,
 		WipeDatabaseFunc: func(s *sqlhelp.SQLHelper) error {
 			queries := []string{
 				`TRUNCATE TABLE release`,
