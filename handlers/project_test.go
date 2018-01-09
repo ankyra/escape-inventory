@@ -191,7 +191,7 @@ func (s *suite) addProjectMuxWithProvider(provider *projectHandlerProvider) *mux
 
 func (s *suite) Test_AddProjectHandler_happy_path(c *C) {
 	provider := &projectHandlerProvider{
-		AddProject: func(project *types.Project) error {
+		AddProject: func(project *types.Project, username string) error {
 			return nil
 		},
 	}
@@ -214,7 +214,7 @@ func (s *suite) Test_AddProjectHandler_fails_if_invalid_json(c *C) {
 
 func (s *suite) Test_AddProjectHandler_fails_if_AddProject_fails(c *C) {
 	provider := &projectHandlerProvider{
-		AddProject: func(project *types.Project) error {
+		AddProject: func(project *types.Project, username string) error {
 			return types.AlreadyExists
 		},
 	}

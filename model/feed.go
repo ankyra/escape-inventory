@@ -1,13 +1,16 @@
 package model
 
 import (
+	"github.com/ankyra/escape-inventory/dao"
 	"github.com/ankyra/escape-inventory/dao/types"
 )
 
-func GetFeedPage(page int) ([]*types.FeedEvent, error) {
-	return []*types.FeedEvent{}, nil
+func AddCreateProjectFeedEvent(project, username string) error {
+	event := types.NewCreateProjectEvent(project, username)
+	return dao.AddFeedEvent(event)
 }
 
-func GetProjectFeed(project string, page int) ([]*types.FeedEvent, error) {
-	return []*types.FeedEvent{}, nil
+func AddNewReleaseFeedEvent(project, name, version, username string) error {
+	event := types.NewReleaseEvent(project, name, version, username)
+	return dao.AddFeedEvent(event)
 }

@@ -105,6 +105,10 @@ func AddReleaseByUser(project, metadataJson, uploadUser string) (*core.ReleaseMe
 	if err != nil {
 		return nil, err
 	}
+	err = AddNewReleaseFeedEvent(project, metadata.Name, metadata.Version, uploadUser)
+	if err != nil {
+		return nil, err
+	}
 	return result.Metadata, ProcessDependencies(result)
 }
 
