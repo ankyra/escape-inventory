@@ -135,6 +135,25 @@ func (s *SQLHelper) GetProjectsByGroups(readGroups []string) (map[string]*Projec
 	return result, nil
 }
 
+func (s *SQLHelper) HardDeleteProject(project string) error {
+	if err := s.PrepareAndExec(s.HardDeleteProjectFeedEventsQuery, project); err != nil {
+		return err
+	}
+	if err := s.PrepareAndExec(s.HardDeleteProjectACLQuery, project); err != nil {
+		return err
+	}
+	if err := s.PrepareAndExec(s.HardDeleteProjectReleasesQuery, project); err != nil {
+		return err
+	}
+	if err := s.PrepareAndExec(s.HardDeleteProjectApplicationsQuery, project); err != nil {
+		return err
+	}
+	if err := s.PrepareAndExec(s.HardDeleteProjectQuery, project); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (s *SQLHelper) scanProject(rows *sql.Rows) (*Project, error) {
 	var name, description, orgURL, logo string
 	if err := rows.Scan(&name, &description, &orgURL, &logo); err != nil {

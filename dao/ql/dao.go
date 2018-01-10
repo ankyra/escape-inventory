@@ -142,6 +142,11 @@ func NewQLDAO(path string) (DAO, error) {
 									  FROM feed_events AS f, acl
 									  WHERE f.project = acl.project
 									  AND acl.group_name `,
+		HardDeleteProjectFeedEventsQuery:   `DELETE FROM feed_events WHERE project = $1`,
+		HardDeleteProjectACLQuery:          `DELETE FROM acl WHERE project = $1`,
+		HardDeleteProjectReleasesQuery:     `DELETE FROM release WHERE project = $1`,
+		HardDeleteProjectApplicationsQuery: `DELETE FROM application WHERE project = $1`,
+		HardDeleteProjectQuery:             `DELETE FROM project WHERE name = $1 `,
 		WipeDatabaseFunc: func(s *sqlhelp.SQLHelper) error {
 			queries := []string{
 				`TRUNCATE TABLE release`,

@@ -32,6 +32,7 @@ func ValidateDAO(dao func() DAO, c *C) {
 	Validate_GetRelease_NotFound(dao(), c)
 	Validate_GetProjects(dao(), c)
 	Validate_ProjectMetadata(dao(), c)
+	Validate_HardDeleteProject(dao(), c)
 	Validate_GetProjectsByGroups(dao(), c)
 	Validate_ApplicationMetadata(dao(), c)
 	Validate_GetDownstreamHooks(dao(), c)
@@ -46,8 +47,8 @@ func ValidateDAO(dao func() DAO, c *C) {
 	Validate_Dependencies(dao(), c)
 	Validate_DependenciesByGroups(dao(), c)
 	Validate_Metrics(dao(), c)
-	Validate_WipeDatabase(dao(), c)
 	Validate_Feed(dao(), c)
+	Validate_WipeDatabase(dao(), c)
 }
 
 func addReleaseToProject(dao DAO, c *C, name, version, project string) *Release {
@@ -184,7 +185,62 @@ func Validate_ProjectMetadata(dao DAO, c *C) {
 	c.Assert(err, IsNil)
 	c.Assert(hooks, HasLen, 1)
 	c.Assert(hooks["slack"]["url"], Equals, "http://example.com")
+}
 
+func Validate_HardDeleteProject(dao DAO, c *C) {
+	prj := NewProject("_")
+	c.Assert(dao.AddProject(prj), IsNil)
+	addRelease(dao, c, "dao-val", "1")
+	dao.SetACL("_", "group1", ReadPermission)
+	dao.AddFeedEvent(NewCreateProjectEvent("_", "admin"))
+
+	// Before Delete
+	_, err := dao.GetProject("_")
+	c.Assert(err, IsNil)
+	c.Assert(dao.UpdateProject(prj), IsNil)
+	prjs, err := dao.GetProjects()
+	c.Assert(err, IsNil)
+	c.Assert(prjs, HasLen, 1)
+	hooks, err := dao.GetProjectHooks(prj)
+	c.Assert(err, IsNil)
+	c.Assert(hooks, HasLen, 0)
+	_, err = dao.GetApplication("_", "dao-val")
+	c.Assert(err, IsNil)
+	c.Assert(dao.AddApplication(NewApplication("_", "dao-val")), Equals, AlreadyExists)
+	_, err = dao.GetRelease("_", "dao-val", "dao-val-v1")
+	c.Assert(err, IsNil)
+	perm, err := dao.GetACL("_")
+	c.Assert(err, IsNil)
+	c.Assert(perm["group1"], Equals, ReadPermission)
+	feed, err := dao.GetProjectFeedPage("_", 1)
+	c.Assert(err, IsNil)
+	c.Assert(feed, HasLen, 1)
+	c.Assert(dao.AddProject(prj), Equals, AlreadyExists)
+
+	// Delete
+	c.Assert(dao.HardDeleteProject("_"), IsNil)
+
+	// After Delete
+	_, err = dao.GetProject("_")
+	c.Assert(err, Equals, NotFound)
+	c.Assert(dao.UpdateProject(prj), Equals, NotFound)
+	prjs, err = dao.GetProjects()
+	c.Assert(err, IsNil)
+	c.Assert(prjs, HasLen, 0)
+	_, err = dao.GetProjectHooks(prj)
+	c.Assert(err, Equals, NotFound)
+	_, err = dao.GetApplication("_", "dao-val")
+	c.Assert(err, Equals, NotFound)
+	_, err = dao.GetRelease("_", "dao-val", "dao-val-v1")
+	c.Assert(err, Equals, NotFound)
+	perm, err = dao.GetACL("_")
+	c.Assert(err, IsNil)
+	c.Assert(perm, HasLen, 0)
+	feed, err = dao.GetProjectFeedPage("_", 1)
+	c.Assert(err, IsNil)
+	c.Assert(feed, HasLen, 0)
+	c.Assert(dao.AddProject(prj), IsNil)
+	c.Assert(dao.AddApplication(NewApplication("_", "dao-val")), IsNil)
 }
 
 func Validate_GetProjectsByGroups(dao DAO, c *C) {

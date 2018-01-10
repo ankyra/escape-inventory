@@ -183,6 +183,7 @@ func (f *FeedEvent) Equals(other *FeedEvent) bool {
 type DAO interface {
 	GetProject(project string) (*Project, error)
 	AddProject(*Project) error
+	HardDeleteProject(project string) error
 	UpdateProject(*Project) error
 	GetProjects() (map[string]*Project, error)
 	GetProjectsByGroups(readGroups []string) (map[string]*Project, error)

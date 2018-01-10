@@ -84,3 +84,25 @@ func (a *dao) SetProjectHooks(project *Project, hooks Hooks) error {
 	a.projectHooks[project] = hooks
 	return nil
 }
+
+func (a *dao) HardDeleteProject(project string) error {
+	prj, exists := a.projectMetadata[project]
+	if !exists {
+		return NotFound
+	}
+	delete(a.projectMetadata, project)
+	delete(a.projectHooks, prj)
+	delete(a.projects, project)
+	delete(a.acls, project)
+
+	deleteEvents := []int{}
+	for i, ev := range a.events {
+		if ev.Project == project {
+			deleteEvents = append(deleteEvents, i)
+		}
+	}
+	for _, i := range deleteEvents {
+		a.events = append(a.events[:i], a.events[i+1:]...)
+	}
+	return nil
+}

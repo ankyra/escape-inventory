@@ -60,6 +60,12 @@ type SQLHelper struct {
 	ProjectFeedEventPageQuery   string
 	FeedEventsByGroupsPageQuery string
 	AddFeedEventQuery           string
+
+	HardDeleteProjectReleasesQuery     string
+	HardDeleteProjectFeedEventsQuery   string
+	HardDeleteProjectACLQuery          string
+	HardDeleteProjectApplicationsQuery string
+	HardDeleteProjectQuery             string
 }
 
 func (s *SQLHelper) ReadRowsIntoStringArray(rows *sql.Rows) ([]string, error) {
