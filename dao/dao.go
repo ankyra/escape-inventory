@@ -84,6 +84,10 @@ func SetProjectHooks(project *Project, hooks Hooks) error {
 	return GlobalDAO.SetProjectHooks(project, hooks)
 }
 
+func HardDeleteProject(project string) error {
+	return GlobalDAO.HardDeleteProject(project)
+}
+
 func GetApplications(project string) (map[string]*Application, error) {
 	return GlobalDAO.GetApplications(project)
 }

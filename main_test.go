@@ -426,3 +426,27 @@ func (s *suite) Test_Feed(c *C) {
 	c.Assert(result[0].Project, Equals, "project2")
 	c.Assert(result[2].Project, Equals, "project1")
 }
+
+func (s *suite) Test_HardDeleteProject(c *C) {
+	s.addRelease(c, "project1", "1")
+	s.addRelease(c, "project2", "2")
+	req, _ := http.NewRequest("GET", getProjectsEndpoints, nil)
+	rr = httptest.NewRecorder()
+	testRequest(c, req, http.StatusOK)
+	result := map[string]map[string]string{}
+	err := json.Unmarshal([]byte(rr.Body.String()), &result)
+	c.Assert(err, IsNil)
+	c.Assert(result, HasLen, 2)
+
+	req, _ = http.NewRequest("DELETE", "/api/v1/inventory/project1/hard-delete", nil)
+	rr = httptest.NewRecorder()
+	testRequest(c, req, 200)
+
+	req, _ = http.NewRequest("GET", getProjectsEndpoints, nil)
+	rr = httptest.NewRecorder()
+	testRequest(c, req, http.StatusOK)
+	result = map[string]map[string]string{}
+	err = json.Unmarshal([]byte(rr.Body.String()), &result)
+	c.Assert(err, IsNil)
+	c.Assert(result, HasLen, 1)
+}

@@ -67,6 +67,10 @@ var ReadRoutes = map[string]http.HandlerFunc{
 	"/api/v1/registry/{project}/units/{name}/next-version":                        handlers.NextVersionHandler,
 }
 
+var DeleteRoutes = map[string]http.HandlerFunc{
+	"/api/v1/inventory/{project}/hard-delete": handlers.HardDeleteProjectHandler,
+}
+
 var WriteRoutes = map[string]http.HandlerFunc{
 	"/api/v1/inventory/{project}/add-project":                            handlers.AddProjectHandler,
 	"/api/v1/inventory/{project}/register":                               handlers.RegisterHandler,
@@ -112,6 +116,10 @@ func getMux(cfg *config.Config) *mux.Router {
 	putRouter := r.Methods("PUT").Subrouter()
 	for url, handler := range UpdateRoutes {
 		putRouter.Handle(url, handler)
+	}
+	deleteRouter := r.Methods("DELETE").Subrouter()
+	for url, handler := range DeleteRoutes {
+		deleteRouter.Handle(url, handler)
 	}
 
 	if cfg.Dev {
