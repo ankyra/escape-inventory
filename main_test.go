@@ -422,7 +422,7 @@ func (s *suite) Test_Feed(c *C) {
 	s.addRelease(c, "project2", "2")
 
 	result = s.feed(c)
-	c.Assert(result, HasLen, 2)
+	c.Assert(result, HasLen, 4)
 	c.Assert(result[0].Project, Equals, "project2")
-	c.Assert(result[1].Project, Equals, "project1")
+	c.Assert(result[2].Project, Equals, "project1")
 }
