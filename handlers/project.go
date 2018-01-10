@@ -35,6 +35,8 @@ type projectHandlerProvider struct {
 
 	GetProjectHooks    func(project string) (types.Hooks, error)
 	UpdateProjectHooks func(project string, hooks types.Hooks) error
+
+	HardDeleteProject func(project string) error
 }
 
 func newProjectHandlerProvider() *projectHandlerProvider {
@@ -45,6 +47,7 @@ func newProjectHandlerProvider() *projectHandlerProvider {
 		UpdateProject:      model.UpdateProject,
 		GetProjectHooks:    model.GetProjectHooks,
 		UpdateProjectHooks: model.UpdateProjectHooks,
+		HardDeleteProject:  dao.HardDeleteProject,
 	}
 }
 
@@ -65,6 +68,9 @@ func GetProjectHooksHandler(w http.ResponseWriter, r *http.Request) {
 }
 func UpdateProjectHooksHandler(w http.ResponseWriter, r *http.Request) {
 	newProjectHandlerProvider().UpdateProjectHooksHandler(w, r)
+}
+func HardDeleteProjectHandler(w http.ResponseWriter, r *http.Request) {
+	newProjectHandlerProvider().HardDeleteProjectHandler(w, r)
 }
 
 func (h *projectHandlerProvider) GetProjectsHandler(w http.ResponseWriter, r *http.Request) {
@@ -127,4 +133,9 @@ func (h *projectHandlerProvider) UpdateProjectHooksHandler(w http.ResponseWriter
 		return
 	}
 	w.WriteHeader(201)
+}
+
+func (h *projectHandlerProvider) HardDeleteProjectHandler(w http.ResponseWriter, r *http.Request) {
+	project := mux.Vars(r)["project"]
+	ErrorOrSuccess(w, r, h.HardDeleteProject(project))
 }

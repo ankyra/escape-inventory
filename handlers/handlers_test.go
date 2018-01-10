@@ -81,6 +81,14 @@ func (s *suite) testGET(c *C, r *mux.Router, url string) *http.Response {
 	return w.Result()
 }
 
+func (s *suite) testDELETE(c *C, r *mux.Router, url string) *http.Response {
+	var reader io.Reader = nil
+	req := httptest.NewRequest("DELETE", url, reader)
+	w := httptest.NewRecorder()
+	r.ServeHTTP(w, req)
+	return w.Result()
+}
+
 func (s *suite) testPUT(c *C, r *mux.Router, url string, data interface{}) *http.Response {
 	var reader io.Reader = nil
 	if data != nil {

@@ -45,6 +45,9 @@ const (
 
 	UpdateProjectHooksURL     = "/api/v1/inventory/{project}/hooks/"
 	updateProjectHooksTestURL = "/api/v1/inventory/project/hooks/"
+
+	HardDeleteProjectHooksURL     = "/api/v1/inventory/{project}/hard-delete"
+	hardDeleteProjectHooksTestURL = "/api/v1/inventory/project/hard-delete"
 )
 
 /*
@@ -336,4 +339,35 @@ func (s *suite) Test_UpdateProjectHooksHandler_fails_if_UpdateProjectHooks_fails
 	body, err := ioutil.ReadAll(resp.Body)
 	c.Assert(err, IsNil)
 	c.Assert(string(body), Equals, "")
+}
+
+/*
+	HardDeleteProjectHandler
+*/
+
+func (s *suite) hardDeleteProjectMuxWithProvider(provider *projectHandlerProvider) *mux.Router {
+	return s.GetMuxForHandler("DELETE", HardDeleteProjectHooksURL, provider.HardDeleteProjectHandler)
+}
+
+func (s *suite) Test_HardDeleteProjectHandler_happy_path(c *C) {
+	var capturedProject string
+	provider := &projectHandlerProvider{
+		HardDeleteProject: func(project string) error {
+			capturedProject = project
+			return nil
+		},
+	}
+	resp := s.testDELETE(c, s.hardDeleteProjectMuxWithProvider(provider), hardDeleteProjectHooksTestURL)
+	s.ExpectSuccessResponse(c, resp, "")
+	c.Assert(capturedProject, Equals, "project")
+}
+
+func (s *suite) Test_HardDeleteProjectHandler_fails_if_HardDeleteProject_fails(c *C) {
+	provider := &projectHandlerProvider{
+		HardDeleteProject: func(project string) error {
+			return types.NotFound
+		},
+	}
+	resp := s.testDELETE(c, s.hardDeleteProjectMuxWithProvider(provider), hardDeleteProjectHooksTestURL)
+	s.ExpectErrorResponse(c, resp, 404, "")
 }
