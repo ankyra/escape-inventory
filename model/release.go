@@ -27,7 +27,7 @@ import (
 	. "github.com/ankyra/escape-inventory/dao/types"
 )
 
-func ensureProjectExists(project string) error {
+func ensureProjectExists(project, username string) error {
 	prj, err := dao.GetProject(project)
 	if err == nil {
 		return nil
@@ -36,7 +36,10 @@ func ensureProjectExists(project string) error {
 		return err
 	}
 	prj = NewProject(project)
-	return dao.AddProject(prj)
+	if err := dao.AddProject(prj); err != nil {
+		return err
+	}
+	return AddCreateProjectFeedEvent(project, username)
 }
 
 func updateApp(app *Application, metadata *core.ReleaseMetadata, byUser string, uploadedAt time.Time) {
@@ -92,7 +95,7 @@ func AddReleaseByUser(project, metadataJson, uploadUser string) (*core.ReleaseMe
 	if release != nil {
 		return nil, NewUserError(fmt.Errorf("Release %s already exists", releaseId))
 	}
-	if err := ensureProjectExists(project); err != nil {
+	if err := ensureProjectExists(project, uploadUser); err != nil {
 		return nil, err
 	}
 	result := NewRelease(NewApplication(project, metadata.Name), metadata)
