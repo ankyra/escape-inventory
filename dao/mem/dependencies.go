@@ -21,7 +21,10 @@ func (a *dao) SetDependencies(release *Release, depends []*Dependency) error {
 }
 
 func (a *dao) GetDependencies(release *Release) ([]*Dependency, error) {
-	r := a.releases[release]
+	r, ok := a.releases[release]
+	if !ok {
+		return []*Dependency{}, nil
+	}
 	return r.Dependencies, nil
 }
 

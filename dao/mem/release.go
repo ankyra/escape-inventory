@@ -57,7 +57,10 @@ func (a *dao) GetAllReleases() ([]*Release, error) {
 }
 
 func (a *dao) GetPackageURIs(release *Release) ([]string, error) {
-	r := a.releases[release]
+	r, ok := a.releases[release]
+	if !ok {
+		return []string{}, nil
+	}
 	return r.Packages, nil
 }
 

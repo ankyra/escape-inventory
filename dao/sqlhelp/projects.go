@@ -142,6 +142,15 @@ func (s *SQLHelper) HardDeleteProject(project string) error {
 	if err := s.PrepareAndExec(s.HardDeleteProjectACLQuery, project); err != nil {
 		return err
 	}
+	if err := s.PrepareAndExec(s.HardDeleteProjectUnitSubscriptions, project); err != nil {
+		return err
+	}
+	if err := s.PrepareAndExec(s.HardDeleteProjectReleaseDependenciesQuery, project); err != nil {
+		return err
+	}
+	if err := s.PrepareAndExec(s.HardDeleteProjectPackageURIsQuery, project); err != nil {
+		return err
+	}
 	if err := s.PrepareAndExec(s.HardDeleteProjectReleasesQuery, project); err != nil {
 		return err
 	}

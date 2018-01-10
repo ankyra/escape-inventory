@@ -90,6 +90,22 @@ func (a *dao) HardDeleteProject(project string) error {
 	if !exists {
 		return NotFound
 	}
+	toDelete := []*Application{}
+	for app, _ := range a.subscriptions {
+		if app.Project == project {
+			toDelete = append(toDelete, app)
+		}
+	}
+	for _, i := range toDelete {
+		delete(a.subscriptions, i)
+	}
+	for _, app := range a.projects[project] {
+		delete(a.applicationHooks, app.App)
+		for _, rel := range a.apps[app.App].Releases {
+			delete(a.releases, rel.Release)
+		}
+		delete(a.apps, app.App)
+	}
 	delete(a.projectMetadata, project)
 	delete(a.projectHooks, prj)
 	delete(a.projects, project)

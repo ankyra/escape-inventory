@@ -61,11 +61,14 @@ type SQLHelper struct {
 	FeedEventsByGroupsPageQuery string
 	AddFeedEventQuery           string
 
-	HardDeleteProjectReleasesQuery     string
-	HardDeleteProjectFeedEventsQuery   string
-	HardDeleteProjectACLQuery          string
-	HardDeleteProjectApplicationsQuery string
-	HardDeleteProjectQuery             string
+	HardDeleteProjectPackageURIsQuery         string
+	HardDeleteProjectUnitSubscriptions        string
+	HardDeleteProjectReleaseDependenciesQuery string
+	HardDeleteProjectReleasesQuery            string
+	HardDeleteProjectFeedEventsQuery          string
+	HardDeleteProjectACLQuery                 string
+	HardDeleteProjectApplicationsQuery        string
+	HardDeleteProjectQuery                    string
 }
 
 func (s *SQLHelper) ReadRowsIntoStringArray(rows *sql.Rows) ([]string, error) {
