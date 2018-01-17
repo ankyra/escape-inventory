@@ -70,8 +70,8 @@ func NewPostgresDAO(url string) (DAO, error) {
 
 		GetApplicationQuery: `SELECT name, project, description, latest_version, logo, uploaded_by, uploaded_at 
 							     FROM application WHERE project = $1 AND name = $2`,
-		AddApplicationQuery: `INSERT INTO application(name, project, description, latest_version, logo)
-						      VALUES ($1, $2, $3, $4, $5)`,
+		AddApplicationQuery: `INSERT INTO application(name, project, description, latest_version, logo, uploaded_by, uploaded_at)
+						      VALUES ($1, $2, $3, $4, $5, $6, $7)`,
 		UpdateApplicationQuery: `UPDATE application 
 								 SET description = $1, latest_version = $2, logo = $3,
                                      uploaded_by = $4, uploaded_at = $5
