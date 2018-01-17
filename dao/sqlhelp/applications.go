@@ -14,7 +14,9 @@ func (s *SQLHelper) AddApplication(app *Application) error {
 		app.Project,
 		app.Description,
 		app.LatestVersion,
-		app.Logo)
+		app.Logo,
+		app.UploadedBy,
+		app.UploadedAt.Unix())
 }
 func (s *SQLHelper) UpdateApplication(app *Application) error {
 	return s.PrepareAndExecUpdate(s.UpdateApplicationQuery,
