@@ -141,7 +141,7 @@ func validate(m *ReleaseMetadata) error {
 	if m.Project == "" {
 		m.Project = "_"
 	}
-	if err := validateName(m.Project); m.Project != "_" && err != nil {
+	if err := ValidateProjectName(m.Project); err != nil {
 		return err
 	}
 	if m.ApiVersion <= 0 || m.ApiVersion > CurrentApiVersion {
@@ -198,6 +198,9 @@ func validateName(name string) error {
 }
 
 func ValidateProjectName(name string) error {
+	if name == "_" {
+		return nil
+	}
 	return validateName(name)
 }
 

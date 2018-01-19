@@ -35,6 +35,9 @@ func ensureProjectExists(project, username string) error {
 	if err != NotFound {
 		return err
 	}
+	if err := core.ValidateProjectName(project); err != nil {
+		return NewUserError(err)
+	}
 	prj = NewProject(project)
 	if err := dao.AddProject(prj); err != nil {
 		return err

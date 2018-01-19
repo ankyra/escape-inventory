@@ -17,6 +17,8 @@ limitations under the License.
 package model
 
 import (
+	"fmt"
+
 	"github.com/ankyra/escape-inventory/dao"
 	"github.com/ankyra/escape-inventory/dao/types"
 	. "gopkg.in/check.v1"
@@ -63,6 +65,14 @@ func (s *releaseSuite) Test_AddRelease_Creates_Project_Metadata(c *C) {
 	prj, err := dao.GetProject("test")
 	c.Assert(err, IsNil)
 	c.Assert(prj.Name, Equals, "test")
+}
+
+func (s *releaseSuite) Test_AddRelease_Creates_Project_Metadata_fails_if_invalid_project_name(c *C) {
+	_, err := dao.GetProject("invalid$")
+	c.Assert(err, Equals, types.NotFound)
+
+	_, err = AddRelease("invalid$", `{"name": "rel-test", "version": "0"}`)
+	c.Assert(err, DeepEquals, NewUserError(fmt.Errorf("Invalid name 'invalid$'")))
 }
 
 func (s *releaseSuite) Test_AddRelease_Creates_Application_Metadata(c *C) {
