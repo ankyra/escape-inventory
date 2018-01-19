@@ -163,7 +163,7 @@ func _13_release_metadata_blobUpSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "13_release_metadata_blob.up.sql", size: 10, mode: os.FileMode(436), modTime: time.Unix(1516291847, 0)}
+	info := bindataFileInfo{name: "13_release_metadata_blob.up.sql", size: 10, mode: os.FileMode(436), modTime: time.Unix(1516291993, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }

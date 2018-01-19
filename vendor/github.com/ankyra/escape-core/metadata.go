@@ -197,6 +197,10 @@ func validateName(name string) error {
 	return nil
 }
 
+func ValidateProjectName(name string) error {
+	return validateName(name)
+}
+
 func (m *ReleaseMetadata) AddExtension(releaseId string) {
 	for _, e := range m.Extends {
 		if e.ReleaseId == releaseId {

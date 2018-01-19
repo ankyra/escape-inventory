@@ -19,6 +19,7 @@ package model
 import (
 	"fmt"
 
+	core "github.com/ankyra/escape-core"
 	"github.com/ankyra/escape-inventory/dao"
 	"github.com/ankyra/escape-inventory/dao/types"
 )
@@ -54,6 +55,9 @@ func GetProjectHooks(project string) (types.Hooks, error) {
 func AddProject(p *types.Project, username string) error {
 	if p.Name == "" {
 		return NewUserError(fmt.Errorf("Missing name"))
+	}
+	if err := core.ValidateProjectName(p.Name); err != nil {
+		return NewUserError(err)
 	}
 	err := dao.AddProject(p)
 	if err != nil {
