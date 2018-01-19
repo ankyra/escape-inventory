@@ -90,6 +90,14 @@ func (s *releaseSuite) Test_AddRelease_Creates_Application_Metadata(c *C) {
 	c.Assert(app.LatestVersion, Equals, "0")
 }
 
+func (s *releaseSuite) Test_AddRelease_Creates_Application_Metadata_fails_if_invalid_app_name(c *C) {
+	_, err := dao.GetApplication("test", "up/test")
+	c.Assert(err, Equals, types.NotFound)
+
+	_, err = AddRelease("test", `{"name": "up/test", "version": "0", "description": "testing", "project": "test"}`)
+	c.Assert(err, DeepEquals, NewUserError(fmt.Errorf("Invalid name 'up/test'")))
+}
+
 func (s *releaseSuite) Test_AddRelease_Updates_Application_Metadata(c *C) {
 	_, err := dao.GetApplication("test", "up-test")
 	c.Assert(err, Equals, types.NotFound)
