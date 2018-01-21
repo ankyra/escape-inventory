@@ -287,9 +287,17 @@ func (m *ReleaseMetadata) SetConsumes(c []string) {
 
 func (m *ReleaseMetadata) GetConsumes(stage string) []string {
 	result := []string{}
+	for _, c := range m.GetConsumerConfig(stage) {
+		result = append(result, c.Name)
+	}
+	return result
+}
+
+func (m *ReleaseMetadata) GetConsumerConfig(stage string) []*ConsumerConfig {
+	result := []*ConsumerConfig{}
 	for _, c := range m.Consumes {
 		if c.InScope(stage) {
-			result = append(result, c.Name)
+			result = append(result, c)
 		}
 	}
 	return result
