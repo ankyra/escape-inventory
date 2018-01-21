@@ -1,11 +1,9 @@
 # Escape Inventory
 
-[![Build status](https://circleci.com/gh/ankyra/escape-inventory.svg?style=shield&circle-token=8423f6a5c860934d1c911eaedcca6ab21ddfac51)](https://circleci.com/gh/ankyra/escape) 
+[![Build status](https://circleci.com/gh/ankyra/escape-inventory.svg?style=shield&circle-token=8423f6a5c860934d1c911eaedcca6ab21ddfac51)](https://circleci.com/gh/ankyra/escape-inventory) 
 
 This is the open source version of the Escape Inventory. The client can be found 
 [here](https://github.com/ankyra/escape).
-
-![Escape Logo](/logo.png)
 
 ## Downloads
 
