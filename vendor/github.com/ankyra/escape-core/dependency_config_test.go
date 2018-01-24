@@ -26,7 +26,7 @@ func (s *metadataSuite) Test_NewDependencyConfig_Validate_happy_path(c *C) {
 	dep.BuildMapping = nil
 	dep.DeployMapping = nil
 	c.Assert(dep.Validate(metadata), IsNil)
-	c.Assert(dep.VariableName, Equals, "my-dependency")
+	c.Assert(dep.VariableName, Equals, "_/my-dependency")
 	c.Assert(dep.DeploymentName, Equals, "_/my-dependency")
 	c.Assert(dep.Project, Equals, "_")
 	c.Assert(dep.Name, Equals, "my-dependency")
@@ -46,6 +46,7 @@ func (s *metadataSuite) Test_NewDependencyConfig_Validate_happy_path_set_variabl
 	dep.DeployMapping = nil
 	c.Assert(dep.Validate(metadata), IsNil)
 	c.Assert(dep.VariableName, Equals, "my-variable")
+	c.Assert(dep.DeploymentName, Equals, "my-variable")
 }
 
 func (s *metadataSuite) Test_NewDependencyConfig_Validate_fails_if_invalid_dependency_string(c *C) {
@@ -78,6 +79,47 @@ func (s *metadataSuite) Test_NewDependencyConfig_fails_if_version_needs_resolvin
 		dep.BuildMapping = nil
 		dep.DeployMapping = nil
 		c.Assert(dep.Validate(metadata), DeepEquals, DependencyNeedsResolvingError(normalized))
+	}
+}
+
+func (s *metadataSuite) Test_NewDependencyConfig_EnsureConfigIsParsed(c *C) {
+	cases := [][]string{
+		[]string{"my-dependency-v1.0", "_/my-dependency-v1.0", "_", "my-dependency", "1.0", ""},
+		[]string{"_/my-dependency-v1.0", "_/my-dependency-v1.0", "_", "my-dependency", "1.0", ""},
+		[]string{"  _/my-dependency-v1.0  ", "_/my-dependency-v1.0", "_", "my-dependency", "1.0", ""},
+		[]string{"my-dependency-v1.0 as dep", "_/my-dependency-v1.0", "_", "my-dependency", "1.0", "dep"},
+	}
+	for _, test := range cases {
+		dep := NewDependencyConfig(test[0])
+		err := dep.EnsureConfigIsParsed()
+		c.Assert(err, IsNil)
+		c.Assert(dep.ReleaseId, Equals, test[1])
+		c.Assert(dep.Project, Equals, test[2])
+		c.Assert(dep.Name, Equals, test[3])
+		c.Assert(dep.Version, Equals, test[4])
+		c.Assert(dep.VariableName, Equals, test[5])
+		c.Assert(dep.DeploymentName, Equals, "")
+	}
+}
+
+func (s *metadataSuite) Test_NewDependencyConfig_EnsureConfigIsParsed_Validate(c *C) {
+	cases := [][]string{
+		[]string{"my-dependency-v1.0", "_/my-dependency-v1.0", "_", "my-dependency", "1.0", "_/my-dependency", "_/my-dependency"},
+		[]string{"_/my-dependency-v1.0", "_/my-dependency-v1.0", "_", "my-dependency", "1.0", "_/my-dependency", "_/my-dependency"},
+		[]string{"  _/my-dependency-v1.0  ", "_/my-dependency-v1.0", "_", "my-dependency", "1.0", "_/my-dependency", "_/my-dependency"},
+		[]string{"my-dependency-v1.0 as dep", "_/my-dependency-v1.0", "_", "my-dependency", "1.0", "dep", "dep"},
+	}
+	for _, test := range cases {
+		dep := NewDependencyConfig(test[0])
+		err := dep.EnsureConfigIsParsed()
+		c.Assert(err, IsNil)
+		c.Assert(dep.Validate(nil), IsNil)
+		c.Assert(dep.ReleaseId, Equals, test[1])
+		c.Assert(dep.Project, Equals, test[2])
+		c.Assert(dep.Name, Equals, test[3])
+		c.Assert(dep.Version, Equals, test[4])
+		c.Assert(dep.VariableName, Equals, test[5])
+		c.Assert(dep.DeploymentName, Equals, test[6])
 	}
 }
 

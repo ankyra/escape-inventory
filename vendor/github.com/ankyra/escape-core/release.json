@@ -1,21 +1,21 @@
 {
-   "api_version": 9,
-   "built_with_core_version": "0.9.9",
-   "built_with_escape_version": "0.22.8",
+   "api_version": 10,
+   "built_with_core_version": "0.10.11",
+   "built_with_escape_version": "0.22.9",
    "description": "Core library containing datastructures for working with Release Metadata, State and the Escape Scripting Language.\nPlease see https://escape.ankyra.io for the full documentation.",
    "files": {
       "LICENSE": "2a944942e1496af1886903d274dedb13",
       "README.md": "72bda3a0e4c579e06e1f459d53eb2076",
       "consumer.go": "f13ce04bc16ce249a06d05d7fa0658db",
       "consumer_test.go": "e49077a8242e9e16a2b90ae6468fb886",
-      "core.go": "0fd02485cdd8dd9c522dcd224fda9791",
+      "core.go": "66ee5107e30b96b4c74d4f4f17491390",
       "core.go.tpl": "4099a7b2c6c7798799ea2819f8cf5c27",
       "dependency.go": "824ac7f427ead64864ee36bc8431564a",
-      "dependency_config.go": "78193feb58903599e9fe84c47ec77769",
-      "dependency_config_test.go": "fdfa42eff6fd0d3643467fd49300d1b9",
+      "dependency_config.go": "c46c4ae749505ceea1a3ff4c02e670e2",
+      "dependency_config_test.go": "136b789c3b591d5a414f9b116b51d8c6",
       "dependency_test.go": "548fcc9b10d415f8fe5eb6877a112889",
       "diff.go": "0696c416c5b7989e9ec9b252ace090ea",
-      "diff_test.go": "46655d79b542e5b511ca62aa57aea659",
+      "diff_test.go": "b498c8a357f2f2a89248c4295297a159",
       "docs/generate_pages.go": "6f9a2bea4ba36801d27c29dace654dd6",
       "docs/generate_stdlib_docs.go": "672a40c6b105e634e880d5447d5b30f0",
       "docs/generated/dependencies.md": "7f86f757d8bfc38617e792c96c166500",
@@ -24,15 +24,15 @@
       "docs/generated/extensions.md": "8fbf06d246023679e41159a4041ced0d",
       "docs/generated/input-and-output-variables.md": "9a626703807de0628458e4262d883320",
       "docs/generated/providers-and-consumers.md": "3a6aa96daca4a6bb92c3b6efa3e46389",
-      "docs/generated/stdlib.md": "64e758b96a42f2e0adfb9b586ba7c445",
+      "docs/generated/stdlib.md": "3163ed386b3f69462c81f24f93470511",
       "docs/generated/templates.md": "fffaa52cdb246bc5dd9471c3e425f894",
       "docs/scripting_language.md": "79ffa91ba9dad432b9c3810b474036d8",
       "download_config.go": "e1f64beb02a3f1825d428280976d209a",
       "errand.go": "9a6714f0143390faa5644c8d6f6b735c",
       "errand_test.go": "de80890ce5f1714da94804eef7d7699e",
       "extension_config.go": "aac1efa292b8856aade1f0804ccb8058",
-      "metadata.go": "84ec82a34a2ff32f3d7b6d4387d3c8a8",
-      "metadata_test.go": "35abdd1eb0d0645cf9181058012a889d",
+      "metadata.go": "608ddb9ae26f6801d152e5cca2058836",
+      "metadata_test.go": "1931d311c95f23877ed2f3fabc247080",
       "parsers/consumer.go": "6ac33725157930093aceb29f4db3fbdb",
       "parsers/consumer_test.go": "4214109154a387c4142bc9ac4ad6a009",
       "parsers/dependency.go": "be3bf74de4855944993e567225767e22",
@@ -65,8 +65,8 @@
       "state/environment_test.go": "4c9c78f377a054737e300056568880d9",
       "state/project.go": "4c45fc909275c9fe566e5f25bbff9971",
       "state/project_test.go": "8ce2ec92c727ddc08fa68f549a60f708",
-      "state/script.go": "5700b89abd3c70d24625d74ba816c0ae",
-      "state/script_test.go": "459374afac3e8e4cef46b882bda098cb",
+      "state/script.go": "35a2cdee7cde63e23ee35c1b9df319a9",
+      "state/script_test.go": "c02a24e000069ac7824b6c298844ca6f",
       "state/stage.go": "a4b15b6fbc39710736454fb4aa511759",
       "state/status.go": "bdfa737a10988887037cc878bd04f3b7",
       "state/status_test.go": "08b9ad2033b1170f6ec4a9b06d0fe137",
@@ -144,13 +144,13 @@
    "name": "escape-core",
    "repository": "git@github.com:ankyra/escape-core.git",
    "branch": "master",
-   "git_revision": "57e70431399fd61d33569234222961653b12fee9",
-   "revision_message": "Add EnsureConfigIsParsed and NeedsResolving methods to DependencyConfig",
+   "git_revision": "8e811f10aee9fc21c0e1825abcdbe9ae0380e07d",
+   "revision_message": "Set default VariableName = DeploymentName.",
    "revision_author": "Bart Spaans \u003cbart.spaans@gmail.com\u003e",
    "metadata": {
       "release_metadata_api_version": "10"
    },
-   "version": "0.10.5",
+   "version": "0.10.12",
    "consumes": [],
    "downloads": null,
    "depends": [],
@@ -335,8 +335,5 @@
             "versionless_release": "$this.versionless_release"
          }
       }
-   ],
-   "variable_context": {
-      "extension-golang-binary": "_/extension-golang-binary-v0.0.24"
-   }
+   ]
 }

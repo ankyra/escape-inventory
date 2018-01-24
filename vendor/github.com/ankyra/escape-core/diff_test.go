@@ -69,10 +69,6 @@ func (s *metadataSuite) Test_Diff_maps(c *C) {
 		[]interface{}{"Metadata", oldDict, newDict, `Change Metadata["newfile.txt"] from '123' to '123123123'`},
 		[]interface{}{"Metadata", emptyDict, newDict, `Add 'newfile.txt' to Metadata`},
 		[]interface{}{"Metadata", oldDict, emptyDict, `Remove 'newfile.txt' from Metadata`},
-
-		[]interface{}{"VariableCtx", oldDict, newDict, `Change VariableCtx["newfile.txt"] from '123' to '123123123'`},
-		[]interface{}{"VariableCtx", emptyDict, newDict, `Add 'newfile.txt' to VariableCtx`},
-		[]interface{}{"VariableCtx", oldDict, emptyDict, `Remove 'newfile.txt' from VariableCtx`},
 	}
 	for _, test := range testCases {
 		m1 := NewReleaseMetadata("test", "1.0")
