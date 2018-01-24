@@ -53,7 +53,7 @@ func (s *appSuite) Test_UploadPackage_happy_path(c *C) {
 func (s *appSuite) Test_UploadPackage_fails_on_invalid_release_id(c *C) {
 	err := UploadPackage("project", "asdoijasdoijasd", nil)
 	c.Assert(err, Not(IsNil))
-	c.Assert(err.Error(), Equals, "Invalid release format: asdoijasdoijasd")
+	c.Assert(err.Error(), Equals, "Invalid release format: asdoijasdoijasd.")
 }
 
 func (s *appSuite) Test_UploadPackage_fails_on_release_id_that_needs_resolving(c *C) {

@@ -1,5 +1,5 @@
 /*
-Copyright 2017 Ankyra
+Copyright 2017, 2018 Ankyra
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -127,7 +127,7 @@ func (s *metadataSuite) Test_validate(c *C) {
 		`{"name": "1"}`:                                             "Invalid name '1'",
 		`{"name": "test"}`:                                          "Missing version field in release metadata",
 		`{"name": "test", "version": "1", "api_version": 1000}`:     "The release metadata is compiled with a version of Escape targetting API version v1000, but this build supports up to v" + strconv.Itoa(CurrentApiVersion),
-		`{"name": "name", "version": "@ASD"}`:                       "Invalid version format: @ASD",
+		`{"name": "name", "version": "@ASD"}`:                       "Invalid version string '@ASD'.",
 		`{"name": "name", "version": "1", "inputs": [{"id": ""}]}`:  "Variable object is missing an 'id'",
 		`{"name": "name", "version": "1", "outputs": [{"id": ""}]}`: "Variable object is missing an 'id'",
 	}
@@ -312,4 +312,12 @@ func (s *metadataSuite) Test_AddConsumes(c *C) {
 	m.AddConsumes(dep2)
 	c.Assert(m.GetConsumes("build"), HasLen, 2, Commentf("Most scopes win"))
 	c.Assert(m.GetConsumes("deploy"), HasLen, 2)
+	dep3 := NewConsumerConfig("deploy-scope")
+	dep3.VariableName = "t"
+	m.AddConsumes(dep3)
+	c.Assert(m.GetConsumes("build"), HasLen, 3, Commentf("Variable name is part of key"))
+	c.Assert(m.GetConsumes("deploy"), HasLen, 3)
+	m.AddConsumes(dep3)
+	c.Assert(m.GetConsumes("build"), HasLen, 3)
+	c.Assert(m.GetConsumes("deploy"), HasLen, 3)
 }

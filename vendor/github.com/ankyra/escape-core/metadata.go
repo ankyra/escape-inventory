@@ -1,5 +1,5 @@
 /*
-Copyright 2017 Ankyra
+Copyright 2017, 2018 Ankyra
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -269,7 +269,7 @@ func (m *ReleaseMetadata) AddOutputVariable(output *variables.Variable) {
 
 func (m *ReleaseMetadata) AddConsumes(c *ConsumerConfig) {
 	for _, consumer := range m.Consumes {
-		if consumer.Name == c.Name {
+		if consumer.Name == c.Name && consumer.VariableName == c.VariableName {
 			if len(consumer.Scopes) < len(c.Scopes) {
 				consumer.Scopes = c.Scopes
 			}
@@ -379,7 +379,11 @@ func (m *ReleaseMetadata) AddDependency(dep *DependencyConfig) {
 }
 
 func (m *ReleaseMetadata) AddDependencyFromString(dep string) {
-	m.Depends = append(m.Depends, NewDependencyConfig(dep))
+	cfg := NewDependencyConfig(dep)
+	if err := cfg.Validate(m); err != nil {
+		panic(err)
+	}
+	m.Depends = append(m.Depends, cfg)
 }
 
 func (m *ReleaseMetadata) SetDependencies(deps []string) {

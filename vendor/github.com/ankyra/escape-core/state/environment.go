@@ -1,5 +1,5 @@
 /*
-Copyright 2017 Ankyra
+Copyright 2017, 2018 Ankyra
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -18,7 +18,16 @@ package state
 
 import (
 	"fmt"
+	"strings"
 )
+
+func DeploymentDoesNotExistError(deploymentName string) error {
+	return fmt.Errorf("Deployment '%s' does not exist", deploymentName)
+}
+
+func DeploymentPathResolveError(stage, deploymentPath, deploymentName string) error {
+	return fmt.Errorf("Failed to resolve deployment path '%s': the deployment '%s' could not be found in the %s stage", deploymentPath, deploymentName, stage)
+}
 
 type EnvironmentState struct {
 	Name        string                      `json:"name"`
@@ -72,7 +81,28 @@ func (e *EnvironmentState) ValidateAndFix(name string, project *ProjectState) er
 func (e *EnvironmentState) LookupDeploymentState(deploymentName string) (*DeploymentState, error) {
 	val, ok := e.Deployments[deploymentName]
 	if !ok {
-		return nil, fmt.Errorf("Deployment '%s' does not exist", deploymentName)
+		return nil, DeploymentDoesNotExistError(deploymentName)
+	}
+	return val, nil
+}
+
+func (e *EnvironmentState) ResolveDeploymentPath(stage, deploymentPath string) (*DeploymentState, error) {
+	parts := strings.Split(deploymentPath, ":")
+	if len(parts) == 0 {
+		return nil, DeploymentDoesNotExistError(deploymentPath)
+	}
+	deploymentName := parts[0]
+	val, ok := e.Deployments[deploymentName]
+	if !ok {
+		return nil, DeploymentDoesNotExistError(deploymentPath)
+	}
+	for _, p := range parts[1:] {
+		newVal, err := val.GetDeployment(stage, p)
+		if err != nil {
+			return nil, DeploymentPathResolveError(stage, deploymentPath, p)
+		}
+		val = newVal
+		stage = "deploy"
 	}
 	return val, nil
 }

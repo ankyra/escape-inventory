@@ -1,5 +1,5 @@
 /*
-Copyright 2017 Ankyra
+Copyright 2017, 2018 Ankyra
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -250,11 +250,6 @@ func (s *metadataSuite) Test_Diff_Slices(c *C) {
 		[]interface{}{"Provides", []string{"test"}, []string{}, `Remove 'test' from Provides`},
 		[]interface{}{"Provides", []string{}, []string{"test"}, `Add 'test' to Provides`},
 		[]interface{}{"Provides", []string{"test"}, []string{"kubernetes"}, `Change Provides[0].Name from 'test' to 'kubernetes'`},
-
-		[]interface{}{"Depends", []string{"test"}, []string{}, `Remove 'test' from Depends`},
-		[]interface{}{"Depends", []string{}, []string{"test"}, `Add 'test' to Depends`},
-		[]interface{}{"Depends", []string{"test"}, []string{"kubernetes"}, `Change Depends[0].ReleaseId from 'test' to 'kubernetes'`},
-
 		[]interface{}{"Extends", []string{"test"}, []string{}, `Remove 'test' from Extends`},
 		[]interface{}{"Extends", []string{}, []string{"test"}, `Add 'test' to Extends`},
 		[]interface{}{"Extends", []string{"test"}, []string{"kubernetes"}, `Change Extends[0].ReleaseId from 'test' to 'kubernetes'`},
@@ -282,6 +277,23 @@ func (s *metadataSuite) Test_Diff_Slices(c *C) {
 		}
 		changes := Diff(m1, m2)
 		c.Assert(changes, HasLen, 1, Commentf(test[3].(string)))
+		c.Assert(changes[0].ToString(), DeepEquals, test[3])
+	}
+}
+
+func (s *metadataSuite) Test_Diff_Depends(c *C) {
+	testCases := [][]interface{}{
+		[]interface{}{"Depends", []string{"test-v1.0"}, []string{}, `Remove '_/test-v1.0' from Depends`, 1},
+		[]interface{}{"Depends", []string{}, []string{"test-v1.0"}, `Add '_/test-v1.0' to Depends`, 1},
+		[]interface{}{"Depends", []string{"test-v1.0"}, []string{"kubernetes-v1.0"}, `Change Depends[0].ReleaseId from '_/test-v1.0' to '_/kubernetes-v1.0'`, 4},
+	}
+	for _, test := range testCases {
+		m1 := NewReleaseMetadata("test", "1.0")
+		m2 := NewReleaseMetadata("test", "1.0")
+		m1.SetDependencies(test[1].([]string))
+		m2.SetDependencies(test[2].([]string))
+		changes := Diff(m1, m2)
+		c.Assert(changes, HasLen, test[4], Commentf(test[3].(string)))
 		c.Assert(changes[0].ToString(), DeepEquals, test[3])
 	}
 }

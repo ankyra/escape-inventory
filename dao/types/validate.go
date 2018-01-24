@@ -674,7 +674,7 @@ func Validate_Dependencies(dao DAO, c *C) {
 
 	app := NewApplication("_", "dao-parent")
 	dao.AddApplication(app)
-	metadataJson := `{"name": "dao-parent", "version": "1", "depends": [{"id": "_/dao-val-v1", "scopes": ["build"]}]}`
+	metadataJson := `{"name": "dao-parent", "version": "1", "depends": [{"release_id": "_/dao-val-v1", "scopes": ["build"]}]}`
 	metadata, err := core.NewReleaseMetadataFromJsonString(metadataJson)
 	c.Assert(err, IsNil)
 	releaseParent := NewRelease(app, metadata)
@@ -718,7 +718,7 @@ func Validate_DependenciesByGroups(dao DAO, c *C) {
 
 	app := NewApplication("_", "dao-parent")
 	dao.AddApplication(app)
-	metadataJson := `{"name": "dao-parent", "version": "1", "depends": [{"id": "_/dao-val-v1", "scopes": ["build"]}]}`
+	metadataJson := `{"name": "dao-parent", "version": "1", "depends": [{"release_id": "_/dao-val-v1", "scopes": ["build"]}]}`
 	metadata, err := core.NewReleaseMetadataFromJsonString(metadataJson)
 	c.Assert(err, IsNil)
 	releaseParent := NewRelease(app, metadata)
