@@ -68,7 +68,10 @@ func ensureApplicationExists(project, byUser string, metadata *core.ReleaseMetad
 	}
 	app = NewApplication(project, name)
 	updateApp(app, metadata, byUser, uploadAt)
-	return dao.AddApplication(app)
+	if err := dao.AddApplication(app); err != nil {
+		return err
+	}
+	return AddNewApplicationFeedEvent(project, name, byUser)
 }
 
 func AddRelease(project, metadataJson string) (*core.ReleaseMetadata, error) {
