@@ -248,6 +248,7 @@ type DAO interface {
 
 	GetFeedPage(pageSize int) ([]*FeedEvent, error)
 	GetProjectFeedPage(project string, pageSize int) ([]*FeedEvent, error)
+	GetApplicationFeedPage(project, application string, pageSize int) ([]*FeedEvent, error)
 	GetFeedPageByGroups(readGroups []string, pageSize int) ([]*FeedEvent, error)
 	AddFeedEvent(event *FeedEvent) error
 

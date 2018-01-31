@@ -26,6 +26,14 @@ func (s *SQLHelper) GetProjectFeedPage(project string, pageSize int) ([]*FeedEve
 	return s.scanFeedEvents(rows)
 }
 
+func (s *SQLHelper) GetApplicationFeedPage(project, application string, pageSize int) ([]*FeedEvent, error) {
+	rows, err := s.PrepareAndQuery(s.ApplicationFeedEventPageQuery, project, application, pageSize)
+	if err != nil {
+		return nil, err
+	}
+	return s.scanFeedEvents(rows)
+}
+
 func (s *SQLHelper) GetFeedPageByGroups(readGroups []string, pageSize int) ([]*FeedEvent, error) {
 	starFound := false
 	for _, g := range readGroups {
@@ -72,6 +80,7 @@ func (s *SQLHelper) AddFeedEvent(event *FeedEvent) error {
 		event.Type,
 		event.Username,
 		event.Project,
+		event.Application,
 		event.Timestamp.Unix(),
 		string(data))
 }
@@ -80,15 +89,16 @@ func (s *SQLHelper) scanFeedEvents(rows *sql.Rows) ([]*FeedEvent, error) {
 	defer rows.Close()
 	result := []*FeedEvent{}
 	for rows.Next() {
-		var id, eventType, username, project, data string
+		var id, eventType, username, project, application, data string
 		var uploadedAt int64
-		if err := rows.Scan(&id, &eventType, &username, &project, &uploadedAt, &data); err != nil {
+		if err := rows.Scan(&id, &eventType, &username, &project, &application, &uploadedAt, &data); err != nil {
 			return nil, err
 		}
 		ev := &FeedEvent{}
 		ev.ID = id
 		ev.Type = eventType
 		ev.Project = project
+		ev.Application = application
 		ev.Username = username
 		ev.Timestamp = time.Unix(uploadedAt, 0)
 		ev.Data = map[string]interface{}{}

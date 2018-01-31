@@ -8,6 +8,7 @@
 // dao/postgres/schemas/15_metrics_user_id.down.sql
 // dao/postgres/schemas/15_metrics_user_id.up.sql
 // dao/postgres/schemas/16_feeds.up.sql
+// dao/postgres/schemas/17_feed_application.up.sql
 // dao/postgres/schemas/1_initial_schema.down.sql
 // dao/postgres/schemas/1_initial_schema.up.sql
 // dao/postgres/schemas/2_project_metadata.down.sql
@@ -244,6 +245,26 @@ func _16_feedsUpSql() (*asset, error) {
 	}
 
 	info := bindataFileInfo{name: "16_feeds.up.sql", size: 186, mode: os.FileMode(436), modTime: time.Unix(1515498904, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var __17_feed_applicationUpSql = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x72\xf4\x09\x71\x0d\x52\x08\x71\x74\xf2\x71\x55\x48\x4b\x4d\x4d\x89\x4f\x2d\x4b\xcd\x2b\x29\x56\x70\x74\x71\x51\x70\xf6\xf7\x09\xf5\xf5\x53\x48\x2c\x28\xc8\xc9\x4c\x4e\x2c\xc9\xcc\xcf\x53\x08\x73\x0c\x72\xf6\x70\x0c\xd2\x30\x34\xb2\xd0\x54\x70\x71\x75\x73\x0c\xf5\x09\x51\x50\x57\xb7\xe6\x02\x04\x00\x00\xff\xff\xda\x32\xf7\x86\x48\x00\x00\x00")
+
+func _17_feed_applicationUpSqlBytes() ([]byte, error) {
+	return bindataRead(
+		__17_feed_applicationUpSql,
+		"17_feed_application.up.sql",
+	)
+}
+
+func _17_feed_applicationUpSql() (*asset, error) {
+	bytes, err := _17_feed_applicationUpSqlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "17_feed_application.up.sql", size: 72, mode: os.FileMode(436), modTime: time.Unix(1517440541, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -568,6 +589,7 @@ var _bindata = map[string]func() (*asset, error){
 	"15_metrics_user_id.down.sql": _15_metrics_user_idDownSql,
 	"15_metrics_user_id.up.sql": _15_metrics_user_idUpSql,
 	"16_feeds.up.sql": _16_feedsUpSql,
+	"17_feed_application.up.sql": _17_feed_applicationUpSql,
 	"1_initial_schema.down.sql": _1_initial_schemaDownSql,
 	"1_initial_schema.up.sql": _1_initial_schemaUpSql,
 	"2_project_metadata.down.sql": _2_project_metadataDownSql,
@@ -631,6 +653,7 @@ var _bintree = &bintree{nil, map[string]*bintree{
 	"15_metrics_user_id.down.sql": &bintree{_15_metrics_user_idDownSql, map[string]*bintree{}},
 	"15_metrics_user_id.up.sql": &bintree{_15_metrics_user_idUpSql, map[string]*bintree{}},
 	"16_feeds.up.sql": &bintree{_16_feedsUpSql, map[string]*bintree{}},
+	"17_feed_application.up.sql": &bintree{_17_feed_applicationUpSql, map[string]*bintree{}},
 	"1_initial_schema.down.sql": &bintree{_1_initial_schemaDownSql, map[string]*bintree{}},
 	"1_initial_schema.up.sql": &bintree{_1_initial_schemaUpSql, map[string]*bintree{}},
 	"2_project_metadata.down.sql": &bintree{_2_project_metadataDownSql, map[string]*bintree{}},

@@ -56,10 +56,11 @@ type SQLHelper struct {
 	GetMetricsByUserIDQuery      string
 	SetProjectCountMetricForUser string
 
-	FeedEventPageQuery          string
-	ProjectFeedEventPageQuery   string
-	FeedEventsByGroupsPageQuery string
-	AddFeedEventQuery           string
+	FeedEventPageQuery            string
+	ProjectFeedEventPageQuery     string
+	ApplicationFeedEventPageQuery string
+	FeedEventsByGroupsPageQuery   string
+	AddFeedEventQuery             string
 
 	HardDeleteProjectPackageURIsQuery         string
 	HardDeleteProjectUnitSubscriptions        string

@@ -32,7 +32,6 @@ func ValidateDAO(dao func() DAO, c *C) {
 	Validate_GetRelease_NotFound(dao(), c)
 	Validate_GetProjects(dao(), c)
 	Validate_ProjectMetadata(dao(), c)
-	Validate_HardDeleteProject(dao(), c)
 	Validate_GetProjectsByGroups(dao(), c)
 	Validate_ApplicationMetadata(dao(), c)
 	Validate_GetDownstreamHooks(dao(), c)
@@ -48,6 +47,8 @@ func ValidateDAO(dao func() DAO, c *C) {
 	Validate_DependenciesByGroups(dao(), c)
 	Validate_Metrics(dao(), c)
 	Validate_Feed(dao(), c)
+	Validate_ApplicationFeed(dao(), c)
+	Validate_HardDeleteProject(dao(), c)
 	Validate_WipeDatabase(dao(), c)
 }
 
@@ -798,6 +799,32 @@ func Validate_Feed(dao DAO, c *C) {
 	c.Assert(err, IsNil)
 	c.Assert(received, HasLen, 1)
 	c.Assert(received[0].Equals(events[0]), Equals, true, Commentf("expected '%s'; was '%s'", events[0], received[0]))
+}
+
+func Validate_ApplicationFeed(dao DAO, c *C) {
+	events := []*FeedEvent{
+		NewCreateProjectEvent("test1", "user"),
+		NewReleaseEvent("test1", "app", "1.0", "user"),
+		NewCreateProjectEvent("test2", "user"),
+		NewReleaseEvent("test2", "app", "1.2", "user"),
+		NewReleaseEvent("test1", "app", "1.2", "user"),
+		NewCreateProjectEvent("test3", "user"),
+		NewCreateApplicationEvent("test1", "app", "user"),
+	}
+	for _, ev := range events {
+		c.Assert(dao.AddFeedEvent(ev), IsNil)
+	}
+	received, err := dao.GetApplicationFeedPage("test1", "app", 3)
+	c.Assert(err, IsNil)
+	c.Assert(received, HasLen, 3)
+	expected := [][]*FeedEvent{
+		[]*FeedEvent{received[0], events[6]},
+		[]*FeedEvent{received[1], events[4]},
+		[]*FeedEvent{received[2], events[1]},
+	}
+	for i, exp := range expected {
+		c.Assert(exp[0].Equals(exp[1]), Equals, true, Commentf("%d item '%s' expected; was '%s'", i, exp[1], exp[0]))
+	}
 }
 
 func Validate_WipeDatabase(dao DAO, c *C) {

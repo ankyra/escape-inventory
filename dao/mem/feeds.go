@@ -22,6 +22,16 @@ func (a *dao) GetProjectFeedPage(project string, pageSize int) ([]*FeedEvent, er
 	return result, nil
 }
 
+func (a *dao) GetApplicationFeedPage(project, application string, pageSize int) ([]*FeedEvent, error) {
+	result := []*FeedEvent{}
+	for i := len(a.events) - 1; i >= 0 && len(result) < pageSize; i-- {
+		if a.events[i].Project == project && a.events[i].Application == application {
+			result = append(result, a.events[i])
+		}
+	}
+	return result, nil
+}
+
 func (a *dao) GetFeedPageByGroups(readGroups []string, pageSize int) ([]*FeedEvent, error) {
 	result := []*FeedEvent{}
 	for i := len(a.events) - 1; i >= 0 && len(result) < pageSize; i-- {

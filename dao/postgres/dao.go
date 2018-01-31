@@ -128,12 +128,14 @@ func NewPostgresDAO(url string) (DAO, error) {
 		CreateUserIDMetricsQuery:     `INSERT INTO metrics(user_id) VALUES($1)`,
 		GetMetricsByUserIDQuery:      `SELECT project_count FROM metrics WHERE user_id = $1`,
 		SetProjectCountMetricForUser: `UPDATE metrics SET project_count = $3 WHERE user_id = $1 AND project_count = $2`,
-		AddFeedEventQuery:            `INSERT INTO feed_events(event_type, username, project, timestamp, data) VALUES ($1, $2, $3, $4, $5)`,
-		FeedEventPageQuery: `SELECT id, event_type, username, project, timestamp, data 
+		AddFeedEventQuery:            `INSERT INTO feed_events(event_type, username, project, application, timestamp, data) VALUES ($1, $2, $3, $4, $5, $6)`,
+		FeedEventPageQuery: `SELECT id, event_type, username, project, application, timestamp, data 
 							 FROM feed_events ORDER BY id DESC LIMIT $1`,
-		ProjectFeedEventPageQuery: `SELECT id, event_type, username, project, timestamp, data 
+		ProjectFeedEventPageQuery: `SELECT id, event_type, username, project, application, timestamp, data 
 									 FROM feed_events WHERE project = $1 ORDER BY id DESC LIMIT $2`,
-		FeedEventsByGroupsPageQuery: `SELECT f.id, f.event_type, f.username, f.project, f.timestamp, f.data 
+		ApplicationFeedEventPageQuery: `SELECT id, event_type, username, project, application, timestamp, data 
+									 FROM feed_events WHERE project = $1 AND application = $2 ORDER BY id DESC LIMIT $3`,
+		FeedEventsByGroupsPageQuery: `SELECT f.id, f.event_type, f.username, f.project, f.application, f.timestamp, f.data 
 									  FROM feed_events AS f
 									  JOIN acl ON f.project = acl.project
 									  WHERE group_name `,

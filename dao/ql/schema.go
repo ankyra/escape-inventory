@@ -7,6 +7,7 @@
 // dao/ql/schemas/3_metrics_user_id.down.sql
 // dao/ql/schemas/3_metrics_user_id.up.sql
 // dao/ql/schemas/4_feeds.up.sql
+// dao/ql/schemas/5_feeds_application_field.up.sql
 // DO NOT EDIT!
 
 package ql
@@ -209,7 +210,27 @@ func _4_feedsUpSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "4_feeds.up.sql", size: 247, mode: os.FileMode(436), modTime: time.Unix(1515501738, 0)}
+	info := bindataFileInfo{name: "4_feeds.up.sql", size: 247, mode: os.FileMode(436), modTime: time.Unix(1517441980, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var __5_feeds_application_fieldUpSql = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\xdc\x53\xcd\x6a\xf3\x30\x10\xbc\xeb\x29\x86\x9c\x62\xf0\xe1\xbb\xfb\xe4\x2f\x96\xc1\xe0\x5a\xc5\x56\x21\x37\x21\x12\xb5\xa8\xd4\x8a\xb0\xb6\x85\xbe\x7d\xc1\x4e\x62\x3b\xc4\x2d\xee\xb1\x47\xed\xec\xdf\xcc\x68\xb3\x5a\x3c\xa2\xa8\x32\xbe\xc7\xb3\x31\x47\x65\x3e\x8c\xa3\xa0\x7c\x77\x7a\x35\x07\x0a\x09\x63\xbb\x9a\xa7\x92\x43\xa6\xff\x4b\x0e\x6a\xbd\x9a\xe4\x61\xcb\x00\xa0\x7f\x28\xfa\xf4\x06\x81\x3a\xeb\x5e\xe2\x3e\xfc\x1e\x4c\xe7\x74\x7b\x09\x22\xe3\x79\xfa\x54\x4a\x6c\x36\x03\x7e\x1e\xb2\x04\x6b\xef\xdf\xec\x41\x93\x3d\xb9\xa5\x14\xb2\xad\x09\xa4\x5b\x0f\xeb\xe8\x8a\xfe\x1b\xc0\xa3\x26\x7d\xaf\x30\x4a\x18\x2b\xaa\x86\xd7\x12\x45\x25\xc5\x2d\xa7\xed\xc8\x26\xbe\x52\x88\x2f\xcb\xc6\xe3\xcc\xb8\x9f\x10\xa1\xe1\x25\xdf\x49\xac\x2b\x43\x5e\x8b\x87\xa9\xe4\x09\x63\xbd\x17\x83\xce\x73\x60\x66\xc1\x5f\x93\x7f\x85\xf4\x93\x95\x7e\xed\xc3\x77\x3d\x7e\x30\xe5\xe6\xa3\x8c\xc6\x0c\xf7\x53\xe4\xa8\x84\x04\xdf\x17\x8d\x6c\xee\x5e\x13\x44\x35\xa3\x7b\x8e\x47\xc9\xca\x46\x6a\x42\x62\xa9\xe9\x8c\x69\x94\xb0\xaf\x00\x00\x00\xff\xff\x9d\x0a\x32\x7a\xe9\x03\x00\x00")
+
+func _5_feeds_application_fieldUpSqlBytes() ([]byte, error) {
+	return bindataRead(
+		__5_feeds_application_fieldUpSql,
+		"5_feeds_application_field.up.sql",
+	)
+}
+
+func _5_feeds_application_fieldUpSql() (*asset, error) {
+	bytes, err := _5_feeds_application_fieldUpSqlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "5_feeds_application_field.up.sql", size: 1001, mode: os.FileMode(436), modTime: time.Unix(1517442068, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -273,6 +294,7 @@ var _bindata = map[string]func() (*asset, error){
 	"3_metrics_user_id.down.sql": _3_metrics_user_idDownSql,
 	"3_metrics_user_id.up.sql": _3_metrics_user_idUpSql,
 	"4_feeds.up.sql": _4_feedsUpSql,
+	"5_feeds_application_field.up.sql": _5_feeds_application_fieldUpSql,
 }
 
 // AssetDir returns the file names below a certain
@@ -322,6 +344,7 @@ var _bintree = &bintree{nil, map[string]*bintree{
 	"3_metrics_user_id.down.sql": &bintree{_3_metrics_user_idDownSql, map[string]*bintree{}},
 	"3_metrics_user_id.up.sql": &bintree{_3_metrics_user_idUpSql, map[string]*bintree{}},
 	"4_feeds.up.sql": &bintree{_4_feedsUpSql, map[string]*bintree{}},
+	"5_feeds_application_field.up.sql": &bintree{_5_feeds_application_fieldUpSql, map[string]*bintree{}},
 }}
 
 // RestoreAsset restores an asset under the given directory
