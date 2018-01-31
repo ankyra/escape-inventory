@@ -134,21 +134,23 @@ func NewMetrics(projectCount int) *Metrics {
 const FeedPageSize = 7
 
 type FeedEvent struct {
-	ID        string                 `json:"id"` // set by DAO
-	Type      string                 `json:"type"`
-	Username  string                 `json:"user"`
-	Project   string                 `json:"project"`
-	Timestamp time.Time              `json:"time"`
-	Data      map[string]interface{} `json:"data"`
+	ID          string                 `json:"id"` // set by DAO
+	Type        string                 `json:"type"`
+	Username    string                 `json:"user"`
+	Project     string                 `json:"project"`
+	Application string                 `json:"application"`
+	Timestamp   time.Time              `json:"time"`
+	Data        map[string]interface{} `json:"data"`
 }
 
 func NewEvent(typ, project, username string) *FeedEvent {
 	return &FeedEvent{
-		Type:      typ,
-		Project:   project,
-		Username:  username,
-		Timestamp: time.Now(),
-		Data:      map[string]interface{}{},
+		Type:        typ,
+		Project:     project,
+		Application: "",
+		Username:    username,
+		Timestamp:   time.Now(),
+		Data:        map[string]interface{}{},
 	}
 }
 func NewEventWithData(typ, project, username string, data map[string]interface{}) *FeedEvent {
@@ -161,13 +163,35 @@ func NewCreateProjectEvent(project, username string) *FeedEvent {
 	return NewEvent("CREATE_PROJECT", project, username)
 }
 
+func NewUserAddedToProjectEvent(project, username, addedByUser string) *FeedEvent {
+	data := map[string]interface{}{
+		"added_username": username,
+	}
+	return NewEventWithData("USER_ADDED_TO_PROJECT", project, addedByUser, data)
+}
+
+func NewUserRemovedFromProjectEvent(project, username, removedByUser string) *FeedEvent {
+	data := map[string]interface{}{
+		"removed_username": username,
+	}
+	return NewEventWithData("USER_REMOVED_FROM_PROJECT", project, removedByUser, data)
+}
+
+func NewCreateApplicationEvent(project, application, username string) *FeedEvent {
+	ev := NewEvent("CREATE_APPLICATION", project, username)
+	ev.Application = application
+	return ev
+}
+
 func NewReleaseEvent(project, name, version, uploadedBy string) *FeedEvent {
 	data := map[string]interface{}{
 		"name":        name,
 		"version":     version,
 		"uploaded_by": uploadedBy,
 	}
-	return NewEventWithData("NEW_RELEASE", project, uploadedBy, data)
+	ev := NewEventWithData("NEW_RELEASE", project, uploadedBy, data)
+	ev.Application = name
+	return ev
 }
 
 func (f *FeedEvent) Equals(other *FeedEvent) bool {
