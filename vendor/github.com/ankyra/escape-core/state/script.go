@@ -108,8 +108,12 @@ func (s *stateCompiler) compileDependencies(d *DeploymentState, metadata *core.R
 		if err != nil {
 			return err
 		}
-		depState := d.GetDeploymentOrMakeNew(stage, depend.DeploymentName)
+		depState, err := d.GetDeploymentOrMakeNew(stage, depend.DeploymentName)
+		if err != nil {
+			return err
+		}
 		s.Result[depend.VariableName] = s.compileState(depState, depMetadata, "deploy", s.DependencyInputsAreAvailable)
+		s.Result[depend.ReleaseId] = s.Result[depend.VariableName]
 	}
 	return nil
 }
