@@ -3,7 +3,7 @@ title: "Escape Inventory"
 slug: escape-inventory 
 type: "docs"
 toc: true
-wip: true
+wip: false
 ---
 
 * [Usage](#usage)
