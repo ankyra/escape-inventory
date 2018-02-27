@@ -166,3 +166,16 @@ func (s *releaseSuite) Test_AddRelease_Processes_Dependencies_2(c *C) {
 	c.Assert(deps[2].BuildScope, Equals, true)
 	c.Assert(deps[2].DeployScope, Equals, true)
 }
+
+func (s *releaseSuite) Test_AddRelease_Registers_Providers(c *C) {
+	_, err := AddRelease("test", `{"name": "up-test", "version": "1", "project": "test", 
+								   "providers": [{
+										 "name": "provider-test"
+									 }]
+								 }`)
+	c.Assert(err, IsNil)
+	providers, err := dao.GetProviders("provider-test")
+	c.Assert(err, IsNil)
+	c.Assert(providers, HasLen, 1)
+	c.Assert(providers["test/up-test"].Version, Equals, "1")
+}

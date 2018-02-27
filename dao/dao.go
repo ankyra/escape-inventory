@@ -19,6 +19,7 @@ package dao
 import (
 	"fmt"
 
+	core "github.com/ankyra/escape-core"
 	"github.com/ankyra/escape-inventory/config"
 	"github.com/ankyra/escape-inventory/dao/mem"
 	"github.com/ankyra/escape-inventory/dao/postgres"
@@ -132,6 +133,9 @@ func GetRelease(project, name, releaseId string) (*Release, error) {
 
 func GetProviders(providerName string) (map[string]*MinimalReleaseMetadata, error) {
 	return GlobalDAO.GetProviders(providerName)
+}
+func RegisterProviders(release *core.ReleaseMetadata) error {
+	return GlobalDAO.RegisterProviders(release)
 }
 
 func FindAllVersions(app *Application) ([]string, error) {

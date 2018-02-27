@@ -110,8 +110,10 @@ func AddReleaseByUser(project, metadataJson, uploadUser string) (*core.ReleaseMe
 	if err := ensureApplicationExists(project, result.UploadedBy, metadata, result.UploadedAt); err != nil {
 		return nil, err
 	}
-	err = dao.AddRelease(result)
-	if err != nil {
+	if err := dao.AddRelease(result); err != nil {
+		return nil, err
+	}
+	if err := dao.RegisterProviders(metadata); err != nil {
 		return nil, err
 	}
 	err = AddNewReleaseFeedEvent(project, metadata.Name, metadata.Version, uploadUser)
