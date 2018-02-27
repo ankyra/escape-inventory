@@ -48,6 +48,7 @@ func ValidateDAO(dao func() DAO, c *C) {
 	Validate_Metrics(dao(), c)
 	Validate_Feed(dao(), c)
 	Validate_ApplicationFeed(dao(), c)
+	Validate_Providers(dao(), c)
 	Validate_HardDeleteProject(dao(), c)
 	Validate_WipeDatabase(dao(), c)
 }
@@ -799,6 +800,42 @@ func Validate_Feed(dao DAO, c *C) {
 	c.Assert(err, IsNil)
 	c.Assert(received, HasLen, 1)
 	c.Assert(received[0].Equals(events[0]), Equals, true, Commentf("expected '%s'; was '%s'", events[0], received[0]))
+}
+
+func Validate_Providers(dao DAO, c *C) {
+	release := core.NewReleaseMetadata("application", "1.0")
+	release.Description = "desc"
+	release.AddProvides("provider")
+	release.AddProvides("provider2")
+	c.Assert(dao.RegisterProviders(release), IsNil)
+	providers, err := dao.GetProviders("provider")
+	c.Assert(err, IsNil)
+	c.Assert(providers, HasLen, 1)
+	c.Assert(providers["_/application-v1.0"], Not(IsNil))
+	c.Assert(providers["_/application-v1.0"].Application, Equals, "application")
+	c.Assert(providers["_/application-v1.0"].Version, Equals, "1.0")
+	c.Assert(providers["_/application-v1.0"].Project, Equals, "_")
+	c.Assert(providers["_/application-v1.0"].Description, Equals, "desc")
+	providers, err = dao.GetProviders("provider2")
+	c.Assert(err, IsNil)
+	c.Assert(providers, HasLen, 1)
+	c.Assert(providers["_/application-v1.0"], Not(IsNil))
+
+	olderRelease := core.NewReleaseMetadata("application", "0.9")
+	olderRelease.AddProvides("provider")
+	c.Assert(dao.RegisterProviders(olderRelease), IsNil)
+	providers, err = dao.GetProviders("provider")
+	c.Assert(err, IsNil)
+	c.Assert(providers, HasLen, 1)
+	c.Assert(providers["_/application-v1.0"], Not(IsNil))
+
+	newerRelease := core.NewReleaseMetadata("application", "1.1")
+	newerRelease.AddProvides("provider")
+	c.Assert(dao.RegisterProviders(newerRelease), IsNil)
+	providers, err = dao.GetProviders("provider")
+	c.Assert(err, IsNil)
+	c.Assert(providers, HasLen, 1)
+	c.Assert(providers["_/application-v1.1"], Not(IsNil))
 }
 
 func Validate_ApplicationFeed(dao DAO, c *C) {

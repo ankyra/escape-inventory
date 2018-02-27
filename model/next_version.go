@@ -17,8 +17,10 @@ limitations under the License.
 package model
 
 import (
-	"github.com/ankyra/escape-inventory/dao"
 	"strings"
+
+	core "github.com/ankyra/escape-core"
+	"github.com/ankyra/escape-inventory/dao"
 )
 
 func GetNextVersion(project, app, prefix string) (string, error) {
@@ -36,7 +38,7 @@ func GetNextVersion(project, app, prefix string) (string, error) {
 
 }
 
-func getLastVersionForPrefix(project, appName, prefix string) (*SemanticVersion, error) {
+func getLastVersionForPrefix(project, appName, prefix string) (*core.SemanticVersion, error) {
 	app, err := dao.GetApplication(project, appName)
 	if err != nil {
 		return nil, NewUserError(err)
@@ -48,12 +50,12 @@ func getLastVersionForPrefix(project, appName, prefix string) (*SemanticVersion,
 	return getMaxFromVersions(versions, prefix), nil
 }
 
-func getMaxFromVersions(versions []string, prefix string) *SemanticVersion {
-	current := NewSemanticVersion("-1")
+func getMaxFromVersions(versions []string, prefix string) *core.SemanticVersion {
+	current := core.NewSemanticVersion("-1")
 	for _, v := range versions {
 		if strings.HasPrefix(v, prefix) {
 			release_version := v[len(prefix):]
-			newver := NewSemanticVersion(release_version)
+			newver := core.NewSemanticVersion(release_version)
 			if current.LessOrEqual(newver) {
 				current = newver
 			}

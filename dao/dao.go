@@ -129,6 +129,11 @@ func UpdateRelease(release *Release) error {
 func GetRelease(project, name, releaseId string) (*Release, error) {
 	return GlobalDAO.GetRelease(project, name, releaseId)
 }
+
+func GetProviders(providerName string) (map[string]*MinimalReleaseMetadata, error) {
+	return GlobalDAO.GetProviders(providerName)
+}
+
 func FindAllVersions(app *Application) ([]string, error) {
 	return GlobalDAO.FindAllVersions(app)
 }

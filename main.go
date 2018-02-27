@@ -48,6 +48,7 @@ var ReadRoutes = map[string]http.HandlerFunc{
 	"/api/v1/inventory/{project}/units/{name}/versions/{version}/previous/":        handlers.PreviousVersionHandler,
 	"/api/v1/inventory/{project}/units/{name}/next-version":                        handlers.NextVersionHandler,
 	"/api/v1/inventory/__feed":                                                     handlers.FeedHandler,
+	"/api/v1/inventory/__providers":                                                handlers.ProviderHandler,
 
 	/* DEPRECATED HANDLERS */
 	"/api/v1/registry/":                                                           handlers.GetProjectsHandler,

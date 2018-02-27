@@ -139,6 +139,10 @@ func NewPostgresDAO(url string) (DAO, error) {
 									  FROM feed_events AS f
 									  JOIN acl ON f.project = acl.project
 									  WHERE group_name `,
+		GetProviderReleasesQuery:                  `SELECT project, application, version, description FROM providers WHERE provider = $1`,
+		GetProvidersForReleaseQuery:               `SELECT provider, version FROM providers WHERE project = $1 AND application = $2`,
+		SetProviderQuery:                          `INSERT INTO providers(project, application, version, description, provider) VALUES ($1, $2, $3, $4, $5)`,
+		UpdateProviderQuery:                       `UPDATE providers SET version = $3, description = $4 WHERE project = $1 AND application = $2 AND provider = $5`,
 		HardDeleteProjectFeedEventsQuery:          `DELETE FROM feed_events WHERE project = $1`,
 		HardDeleteProjectACLQuery:                 `DELETE FROM acl WHERE project = $1`,
 		HardDeleteProjectPackageURIsQuery:         `DELETE FROM package WHERE project = $1`,
@@ -158,6 +162,7 @@ func NewPostgresDAO(url string) (DAO, error) {
 				`TRUNCATE subscriptions CASCADE`,
 				`TRUNCATE metrics CASCADE`,
 				`TRUNCATE feed_events CASCADE`,
+				`TRUNCATE providers CASCADE`,
 			}
 
 			for _, query := range queries {

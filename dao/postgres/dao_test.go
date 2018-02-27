@@ -56,6 +56,7 @@ func (s *memSuite) Test_DAO(c *C) {
 			_, err = db.Exec(`TRUNCATE subscriptions CASCADE`)
 			_, err = db.Exec(`TRUNCATE metrics CASCADE`)
 			_, err = db.Exec(`TRUNCATE feed_events CASCADE`)
+			_, err = db.Exec(`TRUNCATE providers CASCADE`)
 
 			// Create unit
 			dao, err := NewPostgresDAO(url)
@@ -93,6 +94,7 @@ func (s *memSuite) Test_DAO_migrate(c *C) {
 		_, err = db.Exec(`DROP TABLE metrics CASCADE`)
 		_, err = db.Exec(`DROP TABLE schema_migrations CASCADE`)
 		_, err = db.Exec(`DROP TABLE feed_events CASCADE`)
+		_, err = db.Exec(`DROP TABLE providers CASCADE`)
 
 		bytes, err := ioutil.ReadFile(file)
 		c.Assert(err, IsNil)

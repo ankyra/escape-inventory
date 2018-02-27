@@ -14,14 +14,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package model
+package core
 
 import (
 	. "gopkg.in/check.v1"
-	"testing"
 )
-
-func Test(t *testing.T) { TestingT(t) }
 
 type semverSuite struct{}
 

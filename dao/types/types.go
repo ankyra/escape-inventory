@@ -95,6 +95,18 @@ type Release struct {
 	UploadedAt            time.Time
 }
 
+// Mainly used for view purposes
+type MinimalReleaseMetadata struct {
+	Application string `json:"application"`
+	Project     string `json:"project"`
+	Version     string `json:"version"`
+	Description string `json:"description"`
+}
+
+func (m *MinimalReleaseMetadata) GetReleaseId() string {
+	return m.Project + "/" + m.Application + "-v" + m.Version
+}
+
 type Dependency struct {
 	Project     string `json:"project"`
 	Application string `json:"name"`
@@ -234,6 +246,9 @@ type DAO interface {
 	GetDependencies(*Release) ([]*Dependency, error)
 	GetDownstreamDependencies(*Release) ([]*Dependency, error)
 	GetDownstreamDependenciesByGroups(rel *Release, readGroups []string) ([]*Dependency, error)
+
+	GetProviders(providerName string) (map[string]*MinimalReleaseMetadata, error)
+	RegisterProviders(release *core.ReleaseMetadata) error
 
 	GetPackageURIs(release *Release) ([]string, error)
 	AddPackageURI(release *Release, uri string) error

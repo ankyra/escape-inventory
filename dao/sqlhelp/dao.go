@@ -62,6 +62,11 @@ type SQLHelper struct {
 	FeedEventsByGroupsPageQuery   string
 	AddFeedEventQuery             string
 
+	GetProviderReleasesQuery    string
+	GetProvidersForReleaseQuery string
+	SetProviderQuery            string
+	UpdateProviderQuery         string
+
 	HardDeleteProjectPackageURIsQuery         string
 	HardDeleteProjectUnitSubscriptions        string
 	HardDeleteProjectReleaseDependenciesQuery string

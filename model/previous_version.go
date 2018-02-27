@@ -39,14 +39,14 @@ func GetPreviousVersion(project, app, version string) (string, error) {
 	if err != nil {
 		return "", NewUserError(err)
 	}
-	if prev.Equals(NewSemanticVersion("-1")) {
+	if prev.Equals(core.NewSemanticVersion("-1")) {
 		return "", types.NotFound
 	}
 	return prev.ToString(), nil
 
 }
 
-func getPreviousVersion(project, appName, version string) (*SemanticVersion, error) {
+func getPreviousVersion(project, appName, version string) (*core.SemanticVersion, error) {
 	app, err := dao.GetApplication(project, appName)
 	if err != nil {
 		return nil, NewUserError(err)
@@ -58,11 +58,11 @@ func getPreviousVersion(project, appName, version string) (*SemanticVersion, err
 	return getPrevVersion(versions, version), nil
 }
 
-func getPrevVersion(versions []string, version string) *SemanticVersion {
-	prev := NewSemanticVersion(version)
-	current := NewSemanticVersion("-1")
+func getPrevVersion(versions []string, version string) *core.SemanticVersion {
+	prev := core.NewSemanticVersion(version)
+	current := core.NewSemanticVersion("-1")
 	for _, release_version := range versions {
-		newver := NewSemanticVersion(release_version)
+		newver := core.NewSemanticVersion(release_version)
 		if newver.LessOrEqual(prev) && !newver.Equals(prev) && current.LessOrEqual(newver) {
 			current = newver
 		}
