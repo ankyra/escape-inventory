@@ -836,6 +836,15 @@ func Validate_Providers(dao DAO, c *C) {
 	c.Assert(err, IsNil)
 	c.Assert(providers, HasLen, 1)
 	c.Assert(providers["_/application-v1.1"], Not(IsNil))
+
+	providers, err = dao.GetProvidersByGroups("provider", []string{"group"})
+	c.Assert(err, IsNil)
+	c.Assert(providers, HasLen, 0)
+	c.Assert(dao.SetACL("_", "group", ReadPermission), IsNil)
+	providers, err = dao.GetProvidersByGroups("provider", []string{"group"})
+	c.Assert(err, IsNil)
+	c.Assert(providers, HasLen, 1)
+	c.Assert(providers["_/application-v1.1"], Not(IsNil))
 }
 
 func Validate_ApplicationFeed(dao DAO, c *C) {

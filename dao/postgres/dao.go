@@ -140,6 +140,7 @@ func NewPostgresDAO(url string) (DAO, error) {
 									  JOIN acl ON f.project = acl.project
 									  WHERE group_name `,
 		GetProviderReleasesQuery:                  `SELECT project, application, version, description FROM providers WHERE provider = $1`,
+		GetProviderReleasesByGroupsQuery:          `SELECT p.project, p.application, p.version, p.description FROM providers AS p, acl WHERE p.provider = $1 AND p.project = acl.project AND acl.group_name `,
 		GetProvidersForReleaseQuery:               `SELECT provider, version FROM providers WHERE project = $1 AND application = $2`,
 		SetProviderQuery:                          `INSERT INTO providers(project, application, version, description, provider) VALUES ($1, $2, $3, $4, $5)`,
 		UpdateProviderQuery:                       `UPDATE providers SET version = $3, description = $4 WHERE project = $1 AND application = $2 AND provider = $5`,

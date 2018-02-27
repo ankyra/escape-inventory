@@ -1,6 +1,10 @@
 package sqlhelp
 
 import (
+	"database/sql"
+	"strconv"
+	"strings"
+
 	core "github.com/ankyra/escape-core"
 	. "github.com/ankyra/escape-inventory/dao/types"
 )
@@ -10,6 +14,10 @@ func (s *SQLHelper) GetProviders(providerName string) (map[string]*MinimalReleas
 	if err != nil {
 		return nil, err
 	}
+	return s.scanMinimalReleaseMetadata(rows)
+}
+
+func (s *SQLHelper) scanMinimalReleaseMetadata(rows *sql.Rows) (map[string]*MinimalReleaseMetadata, error) {
 	result := map[string]*MinimalReleaseMetadata{}
 	defer rows.Close()
 	for rows.Next() {
@@ -26,6 +34,42 @@ func (s *SQLHelper) GetProviders(providerName string) (map[string]*MinimalReleas
 		result[mini.GetReleaseId()] = mini
 	}
 	return result, nil
+}
+
+func (s *SQLHelper) GetProvidersByGroups(providerName string, groups []string) (map[string]*MinimalReleaseMetadata, error) {
+	starFound := false
+	for _, g := range groups {
+		if g == "*" {
+			starFound = true
+			break
+		}
+	}
+	if !starFound {
+		groups = append(groups, "*")
+	}
+	insertMarks := []string{}
+	for i, _ := range groups {
+		if s.UseNumericInsertMarks {
+			insertMarks = append(insertMarks, "$"+strconv.Itoa(i+2))
+		} else {
+			insertMarks = append(insertMarks, "?")
+		}
+	}
+	query := s.GetProviderReleasesByGroupsQuery
+	if len(groups) == 1 {
+		query += " = " + insertMarks[0]
+	} else {
+		query += "IN (" + strings.Join(insertMarks, ", ") + ")"
+	}
+	interfaceGroups := []interface{}{providerName}
+	for _, g := range groups {
+		interfaceGroups = append(interfaceGroups, g)
+	}
+	rows, err := s.PrepareAndQuery(query, interfaceGroups...)
+	if err != nil {
+		return nil, err
+	}
+	return s.scanMinimalReleaseMetadata(rows)
 }
 
 func (s *SQLHelper) RegisterProviders(release *core.ReleaseMetadata) error {

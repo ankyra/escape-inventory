@@ -134,6 +134,9 @@ func GetRelease(project, name, releaseId string) (*Release, error) {
 func GetProviders(providerName string) (map[string]*MinimalReleaseMetadata, error) {
 	return GlobalDAO.GetProviders(providerName)
 }
+func GetProvidersByGroups(providerName string, groups []string) (map[string]*MinimalReleaseMetadata, error) {
+	return GlobalDAO.GetProvidersByGroups(providerName, groups)
+}
 func RegisterProviders(release *core.ReleaseMetadata) error {
 	return GlobalDAO.RegisterProviders(release)
 }

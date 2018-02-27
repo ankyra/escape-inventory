@@ -248,6 +248,7 @@ type DAO interface {
 	GetDownstreamDependenciesByGroups(rel *Release, readGroups []string) ([]*Dependency, error)
 
 	GetProviders(providerName string) (map[string]*MinimalReleaseMetadata, error)
+	GetProvidersByGroups(providerName string, groups []string) (map[string]*MinimalReleaseMetadata, error)
 	RegisterProviders(release *core.ReleaseMetadata) error
 
 	GetPackageURIs(release *Release) ([]string, error)
