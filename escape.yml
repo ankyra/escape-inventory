@@ -12,6 +12,7 @@ includes:
 - Makefile
 - README.md
 - "*.go"
+- api/
 - cmd/
 - config/
 - dao/

@@ -1,0 +1,312 @@
+paths:
+
+  /:
+    get:
+      summary: "Home."
+      operationId: home
+      responses:
+        default:
+          description: "Responds with the Escape Inventory version."
+          type: string
+          example: "Escape Release Inventory v0.15.0"
+
+  /health:
+    get:
+      summary: "Healthcheck endpoint."
+      operationId: healthCheck
+      responses:
+        default:
+          description: "Responds OK."
+
+  /api/v1/internal/database:
+    delete:
+      summary: "Wipe the database. Only enabled in dev mode."
+      operationId: wipeDatabase
+      responses:
+        default:
+          description: "Responds OK."
+
+  /api/v1/inventory/:
+    get:
+      summary: "Get Inventory projects."
+      operationId: getProjects
+      responses:
+        default:
+          "$ref": "#/components/schemas/Projects"
+
+  /api/v1/inventory/{project}/:
+    get:
+      summary: "Get Inventory project."
+      operationId: getProject
+      responses:
+        "404":
+          description: "Project not found."
+        default:
+          "$ref": "#/components/schemas/ProjectWithUnits"
+    put:
+      summary: "Update Inventory project metadata."
+      operationId: updateProject
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/Project"
+      responses:
+        "404":
+          description: "Project not found."
+        "400":
+          description: "Invalid JSON body."
+        "201":
+          description: "Project updated"
+
+  /api/v1/inventory/{project}/units/:
+    get:
+      summary: "Get units."
+      operationId: getApplications
+      responses:
+        "404":
+          description: "Project not found."
+        default:
+          "$ref": "#/components/schemas/Units"
+
+
+  /api/v1/inventory/{project}/units/{name}/:
+    get:
+      summary: "Get unit."
+      operationId: getApplication
+      responses:
+        "404":
+          description: "Project or unit not found."
+        default:
+          "$ref": "#/components/schemas/UnitWithVersions"
+
+  /api/v1/inventory/{project}/units/{name}/versions/:
+    get:
+      summary: "Get unit versions."
+      operationId: getApplicationVersions
+      responses:
+        "404":
+          description: "Project or unit not found."
+        default:
+          "$ref": "#/components/schemas/Versions"
+
+  /api/v1/inventory/{project}/units/{name}/hooks/:
+    get:
+      summary: "Get unit hooks."
+      operationId: getApplicationHooks
+      responses:
+        "200": {}
+    put:
+      summary: "Update Inventory unit hooks."
+      operationId: updateApplicationHooks
+      responses:
+        "200": {}
+  /api/v1/inventory/{project}/units/{name}/versions/{version}/:
+    get:
+      summary: "Get unit version."
+      operationId: getVersion
+      responses:
+        "200": {}
+  /api/v1/inventory/{project}/units/{name}/versions/{version}/downstream:
+    get:
+      summary: "Get downstream releases."
+      operationId: downstream
+      responses:
+        "200": {}
+  /api/v1/inventory/{project}/units/{name}/versions/{version}/dependency-graph:
+    get:
+      summary: "Get dependency graph."
+      operationId: dependencyGraph
+      responses:
+        "200": {}
+  /api/v1/inventory/{project}/units/{name}/versions/{version}/diff/:
+    get:
+      summary: "Diff this version with latest."
+      operationId: diff
+      responses:
+        "200": {}
+  /api/v1/inventory/{project}/units/{name}/versions/{version}/diff/{diffWith}/:
+    get:
+      summary: "Diff this version with another version."
+      operationId: diff
+      responses:
+        "200": {}
+  /api/v1/inventory/{project}/units/{name}/versions/{version}/download:
+    get:
+      summary: "Download this version"
+      operationId: download
+      responses:
+        "200": {}
+  /api/v1/inventory/{project}/units/{name}/versions/{version}/upload:
+    post:
+      summary: "Upload a package."
+      operationId: upload
+      responses:
+        "200": {}
+  /api/v1/inventory/{project}/units/{name}/versions/{version}/previous/:
+    get:
+      summary: "Get the previous release."
+      operationId: previousVersion
+      responses:
+        "200": {}
+  /api/v1/inventory/{project}/units/{name}/next-version:
+    get:
+      summary: "Get the next version."
+      operationId: nextVersion
+      responses:
+        "200": {}
+  /api/v1/inventory/{project}/feed:
+    get:
+      summary: "Get project feed."
+      operationId: projectFeed
+      responses:
+        "200": {}
+  /api/v1/inventory/{project}/add-project:
+    post:
+      summary: "Add a project."
+      operationId: addProject
+      responses:
+        "200": {}
+  /api/v1/inventory/{project}/register:
+    post:
+      summary: "Register a new version"
+      operationId: register
+      responses:
+        "200": {}
+  /api/v1/inventory/{project}/hooks/:
+    get:
+      summary: "Get project hooks."
+      operationId: getProjectHooks
+      responses:
+        "200": {}
+    put:
+      summary: "Update Inventory project hooks."
+      operationId: updateProjectHooks
+      responses:
+        "200": {}
+
+  /api/v1/inventory/__feed:
+    get:
+      summary: "Get the event feed."
+      operationId: feed
+      responses:
+        "200": {}
+  /api/v1/inventory/__providers:
+    get:
+      summary: "Query by provider"
+      operationId: provider
+      responses:
+        "200": {}
+
+components:
+  schemas:
+    Projects:
+      description: "Projects."
+      type: object
+      additionalProperties:
+        $ref: "#/components/schemas/Project"
+    Project:
+      type: object
+      description: "Project."
+      required:
+      - name
+      properties:
+        name:
+          description: "The project name."
+          type: string
+        description:
+          description: "Optional project description."
+          type: string
+        org_url:
+          description: "Optional project organisation URL."
+          type: string
+        logo:
+          description: "Optional project logo."
+          type: string
+    ProjectWithUnits:
+      type: object
+      description: "Project."
+      required:
+      - name
+      properties:
+        name:
+          description: "The project name."
+          type: string
+        description:
+          description: "Optional project description."
+          type: string
+        org_url:
+          description: "Optional project organisation URL."
+          type: string
+        logo:
+          description: "Optional project logo."
+          type: string
+        units:
+          "$ref": "#/components/schemas/Units"
+    Units:
+      description: "Units."
+      type: object
+      additionalProperties:
+        "$ref": "#/components/schemas/Unit"
+    Unit:
+      type: object
+      description: "Unit."
+      required:
+      - name
+      properties:
+        name:
+          description: "The application name."
+          type: string
+        project:
+          description: "The parent project."
+          type: string
+        description:
+          description: "Optional application description."
+          type: string
+        latest_version:
+          description: "The latest version for this unit."
+          type: string
+        logo:
+          description: "Optional application logo."
+          type: string
+        uploaded_by:
+          description: "Optional uploader information for the latest version."
+          type: string
+        uploaded_at:
+          description: "Upload time for the latest version."
+          type: string
+    UnitWithVersions:
+      type: object
+      description: "Unit."
+      required:
+      - name
+      properties:
+        name:
+          description: "The application name."
+          type: string
+        project:
+          description: "The parent project."
+          type: string
+        description:
+          description: "Optional application description."
+          type: string
+        latest_version:
+          description: "The latest version for this unit."
+          type: string
+        logo:
+          description: "Optional application logo."
+          type: string
+        uploaded_by:
+          description: "Optional uploader information for the latest version."
+          type: string
+        uploaded_at:
+          description: "Upload time for the latest version."
+          type: string
+        versions:
+          "$ref": "#/components/schemas/Versions"
+    Versions:
+      description: "Versions."
+      type: array
+      items:
+        description: "Version."
+        type: string
