@@ -1,5 +1,5 @@
 name: escape-inventory
-version: '0.14.@'
+version: '0.15.@'
 description: "A Go build for the Escape Inventory"
 logo: logo.png
 

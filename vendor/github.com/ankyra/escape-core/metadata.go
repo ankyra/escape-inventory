@@ -50,6 +50,7 @@ type ReleaseMetadata struct {
 	BuiltWithEscapeVersion string            `json:"built_with_escape_version"`
 	Description            string            `json:"description"`
 	Files                  map[string]string `json:"files", {}`
+	License                string            `json:"license"`
 	Logo                   string            `json:"logo"`
 	Name                   string            `json:"name"`
 	Repository             string            `json:"repository"`
@@ -483,6 +484,7 @@ func (m *ReleaseMetadata) ToScriptMap() map[string]script.Script {
 
 		"branch":              script.LiftString(m.Branch),
 		"description":         script.LiftString(m.Description),
+		"license":             script.LiftString(m.License),
 		"logo":                script.LiftString(m.Logo),
 		"name":                script.LiftString(m.Name),
 		"revision":            script.LiftString(m.Revision),
