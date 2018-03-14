@@ -17,10 +17,10 @@ limitations under the License.
 package types
 
 import (
+	"math/rand"
 	"time"
 
 	"github.com/ankyra/escape-core"
-	"github.com/ankyra/escape-core/util"
 	. "gopkg.in/check.v1"
 )
 
@@ -100,7 +100,7 @@ func Validate_AddRelease_Big_Metadata(dao DAO, c *C) {
 	app1 := NewApplication("_", "dao-val")
 	c.Assert(dao.AddProject(NewProject("_")), IsNil)
 	c.Assert(dao.AddApplication(app1), IsNil)
-	longValue := util.RandomString(70000)
+	longValue := RandomString(70000)
 	metadataJson := `{"name": "dao-val", "metadata": {"key": "` + longValue + `"}, "version": "1"}`
 	metadata, err := core.NewReleaseMetadataFromJsonString(metadataJson)
 	c.Assert(err, IsNil)
@@ -908,4 +908,16 @@ func (*hasItemChecker) Check(params []interface{}, names []string) (bool, string
 		return false, "Unexpected type."
 	}
 	return false, "Item not found"
+}
+
+func RandomString(length int) string {
+	rand.Seed(time.Now().UnixNano())
+
+	var chars = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+
+	b := make([]rune, length)
+	for i := range b {
+		b[i] = chars[rand.Intn(len(chars))]
+	}
+	return string(b)
 }

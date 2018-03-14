@@ -21,7 +21,6 @@ import (
 	"os"
 	"testing"
 
-	"github.com/ankyra/escape-core/util"
 	"github.com/ankyra/escape-inventory/dao/types"
 	. "gopkg.in/check.v1"
 )
@@ -36,7 +35,7 @@ func (s *qlSuite) Test_DAO(c *C) {
 	os.Mkdir("testdata", os.ModePerm)
 	var dbName string
 	types.ValidateDAO(func() types.DAO {
-		dbName := fmt.Sprintf("./testdata/%s.db", util.RandomString(6))
+		dbName := fmt.Sprintf("./testdata/%s.db", types.RandomString(6))
 		os.RemoveAll(dbName)
 		dao, err := NewQLDAO(dbName)
 		c.Assert(err, IsNil)

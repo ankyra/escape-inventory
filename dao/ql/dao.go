@@ -24,7 +24,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/ankyra/escape-core/util"
 	"github.com/ankyra/escape-inventory/dao/sqlhelp"
 	. "github.com/ankyra/escape-inventory/dao/types"
 	_ "github.com/cznic/ql/driver"
@@ -201,7 +200,7 @@ func startupCheckDir(path string) error {
 	permissionTestFileName := ""
 
 	for len(permissionTestFileName) == 0 {
-		fileName := escapeDir + "." + util.RandomString(6)
+		fileName := escapeDir + "." + RandomString(6)
 		_, err = os.Stat(fileName)
 		if os.IsNotExist(err) {
 			permissionTestFileName = fileName
