@@ -92,7 +92,7 @@ func AddReleaseByUser(project, metadataJson, uploadUser string) (*core.ReleaseMe
 		return nil, NewUserError(fmt.Errorf("Can't add release with unresolved version"))
 	}
 	if metadata.ApiVersion > core.CurrentApiVersion {
-		return nil, NewUserError(fmt.Errorf("Release format version v%s is not supported (this Inventory supports up to v%s)", metadata.ApiVersion, core.CurrentApiVersion))
+		return nil, NewUserError(fmt.Errorf("Release format version v%d is not supported (this Inventory supports up to v%d)", metadata.ApiVersion, core.CurrentApiVersion))
 	}
 	release, err := dao.GetRelease(project, parsed.Name, releaseId)
 	if err != nil && !dao.IsNotFound(err) {
