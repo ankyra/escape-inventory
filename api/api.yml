@@ -59,6 +59,21 @@ paths:
         "201":
           description: "Project updated"
 
+  /api/v1/inventory/{project}/add-project:
+    post:
+      summary: "Add a project."
+      operationId: addProject
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/Project"
+      responses:
+        "400":
+          description: "Invalid JSON body."
+        "200":
+          description: "Project added."
+
   /api/v1/inventory/{project}/units/:
     get:
       summary: "Get units."
@@ -161,16 +176,16 @@ paths:
       operationId: projectFeed
       responses:
         "200": {}
-  /api/v1/inventory/{project}/add-project:
-    post:
-      summary: "Add a project."
-      operationId: addProject
-      responses:
-        "200": {}
   /api/v1/inventory/{project}/register:
     post:
       summary: "Register a new version"
       operationId: register
+      responses:
+        "200": {}
+  /api/v1/inventory/{project}/hard-delete:
+    delete:
+      summary: "Hard delete a project and everything under it."
+      operationId: hardDeleteProject
       responses:
         "200": {}
   /api/v1/inventory/{project}/hooks/:
