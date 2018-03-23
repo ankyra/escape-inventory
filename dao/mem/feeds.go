@@ -33,6 +33,7 @@ func (a *dao) GetApplicationFeedPage(project, application string, pageSize int) 
 }
 
 func (a *dao) GetFeedPageByGroups(readGroups []string, pageSize int) ([]*FeedEvent, error) {
+	added := map[string]bool{}
 	result := []*FeedEvent{}
 	for i := len(a.events) - 1; i >= 0 && len(result) < pageSize; i-- {
 		allowedGroups, found := a.acls[a.events[i].Project]
@@ -47,7 +48,11 @@ func (a *dao) GetFeedPageByGroups(readGroups []string, pageSize int) ([]*FeedEve
 				}
 			}
 			if found {
-				result = append(result, a.events[i])
+				_, ok := added[a.events[i].ID]
+				if !ok {
+					added[a.events[i].ID] = true
+					result = append(result, a.events[i])
+				}
 			}
 		}
 	}

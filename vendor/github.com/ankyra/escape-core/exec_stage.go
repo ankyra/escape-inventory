@@ -17,9 +17,17 @@ limitations under the License.
 package core
 
 import (
+	"errors"
 	"fmt"
+	"io/ioutil"
 	"strings"
+
+	"github.com/ankyra/escape-core/script"
 )
+
+func ExpectingTypeForExecStageError(typ, field string, val interface{}) error {
+	return fmt.Errorf("Expecting %s for exec stage field %s; got '%T'", typ, field, val)
+}
 
 type ExecStage struct {
 
@@ -38,8 +46,10 @@ type ExecStage struct {
 	RelativeScript string `json:"script,omitempty"`
 }
 
-func ExpectingTypeForExecStageError(typ, field string, val interface{}) error {
-	return fmt.Errorf("Expecting %s for exec stage field %s; got '%T'", typ, field, val)
+func NewExecStageForRelativeScript(script string) *ExecStage {
+	return &ExecStage{
+		RelativeScript: script,
+	}
 }
 
 func NewExecStageFromDict(values map[interface{}]interface{}) (*ExecStage, error) {
@@ -86,9 +96,16 @@ func NewExecStageFromDict(values map[interface{}]interface{}) (*ExecStage, error
 	return &result, nil
 }
 
-func NewExecStageForRelativeScript(script string) *ExecStage {
+func (e *ExecStage) Copy() *ExecStage {
+	args := []string{}
+	for _, arg := range e.Args {
+		args = append(args, arg)
+	}
 	return &ExecStage{
-		RelativeScript: script,
+		Cmd:            e.Cmd,
+		Args:           args,
+		RelativeScript: e.RelativeScript,
+		Inline:         e.Inline,
 	}
 }
 
@@ -96,17 +113,29 @@ func (e *ExecStage) IsEmpty() bool {
 	return e.Cmd == "" && e.RelativeScript == "" && e.Inline == ""
 }
 
-func (e *ExecStage) GetAsCommand() []string {
+func (e *ExecStage) GetAsCommand() ([]string, error) {
 	if e.Cmd != "" {
 		result := []string{e.Cmd}
-		return append(result, e.Args...)
+		return append(result, e.Args...), nil
 	} else if e.RelativeScript != "" {
-		script := "./" + e.RelativeScript + " .escape/outputs.json"
-		return []string{"/bin/sh", "-c", script}
+		script := e.RelativeScript + " .escape/outputs.json"
+		if !strings.HasPrefix(e.RelativeScript, ".") &&
+			!strings.HasPrefix(e.RelativeScript, "/") &&
+			!strings.HasPrefix(e.RelativeScript, "\\") {
+			script = "./" + e.RelativeScript + " .escape/outputs.json"
+		}
+		return []string{"sh", "-c", script}, nil
 	} else if e.Inline != "" {
-		panic("not yet supported")
+		file, err := ioutil.TempFile("", "escape-inline")
+		if err != nil {
+			return nil, errors.New("Could not create temporary file for inline script.")
+		}
+		if err := ioutil.WriteFile(file.Name(), []byte(e.Inline), 0755); err != nil {
+			return nil, err
+		}
+		return []string{"sh", file.Name()}, nil
 	}
-	return []string{}
+	return []string{}, nil
 }
 
 func (e *ExecStage) ValidateAndFix() error {
@@ -132,6 +161,31 @@ func (e *ExecStage) String() string {
 	} else if e.RelativeScript != "" {
 		return e.RelativeScript
 	} else {
-		return e.Inline
+		firstLine := strings.Split(e.Inline, "\n")[0]
+		return fmt.Sprintf("<inline script starting with '%s'>", firstLine)
 	}
+}
+
+func (e *ExecStage) Eval(env *script.ScriptEnvironment) (*ExecStage, error) {
+	result := e.Copy()
+	relative, err := script.ParseAndEvalToString(e.RelativeScript, env)
+	if err != nil {
+		return nil, err
+	}
+	cmd, err := script.ParseAndEvalToString(e.Cmd, env)
+	if err != nil {
+		return nil, err
+	}
+	args := []string{}
+	for _, arg := range e.Args {
+		a, err := script.ParseAndEvalToString(arg, env)
+		if err != nil {
+			return nil, err
+		}
+		args = append(args, a)
+	}
+	result.RelativeScript = relative
+	result.Cmd = cmd
+	result.Args = args
+	return result, nil
 }

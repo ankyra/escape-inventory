@@ -139,7 +139,7 @@ func NewQLDAO(path string) (DAO, error) {
 									 FROM feed_events WHERE project = $1 ORDER BY id DESC LIMIT $2`,
 		ApplicationFeedEventPageQuery: `SELECT id() as id, event_type, username, project, application, timestamp, data 
 									 FROM feed_events WHERE project = $1 AND application= $2 ORDER BY id DESC LIMIT $3`,
-		FeedEventsByGroupsPageQuery: `SELECT id(f) as id, f.event_type, f.username, f.project, f.application, f.timestamp, f.data 
+		FeedEventsByGroupsPageQuery: `SELECT DISTINCT(id(f)) as id, f.event_type, f.username, f.project, f.application, f.timestamp, f.data 
 									  FROM feed_events AS f, acl
 									  WHERE f.project = acl.project
 									  AND acl.group_name `,

@@ -796,7 +796,8 @@ func Validate_Feed(dao DAO, c *C) {
 	c.Assert(received[1].Equals(events[1]), Equals, true, Commentf("expected '%s'; was '%s'", events[1], received[1]))
 
 	c.Assert(dao.SetACL("test1", "test1", ReadPermission), IsNil)
-	received, err = dao.GetFeedPageByGroups([]string{"test1"}, 4)
+	c.Assert(dao.SetACL("test1", "test3", ReadPermission), IsNil)
+	received, err = dao.GetFeedPageByGroups([]string{"test1", "test3"}, 4)
 	c.Assert(err, IsNil)
 	c.Assert(received, HasLen, 1)
 	c.Assert(received[0].Equals(events[0]), Equals, true, Commentf("expected '%s'; was '%s'", events[0], received[0]))
