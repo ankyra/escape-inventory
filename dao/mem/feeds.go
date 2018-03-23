@@ -1,6 +1,8 @@
 package mem
 
 import (
+	"strconv"
+
 	. "github.com/ankyra/escape-inventory/dao/types"
 )
 
@@ -60,6 +62,10 @@ func (a *dao) GetFeedPageByGroups(readGroups []string, pageSize int) ([]*FeedEve
 }
 
 func (a *dao) AddFeedEvent(event *FeedEvent) error {
+	if event.ID == "" {
+		event.ID = strconv.Itoa(a.feedIDCounter)
+		a.feedIDCounter++
+	}
 	a.events = append(a.events, event)
 	return nil
 }

@@ -43,6 +43,7 @@ type dao struct {
 	metrics          map[string]*Metrics
 	providers        map[string]map[string]*MinimalReleaseMetadata
 	events           []*FeedEvent
+	feedIDCounter    int
 }
 
 func NewInMemoryDAO() DAO {
