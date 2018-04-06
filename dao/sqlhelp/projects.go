@@ -136,9 +136,6 @@ func (s *SQLHelper) GetProjectsByGroups(readGroups []string) (map[string]*Projec
 }
 
 func (s *SQLHelper) HardDeleteProject(project string) error {
-	if err := s.PrepareAndExec(s.HardDeleteProjectFeedEventsQuery, project); err != nil {
-		return err
-	}
 	if err := s.PrepareAndExec(s.HardDeleteProjectACLQuery, project); err != nil {
 		return err
 	}

@@ -39,10 +39,7 @@ func ensureProjectExists(project, username string) error {
 		return NewUserError(err)
 	}
 	prj = NewProject(project)
-	if err := dao.AddProject(prj); err != nil {
-		return err
-	}
-	return AddCreateProjectFeedEvent(project, username)
+	return dao.AddProject(prj)
 }
 
 func updateApp(app *Application, metadata *core.ReleaseMetadata, byUser string, uploadedAt time.Time) {
@@ -68,10 +65,7 @@ func ensureApplicationExists(project, byUser string, metadata *core.ReleaseMetad
 	}
 	app = NewApplication(project, name)
 	updateApp(app, metadata, byUser, uploadAt)
-	if err := dao.AddApplication(app); err != nil {
-		return err
-	}
-	return AddNewApplicationFeedEvent(project, name, byUser)
+	return dao.AddApplication(app)
 }
 
 func AddRelease(project, metadataJson string) (*core.ReleaseMetadata, error) {
@@ -114,10 +108,6 @@ func AddReleaseByUser(project, metadataJson, uploadUser string) (*core.ReleaseMe
 		return nil, err
 	}
 	if err := dao.RegisterProviders(metadata); err != nil {
-		return nil, err
-	}
-	err = AddNewReleaseFeedEvent(project, metadata.Name, metadata.Version, uploadUser)
-	if err != nil {
 		return nil, err
 	}
 	return result.Metadata, ProcessDependencies(result)

@@ -111,14 +111,5 @@ func (a *dao) HardDeleteProject(project string) error {
 	delete(a.projects, project)
 	delete(a.acls, project)
 
-	deleteEvents := []int{}
-	for i, ev := range a.events {
-		if ev.Project == project {
-			deleteEvents = append(deleteEvents, i)
-		}
-	}
-	for _, i := range deleteEvents {
-		a.events = append(a.events[:i], a.events[i+1:]...)
-	}
 	return nil
 }

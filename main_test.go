@@ -414,19 +414,6 @@ func (s *suite) feed(c *C) []*types.FeedEvent {
 	return result
 }
 
-func (s *suite) Test_Feed(c *C) {
-	result := s.feed(c)
-	c.Assert(result, HasLen, 0)
-
-	s.addRelease(c, "project1", "1")
-	s.addRelease(c, "project2", "2")
-
-	result = s.feed(c)
-	c.Assert(result, HasLen, 6)
-	c.Assert(result[0].Project, Equals, "project2")
-	c.Assert(result[3].Project, Equals, "project1")
-}
-
 func (s *suite) Test_HardDeleteProject(c *C) {
 	s.addRelease(c, "project1", "1")
 	s.addRelease(c, "project2", "2")

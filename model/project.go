@@ -59,11 +59,7 @@ func AddProject(p *types.Project, username string) error {
 	if err := core.ValidateProjectName(p.Name); err != nil {
 		return NewUserError(err)
 	}
-	err := dao.AddProject(p)
-	if err != nil {
-		return err
-	}
-	return AddCreateProjectFeedEvent(p.Name, username)
+	return dao.AddProject(p)
 }
 
 func UpdateProject(p *types.Project) error {
