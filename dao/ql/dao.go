@@ -124,31 +124,19 @@ func NewQLDAO(path string) (DAO, error) {
 													AND release_dependency.dep_project = $1 
 													AND release_dependency.dep_name = $2 AND release_dependency.dep_version = $3
 													AND acl.group_name `,
-		GetACLQuery:                  "SELECT group_name, permission FROM acl WHERE project = $1",
-		InsertACLQuery:               "INSERT INTO acl(project, group_name, permission) VALUES($1, $2, $3)",
-		UpdateACLQuery:               "UPDATE acl SET permission = $1 WHERE project = $2 AND group_name = $3",
-		DeleteACLQuery:               "DELETE FROM acl WHERE project = $1 AND group_name = $2",
-		GetPermittedGroupsQuery:      "SELECT group_name FROM acl WHERE project = $1 AND (permission >= $2)",
-		CreateUserIDMetricsQuery:     `INSERT INTO metrics(user_id) VALUES($1)`,
-		GetMetricsByUserIDQuery:      `SELECT project_count FROM metrics WHERE user_id = $1`,
-		SetProjectCountMetricForUser: `UPDATE metrics SET project_count = $3 WHERE user_id = $1 AND project_count = $2`,
-		AddFeedEventQuery:            `INSERT INTO feed_events(event_type, username, project, application, timestamp, data) VALUES ($1, $2, $3, $4, $5, $6)`,
-		FeedEventPageQuery: `SELECT id() as id, event_type, username, project, application, timestamp, data 
-							 FROM feed_events ORDER BY id DESC LIMIT $1`,
-		ProjectFeedEventPageQuery: `SELECT id() as id, event_type, username, project, application, timestamp, data 
-									 FROM feed_events WHERE project = $1 ORDER BY id DESC LIMIT $2`,
-		ApplicationFeedEventPageQuery: `SELECT id() as id, event_type, username, project, application, timestamp, data 
-									 FROM feed_events WHERE project = $1 AND application= $2 ORDER BY id DESC LIMIT $3`,
-		FeedEventsByGroupsPageQuery: `SELECT DISTINCT(id(f)) as id, f.event_type, f.username, f.project, f.application, f.timestamp, f.data 
-									  FROM feed_events AS f, acl
-									  WHERE f.project = acl.project
-									  AND acl.group_name `,
+		GetACLQuery:                               "SELECT group_name, permission FROM acl WHERE project = $1",
+		InsertACLQuery:                            "INSERT INTO acl(project, group_name, permission) VALUES($1, $2, $3)",
+		UpdateACLQuery:                            "UPDATE acl SET permission = $1 WHERE project = $2 AND group_name = $3",
+		DeleteACLQuery:                            "DELETE FROM acl WHERE project = $1 AND group_name = $2",
+		GetPermittedGroupsQuery:                   "SELECT group_name FROM acl WHERE project = $1 AND (permission >= $2)",
+		CreateUserIDMetricsQuery:                  `INSERT INTO metrics(user_id) VALUES($1)`,
+		GetMetricsByUserIDQuery:                   `SELECT project_count FROM metrics WHERE user_id = $1`,
+		SetProjectCountMetricForUser:              `UPDATE metrics SET project_count = $3 WHERE user_id = $1 AND project_count = $2`,
 		GetProviderReleasesQuery:                  `SELECT project, application, version, description FROM providers WHERE provider = $1`,
 		GetProviderReleasesByGroupsQuery:          `SELECT p.project, p.application, p.version, p.description FROM providers AS p, acl WHERE p.provider = $1 AND p.project = acl.project AND acl.group_name `,
 		GetProvidersForReleaseQuery:               `SELECT provider, version FROM providers WHERE project = $1 AND application = $2`,
 		SetProviderQuery:                          `INSERT INTO providers(project, application, version, description, provider) VALUES ($1, $2, $3, $4, $5)`,
 		UpdateProviderQuery:                       `UPDATE providers SET version = $3, description = $4 WHERE project = $1 AND application = $2 AND provider = $5`,
-		HardDeleteProjectFeedEventsQuery:          `DELETE FROM feed_events WHERE project = $1`,
 		HardDeleteProjectACLQuery:                 `DELETE FROM acl WHERE project = $1`,
 		HardDeleteProjectPackageURIsQuery:         `DELETE FROM package WHERE project = $1`,
 		HardDeleteProjectUnitSubscriptions:        `DELETE FROM subscriptions WHERE project = $1`,
@@ -166,7 +154,6 @@ func NewQLDAO(path string) (DAO, error) {
 				`TRUNCATE TABLE release_dependency`,
 				`TRUNCATE TABLE subscriptions`,
 				`TRUNCATE TABLE metrics`,
-				`TRUNCATE TABLE feed_events`,
 				`TRUNCATE TABLE providers`,
 			}
 

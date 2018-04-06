@@ -46,8 +46,6 @@ func ValidateDAO(dao func() DAO, c *C) {
 	Validate_Dependencies(dao(), c)
 	Validate_DependenciesByGroups(dao(), c)
 	Validate_Metrics(dao(), c)
-	Validate_Feed(dao(), c)
-	Validate_ApplicationFeed(dao(), c)
 	Validate_Providers(dao(), c)
 	Validate_HardDeleteProject(dao(), c)
 	Validate_WipeDatabase(dao(), c)
@@ -204,7 +202,6 @@ func Validate_HardDeleteProject(dao DAO, c *C) {
 	c.Assert(dao.SetDependencies(release, deps), IsNil)
 	addRelease(dao, c, "dao-val", "2")
 	dao.SetACL("_", "group1", ReadPermission)
-	dao.AddFeedEvent(NewCreateProjectEvent("_", "admin"))
 	hooks := NewHooks()
 	hooks["test"] = map[string]string{
 		"wut": "wat",
@@ -258,9 +255,6 @@ func Validate_HardDeleteProject(dao DAO, c *C) {
 	perm, err := dao.GetACL("_")
 	c.Assert(err, IsNil)
 	c.Assert(perm["group1"], Equals, ReadPermission)
-	feed, err := dao.GetProjectFeedPage("_", 1)
-	c.Assert(err, IsNil)
-	c.Assert(feed, HasLen, 1)
 	c.Assert(dao.AddProject(prj), Equals, AlreadyExists)
 
 	// Delete
@@ -302,9 +296,7 @@ func Validate_HardDeleteProject(dao DAO, c *C) {
 	perm, err = dao.GetACL("_")
 	c.Assert(err, IsNil)
 	c.Assert(perm, HasLen, 0)
-	feed, err = dao.GetProjectFeedPage("_", 1)
 	c.Assert(err, IsNil)
-	c.Assert(feed, HasLen, 0)
 
 	// Re-adding
 	c.Assert(dao.AddProject(prj), IsNil)
@@ -764,45 +756,6 @@ func Validate_Metrics(dao DAO, c *C) {
 	c.Assert(err, Equals, NotFound)
 }
 
-func Validate_Feed(dao DAO, c *C) {
-	events := []*FeedEvent{
-		NewCreateProjectEvent("test1", "user"),
-		NewReleaseEvent("test2", "app", "1.0", "user"),
-		NewCreateProjectEvent("test2", "user"),
-		NewCreateProjectEvent("test3", "user"),
-		NewCreateProjectEvent("test4", "user"),
-		NewCreateProjectEvent("test5", "user"),
-	}
-	for _, ev := range events {
-		c.Assert(dao.AddFeedEvent(ev), IsNil)
-	}
-	received, err := dao.GetFeedPage(4)
-	c.Assert(err, IsNil)
-	c.Assert(received, HasLen, 4)
-	expected := [][]*FeedEvent{
-		[]*FeedEvent{received[0], events[5]},
-		[]*FeedEvent{received[1], events[4]},
-		[]*FeedEvent{received[2], events[3]},
-		[]*FeedEvent{received[3], events[2]},
-	}
-	for i, exp := range expected {
-		c.Assert(exp[0].Equals(exp[1]), Equals, true, Commentf("%d item '%s' expected; was '%s'", i, exp[1], exp[0]))
-	}
-
-	received, err = dao.GetProjectFeedPage("test2", 4)
-	c.Assert(err, IsNil)
-	c.Assert(received, HasLen, 2)
-	c.Assert(received[0].Equals(events[2]), Equals, true, Commentf("expected '%s'; was '%s'", events[2], received[0]))
-	c.Assert(received[1].Equals(events[1]), Equals, true, Commentf("expected '%s'; was '%s'", events[1], received[1]))
-
-	c.Assert(dao.SetACL("test1", "test1", ReadPermission), IsNil)
-	c.Assert(dao.SetACL("test1", "test3", ReadPermission), IsNil)
-	received, err = dao.GetFeedPageByGroups([]string{"test1", "test3"}, 4)
-	c.Assert(err, IsNil)
-	c.Assert(received, HasLen, 1)
-	c.Assert(received[0].Equals(events[0]), Equals, true, Commentf("expected '%s'; was '%s'", events[0], received[0]))
-}
-
 func Validate_Providers(dao DAO, c *C) {
 	release := core.NewReleaseMetadata("application", "1.0")
 	release.Description = "desc"
@@ -846,32 +799,6 @@ func Validate_Providers(dao DAO, c *C) {
 	c.Assert(err, IsNil)
 	c.Assert(providers, HasLen, 1)
 	c.Assert(providers["_/application-v1.1"], Not(IsNil))
-}
-
-func Validate_ApplicationFeed(dao DAO, c *C) {
-	events := []*FeedEvent{
-		NewCreateProjectEvent("test1", "user"),
-		NewReleaseEvent("test1", "app", "1.0", "user"),
-		NewCreateProjectEvent("test2", "user"),
-		NewReleaseEvent("test2", "app", "1.2", "user"),
-		NewReleaseEvent("test1", "app", "1.2", "user"),
-		NewCreateProjectEvent("test3", "user"),
-		NewCreateApplicationEvent("test1", "app", "user"),
-	}
-	for _, ev := range events {
-		c.Assert(dao.AddFeedEvent(ev), IsNil)
-	}
-	received, err := dao.GetApplicationFeedPage("test1", "app", 3)
-	c.Assert(err, IsNil)
-	c.Assert(received, HasLen, 3)
-	expected := [][]*FeedEvent{
-		[]*FeedEvent{received[0], events[6]},
-		[]*FeedEvent{received[1], events[4]},
-		[]*FeedEvent{received[2], events[1]},
-	}
-	for i, exp := range expected {
-		c.Assert(exp[0].Equals(exp[1]), Equals, true, Commentf("%d item '%s' expected; was '%s'", i, exp[1], exp[0]))
-	}
 }
 
 func Validate_WipeDatabase(dao DAO, c *C) {

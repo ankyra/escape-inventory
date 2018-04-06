@@ -42,8 +42,6 @@ type dao struct {
 	acls             map[string]map[string]Permission
 	metrics          map[string]*Metrics
 	providers        map[string]map[string]*MinimalReleaseMetadata
-	events           []*FeedEvent
-	feedIDCounter    int
 }
 
 func NewInMemoryDAO() DAO {
@@ -58,7 +56,6 @@ func NewInMemoryDAO() DAO {
 		acls:             map[string]map[string]Permission{},
 		metrics:          map[string]*Metrics{},
 		providers:        map[string]map[string]*MinimalReleaseMetadata{},
-		events:           []*FeedEvent{},
 	}
 }
 
