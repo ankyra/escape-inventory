@@ -44,6 +44,7 @@ type Config struct {
 	DatabaseSettings DatabaseSettings `json:"database_settings" yaml:"database_settings"`
 	StorageBackend   string           `json:"storage_backend" yaml:"storage_backend"`
 	StorageSettings  StorageSettings  `json:"storage_settings" yaml:"storage_settings"`
+	EventServiceURL  string           `json:"event_service_url" yaml:"event_service_url"`
 	UserServiceURL   string           `json:"user_service_url" yaml:"user_service_url"`
 	WebHook          string           `json:"web_hook" yaml:"web_hook"`
 	Dev              bool             `json:"dev" yaml:"dev"`
@@ -127,6 +128,8 @@ func processEnvironmentOverrides(config *Config, env []string) *Config {
 			config.WebHook = value
 		} else if key == "USER_SERVICE_URL" {
 			config.UserServiceURL = value
+		} else if key == "EVENT_SERVICE_URL" {
+			config.EventServiceURL = value
 		} else if key == "DEV" {
 			valueBool, _ := strconv.ParseBool(value)
 			config.Dev = valueBool
