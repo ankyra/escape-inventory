@@ -54,6 +54,8 @@ JSON/YAML field | Environment Variable | Default |Description
 |`storage_settings . path`|`STORAGE_SETTINGS_PATH`|`/var/lib/escape/releases/`|Where packages will be stored. Only relevant for the the `local` storage backend.
 |`storage_settings . bucket`|`STORAGE_SETTINGS_BUCKET`||The bucket where packages will be stored. Only relevant for the `gcs` storage backend. 
 |`storage_settings . credentials`|`STORAGE_SETTINGS_CREDENTIALS`||This path points to the credentials for the GCS bucket. For more information see the documentation for the GCS storage backend. 
+|`basic_auth_username`|`BASIC_AUTH_USERNAME`|`escape`|The username for basic authentication. Only used when `basic_auth_password` is set.
+|`basic_auth_password`|`BASIC_AUTH_PASSWORD`||The password for basic authentication. When set this will require HTTP Basic Authentication on all requests.
 
 
 # Storage Backends
