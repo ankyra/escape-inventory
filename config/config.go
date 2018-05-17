@@ -39,15 +39,17 @@ type StorageSettings struct {
 }
 
 type Config struct {
-	Port             string           `json:"port" yaml:"port"`
-	Database         string           `json:"database" yaml:"database"`
-	DatabaseSettings DatabaseSettings `json:"database_settings" yaml:"database_settings"`
-	StorageBackend   string           `json:"storage_backend" yaml:"storage_backend"`
-	StorageSettings  StorageSettings  `json:"storage_settings" yaml:"storage_settings"`
-	EventServiceURL  string           `json:"event_service_url" yaml:"event_service_url"`
-	UserServiceURL   string           `json:"user_service_url" yaml:"user_service_url"`
-	WebHook          string           `json:"web_hook" yaml:"web_hook"`
-	Dev              bool             `json:"dev" yaml:"dev"`
+	Port              string           `json:"port" yaml:"port"`
+	Database          string           `json:"database" yaml:"database"`
+	DatabaseSettings  DatabaseSettings `json:"database_settings" yaml:"database_settings"`
+	StorageBackend    string           `json:"storage_backend" yaml:"storage_backend"`
+	StorageSettings   StorageSettings  `json:"storage_settings" yaml:"storage_settings"`
+	EventServiceURL   string           `json:"event_service_url" yaml:"event_service_url"`
+	UserServiceURL    string           `json:"user_service_url" yaml:"user_service_url"`
+	WebHook           string           `json:"web_hook" yaml:"web_hook"`
+	Dev               bool             `json:"dev" yaml:"dev"`
+	BasicAuthUsername string           `json:"basic_auth_username" yaml:"basic_auth_username"`
+	BasicAuthPassword string           `json:"basic_auth_password" yaml:"basic_auth_password"`
 }
 
 func NewConfig(env []string) (*Config, error) {
@@ -75,6 +77,9 @@ func replaceMissingValuesWithDefaults(config *Config) {
 	}
 	if config.DatabaseSettings.PostgresUrl == "" && config.Database == "postgres" {
 		config.DatabaseSettings.PostgresUrl = "postgres://postgres:@localhost/postgres?sslmode=disable"
+	}
+	if config.BasicAuthUsername == "" {
+		config.BasicAuthUsername = "escape"
 	}
 }
 
@@ -130,6 +135,10 @@ func processEnvironmentOverrides(config *Config, env []string) *Config {
 			config.UserServiceURL = value
 		} else if key == "EVENT_SERVICE_URL" {
 			config.EventServiceURL = value
+		} else if key == "BASIC_AUTH_USERNAME" {
+			config.BasicAuthUsername = value
+		} else if key == "BASIC_AUTH_PASSWORD" {
+			config.BasicAuthPassword = value
 		} else if key == "DEV" {
 			valueBool, _ := strconv.ParseBool(value)
 			config.Dev = valueBool

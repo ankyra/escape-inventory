@@ -82,6 +82,12 @@
 			"revisionTime": "2017-11-30T20:04:20Z"
 		},
 		{
+			"checksumSHA1": "rDtGrzsHqWyKpmu13z3jtCzk440=",
+			"path": "github.com/aphistic/negroni-basicauth",
+			"revision": "5f0c046362eea213896e7786f01ecee66fae9380",
+			"revisionTime": "2018-01-04T20:16:26Z"
+		},
+		{
 			"checksumSHA1": "spyv5/YFBjYyZLZa1U2LBfDR8PM=",
 			"origin": "github.com/prometheus/client_golang/vendor/github.com/beorn7/perks/quantile",
 			"path": "github.com/beorn7/perks/quantile",

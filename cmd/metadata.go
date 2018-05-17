@@ -1,3 +1,3 @@
 package cmd
 
-const InventoryVersion = "0.16.11"
+const InventoryVersion = "0.16.12"

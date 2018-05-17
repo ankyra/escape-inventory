@@ -29,6 +29,7 @@ import (
 	"github.com/ankyra/escape-inventory/metrics"
 	"github.com/ankyra/escape-inventory/model"
 	"github.com/ankyra/escape-inventory/storage"
+	basicauth "github.com/aphistic/negroni-basicauth"
 	"github.com/gorilla/mux"
 	"github.com/urfave/negroni"
 )
@@ -114,7 +115,14 @@ func GetHandler(router *mux.Router) http.Handler {
 	middleware.Use(NewMetricMiddleware())
 	middleware.Use(recovery)
 	middleware.Use(negroni.NewLogger())
+	if Config != nil && Config.BasicAuthPassword != "" {
+		log.Printf("INFO: Enabling basic authentication.\n")
+		users := map[string]string{}
+		users[Config.BasicAuthUsername] = Config.BasicAuthPassword
+		middleware.Use(basicauth.BasicAuth("escape", users))
+	}
 	middleware.UseHandler(router)
+
 	return middleware
 }
 
