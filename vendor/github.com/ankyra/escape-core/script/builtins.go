@@ -25,6 +25,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/ankyra/escape-core/util"
 )
 
 type StdlibFunc struct {
@@ -42,18 +44,23 @@ var trackVersion = ShouldParse(`$func(v) { $v.concat(".@") }`)
 
 var Stdlib = []StdlibFunc{
 	StdlibFunc{"id", LiftFunction(builtinId), "Returns its argument", "everything", "parameter :: *"},
+	StdlibFunc{"equals", LiftFunction(builtinEquals), "Returns true if the arguments are of the same type and have the same value", "everything", "parameter :: *"},
 	StdlibFunc{"env_lookup", LiftFunction(builtinEnvLookup), "Lookup key in environment. Usually called implicitly when using '$'", "lists", "key :: string"},
 	StdlibFunc{"concat", LiftFunction(builtinConcat), "Concatate stringable arguments", "strings", "v1 :: string, v2 :: string, ..."},
 	StdlibFunc{"lower", ShouldLift(strings.ToLower), "Returns a copy of the string v with all Unicode characters mapped to their lower case", "strings", "v :: string"},
 	StdlibFunc{"upper", ShouldLift(strings.ToUpper), "Returns a copy of the string v with all Unicode characters mapped to their upper case", "strings", "v :: string"},
 	StdlibFunc{"title", ShouldLift(strings.ToTitle), "Returns a copy of the string v with all Unicode characters mapped to their title case", "strings", "v :: string"},
 	StdlibFunc{"split", ShouldLift(strings.Split), "Split slices s into all substrings separated by sep and returns a slice of the substrings between those separators. If sep is empty, Split splits after each UTF-8 sequence.", "strings", "sep :: string"},
+	StdlibFunc{"path_exists", ShouldLift(util.PathExists), "Returns true if the path exists, false if not", "strings", ""},
+	StdlibFunc{"file_exists", ShouldLift(util.FileExists), "Returns true if the path exists and if it's not a directory, false otherwise", "strings", ""},
+	StdlibFunc{"dir_exists", ShouldLift(util.IsDir), "Returns true if the path exists and if it is a directory, false otherwise", "strings", ""},
 	StdlibFunc{"join", ShouldLift(strings.Join), "Join concatenates the elements of a to create a single string. The separator string sep is placed between elements in the resulting string. ", "lists", "sep :: string"},
 	StdlibFunc{"replace", ShouldLift(strings.Replace), "Replace returns a copy of the string s with the first n non-overlapping instances of old replaced by new. If old is empty, it matches at the beginning of the string and after each UTF-8 sequence, yielding up to k+1 replacements for a k-rune string. If n < 0, there is no limit on the number of replacements.", "strings", "old :: string, new :: string, n :: integer"},
 	StdlibFunc{"base64_encode", ShouldLift(base64.StdEncoding.EncodeToString), "Encode string to base64", "strings", ""},
 	StdlibFunc{"base64_decode", ShouldLift(base64.StdEncoding.DecodeString), "Decode string from base64", "strings", ""},
 	StdlibFunc{"trim", ShouldLift(strings.TrimSpace), "Returns a slice of the string s, with all leading and trailing white space removed, as defined by Unicode. ", "strings", ""},
 	StdlibFunc{"list_index", LiftFunction(builtinListIndex), "Index a list at position `n`. Usually accessed implicitly using indexing syntax (eg. `list[0]`)", "lists", "n :: integer"},
+	StdlibFunc{"length", LiftFunction(builtinListLength), "Returns the length of the list", "lists", "n :: integer"},
 	StdlibFunc{"list_slice", LiftFunction(builtinListSlice), "Slice a list. Usually accessed implicitly using slice syntax (eg. `list[0:5]`)", "lists", "i :: integer, j :: integer"},
 	StdlibFunc{"add", ShouldLift(builtinAdd), "Add two integers", "integers", "y :: integer"},
 	StdlibFunc{"timestamp", ShouldLift(builtinTimestamp), "Returns a UNIX timestamp", "", ""},
@@ -62,6 +69,13 @@ var Stdlib = []StdlibFunc{
 	StdlibFunc{"track_minor_version", trackMinorVersion, "Track minor version", "strings", ""},
 	StdlibFunc{"track_patch_version", trackPatchVersion, "Track patch version", "strings", ""},
 	StdlibFunc{"track_version", trackVersion, "Track version", "strings", ""},
+	StdlibFunc{"not", LiftFunction(builtinNOT), "Logical NOT operation", "bool", ""},
+	StdlibFunc{"and", LiftFunction(builtinAND), "Logical AND operation", "bool", "b2 :: bool"},
+	StdlibFunc{"or", LiftFunction(builtinOR), "Logical OR operation", "bool", "b2 :: bool"},
+	StdlibFunc{"lt", LiftFunction(builtinLT), "Returns true if first argument is less than the second argument", "integer", "i2 :: integer"},
+	StdlibFunc{"lte", LiftFunction(builtinLTE), "Returns true if first argument is less than or equal to the second argument", "integer", "i2 :: integer"},
+	StdlibFunc{"gt", LiftFunction(builtinGT), "Returns true if first argument is greater than second argument", "integer", "i2 :: integer"},
+	StdlibFunc{"gte", LiftFunction(builtinGTE), "Returns true if first argument is greater than or equal to second argument", "integer", "i2 :: integer"},
 }
 
 func LiftGoFunc(f interface{}) Script {
@@ -186,6 +200,22 @@ func builtinConcat(env *ScriptEnvironment, inputValues []Script) (Script, error)
 	return LiftString(result), nil
 }
 
+func builtinListLength(env *ScriptEnvironment, inputValues []Script) (Script, error) {
+	if err := builtinArgCheck(1, "list_index", inputValues); err != nil {
+		return nil, err
+	}
+	lstArg := inputValues[0]
+	if !IsListAtom(lstArg) {
+		if IsStringAtom(lstArg) {
+			str := ExpectStringAtom(lstArg)
+			return LiftInteger(len(str)), nil
+		}
+		return nil, fmt.Errorf("Expecting list or string argument in length call, but got '%s'", lstArg.Type().Name())
+	}
+	lst := ExpectListAtom(inputValues[0])
+	return LiftInteger(len(lst)), nil
+}
+
 func builtinListIndex(env *ScriptEnvironment, inputValues []Script) (Script, error) {
 	if err := builtinArgCheck(2, "list_index", inputValues); err != nil {
 		return nil, err
@@ -234,6 +264,111 @@ func builtinListSlice(env *ScriptEnvironment, inputValues []Script) (Script, err
 		return Lift(lst[index:endIndex])
 	}
 	return Lift(lst[index:])
+}
+
+func builtinEquals(env *ScriptEnvironment, inputValues []Script) (Script, error) {
+	if err := builtinArgCheck(2, "equals", inputValues); err != nil {
+		return nil, err
+	}
+	i1 := inputValues[0]
+	i2 := inputValues[1]
+	return Lift(i1.Equals(i2))
+}
+
+func builtinNOT(env *ScriptEnvironment, inputValues []Script) (Script, error) {
+	if err := builtinArgCheck(1, "not", inputValues); err != nil {
+		return nil, err
+	}
+	boolArg := inputValues[0]
+	if !IsBoolAtom(boolArg) {
+		return nil, fmt.Errorf("Expecting bool argument in not call, but got '%s'", boolArg.Type().Name())
+	}
+	bool := ExpectBoolAtom(boolArg)
+	return Lift(!bool)
+}
+
+func builtinAND(env *ScriptEnvironment, inputValues []Script) (Script, error) {
+	if err := builtinArgCheck(2, "and", inputValues); err != nil {
+		return nil, err
+	}
+	boolArg1 := inputValues[0]
+	boolArg2 := inputValues[1]
+	if !IsBoolAtom(boolArg1) || !IsBoolAtom(boolArg2) {
+		return nil, fmt.Errorf("Expecting bool arguments in and call, but got '%s' and '%s'", boolArg1.Type().Name(), boolArg2.Type().Name())
+	}
+	bool1 := ExpectBoolAtom(boolArg1)
+	bool2 := ExpectBoolAtom(boolArg2)
+	return Lift(bool1 && bool2)
+}
+
+func builtinOR(env *ScriptEnvironment, inputValues []Script) (Script, error) {
+	if err := builtinArgCheck(2, "or", inputValues); err != nil {
+		return nil, err
+	}
+	boolArg1 := inputValues[0]
+	boolArg2 := inputValues[1]
+	if !IsBoolAtom(boolArg1) || !IsBoolAtom(boolArg2) {
+		return nil, fmt.Errorf("Expecting bool arguments in and call, but got '%s' and '%s'", boolArg1.Type().Name(), boolArg2.Type().Name())
+	}
+	bool1 := ExpectBoolAtom(boolArg1)
+	bool2 := ExpectBoolAtom(boolArg2)
+	return Lift(bool1 || bool2)
+}
+
+func builtinLT(env *ScriptEnvironment, inputValues []Script) (Script, error) {
+	if err := builtinArgCheck(2, "lt", inputValues); err != nil {
+		return nil, err
+	}
+	arg1 := inputValues[0]
+	arg2 := inputValues[1]
+	if !IsIntegerAtom(arg1) || !IsIntegerAtom(arg2) {
+		return nil, fmt.Errorf("Expecting integer arguments in lt call, but got '%s' and '%s'", arg1.Type().Name(), arg2.Type().Name())
+	}
+	i1 := ExpectIntegerAtom(arg1)
+	i2 := ExpectIntegerAtom(arg2)
+	return Lift(i1 < i2)
+}
+
+func builtinLTE(env *ScriptEnvironment, inputValues []Script) (Script, error) {
+	if err := builtinArgCheck(2, "lte", inputValues); err != nil {
+		return nil, err
+	}
+	arg1 := inputValues[0]
+	arg2 := inputValues[1]
+	if !IsIntegerAtom(arg1) || !IsIntegerAtom(arg2) {
+		return nil, fmt.Errorf("Expecting integer arguments in lte call, but got '%s' and '%s'", arg1.Type().Name(), arg2.Type().Name())
+	}
+	i1 := ExpectIntegerAtom(arg1)
+	i2 := ExpectIntegerAtom(arg2)
+	return Lift(i1 <= i2)
+}
+
+func builtinGT(env *ScriptEnvironment, inputValues []Script) (Script, error) {
+	if err := builtinArgCheck(2, "gt", inputValues); err != nil {
+		return nil, err
+	}
+	arg1 := inputValues[0]
+	arg2 := inputValues[1]
+	if !IsIntegerAtom(arg1) || !IsIntegerAtom(arg2) {
+		return nil, fmt.Errorf("Expecting integer arguments in gt call, but got '%s' and '%s'", arg1.Type().Name(), arg2.Type().Name())
+	}
+	i1 := ExpectIntegerAtom(arg1)
+	i2 := ExpectIntegerAtom(arg2)
+	return Lift(i1 > i2)
+}
+
+func builtinGTE(env *ScriptEnvironment, inputValues []Script) (Script, error) {
+	if err := builtinArgCheck(2, "gte", inputValues); err != nil {
+		return nil, err
+	}
+	arg1 := inputValues[0]
+	arg2 := inputValues[1]
+	if !IsIntegerAtom(arg1) || !IsIntegerAtom(arg2) {
+		return nil, fmt.Errorf("Expecting integer arguments in gte call, but got '%s' and '%s'", arg1.Type().Name(), arg2.Type().Name())
+	}
+	i1 := ExpectIntegerAtom(arg1)
+	i2 := ExpectIntegerAtom(arg2)
+	return Lift(i1 >= i2)
 }
 
 func builtinReadfile(arg string) (string, error) {

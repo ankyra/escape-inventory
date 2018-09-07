@@ -169,7 +169,7 @@ func (s *releaseSuite) Test_AddRelease_Processes_Dependencies_2(c *C) {
 
 func (s *releaseSuite) Test_AddRelease_Registers_Providers(c *C) {
 	_, err := AddRelease("test", `{"name": "up-test", "version": "1", "project": "test", 
-								   "providers": [{
+								   "provides": [{
 										 "name": "provider-test"
 									 }]
 								 }`)
@@ -177,5 +177,6 @@ func (s *releaseSuite) Test_AddRelease_Registers_Providers(c *C) {
 	providers, err := dao.GetProviders("provider-test")
 	c.Assert(err, IsNil)
 	c.Assert(providers, HasLen, 1)
-	c.Assert(providers["test/up-test"].Version, Equals, "1")
+	c.Assert(providers["test/up-test-v1"], Not(IsNil))
+	c.Assert(providers["test/up-test-v1"].Version, Equals, "1")
 }

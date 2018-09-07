@@ -17,29 +17,33 @@ limitations under the License.
 package model
 
 import (
+	"testing"
+
 	. "gopkg.in/check.v1"
 )
 
 type appSuite struct{}
+
+func Test(t *testing.T) { TestingT(t) }
 
 var _ = Suite(&appSuite{})
 
 func (s *appSuite) Test_GetMaxFromVersions_MorePreciseIsGreater(c *C) {
 	versions := []string{"0", "0.0", "0.0.0"}
 	maxVer := getMaxFromVersions(versions, "")
-	c.Assert(maxVer.ToString(), Equals, "0.0.0")
+	c.Assert(maxVer.ToString(), Equals, "0")
 }
 
 func (s *appSuite) Test_GetMaxFromVersions_MorePreciseIsGreater2(c *C) {
 	versions := []string{"0", "0.1"}
 	maxVer := getMaxFromVersions(versions, "")
-	c.Assert(maxVer.ToString(), Equals, "0.1")
+	c.Assert(maxVer.ToString(), Equals, "0")
 }
 
 func (s *appSuite) Test_GetMaxFromVersions_SmallerAndHigherBeatsLonger(c *C) {
 	versions := []string{"0.0.1", "0.0.2", "0.0.3", "0.1"}
-	maxVer := getMaxFromVersions(versions, "")
-	c.Assert(maxVer.ToString(), Equals, "0.1")
+	maxVer := getMaxFromVersions(versions, "0.")
+	c.Assert(maxVer.ToString(), Equals, "1")
 }
 
 func (s *appSuite) Test_GetMaxFromVersions_Prefix_Matching(c *C) {
@@ -59,7 +63,7 @@ func (s *appSuite) Test_GetNextVersion(c *C) {
 	c.Assert(err, IsNil)
 	semver, err = GetNextVersion("_", "semver-test", "")
 	c.Assert(err, IsNil)
-	c.Assert(semver, Equals, "0.2")
+	c.Assert(semver, Equals, "1")
 }
 
 func (s *appSuite) Test_GetNextVersion_With_Prefix(c *C) {
@@ -95,4 +99,14 @@ func (s *appSuite) Test_GetNextVersion_ignores_other_projects(c *C) {
 	semver, err = GetNextVersion("_", "semver3-test", "")
 	c.Assert(err, IsNil)
 	c.Assert(semver, Equals, "2")
+}
+
+// Escape #44
+func (s *appSuite) Test_GetNextVersion_should_have_the_number_of_parts_requested_in_the_prefix(c *C) {
+	_, err := AddRelease("_", `{"name": "semver4-test", "version": "0.0.5.0"}`)
+	c.Assert(err, IsNil)
+
+	semver, err := GetNextVersion("_", "semver4-test", "0.0.")
+	c.Assert(err, IsNil)
+	c.Assert(semver, Equals, "0.0.6")
 }
