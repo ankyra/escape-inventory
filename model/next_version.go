@@ -31,6 +31,7 @@ func GetNextVersion(project, app, prefix string) (string, error) {
 		}
 		return "", NewUserError(err)
 	}
+	latest.OnlyKeepLeadingVersionPart()
 	if err := latest.IncrementSmallest(); err != nil {
 		return "", NewUserError(err)
 	}
@@ -56,7 +57,6 @@ func getMaxFromVersions(versions []string, prefix string) *core.SemanticVersion 
 		if strings.HasPrefix(v, prefix) {
 			release_version := v[len(prefix):]
 			newver := core.NewSemanticVersion(release_version)
-			newver.OnlyKeepLeadingVersionPart()
 			if current.LessOrEqual(newver) {
 				current = newver
 			}

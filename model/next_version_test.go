@@ -31,25 +31,25 @@ var _ = Suite(&appSuite{})
 func (s *appSuite) Test_GetMaxFromVersions_MorePreciseIsGreater(c *C) {
 	versions := []string{"0", "0.0", "0.0.0"}
 	maxVer := getMaxFromVersions(versions, "")
-	c.Assert(maxVer.ToString(), Equals, "0")
+	c.Assert(maxVer.ToString(), Equals, "0.0.0")
 }
 
 func (s *appSuite) Test_GetMaxFromVersions_MorePreciseIsGreater2(c *C) {
 	versions := []string{"0", "0.1"}
 	maxVer := getMaxFromVersions(versions, "")
-	c.Assert(maxVer.ToString(), Equals, "0")
+	c.Assert(maxVer.ToString(), Equals, "0.1")
 }
 
 func (s *appSuite) Test_GetMaxFromVersions_SmallerAndHigherBeatsLonger(c *C) {
 	versions := []string{"0.0.1", "0.0.2", "0.0.3", "0.1"}
-	maxVer := getMaxFromVersions(versions, "0.")
-	c.Assert(maxVer.ToString(), Equals, "1")
+	maxVer := getMaxFromVersions(versions, "")
+	c.Assert(maxVer.ToString(), Equals, "0.1")
 }
 
 func (s *appSuite) Test_GetMaxFromVersions_Prefix_Matching(c *C) {
 	versions := []string{"0.0.1", "0.0.2", "0.0.3", "0.1"}
-	maxVer := getMaxFromVersions(versions, "0.0.")
-	c.Assert(maxVer.ToString(), Equals, "3")
+	maxVer := getMaxFromVersions(versions, "0.")
+	c.Assert(maxVer.ToString(), Equals, "1")
 }
 
 func (s *appSuite) Test_GetNextVersion(c *C) {
