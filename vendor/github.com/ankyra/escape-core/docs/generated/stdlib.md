@@ -17,6 +17,35 @@ h2 {
 Standard library functions for the [Escape Scripting Language](../scripting-language/)
 
 
+# Functions acting on integers
+
+## add(y :: integer)
+
+Add two integers
+
+
+# Unary functions
+
+## timestamp()
+
+Returns a UNIX timestamp
+
+
+# Functions acting on bool
+
+## or(b2 :: bool)
+
+Logical OR operation
+
+## not()
+
+Logical NOT operation
+
+## and(b2 :: bool)
+
+Logical AND operation
+
+
 # Functions acting on integer
 
 ## lt(i2 :: integer)
@@ -72,21 +101,33 @@ Slice a list. Usually accessed implicitly using slice syntax (eg. `list[0:5]`)
 
 # Functions acting on strings
 
+## base64_decode()
+
+Decode string from base64
+
+## read_file()
+
+Read the contents of a file
+
+## concat(v1 :: string, v2 :: string, ...)
+
+Concatate stringable arguments
+
+## lower(v :: string)
+
+Returns a copy of the string v with all Unicode characters mapped to their lower case
+
 ## path_exists()
 
 Returns true if the path exists, false if not
 
+## dir_exists()
+
+Returns true if the path exists and if it is a directory, false otherwise
+
 ## base64_encode()
 
 Encode string to base64
-
-## track_minor_version()
-
-Track minor version
-
-## track_patch_version()
-
-Track patch version
 
 ## upper(v :: string)
 
@@ -96,9 +137,25 @@ Returns a copy of the string v with all Unicode characters mapped to their upper
 
 Split slices s into all substrings separated by sep and returns a slice of the substrings between those separators. If sep is empty, Split splits after each UTF-8 sequence.
 
-## dir_exists()
+## file_exists()
 
-Returns true if the path exists and if it is a directory, false otherwise
+Returns true if the path exists and if it's not a directory, false otherwise
+
+## track_major_version()
+
+Track major version
+
+## track_minor_version()
+
+Track minor version
+
+## track_version()
+
+Track version
+
+## title(v :: string)
+
+Returns a copy of the string v with all Unicode characters mapped to their title case
 
 ## replace(old :: string, new :: string, n :: integer)
 
@@ -108,64 +165,7 @@ Replace returns a copy of the string s with the first n non-overlapping instance
 
 Returns a slice of the string s, with all leading and trailing white space removed, as defined by Unicode. 
 
-## concat(v1 :: string, v2 :: string, ...)
+## track_patch_version()
 
-Concatate stringable arguments
-
-## title(v :: string)
-
-Returns a copy of the string v with all Unicode characters mapped to their title case
-
-## read_file()
-
-Read the contents of a file
-
-## track_major_version()
-
-Track major version
-
-## track_version()
-
-Track version
-
-## lower(v :: string)
-
-Returns a copy of the string v with all Unicode characters mapped to their lower case
-
-## base64_decode()
-
-Decode string from base64
-
-## file_exists()
-
-Returns true if the path exists and if it's not a directory, false otherwise
-
-
-# Functions acting on integers
-
-## add(y :: integer)
-
-Add two integers
-
-
-# Unary functions
-
-## timestamp()
-
-Returns a UNIX timestamp
-
-
-# Functions acting on bool
-
-## not()
-
-Logical NOT operation
-
-## and(b2 :: bool)
-
-Logical AND operation
-
-## or(b2 :: bool)
-
-Logical OR operation
+Track patch version
 
