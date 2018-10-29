@@ -45,14 +45,14 @@ func (s *SQLHelper) FindAllVersions(app *Application) ([]string, error) {
 	return s.ReadRowsIntoStringArray(rows)
 }
 
-func (s *SQLHelper) GetRelease(project, name, releaseId string) (*Release, error) {
-	rows, err := s.PrepareAndQuery(s.GetReleaseQuery, project, name, releaseId)
+func (s *SQLHelper) GetRelease(namespace, name, releaseId string) (*Release, error) {
+	rows, err := s.PrepareAndQuery(s.GetReleaseQuery, namespace, name, releaseId)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 	for rows.Next() {
-		return s.scanRelease(project, name, rows)
+		return s.scanRelease(namespace, name, rows)
 	}
 	return nil, NotFound
 }
@@ -73,7 +73,7 @@ func (s *SQLHelper) GetPackageURIs(release *Release) ([]string, error) {
 	return s.ReadRowsIntoStringArray(rows)
 }
 
-func (s *SQLHelper) scanRelease(project, name string, rows *sql.Rows) (*Release, error) {
+func (s *SQLHelper) scanRelease(namespace, name string, rows *sql.Rows) (*Release, error) {
 	var metadataJson, uploadedBy string
 	var processedDependencies bool
 	var downloads int
@@ -85,7 +85,7 @@ func (s *SQLHelper) scanRelease(project, name string, rows *sql.Rows) (*Release,
 	if err != nil {
 		return nil, err
 	}
-	rel := NewRelease(NewApplication(project, name), metadata)
+	rel := NewRelease(NewApplication(namespace, name), metadata)
 	rel.ProcessedDependencies = processedDependencies
 	rel.Downloads = downloads
 	rel.UploadedBy = uploadedBy
@@ -97,18 +97,18 @@ func (s *SQLHelper) scanReleases(rows *sql.Rows) ([]*Release, error) {
 	defer rows.Close()
 	result := []*Release{}
 	for rows.Next() {
-		var project, metadataJson, uploadedBy string
+		var namespace, metadataJson, uploadedBy string
 		var processedDependencies bool
 		var downloads int
 		var uploadedAt int64
-		if err := rows.Scan(&project, &metadataJson, &processedDependencies, &downloads, &uploadedBy, &uploadedAt); err != nil {
+		if err := rows.Scan(&namespace, &metadataJson, &processedDependencies, &downloads, &uploadedBy, &uploadedAt); err != nil {
 			return nil, err
 		}
 		metadata, err := core.NewReleaseMetadataFromJsonString(metadataJson)
 		if err != nil {
 			return nil, err
 		}
-		rel := NewRelease(NewApplication(project, metadata.Name), metadata)
+		rel := NewRelease(NewApplication(namespace, metadata.Name), metadata)
 		rel.ProcessedDependencies = processedDependencies
 		rel.Downloads = downloads
 		rel.UploadedBy = uploadedBy

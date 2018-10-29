@@ -135,26 +135,26 @@ func (s *SQLHelper) GetNamespacesByGroups(readGroups []string) (map[string]*Proj
 	return result, nil
 }
 
-func (s *SQLHelper) HardDeleteNamespace(project string) error {
-	if err := s.PrepareAndExec(s.HardDeleteProjectACLQuery, project); err != nil {
+func (s *SQLHelper) HardDeleteNamespace(namespace string) error {
+	if err := s.PrepareAndExec(s.HardDeleteProjectACLQuery, namespace); err != nil {
 		return err
 	}
-	if err := s.PrepareAndExec(s.HardDeleteProjectUnitSubscriptions, project); err != nil {
+	if err := s.PrepareAndExec(s.HardDeleteProjectUnitSubscriptions, namespace); err != nil {
 		return err
 	}
-	if err := s.PrepareAndExec(s.HardDeleteProjectReleaseDependenciesQuery, project); err != nil {
+	if err := s.PrepareAndExec(s.HardDeleteProjectReleaseDependenciesQuery, namespace); err != nil {
 		return err
 	}
-	if err := s.PrepareAndExec(s.HardDeleteProjectPackageURIsQuery, project); err != nil {
+	if err := s.PrepareAndExec(s.HardDeleteProjectPackageURIsQuery, namespace); err != nil {
 		return err
 	}
-	if err := s.PrepareAndExec(s.HardDeleteProjectReleasesQuery, project); err != nil {
+	if err := s.PrepareAndExec(s.HardDeleteProjectReleasesQuery, namespace); err != nil {
 		return err
 	}
-	if err := s.PrepareAndExec(s.HardDeleteProjectApplicationsQuery, project); err != nil {
+	if err := s.PrepareAndExec(s.HardDeleteProjectApplicationsQuery, namespace); err != nil {
 		return err
 	}
-	if err := s.PrepareAndExec(s.HardDeleteProjectQuery, project); err != nil {
+	if err := s.PrepareAndExec(s.HardDeleteProjectQuery, namespace); err != nil {
 		return err
 	}
 	return nil
