@@ -17,14 +17,15 @@ limitations under the License.
 package gcs
 
 import (
-	"cloud.google.com/go/storage"
 	"fmt"
+	"io"
+	"strings"
+
+	"cloud.google.com/go/storage"
 	"github.com/ankyra/escape-core/parsers"
 	"github.com/ankyra/escape-inventory/config"
 	"golang.org/x/net/context"
 	"google.golang.org/api/option"
-	"io"
-	"strings"
 )
 
 type GoogleCloudStorageBackend struct {
@@ -59,8 +60,8 @@ func (ls *GoogleCloudStorageBackend) Init(settings config.StorageSettings) error
 	return nil
 }
 
-func (ls *GoogleCloudStorageBackend) Upload(project string, releaseId *parsers.ReleaseId, pkg io.ReadSeeker) (string, error) {
-	archive := strings.Join([]string{project, releaseId.Name, releaseId.ToString() + ".tgz"}, "/")
+func (ls *GoogleCloudStorageBackend) Upload(namespace string, releaseId *parsers.ReleaseId, pkg io.ReadSeeker) (string, error) {
+	archive := strings.Join([]string{namespace, releaseId.Name, releaseId.ToString() + ".tgz"}, "/")
 	writer := ls.Bucket.Object(archive).NewWriter(ls.Context)
 	if _, err := io.Copy(writer, pkg); err != nil {
 		return "", err
@@ -71,7 +72,7 @@ func (ls *GoogleCloudStorageBackend) Upload(project string, releaseId *parsers.R
 	return "gcs://" + ls.BucketString + "/" + archive, nil
 }
 
-func (ls *GoogleCloudStorageBackend) Download(project, uri string) (io.Reader, error) {
+func (ls *GoogleCloudStorageBackend) Download(namespace, uri string) (io.Reader, error) {
 	path := uri[len("gcs://"):]
 	parts := strings.SplitN(path, "/", 2)
 	bucket := ls.Client.Bucket(parts[0])
