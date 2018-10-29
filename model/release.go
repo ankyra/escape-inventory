@@ -28,7 +28,7 @@ import (
 )
 
 func ensureNamespaceExists(namespace, username string) error {
-	prj, err := dao.GetProject(namespace)
+	prj, err := dao.GetNamespace(namespace)
 	if err == nil {
 		return nil
 	}
@@ -39,7 +39,7 @@ func ensureNamespaceExists(namespace, username string) error {
 		return NewUserError(err)
 	}
 	prj = NewProject(namespace)
-	return dao.AddProject(prj)
+	return dao.AddNamespace(prj)
 }
 
 func updateApp(app *Application, metadata *core.ReleaseMetadata, byUser string, uploadedAt time.Time) {

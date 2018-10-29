@@ -32,37 +32,37 @@ type release struct {
 }
 
 type dao struct {
-	projectMetadata  map[string]*Project
-	projectHooks     map[*Project]Hooks
-	projects         map[string]map[string]*application
-	apps             map[*Application]*application
-	applicationHooks map[*Application]Hooks
-	subscriptions    map[*Application][]*Application
-	releases         map[*Release]*release
-	acls             map[string]map[string]Permission
-	metrics          map[string]*Metrics
-	providers        map[string]map[string]*MinimalReleaseMetadata
+	namespaceMetadata map[string]*Project
+	namespaceHooks    map[*Project]Hooks
+	namespaces        map[string]map[string]*application
+	apps              map[*Application]*application
+	applicationHooks  map[*Application]Hooks
+	subscriptions     map[*Application][]*Application
+	releases          map[*Release]*release
+	acls              map[string]map[string]Permission
+	metrics           map[string]*Metrics
+	providers         map[string]map[string]*MinimalReleaseMetadata
 }
 
 func NewInMemoryDAO() DAO {
 	return &dao{
-		projectMetadata:  map[string]*Project{},
-		projectHooks:     map[*Project]Hooks{},
-		projects:         map[string]map[string]*application{},
-		apps:             map[*Application]*application{},
-		applicationHooks: map[*Application]Hooks{},
-		subscriptions:    map[*Application][]*Application{},
-		releases:         map[*Release]*release{},
-		acls:             map[string]map[string]Permission{},
-		metrics:          map[string]*Metrics{},
-		providers:        map[string]map[string]*MinimalReleaseMetadata{},
+		namespaceMetadata: map[string]*Project{},
+		namespaceHooks:    map[*Project]Hooks{},
+		namespaces:        map[string]map[string]*application{},
+		apps:              map[*Application]*application{},
+		applicationHooks:  map[*Application]Hooks{},
+		subscriptions:     map[*Application][]*Application{},
+		releases:          map[*Release]*release{},
+		acls:              map[string]map[string]Permission{},
+		metrics:           map[string]*Metrics{},
+		providers:         map[string]map[string]*MinimalReleaseMetadata{},
 	}
 }
 
 func (a *dao) WipeDatabase() error {
-	a.projectMetadata = map[string]*Project{}
-	a.projectHooks = map[*Project]Hooks{}
-	a.projects = map[string]map[string]*application{}
+	a.namespaceMetadata = map[string]*Project{}
+	a.namespaceHooks = map[*Project]Hooks{}
+	a.namespaces = map[string]map[string]*application{}
 	a.apps = map[*Application]*application{}
 	a.applicationHooks = map[*Application]Hooks{}
 	a.subscriptions = map[*Application][]*Application{}

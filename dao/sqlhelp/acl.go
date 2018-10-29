@@ -6,18 +6,18 @@ import (
 
 func (s *SQLHelper) SetACL(project, group string, perm Permission) error {
 	err := s.PrepareAndExecInsert(s.InsertACLQuery,
-		project,
+		namespace,
 		group,
 		int(perm))
 	if err == AlreadyExists {
 		return s.PrepareAndExecUpdate(s.UpdateACLQuery,
-			int(perm), project, group)
+			int(perm), namespace, group)
 	}
 	return err
 }
 
-func (s *SQLHelper) GetACL(project string) (map[string]Permission, error) {
-	rows, err := s.PrepareAndQuery(s.GetACLQuery, project)
+func (s *SQLHelper) GetACL(namespace string) (map[string]Permission, error) {
+	rows, err := s.PrepareAndQuery(s.GetACLQuery, namespace)
 	if err != nil {
 		return nil, err
 	}
@@ -34,14 +34,14 @@ func (s *SQLHelper) GetACL(project string) (map[string]Permission, error) {
 	return result, nil
 }
 
-func (s *SQLHelper) DeleteACL(project, group string) error {
+func (s *SQLHelper) DeleteACL(namespace, group string) error {
 	return s.PrepareAndExec(s.DeleteACLQuery,
-		project,
+		namespace,
 		group)
 }
 
-func (s *SQLHelper) GetPermittedGroups(project string, perm Permission) ([]string, error) {
-	rows, err := s.PrepareAndQuery(s.GetPermittedGroupsQuery, project, int(perm))
+func (s *SQLHelper) GetPermittedGroups(namespace string, perm Permission) ([]string, error) {
+	rows, err := s.PrepareAndQuery(s.GetPermittedGroupsQuery, namespace, int(perm))
 	if err != nil {
 		return nil, err
 	}

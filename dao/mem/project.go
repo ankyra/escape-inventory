@@ -4,25 +4,25 @@ import (
 	. "github.com/ankyra/escape-inventory/dao/types"
 )
 
-func (a *dao) UpdateProject(project *Project) error {
-	_, exists := a.projectMetadata[project.Name]
+func (a *dao) UpdateNamespace(project *Project) error {
+	_, exists := a.namespaceMetadata[project.Name]
 	if !exists {
 		return NotFound
 	}
-	a.projectMetadata[project.Name] = project
+	a.namespaceMetadata[project.Name] = project
 	return nil
 }
 
-func (a *dao) GetProjects() (map[string]*Project, error) {
-	return a.projectMetadata, nil
+func (a *dao) GetNamespaces() (map[string]*Project, error) {
+	return a.namespaceMetadata, nil
 }
 
-func (a *dao) GetProjectsByGroups(readGroups []string) (map[string]*Project, error) {
+func (a *dao) GetNamespacesByGroups(readGroups []string) (map[string]*Project, error) {
 	result := map[string]*Project{}
-	for name, project := range a.projectMetadata {
+	for name, namespaceMetadata := range a.namespaceMetadata {
 		allowedGroups, found := a.acls[name]
 		if found {
-			project.MatchingGroups = []string{}
+			namespaceMetadata.MatchingGroups = []string{}
 			matchedGroups := map[string]bool{}
 			for _, g := range readGroups {
 				_, found := allowedGroups[g]
@@ -36,80 +36,80 @@ func (a *dao) GetProjectsByGroups(readGroups []string) (map[string]*Project, err
 			}
 			if len(matchedGroups) > 0 {
 				for key, _ := range matchedGroups {
-					project.MatchingGroups = append(project.MatchingGroups, key)
+					namespaceMetadata.MatchingGroups = append(namespaceMetadata.MatchingGroups, key)
 				}
-				result[name] = project
+				result[name] = namespaceMetadata
 			}
 		}
 	}
 	return result, nil
 }
 
-func (a *dao) GetProject(project string) (*Project, error) {
-	prj, ok := a.projectMetadata[project]
+func (a *dao) GetNamespace(namespace string) (*Project, error) {
+	prj, ok := a.namespaceMetadata[namespace]
 	if !ok {
 		return nil, NotFound
 	}
 	return prj, nil
 }
 
-func (a *dao) AddProject(project *Project) error {
-	project.Permission = "admin"
-	_, exists := a.projectMetadata[project.Name]
+func (a *dao) AddNamespace(namespace *Project) error {
+	namespace.Permission = "admin"
+	_, exists := a.namespaceMetadata[namespace.Name]
 	if exists {
 		return AlreadyExists
 	}
-	_, ok := a.projects[project.Name]
+	_, ok := a.namespaces[namespace.Name]
 	if !ok {
-		a.projects[project.Name] = map[string]*application{}
+		a.namespaces[namespace.Name] = map[string]*application{}
 	}
-	a.projectMetadata[project.Name] = project
-	a.projectHooks[project] = NewHooks()
+	a.namespaceMetadata[namespace.Name] = namespace
+	a.namespaceHooks[namespace] = NewHooks()
 	return nil
 }
 
-func (a *dao) GetProjectHooks(project *Project) (Hooks, error) {
-	project, ok := a.projectMetadata[project.Name]
+func (a *dao) GetNamespaceHooks(namespace *Project) (Hooks, error) {
+	namespace, ok := a.namespaceMetadata[namespace.Name]
 	if !ok {
 		return nil, NotFound
 	}
-	return a.projectHooks[project], nil
+	return a.namespaceHooks[namespace], nil
 }
 
-func (a *dao) SetProjectHooks(project *Project, hooks Hooks) error {
-	project, ok := a.projectMetadata[project.Name]
+func (a *dao) SetNamespaceHooks(namespace *Project, hooks Hooks) error {
+	namespace, ok := a.namespaceMetadata[namespace.Name]
 	if !ok {
 		return NotFound
 	}
-	a.projectHooks[project] = hooks
+	a.namespaceHooks[namespace] = hooks
 	return nil
 }
 
-func (a *dao) HardDeleteProject(project string) error {
-	prj, exists := a.projectMetadata[project]
+func (a *dao) HardDeleteNamespace(namespace string) error {
+	namespaceMetadata, exists := a.namespaceMetadata[namespace]
 	if !exists {
 		return NotFound
 	}
 	toDelete := []*Application{}
 	for app, _ := range a.subscriptions {
-		if app.Project == project {
+		if app.Project == namespace {
 			toDelete = append(toDelete, app)
 		}
 	}
 	for _, i := range toDelete {
 		delete(a.subscriptions, i)
 	}
-	for _, app := range a.projects[project] {
+	for _, app := range a.namespaces[namespace] {
 		delete(a.applicationHooks, app.App)
 		for _, rel := range a.apps[app.App].Releases {
 			delete(a.releases, rel.Release)
 		}
 		delete(a.apps, app.App)
 	}
-	delete(a.projectMetadata, project)
-	delete(a.projectHooks, prj)
-	delete(a.projects, project)
-	delete(a.acls, project)
+	delete(a.namespaceMetadata, namespace)
+	delete(a.namespaceHooks, namespaceMetadata)
+	delete(a.namespaces, namespace)
+	delete(a.acls, namespace)
 
 	return nil
 }

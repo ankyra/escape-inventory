@@ -57,40 +57,40 @@ func TestSetup() {
 	GlobalDAO = mem.NewInMemoryDAO()
 }
 
-func GetProject(project string) (*Project, error) {
-	return GlobalDAO.GetProject(project)
+func GetNamespace(namespace string) (*Project, error) {
+	return GlobalDAO.GetNamespace(namespace)
 }
 
-func AddProject(project *Project) error {
-	return GlobalDAO.AddProject(project)
+func AddNamespace(namespace *Project) error {
+	return GlobalDAO.AddNamespace(namespace)
 }
 
-func UpdateProject(project *Project) error {
-	return GlobalDAO.UpdateProject(project)
+func UpdateNamespace(namespace *Project) error {
+	return GlobalDAO.UpdateNamespace(namespace)
 }
 
-func GetProjects() (map[string]*Project, error) {
-	return GlobalDAO.GetProjects()
+func GetNamespaces() (map[string]*Project, error) {
+	return GlobalDAO.GetNamespaces()
 }
 
-func GetProjectsByGroups(readGroups []string) (map[string]*Project, error) {
-	return GlobalDAO.GetProjectsByGroups(readGroups)
+func GetNamespacesByGroups(readGroups []string) (map[string]*Project, error) {
+	return GlobalDAO.GetNamespacesByGroups(readGroups)
 }
 
-func GetProjectHooks(project *Project) (Hooks, error) {
-	return GlobalDAO.GetProjectHooks(project)
+func GetNamespaceHooks(namespace *Project) (Hooks, error) {
+	return GlobalDAO.GetNamespaceHooks(namespace)
 }
 
-func SetProjectHooks(project *Project, hooks Hooks) error {
-	return GlobalDAO.SetProjectHooks(project, hooks)
+func SetNamespaceHooks(namespace *Project, hooks Hooks) error {
+	return GlobalDAO.SetNamespaceHooks(namespace, hooks)
 }
 
-func HardDeleteProject(project string) error {
-	return GlobalDAO.HardDeleteProject(project)
+func HardDeleteNamespace(namespace string) error {
+	return GlobalDAO.HardDeleteNamespace(namespace)
 }
 
-func GetApplications(project string) (map[string]*Application, error) {
-	return GlobalDAO.GetApplications(project)
+func GetApplications(namespace string) (map[string]*Application, error) {
+	return GlobalDAO.GetApplications(namespace)
 }
 
 func AddApplication(app *Application) error {
@@ -101,8 +101,8 @@ func UpdateApplication(app *Application) error {
 	return GlobalDAO.UpdateApplication(app)
 }
 
-func GetApplication(project, name string) (*Application, error) {
-	return GlobalDAO.GetApplication(project, name)
+func GetApplication(namespace, name string) (*Application, error) {
+	return GlobalDAO.GetApplication(namespace, name)
 }
 
 func GetApplicationHooks(app *Application) (Hooks, error) {
@@ -127,8 +127,8 @@ func UpdateRelease(release *Release) error {
 	return GlobalDAO.UpdateRelease(release)
 }
 
-func GetRelease(project, name, releaseId string) (*Release, error) {
-	return GlobalDAO.GetRelease(project, name, releaseId)
+func GetRelease(namespace, name, releaseId string) (*Release, error) {
+	return GlobalDAO.GetRelease(namespace, name, releaseId)
 }
 
 func GetProviders(providerName string) (map[string]*MinimalReleaseMetadata, error) {
@@ -145,20 +145,20 @@ func FindAllVersions(app *Application) ([]string, error) {
 	return GlobalDAO.FindAllVersions(app)
 }
 
-func GetPermittedGroups(project string, perm Permission) ([]string, error) {
-	return GlobalDAO.GetPermittedGroups(project, perm)
+func GetPermittedGroups(namespace string, perm Permission) ([]string, error) {
+	return GlobalDAO.GetPermittedGroups(namespace, perm)
 }
 
-func SetACL(project, group string, perm Permission) error {
-	return GlobalDAO.SetACL(project, group, perm)
+func SetACL(namespace, group string, perm Permission) error {
+	return GlobalDAO.SetACL(namespace, group, perm)
 }
 
-func GetACL(project string) (map[string]Permission, error) {
-	return GlobalDAO.GetACL(project)
+func GetACL(namespace string) (map[string]Permission, error) {
+	return GlobalDAO.GetACL(namespace)
 }
 
-func DeleteACL(project, group string) error {
-	return GlobalDAO.DeleteACL(project, group)
+func DeleteACL(namespace, group string) error {
+	return GlobalDAO.DeleteACL(namespace, group)
 }
 
 func GetPackageURIs(r *Release) ([]string, error) {

@@ -30,7 +30,7 @@ func ValidateDAO(dao func() DAO, c *C) {
 	Validate_AddRelease_Big_Metadata(dao(), c)
 	Validate_GetRelease(dao(), c)
 	Validate_GetRelease_NotFound(dao(), c)
-	Validate_GetProjects(dao(), c)
+	Validate_GetNamespaces(dao(), c)
 	Validate_ProjectMetadata(dao(), c)
 	Validate_GetProjectsByGroups(dao(), c)
 	Validate_ApplicationMetadata(dao(), c)
@@ -47,13 +47,13 @@ func ValidateDAO(dao func() DAO, c *C) {
 	Validate_DependenciesByGroups(dao(), c)
 	Validate_Metrics(dao(), c)
 	Validate_Providers(dao(), c)
-	Validate_HardDeleteProject(dao(), c)
+	Validate_HardDeleteNamespace(dao(), c)
 	Validate_WipeDatabase(dao(), c)
 }
 
 func addReleaseToProject(dao DAO, c *C, name, version, project string) *Release {
 	app := NewApplication(project, name)
-	dao.AddProject(NewProject(project))
+	dao.AddNamespace(NewProject(project))
 	dao.AddApplication(app)
 	metadataJson := `{"name": "` + name + `", "version": "` + version + `"}`
 	metadata, err := core.NewReleaseMetadataFromJsonString(metadataJson)
@@ -71,7 +71,7 @@ func addRelease(dao DAO, c *C, name, version string) *Release {
 
 func Validate_AddRelease_Unique(dao DAO, c *C) {
 	app := NewApplication("_", "dao-val")
-	c.Assert(dao.AddProject(NewProject("_")), IsNil)
+	c.Assert(dao.AddNamespace(NewProject("_")), IsNil)
 	c.Assert(dao.AddApplication(app), IsNil)
 	metadataJson := `{"name": "dao-val", "version": "1"}`
 	metadata, err := core.NewReleaseMetadataFromJsonString(metadataJson)
@@ -83,9 +83,9 @@ func Validate_AddRelease_Unique(dao DAO, c *C) {
 func Validate_AddRelease_Unique_per_project(dao DAO, c *C) {
 	app1 := NewApplication("_", "dao-val")
 	app2 := NewApplication("my-project", "dao-val")
-	c.Assert(dao.AddProject(NewProject("_")), IsNil)
+	c.Assert(dao.AddNamespace(NewProject("_")), IsNil)
 	c.Assert(dao.AddApplication(app1), IsNil)
-	c.Assert(dao.AddProject(NewProject("my-project")), IsNil)
+	c.Assert(dao.AddNamespace(NewProject("my-project")), IsNil)
 	c.Assert(dao.AddApplication(app2), IsNil)
 	metadataJson := `{"name": "dao-val", "version": "1"}`
 	metadata, err := core.NewReleaseMetadataFromJsonString(metadataJson)
@@ -96,7 +96,7 @@ func Validate_AddRelease_Unique_per_project(dao DAO, c *C) {
 
 func Validate_AddRelease_Big_Metadata(dao DAO, c *C) {
 	app1 := NewApplication("_", "dao-val")
-	c.Assert(dao.AddProject(NewProject("_")), IsNil)
+	c.Assert(dao.AddNamespace(NewProject("_")), IsNil)
 	c.Assert(dao.AddApplication(app1), IsNil)
 	longValue := RandomString(70000)
 	metadataJson := `{"name": "dao-val", "metadata": {"key": "` + longValue + `"}, "version": "1"}`
@@ -124,16 +124,16 @@ func Validate_GetRelease_NotFound(dao DAO, c *C) {
 	c.Assert(err, Equals, NotFound)
 }
 
-func Validate_GetProjects(dao DAO, c *C) {
-	empty, err := dao.GetProjects()
+func Validate_GetNamespaces(dao DAO, c *C) {
+	empty, err := dao.GetNamespaces()
 	c.Assert(err, IsNil)
 	c.Assert(empty, HasLen, 0)
 
-	c.Assert(dao.AddProject(NewProject("_")), IsNil)
-	c.Assert(dao.AddProject(NewProject("project1")), Equals, nil)
-	c.Assert(dao.AddProject(NewProject("project2")), Equals, nil)
+	c.Assert(dao.AddNamespace(NewProject("_")), IsNil)
+	c.Assert(dao.AddNamespace(NewProject("project1")), Equals, nil)
+	c.Assert(dao.AddNamespace(NewProject("project2")), Equals, nil)
 
-	projects, err := dao.GetProjects()
+	projects, err := dao.GetNamespaces()
 	c.Assert(err, IsNil)
 	c.Assert(projects, HasLen, 3)
 	c.Assert(projects["_"].Name, Equals, "_")
@@ -149,49 +149,49 @@ func Validate_GetProjects(dao DAO, c *C) {
 func Validate_ProjectMetadata(dao DAO, c *C) {
 	update := NewProject("test")
 	update.Description = "yo"
-	_, err := dao.GetProject("test")
+	_, err := dao.GetNamespace("test")
 	c.Assert(err, Equals, NotFound)
-	hooks, err := dao.GetProjectHooks(update)
+	hooks, err := dao.GetNamespaceHooks(update)
 	c.Assert(err, Equals, NotFound)
-	c.Assert(dao.UpdateProject(update), Equals, NotFound)
-	c.Assert(dao.AddProject(update), IsNil)
-	c.Assert(dao.AddProject(update), Equals, AlreadyExists)
-	hooks, err = dao.GetProjectHooks(update)
+	c.Assert(dao.UpdateNamespace(update), Equals, NotFound)
+	c.Assert(dao.AddNamespace(update), IsNil)
+	c.Assert(dao.AddNamespace(update), Equals, AlreadyExists)
+	hooks, err = dao.GetNamespaceHooks(update)
 	c.Assert(err, IsNil)
 
-	project, err := dao.GetProject("test")
+	project, err := dao.GetNamespace("test")
 	c.Assert(err, IsNil)
 	c.Assert(project.Name, Equals, "test")
 	c.Assert(project.Description, Equals, "yo")
 
 	update = NewProject("test")
 	update.Description = "new description"
-	c.Assert(dao.UpdateProject(update), IsNil)
+	c.Assert(dao.UpdateNamespace(update), IsNil)
 
-	project, err = dao.GetProject("test")
+	project, err = dao.GetNamespace("test")
 	c.Assert(err, IsNil)
 	c.Assert(project.Description, Equals, "new description")
 
-	hooks, err = dao.GetProjectHooks(project)
+	hooks, err = dao.GetNamespaceHooks(project)
 	c.Assert(err, IsNil)
 	c.Assert(hooks, HasLen, 0)
 
 	newHooks := NewHooks()
 	newHooks["slack"] = map[string]string{}
 	newHooks["slack"]["url"] = "http://example.com"
-	c.Assert(dao.SetProjectHooks(project, newHooks), IsNil)
+	c.Assert(dao.SetNamespaceHooks(project, newHooks), IsNil)
 
-	hooks, err = dao.GetProjectHooks(project)
+	hooks, err = dao.GetNamespaceHooks(project)
 	c.Assert(err, IsNil)
 	c.Assert(hooks, HasLen, 1)
 	c.Assert(hooks["slack"]["url"], Equals, "http://example.com")
 }
 
-func Validate_HardDeleteProject(dao DAO, c *C) {
+func Validate_HardDeleteNamespace(dao DAO, c *C) {
 	prj := NewProject("_")
 	otherPrj := NewProject("other-prj")
-	c.Assert(dao.AddProject(prj), IsNil)
-	c.Assert(dao.AddProject(otherPrj), IsNil)
+	c.Assert(dao.AddNamespace(prj), IsNil)
+	c.Assert(dao.AddNamespace(otherPrj), IsNil)
 	c.Assert(dao.AddApplication(NewApplication("_", "yoooo")), IsNil)
 	release := addRelease(dao, c, "dao-val", "1")
 	c.Assert(dao.AddPackageURI(release, "http://example.com"), IsNil)
@@ -206,7 +206,7 @@ func Validate_HardDeleteProject(dao DAO, c *C) {
 	hooks["test"] = map[string]string{
 		"wut": "wat",
 	}
-	c.Assert(dao.SetProjectHooks(prj, hooks), IsNil)
+	c.Assert(dao.SetNamespaceHooks(prj, hooks), IsNil)
 	app := NewApplication("_", "dao-val")
 	c.Assert(dao.SetApplicationHooks(app, hooks), IsNil)
 	otherApp := NewApplication("other-prj", "yo-yo")
@@ -216,13 +216,13 @@ func Validate_HardDeleteProject(dao DAO, c *C) {
 	c.Assert(dao.SetApplicationSubscribesToUpdatesFrom(app, []*Application{otherApp}), IsNil)
 
 	// Before Delete
-	_, err := dao.GetProject("_")
+	_, err := dao.GetNamespace("_")
 	c.Assert(err, IsNil)
-	c.Assert(dao.UpdateProject(prj), IsNil)
-	prjs, err := dao.GetProjects()
+	c.Assert(dao.UpdateNamespace(prj), IsNil)
+	prjs, err := dao.GetNamespaces()
 	c.Assert(err, IsNil)
 	c.Assert(prjs, HasLen, 2)
-	hooks, err = dao.GetProjectHooks(prj)
+	hooks, err = dao.GetNamespaceHooks(prj)
 	c.Assert(err, IsNil)
 	c.Assert(hooks, HasLen, 1)
 	_, err = dao.GetApplication("_", "dao-val")
@@ -255,19 +255,19 @@ func Validate_HardDeleteProject(dao DAO, c *C) {
 	perm, err := dao.GetACL("_")
 	c.Assert(err, IsNil)
 	c.Assert(perm["group1"], Equals, ReadPermission)
-	c.Assert(dao.AddProject(prj), Equals, AlreadyExists)
+	c.Assert(dao.AddNamespace(prj), Equals, AlreadyExists)
 
 	// Delete
-	c.Assert(dao.HardDeleteProject("_"), IsNil)
+	c.Assert(dao.HardDeleteNamespace("_"), IsNil)
 
 	// After Delete
-	_, err = dao.GetProject("_")
+	_, err = dao.GetNamespace("_")
 	c.Assert(err, Equals, NotFound)
-	c.Assert(dao.UpdateProject(prj), Equals, NotFound)
-	prjs, err = dao.GetProjects()
+	c.Assert(dao.UpdateNamespace(prj), Equals, NotFound)
+	prjs, err = dao.GetNamespaces()
 	c.Assert(err, IsNil)
 	c.Assert(prjs, HasLen, 1)
-	_, err = dao.GetProjectHooks(prj)
+	_, err = dao.GetNamespaceHooks(prj)
 	c.Assert(err, Equals, NotFound)
 	_, err = dao.GetApplicationHooks(app)
 	c.Assert(err, Equals, NotFound)
@@ -299,7 +299,7 @@ func Validate_HardDeleteProject(dao DAO, c *C) {
 	c.Assert(err, IsNil)
 
 	// Re-adding
-	c.Assert(dao.AddProject(prj), IsNil)
+	c.Assert(dao.AddNamespace(prj), IsNil)
 	c.Assert(dao.AddApplication(NewApplication("_", "dao-val")), IsNil)
 	addRelease(dao, c, "dao-val", "1")
 
@@ -310,7 +310,7 @@ func Validate_HardDeleteProject(dao DAO, c *C) {
 	apps, err = dao.GetApplications("_")
 	c.Assert(err, IsNil)
 	c.Assert(apps, HasLen, 1)
-	hooks, err = dao.GetProjectHooks(prj)
+	hooks, err = dao.GetNamespaceHooks(prj)
 	c.Assert(err, IsNil)
 	c.Assert(hooks, HasLen, 0)
 	appHooks, err = dao.GetApplicationHooks(app)
@@ -337,19 +337,19 @@ func Validate_GetProjectsByGroups(dao DAO, c *C) {
 	cases := [][]string{anon, oneGroup, allGroups}
 
 	for _, testCase := range cases {
-		empty, err := dao.GetProjectsByGroups(testCase)
+		empty, err := dao.GetNamespacesByGroups(testCase)
 		c.Assert(err, IsNil)
 		c.Assert(empty, HasLen, 0)
 	}
 
-	c.Assert(dao.AddProject(NewProject("_")), Equals, nil)
-	c.Assert(dao.AddProject(NewProject("project1")), Equals, nil)
-	c.Assert(dao.AddProject(NewProject("project2")), Equals, nil)
+	c.Assert(dao.AddNamespace(NewProject("_")), Equals, nil)
+	c.Assert(dao.AddNamespace(NewProject("project1")), Equals, nil)
+	c.Assert(dao.AddNamespace(NewProject("project2")), Equals, nil)
 
 	c.Assert(dao.SetACL("_", "*", ReadPermission), IsNil)
 
 	for _, testCase := range cases {
-		projects, err := dao.GetProjectsByGroups(testCase)
+		projects, err := dao.GetNamespacesByGroups(testCase)
 		c.Assert(err, IsNil)
 		c.Assert(projects, HasLen, 1, Commentf("%s should have one group, got %v", testCase, projects))
 		c.Assert(projects["_"].Name, Equals, "_")
@@ -360,11 +360,11 @@ func Validate_GetProjectsByGroups(dao DAO, c *C) {
 	c.Assert(dao.SetACL("project1", "project1", ReadPermission), IsNil)
 	c.Assert(dao.SetACL("_", "project1", WritePermission), IsNil)
 
-	projects, err := dao.GetProjectsByGroups(anon)
+	projects, err := dao.GetNamespacesByGroups(anon)
 	c.Assert(err, IsNil)
 	c.Assert(projects, HasLen, 1)
 
-	projects, err = dao.GetProjectsByGroups(oneGroup)
+	projects, err = dao.GetNamespacesByGroups(oneGroup)
 	c.Assert(err, IsNil)
 	c.Assert(projects, HasLen, 2)
 	c.Assert(projects["_"].Name, Equals, "_")
@@ -376,7 +376,7 @@ func Validate_GetProjectsByGroups(dao DAO, c *C) {
 	c.Assert(projects["_"].Permission, Equals, "admin")
 	c.Assert(projects["project1"].Permission, Equals, "admin")
 
-	projects, err = dao.GetProjectsByGroups(allGroups)
+	projects, err = dao.GetNamespacesByGroups(allGroups)
 	c.Assert(err, IsNil)
 	c.Assert(projects, HasLen, 2)
 	c.Assert(projects["_"].Name, Equals, "_")
@@ -392,15 +392,15 @@ func Validate_GetProjectsByGroups(dao DAO, c *C) {
 	c.Assert(dao.SetACL("project1", "project2", ReadPermission), IsNil)
 	c.Assert(dao.SetACL("project2", "project2", ReadPermission), IsNil)
 
-	projects, err = dao.GetProjectsByGroups(anon)
+	projects, err = dao.GetNamespacesByGroups(anon)
 	c.Assert(err, IsNil)
 	c.Assert(projects, HasLen, 1)
 
-	projects, err = dao.GetProjectsByGroups(oneGroup)
+	projects, err = dao.GetNamespacesByGroups(oneGroup)
 	c.Assert(err, IsNil)
 	c.Assert(projects, HasLen, 2)
 
-	projects, err = dao.GetProjectsByGroups(allGroups)
+	projects, err = dao.GetNamespacesByGroups(allGroups)
 	c.Assert(err, IsNil)
 	c.Assert(projects, HasLen, 3)
 	c.Assert(projects["_"].Name, Equals, "_")
@@ -430,7 +430,7 @@ func Validate_ApplicationMetadata(dao DAO, c *C) {
 	hooks, err := dao.GetApplicationHooks(app)
 	c.Assert(err, Equals, NotFound)
 
-	c.Assert(dao.AddProject(NewProject("project")), Equals, nil)
+	c.Assert(dao.AddNamespace(NewProject("project")), Equals, nil)
 	hooks, err = dao.GetApplicationHooks(app)
 	c.Assert(err, Equals, NotFound)
 	c.Assert(hooks, HasLen, 0)
@@ -472,7 +472,7 @@ func Validate_GetDownstreamHooks(dao DAO, c *C) {
 	app1 := NewApplication("project", "app1")
 	app2 := NewApplication("project", "app2")
 	app3 := NewApplication("project", "app3")
-	c.Assert(dao.AddProject(NewProject("project")), Equals, nil)
+	c.Assert(dao.AddNamespace(NewProject("project")), Equals, nil)
 	c.Assert(dao.AddApplication(app1), IsNil)
 	c.Assert(dao.AddApplication(app2), IsNil)
 	c.Assert(dao.AddApplication(app3), IsNil)
@@ -495,8 +495,8 @@ func Validate_GetApplications(dao DAO, c *C) {
 	app2 := NewApplication("_", "ansible")
 	app2.Description = "ansible stuff"
 	app3 := NewApplication("other-project", "whatever")
-	c.Assert(dao.AddProject(NewProject("_")), IsNil)
-	c.Assert(dao.AddProject(NewProject("other-project")), IsNil)
+	c.Assert(dao.AddNamespace(NewProject("_")), IsNil)
+	c.Assert(dao.AddNamespace(NewProject("other-project")), IsNil)
 	c.Assert(dao.AddApplication(app1), IsNil)
 	c.Assert(dao.AddApplication(app2), IsNil)
 	c.Assert(dao.AddApplication(app3), IsNil)
@@ -514,7 +514,7 @@ func Validate_GetApplications(dao DAO, c *C) {
 }
 
 func Validate_FindAllVersions(dao DAO, c *C) {
-	c.Assert(dao.AddProject(NewProject("_")), IsNil)
+	c.Assert(dao.AddNamespace(NewProject("_")), IsNil)
 	app := NewApplication("_", "dao-val")
 	c.Assert(dao.AddApplication(app), IsNil)
 	addRelease(dao, c, "dao-val", "0.0.1")
@@ -538,7 +538,7 @@ func Validate_FindAllVersions(dao DAO, c *C) {
 }
 
 func Validate_FindAllVersions_Empty(dao DAO, c *C) {
-	c.Assert(dao.AddProject(NewProject("_")), IsNil)
+	c.Assert(dao.AddNamespace(NewProject("_")), IsNil)
 	app := NewApplication("_", "dao-val")
 	c.Assert(dao.AddApplication(app), IsNil)
 	addRelease(dao, c, "dao-val", "0.1")
@@ -805,7 +805,7 @@ func Validate_WipeDatabase(dao DAO, c *C) {
 	addReleaseToProject(dao, c, "test", "1.0.0", "test-project")
 	dao.WipeDatabase()
 
-	projects, _ := dao.GetProjects()
+	projects, _ := dao.GetNamespaces()
 	c.Assert(projects, HasLen, 0)
 }
 

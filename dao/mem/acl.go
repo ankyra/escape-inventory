@@ -4,35 +4,35 @@ import (
 	. "github.com/ankyra/escape-inventory/dao/types"
 )
 
-func (a *dao) SetACL(project, group string, perm Permission) error {
-	groups, ok := a.acls[project]
+func (a *dao) SetACL(namespace, group string, perm Permission) error {
+	groups, ok := a.acls[namespace]
 	if !ok {
 		groups = map[string]Permission{}
 	}
 	groups[group] = perm
-	a.acls[project] = groups
+	a.acls[namespace] = groups
 	return nil
 }
 
-func (a *dao) GetACL(project string) (map[string]Permission, error) {
-	groups, ok := a.acls[project]
+func (a *dao) GetACL(namespace string) (map[string]Permission, error) {
+	groups, ok := a.acls[namespace]
 	if !ok {
 		groups = map[string]Permission{}
 	}
 	return groups, nil
 }
 
-func (a *dao) DeleteACL(project, group string) error {
-	groups, ok := a.acls[project]
+func (a *dao) DeleteACL(namespace, group string) error {
+	groups, ok := a.acls[namespace]
 	if !ok {
 		return nil
 	}
 	delete(groups, group)
 	return nil
 }
-func (a *dao) GetPermittedGroups(project string, perm Permission) ([]string, error) {
+func (a *dao) GetPermittedGroups(namespace string, perm Permission) ([]string, error) {
 	result := []string{}
-	groups, ok := a.acls[project]
+	groups, ok := a.acls[namespace]
 	if !ok {
 		return result, nil
 	}

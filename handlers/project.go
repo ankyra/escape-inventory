@@ -41,13 +41,13 @@ type namespaceHandlerProvider struct {
 
 func newNamespaceHandlerProvider() *namespaceHandlerProvider {
 	return &namespaceHandlerProvider{
-		GetNamespaces:        dao.GetProjects,
+		GetNamespaces:        dao.GetNamespaces,
 		GetNamespace:         model.GetNamespace,
 		AddNamespace:         model.AddNamespace,
 		UpdateNamespace:      model.UpdateNamespace,
 		GetNamespaceHooks:    model.GetNamespaceHooks,
 		UpdateNamespaceHooks: model.UpdateNamespaceHooks,
-		HardDeleteNamespace:  dao.HardDeleteProject,
+		HardDeleteNamespace:  dao.HardDeleteNamespace,
 	}
 }
 
