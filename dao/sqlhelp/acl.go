@@ -4,7 +4,7 @@ import (
 	. "github.com/ankyra/escape-inventory/dao/types"
 )
 
-func (s *SQLHelper) SetACL(project, group string, perm Permission) error {
+func (s *SQLHelper) SetACL(namespace, group string, perm Permission) error {
 	err := s.PrepareAndExecInsert(s.InsertACLQuery,
 		namespace,
 		group,

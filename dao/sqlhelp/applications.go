@@ -30,16 +30,16 @@ func (s *SQLHelper) UpdateApplication(app *Application) error {
 	)
 }
 
-func (s *SQLHelper) GetApplications(project string) (map[string]*Application, error) {
-	rows, err := s.PrepareAndQuery(s.GetApplicationsQuery, project)
+func (s *SQLHelper) GetApplications(namespace string) (map[string]*Application, error) {
+	rows, err := s.PrepareAndQuery(s.GetApplicationsQuery, namespace)
 	if err != nil {
 		return nil, err
 	}
 	return s.scanApplications(rows)
 }
 
-func (s *SQLHelper) GetApplication(project, name string) (*Application, error) {
-	rows, err := s.PrepareAndQuery(s.GetApplicationQuery, project, name)
+func (s *SQLHelper) GetApplication(namespace, name string) (*Application, error) {
+	rows, err := s.PrepareAndQuery(s.GetApplicationQuery, namespace, name)
 	if err != nil {
 		return nil, err
 	}
@@ -116,14 +116,14 @@ func (s *SQLHelper) GetDownstreamHooks(app *Application) ([]*Hooks, error) {
 }
 
 func (s *SQLHelper) scanApplication(rows *sql.Rows) (*Application, error) {
-	var name, project, description, latestVersion, logo, uploadedBy string
+	var name, namespace, description, latestVersion, logo, uploadedBy string
 	var uploadedAt int64
-	if err := rows.Scan(&name, &project, &description, &latestVersion, &logo, &uploadedBy, &uploadedAt); err != nil {
+	if err := rows.Scan(&name, &namespace, &description, &latestVersion, &logo, &uploadedBy, &uploadedAt); err != nil {
 		return nil, err
 	}
 	return &Application{
 		Name:          name,
-		Project:       project,
+		Project:       namespace,
 		Description:   description,
 		LatestVersion: latestVersion,
 		Logo:          logo,
