@@ -17,7 +17,7 @@ func CallWebHook(namespace, unit, version, releaseId, username, url string) {
 	}
 	prj := types.NewProject(namespace)
 	app := types.NewApplication(namespace, unit)
-	prjHooks, err := dao.GetProjectHooks(prj)
+	prjHooks, err := dao.GetNamespaceHooks(prj)
 	if err != nil {
 		log.Println("ERROR: Failed to get Inventory Project Hooks from database:", err)
 		return

@@ -9,25 +9,25 @@ import (
 	. "github.com/ankyra/escape-inventory/dao/types"
 )
 
-func (s *SQLHelper) AddProject(project *Project) error {
+func (s *SQLHelper) AddNamespace(namespace *Project) error {
 	return s.PrepareAndExecInsert(s.AddProjectQuery,
-		project.Name,
-		project.Description,
-		project.OrgURL,
-		project.Logo)
+		namespace.Name,
+		namespace.Description,
+		namespace.OrgURL,
+		namespace.Logo)
 }
 
-func (s *SQLHelper) UpdateProject(project *Project) error {
+func (s *SQLHelper) UpdateNamespace(namespace *Project) error {
 	return s.PrepareAndExecUpdate(s.UpdateProjectQuery,
-		project.Name,
-		project.Description,
-		project.OrgURL,
-		project.Logo,
-		project.Name)
+		namespace.Name,
+		namespace.Description,
+		namespace.OrgURL,
+		namespace.Logo,
+		namespace.Name)
 }
 
-func (s *SQLHelper) GetProjectHooks(project *Project) (Hooks, error) {
-	rows, err := s.PrepareAndQuery(s.GetProjectHooksQuery, project.Name)
+func (s *SQLHelper) GetNamespaceHooks(namespace *Project) (Hooks, error) {
+	rows, err := s.PrepareAndQuery(s.GetProjectHooksQuery, namespace.Name)
 	if err != nil {
 		return nil, err
 	}
@@ -38,37 +38,37 @@ func (s *SQLHelper) GetProjectHooks(project *Project) (Hooks, error) {
 	return nil, NotFound
 }
 
-func (s *SQLHelper) SetProjectHooks(project *Project, hooks Hooks) error {
+func (s *SQLHelper) SetNamespaceHooks(namespace *Project, hooks Hooks) error {
 	bytes, err := json.Marshal(hooks)
 	if err != nil {
 		return err
 	}
 	return s.PrepareAndExecUpdate(s.SetProjectHooksQuery,
 		string(bytes),
-		project.Name)
+		namespace.Name)
 }
 
-func (s *SQLHelper) GetProject(project string) (*Project, error) {
-	rows, err := s.PrepareAndQuery(s.GetProjectQuery, project)
+func (s *SQLHelper) GetNamespace(namespace string) (*Project, error) {
+	rows, err := s.PrepareAndQuery(s.GetProjectQuery, namespace)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 	for rows.Next() {
-		return s.scanProject(rows)
+		return s.scanNamespace(rows)
 	}
 	return nil, NotFound
 }
 
-func (s *SQLHelper) GetProjects() (map[string]*Project, error) {
+func (s *SQLHelper) GetNamespaces() (map[string]*Project, error) {
 	rows, err := s.PrepareAndQuery(s.GetProjectsQuery)
 	if err != nil {
 		return nil, err
 	}
-	return s.scanProjects(rows)
+	return s.scanNamespaces(rows)
 }
 
-func (s *SQLHelper) GetProjectsByGroups(readGroups []string) (map[string]*Project, error) {
+func (s *SQLHelper) GetNamespacesByGroups(readGroups []string) (map[string]*Project, error) {
 	starFound := false
 	for _, g := range readGroups {
 		if g == "*" {
@@ -135,7 +135,7 @@ func (s *SQLHelper) GetProjectsByGroups(readGroups []string) (map[string]*Projec
 	return result, nil
 }
 
-func (s *SQLHelper) HardDeleteProject(project string) error {
+func (s *SQLHelper) HardDeleteNamespace(project string) error {
 	if err := s.PrepareAndExec(s.HardDeleteProjectACLQuery, project); err != nil {
 		return err
 	}
@@ -160,7 +160,7 @@ func (s *SQLHelper) HardDeleteProject(project string) error {
 	return nil
 }
 
-func (s *SQLHelper) scanProject(rows *sql.Rows) (*Project, error) {
+func (s *SQLHelper) scanNamespace(rows *sql.Rows) (*Project, error) {
 	var name, description, orgURL, logo string
 	if err := rows.Scan(&name, &description, &orgURL, &logo); err != nil {
 		return nil, err
@@ -174,11 +174,11 @@ func (s *SQLHelper) scanProject(rows *sql.Rows) (*Project, error) {
 	}, nil
 }
 
-func (s *SQLHelper) scanProjects(rows *sql.Rows) (map[string]*Project, error) {
+func (s *SQLHelper) scanNamespaces(rows *sql.Rows) (map[string]*Project, error) {
 	defer rows.Close()
 	result := map[string]*Project{}
 	for rows.Next() {
-		prj, err := s.scanProject(rows)
+		prj, err := s.scanNamespace(rows)
 		if err != nil {
 			return nil, err
 		}

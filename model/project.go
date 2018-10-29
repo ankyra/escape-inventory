@@ -30,7 +30,7 @@ type NamespacePayload struct {
 }
 
 func GetNamespace(namespace string) (*NamespacePayload, error) {
-	prj, err := dao.GetProject(namespace)
+	prj, err := dao.GetNamespace(namespace)
 	if err != nil {
 		return nil, err
 	}
@@ -45,11 +45,11 @@ func GetNamespace(namespace string) (*NamespacePayload, error) {
 }
 
 func GetNamespaceHooks(namespace string) (types.Hooks, error) {
-	prj, err := dao.GetProject(namespace)
+	prj, err := dao.GetNamespace(namespace)
 	if err != nil {
 		return nil, err
 	}
-	return dao.GetProjectHooks(prj)
+	return dao.GetNamespaceHooks(prj)
 }
 
 func AddNamespace(p *types.Project, username string) error {
@@ -59,22 +59,22 @@ func AddNamespace(p *types.Project, username string) error {
 	if err := core.ValidateProjectName(p.Name); err != nil {
 		return NewUserError(err)
 	}
-	return dao.AddProject(p)
+	return dao.AddNamespace(p)
 }
 
 func UpdateNamespace(p *types.Project) error {
 	if p.Name == "" {
 		return NewUserError(fmt.Errorf("Missing name"))
 	}
-	return dao.UpdateProject(p)
+	return dao.UpdateNamespace(p)
 }
 
 func UpdateNamespaceHooks(namespace string, hooks types.Hooks) error {
-	prj, err := dao.GetProject(namespace)
+	prj, err := dao.GetNamespace(namespace)
 	if err != nil {
 		return err
 	}
-	currentHooks, err := dao.GetProjectHooks(prj)
+	currentHooks, err := dao.GetNamespaceHooks(prj)
 	if err != nil {
 		return err
 	}
@@ -96,7 +96,7 @@ func UpdateNamespaceHooks(namespace string, hooks types.Hooks) error {
 			return NewUserError(fmt.Errorf("Unknown hook type '%s'", key))
 		}
 	}
-	return dao.SetProjectHooks(prj, hooks)
+	return dao.SetNamespaceHooks(prj, hooks)
 }
 
 func parseSlackHookConfig(values map[string]string) (map[string]string, error) {

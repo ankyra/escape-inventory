@@ -29,7 +29,7 @@ type ApplicationPayload struct {
 }
 
 func GetApplication(namespace, name string) (*ApplicationPayload, error) {
-	_, err := dao.GetProject(namespace)
+	_, err := dao.GetNamespace(namespace)
 	if err != nil {
 		return nil, err
 	}
@@ -48,7 +48,7 @@ func GetApplication(namespace, name string) (*ApplicationPayload, error) {
 }
 
 func GetApplications(namespace string) (map[string]*types.Application, error) {
-	_, err := dao.GetProject(namespace)
+	_, err := dao.GetNamespace(namespace)
 	if err != nil {
 		return nil, err
 	}

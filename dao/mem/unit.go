@@ -6,14 +6,14 @@ import (
 
 func (a *dao) GetApplications(project string) (map[string]*Application, error) {
 	result := map[string]*Application{}
-	for _, app := range a.projects[project] {
+	for _, app := range a.namespaces[project] {
 		result[app.App.Name] = app.App
 	}
 	return result, nil
 }
 
 func (a *dao) GetApplication(project, name string) (*Application, error) {
-	prj, ok := a.projects[project]
+	prj, ok := a.namespaces[project]
 	if !ok {
 		return nil, NotFound
 	}
@@ -37,7 +37,7 @@ func (a *dao) FindAllVersions(app *Application) ([]string, error) {
 }
 
 func (a *dao) AddApplication(app *Application) error {
-	apps, ok := a.projects[app.Project]
+	apps, ok := a.namespaces[app.Project]
 	if !ok {
 		return NotFound
 	}
@@ -51,7 +51,7 @@ func (a *dao) AddApplication(app *Application) error {
 	return nil
 }
 func (a *dao) UpdateApplication(app *Application) error {
-	apps, ok := a.projects[app.Project]
+	apps, ok := a.namespaces[app.Project]
 	if !ok {
 		return NotFound
 	}
@@ -65,7 +65,7 @@ func (a *dao) UpdateApplication(app *Application) error {
 }
 
 func (a *dao) GetApplicationHooks(app *Application) (Hooks, error) {
-	apps, ok := a.projects[app.Project]
+	apps, ok := a.namespaces[app.Project]
 	if !ok {
 		return nil, NotFound
 	}
@@ -77,7 +77,7 @@ func (a *dao) GetApplicationHooks(app *Application) (Hooks, error) {
 }
 
 func (a *dao) SetApplicationHooks(app *Application, hooks Hooks) error {
-	apps, ok := a.projects[app.Project]
+	apps, ok := a.namespaces[app.Project]
 	if !ok {
 		return NotFound
 	}

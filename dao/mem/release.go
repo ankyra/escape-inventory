@@ -5,7 +5,7 @@ import (
 )
 
 func (a *dao) GetRelease(project, name, releaseId string) (*Release, error) {
-	prj, ok := a.projects[project]
+	prj, ok := a.namespaces[project]
 	if !ok {
 		return nil, NotFound
 	}
@@ -21,7 +21,7 @@ func (a *dao) GetRelease(project, name, releaseId string) (*Release, error) {
 }
 
 func (a *dao) AddRelease(rel *Release) error {
-	apps, ok := a.projects[rel.Application.Project]
+	apps, ok := a.namespaces[rel.Application.Project]
 	if !ok {
 		apps = map[string]*application{}
 	}
@@ -39,7 +39,7 @@ func (a *dao) AddRelease(rel *Release) error {
 		Packages: []string{},
 	}
 	apps[rel.Application.Name] = app
-	a.projects[rel.Application.Project] = apps
+	a.namespaces[rel.Application.Project] = apps
 	a.releases[rel] = app.Releases[key]
 	return nil
 }

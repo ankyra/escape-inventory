@@ -56,19 +56,19 @@ func (s *releaseSuite) Test_GetMetadataNotFound(c *C) {
 }
 
 func (s *releaseSuite) Test_AddRelease_Creates_Namespace_Metadata(c *C) {
-	_, err := dao.GetProject("test")
+	_, err := dao.GetNamespace("test")
 	c.Assert(err, Equals, types.NotFound)
 
 	_, err = AddRelease("test", `{"name": "rel-test", "version": "0"}`)
 	c.Assert(err, IsNil)
 
-	prj, err := dao.GetProject("test")
+	prj, err := dao.GetNamespace("test")
 	c.Assert(err, IsNil)
 	c.Assert(prj.Name, Equals, "test")
 }
 
 func (s *releaseSuite) Test_AddRelease_Creates_Project_Metadata_fails_if_invalid_namespace_name(c *C) {
-	_, err := dao.GetProject("invalid$")
+	_, err := dao.GetNamespace("invalid$")
 	c.Assert(err, Equals, types.NotFound)
 
 	_, err = AddRelease("invalid$", `{"name": "rel-test", "version": "0"}`)

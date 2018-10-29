@@ -155,53 +155,53 @@ type FeedEvent struct {
 	Data        map[string]interface{} `json:"data"`
 }
 
-func NewEvent(typ, project, username string) *FeedEvent {
+func NewEvent(typ, namespace, username string) *FeedEvent {
 	return &FeedEvent{
 		Type:        typ,
-		Project:     project,
+		Project:     namespace,
 		Application: "",
 		Username:    username,
 		Timestamp:   time.Now(),
 		Data:        map[string]interface{}{},
 	}
 }
-func NewEventWithData(typ, project, username string, data map[string]interface{}) *FeedEvent {
-	ev := NewEvent(typ, project, username)
+func NewEventWithData(typ, namespace, username string, data map[string]interface{}) *FeedEvent {
+	ev := NewEvent(typ, namespace, username)
 	ev.Data = data
 	return ev
 }
 
-func NewCreateProjectEvent(project, username string) *FeedEvent {
-	return NewEvent("CREATE_PROJECT", project, username)
+func NewCreateProjectEvent(namespace, username string) *FeedEvent {
+	return NewEvent("CREATE_PROJECT", namespace, username)
 }
 
-func NewUserAddedToProjectEvent(project, username, addedByUser string) *FeedEvent {
+func NewUserAddedToProjectEvent(namespace, username, addedByUser string) *FeedEvent {
 	data := map[string]interface{}{
 		"added_username": username,
 	}
-	return NewEventWithData("USER_ADDED_TO_PROJECT", project, addedByUser, data)
+	return NewEventWithData("USER_ADDED_TO_PROJECT", namespace, addedByUser, data)
 }
 
-func NewUserRemovedFromProjectEvent(project, username, removedByUser string) *FeedEvent {
+func NewUserRemovedFromProjectEvent(namespace, username, removedByUser string) *FeedEvent {
 	data := map[string]interface{}{
 		"removed_username": username,
 	}
-	return NewEventWithData("USER_REMOVED_FROM_PROJECT", project, removedByUser, data)
+	return NewEventWithData("USER_REMOVED_FROM_PROJECT", namespace, removedByUser, data)
 }
 
-func NewCreateApplicationEvent(project, application, username string) *FeedEvent {
-	ev := NewEvent("CREATE_APPLICATION", project, username)
+func NewCreateApplicationEvent(namespace, application, username string) *FeedEvent {
+	ev := NewEvent("CREATE_APPLICATION", namespace, username)
 	ev.Application = application
 	return ev
 }
 
-func NewReleaseEvent(project, name, version, uploadedBy string) *FeedEvent {
+func NewReleaseEvent(namespace, name, version, uploadedBy string) *FeedEvent {
 	data := map[string]interface{}{
 		"name":        name,
 		"version":     version,
 		"uploaded_by": uploadedBy,
 	}
-	ev := NewEventWithData("NEW_RELEASE", project, uploadedBy, data)
+	ev := NewEventWithData("NEW_RELEASE", namespace, uploadedBy, data)
 	ev.Application = name
 	return ev
 }
@@ -217,26 +217,26 @@ func (f *FeedEvent) Equals(other *FeedEvent) bool {
 }
 
 type DAO interface {
-	GetProject(project string) (*Project, error)
-	AddProject(*Project) error
-	HardDeleteProject(project string) error
-	UpdateProject(*Project) error
-	GetProjects() (map[string]*Project, error)
-	GetProjectsByGroups(readGroups []string) (map[string]*Project, error)
-	GetProjectHooks(*Project) (Hooks, error)
-	SetProjectHooks(*Project, Hooks) error
+	GetNamespace(namespace string) (*Project, error)
+	AddNamespace(*Project) error
+	HardDeleteNamespace(namespace string) error
+	UpdateNamespace(*Project) error
+	GetNamespaces() (map[string]*Project, error)
+	GetNamespacesByGroups(readGroups []string) (map[string]*Project, error)
+	GetNamespaceHooks(*Project) (Hooks, error)
+	SetNamespaceHooks(*Project, Hooks) error
 
-	GetApplication(project, name string) (*Application, error)
+	GetApplication(namespace, name string) (*Application, error)
 	AddApplication(app *Application) error
 	UpdateApplication(app *Application) error
-	GetApplications(project string) (map[string]*Application, error)
+	GetApplications(namespace string) (map[string]*Application, error)
 	FindAllVersions(application *Application) ([]string, error)
 	GetApplicationHooks(*Application) (Hooks, error)
 	SetApplicationHooks(*Application, Hooks) error
 	GetDownstreamHooks(*Application) ([]*Hooks, error)
 	SetApplicationSubscribesToUpdatesFrom(*Application, []*Application) error
 
-	GetRelease(project, name, releaseId string) (*Release, error)
+	GetRelease(namespace, name, releaseId string) (*Release, error)
 	AddRelease(*Release) error
 	UpdateRelease(*Release) error
 	GetAllReleases() ([]*Release, error)
@@ -254,10 +254,10 @@ type DAO interface {
 	GetPackageURIs(release *Release) ([]string, error)
 	AddPackageURI(release *Release, uri string) error
 
-	SetACL(project, group string, perm Permission) error
-	GetACL(project string) (map[string]Permission, error)
-	DeleteACL(project, group string) error
-	GetPermittedGroups(project string, perm Permission) ([]string, error)
+	SetACL(namespace, group string, perm Permission) error
+	GetACL(namespace string) (map[string]Permission, error)
+	DeleteACL(namespace, group string) error
+	GetPermittedGroups(namespace string, perm Permission) ([]string, error)
 
 	GetUserMetrics(username string) (*Metrics, error)
 	SetUserMetrics(username string, previous, new *Metrics) error
