@@ -18,11 +18,12 @@ package local
 
 import (
 	"fmt"
-	"github.com/ankyra/escape-core/parsers"
-	"github.com/ankyra/escape-inventory/config"
 	"io"
 	"os"
 	"path/filepath"
+
+	"github.com/ankyra/escape-core/parsers"
+	"github.com/ankyra/escape-inventory/config"
 )
 
 type LocalStorageBackend struct {
@@ -54,13 +55,13 @@ func (ls *LocalStorageBackend) getStoragePath() (string, error) {
 	return filepath.Abs(ls.localStoragePath)
 }
 
-func (ls *LocalStorageBackend) Upload(project string, releaseId *parsers.ReleaseId, pkg io.ReadSeeker) (string, error) {
+func (ls *LocalStorageBackend) Upload(namespace string, releaseId *parsers.ReleaseId, pkg io.ReadSeeker) (string, error) {
 	storage, err := ls.getStoragePath()
 	if err != nil {
 		return "", err
 	}
 	name := releaseId.Name
-	targetDir := filepath.Join(storage, project, name)
+	targetDir := filepath.Join(storage, namespace, name)
 	if !PathExists(targetDir) {
 		os.MkdirAll(targetDir, 0755)
 	}
@@ -78,7 +79,7 @@ func (ls *LocalStorageBackend) Upload(project string, releaseId *parsers.Release
 	return "file://" + target, nil
 }
 
-func (ls *LocalStorageBackend) Download(project, uri string) (io.Reader, error) {
+func (ls *LocalStorageBackend) Download(namespace, uri string) (io.Reader, error) {
 	file, err := os.Open(uri[len("file://"):])
 	if err != nil {
 		return nil, err

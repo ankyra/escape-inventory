@@ -17,11 +17,12 @@ limitations under the License.
 package local
 
 import (
-	"github.com/ankyra/escape-core/parsers"
-	. "gopkg.in/check.v1"
 	"io/ioutil"
 	"os"
 	"testing"
+
+	"github.com/ankyra/escape-core/parsers"
+	. "gopkg.in/check.v1"
 )
 
 func Test(t *testing.T) { TestingT(t) }
@@ -43,9 +44,9 @@ func (s *localSuite) Test_Local_Storage_Backend_Upload(c *C) {
 	c.Assert(err, IsNil)
 	releaseId, err := parsers.ParseReleaseId("archive-upload-test-v1")
 	c.Assert(err, IsNil)
-	uri, err := backend.Upload("project", releaseId, pkg)
+	uri, err := backend.Upload("namespace", releaseId, pkg)
 	c.Assert(err, IsNil)
-	c.Assert(uri, Equals, "file:///tmp/escape-test/project/archive-upload-test/archive-upload-test-v1.tgz")
+	c.Assert(uri, Equals, "file:///tmp/escape-test/namespace/archive-upload-test/archive-upload-test-v1.tgz")
 	os.RemoveAll(test_data_path)
 	os.RemoveAll(test_local_storage_path)
 }
@@ -58,9 +59,9 @@ func (s *localSuite) Test_Local_Storage_Backend_Download(c *C) {
 	c.Assert(err, IsNil)
 	releaseId, err := parsers.ParseReleaseId("archive-upload-test-v1")
 	c.Assert(err, IsNil)
-	uri, err := backend.Upload("project", releaseId, pkg)
+	uri, err := backend.Upload("namespace", releaseId, pkg)
 	c.Assert(err, IsNil)
-	seeker, err := backend.Download("project", uri)
+	seeker, err := backend.Download("namespace", uri)
 
 	payload, err := ioutil.ReadAll(seeker)
 	c.Assert(err, IsNil)

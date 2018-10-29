@@ -40,7 +40,7 @@ func (m *InMemoryStorageBackend) Init(settings config.StorageSettings) error {
 	return nil
 }
 
-func (m *InMemoryStorageBackend) Upload(project string, releaseId *parsers.ReleaseId, pkg io.ReadSeeker) (string, error) {
+func (m *InMemoryStorageBackend) Upload(namespace string, releaseId *parsers.ReleaseId, pkg io.ReadSeeker) (string, error) {
 	uri := "mem://" + releaseId.Name + "-v" + releaseId.Version + ".tgz"
 	data, err := ioutil.ReadAll(pkg)
 	if err != nil {
@@ -50,7 +50,7 @@ func (m *InMemoryStorageBackend) Upload(project string, releaseId *parsers.Relea
 	return uri, nil
 }
 
-func (m *InMemoryStorageBackend) Download(project, uri string) (io.Reader, error) {
+func (m *InMemoryStorageBackend) Download(namespace, uri string) (io.Reader, error) {
 	data, exists := m.URIs[uri]
 	if !exists {
 		return nil, types.NotFound

@@ -35,21 +35,21 @@ type suite struct{}
 var _ = Suite(&suite{})
 
 func (s *suite) Test_InMemoryStorageBackend(c *C) {
-	uri := "mem://prj/name-v1.0.tgz"
+	uri := "mem://namespace/name-v1.0.tgz"
 	unit := NewInMemoryStorageBackend()
 	unit.Init(config.StorageSettings{})
 
-	_, err := unit.Download("project", uri)
+	_, err := unit.Download("namespace", uri)
 	c.Assert(err, Equals, types.NotFound)
 
 	pkg := bytes.NewReader([]byte("package data"))
-	releaseId, err := parsers.ParseReleaseId("prj/name-v1.0")
+	releaseId, err := parsers.ParseReleaseId("namespace/name-v1.0")
 	c.Assert(err, IsNil)
-	str, err := unit.Upload("project", releaseId, pkg)
+	str, err := unit.Upload("namespace", releaseId, pkg)
 	c.Assert(err, IsNil)
 	c.Assert(str, Equals, uri)
 
-	data, err := unit.Download("project", uri)
+	data, err := unit.Download("namespace", uri)
 	c.Assert(err, IsNil)
 	bytes, err := ioutil.ReadAll(data)
 	c.Assert(err, IsNil)
