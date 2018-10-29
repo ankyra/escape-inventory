@@ -28,8 +28,8 @@ import (
 )
 
 const (
-	DownloadURL     = "/api/v1/inventory/{project}/units/{name}/versions/{version}/download"
-	downloadTestURL = "/api/v1/inventory/project/units/name/versions/v1.0.0/download"
+	DownloadURL     = "/api/v1/inventory/{namespace}/units/{name}/versions/{version}/download"
+	downloadTestURL = "/api/v1/inventory/namespace/units/name/versions/v1.0.0/download"
 )
 
 func (s *suite) downloadMuxWithProvider(provider *downloadHandlerProvider) *mux.Router {
@@ -46,7 +46,7 @@ func (s *suite) downloadMuxWithProvider(provider *downloadHandlerProvider) *mux.
 func (s *suite) Test_DownloadHandler_happy_path(c *C) {
 
 	provider := &downloadHandlerProvider{
-		GetDownloadReadSeeker: func(project, releaseId string) (io.Reader, error) {
+		GetDownloadReadSeeker: func(namespace, releaseId string) (io.Reader, error) {
 			return bytes.NewReader([]byte("package data")), nil
 		},
 	}
@@ -61,7 +61,7 @@ func (s *suite) Test_DownloadHandler_happy_path(c *C) {
 
 func (s *suite) Test_DownloadHandler_fails_if_download_fails(c *C) {
 	provider := &downloadHandlerProvider{
-		GetDownloadReadSeeker: func(project, releaseId string) (io.Reader, error) {
+		GetDownloadReadSeeker: func(namespace, releaseId string) (io.Reader, error) {
 			return nil, types.NotFound
 		},
 	}

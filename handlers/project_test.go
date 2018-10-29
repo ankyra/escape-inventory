@@ -29,48 +29,48 @@ import (
 )
 
 const (
-	GetProjectsURL = "/api/v1/inventory/"
+	GetNamespacesURL = "/api/v1/inventory/"
 
-	GetProjectURL     = "/api/v1/inventory/{project}/"
-	getProjectTestURL = "/api/v1/inventory/project/"
+	GetNamespaceURL     = "/api/v1/inventory/{namespace}/"
+	getNamespaceTestURL = "/api/v1/inventory/namespace/"
 
-	AddProjectURL     = "/api/v1/inventory/{project}/add-project"
-	addProjectTestURL = "/api/v1/inventory/project/add-project"
+	AddNamespaceURL     = "/api/v1/inventory/{namespace}/add-namespace"
+	addNamespaceTestURL = "/api/v1/inventory/namespace/add-namespace"
 
-	UpdateProjectURL     = "/api/v1/inventory/{project}/"
-	updateProjectTestURL = "/api/v1/inventory/project/"
+	UpdateNamespaceURL     = "/api/v1/inventory/{namespace}/"
+	updateNamespaceTestURL = "/api/v1/inventory/namespace/"
 
-	GetProjectHooksURL     = "/api/v1/inventory/{project}/hooks/"
-	getProjectHooksTestURL = "/api/v1/inventory/project/hooks/"
+	GetNamespaceHooksURL     = "/api/v1/inventory/{namespace}/hooks/"
+	getNamespaceHooksTestURL = "/api/v1/inventory/namespace/hooks/"
 
-	UpdateProjectHooksURL     = "/api/v1/inventory/{project}/hooks/"
-	updateProjectHooksTestURL = "/api/v1/inventory/project/hooks/"
+	UpdateNamespaceHooksURL     = "/api/v1/inventory/{namespace}/hooks/"
+	updateNamespaceHooksTestURL = "/api/v1/inventory/namespace/hooks/"
 
-	HardDeleteProjectHooksURL     = "/api/v1/inventory/{project}/hard-delete"
-	hardDeleteProjectHooksTestURL = "/api/v1/inventory/project/hard-delete"
+	HardDeleteNamespaceHooksURL     = "/api/v1/inventory/{namespace}/hard-delete"
+	hardDeleteNamespaceHooksTestURL = "/api/v1/inventory/namespace/hard-delete"
 )
 
 /*
-	GetProjectsHandler
+	GetNamespacesHandler
 
 */
 
-func (s *suite) getProjectsMuxWithProvider(provider *projectHandlerProvider) *mux.Router {
+func (s *suite) getNamespacesMuxWithProvider(provider *namespaceHandlerProvider) *mux.Router {
 	r := mux.NewRouter()
 	router := r.Methods("GET").Subrouter()
-	router.Handle(GetProjectsURL, http.HandlerFunc(provider.GetProjectsHandler))
+	router.Handle(GetNamespacesURL, http.HandlerFunc(provider.GetNamespacesHandler))
 	return r
 }
 
-func (s *suite) Test_GetProjectsHandler_happy_path(c *C) {
-	provider := &projectHandlerProvider{
-		GetProjects: func() (map[string]*types.Project, error) {
+func (s *suite) Test_GetNamespacesHandler_happy_path(c *C) {
+	provider := &namespaceHandlerProvider{
+		GetNamespaces: func() (map[string]*types.Project, error) {
 			return map[string]*types.Project{
 				"test": types.NewProject("test"),
 			}, nil
 		},
 	}
-	resp := s.testGET(c, s.getProjectsMuxWithProvider(provider), GetProjectsURL)
+	resp := s.testGET(c, s.getNamespacesMuxWithProvider(provider), GetNamespacesURL)
 	c.Assert(resp.StatusCode, Equals, 200)
 	c.Assert(resp.Header.Get("Content-Type"), Equals, "application/json")
 	result := map[string]*types.Project{}
@@ -79,13 +79,13 @@ func (s *suite) Test_GetProjectsHandler_happy_path(c *C) {
 	c.Assert(result["test"].Name, Equals, "test")
 }
 
-func (s *suite) Test_GetProjectsHandler_fails_if_GetProjects_fails(c *C) {
-	provider := &projectHandlerProvider{
-		GetProjects: func() (map[string]*types.Project, error) {
+func (s *suite) Test_GetNamespacesHandler_fails_if_GetNamespaces_fails(c *C) {
+	provider := &namespaceHandlerProvider{
+		GetNamespaces: func() (map[string]*types.Project, error) {
 			return nil, types.NotFound
 		},
 	}
-	resp := s.testGET(c, s.getProjectsMuxWithProvider(provider), GetProjectsURL)
+	resp := s.testGET(c, s.getNamespacesMuxWithProvider(provider), GetNamespacesURL)
 	c.Assert(resp.StatusCode, Equals, 404)
 	body, err := ioutil.ReadAll(resp.Body)
 	c.Assert(err, IsNil)
@@ -93,43 +93,43 @@ func (s *suite) Test_GetProjectsHandler_fails_if_GetProjects_fails(c *C) {
 }
 
 /*
-	GetProjectHandler
+	GetNamespaceHandler
 
 */
 
-func (s *suite) getProjectMuxWithProvider(provider *projectHandlerProvider) *mux.Router {
+func (s *suite) getNamespaceMuxWithProvider(provider *namespaceHandlerProvider) *mux.Router {
 	r := mux.NewRouter()
 	router := r.Methods("GET").Subrouter()
-	router.Handle(GetProjectURL, http.HandlerFunc(provider.GetProjectHandler))
+	router.Handle(GetNamespaceURL, http.HandlerFunc(provider.GetNamespaceHandler))
 	return r
 }
 
-func (s *suite) Test_GetProjectHandler_happy_path(c *C) {
-	var capturedProject string
-	provider := &projectHandlerProvider{
-		GetProject: func(project string) (*model.ProjectPayload, error) {
-			capturedProject = project
+func (s *suite) Test_GetNamespaceHandler_happy_path(c *C) {
+	var capturedNamespace string
+	provider := &namespaceHandlerProvider{
+		GetNamespace: func(namespace string) (*model.ProjectPayload, error) {
+			capturedNamespace = namespace
 			return &model.ProjectPayload{
 				Project: types.NewProject("test"),
 			}, nil
 		},
 	}
-	resp := s.testGET(c, s.getProjectMuxWithProvider(provider), getProjectTestURL)
+	resp := s.testGET(c, s.getNamespaceMuxWithProvider(provider), getNamespaceTestURL)
 	c.Assert(resp.StatusCode, Equals, 200)
-	c.Assert(capturedProject, Equals, "project")
+	c.Assert(capturedNamespace, Equals, "namespace")
 	c.Assert(resp.Header.Get("Content-Type"), Equals, "application/json")
 	result := model.ProjectPayload{}
 	c.Assert(json.NewDecoder(resp.Body).Decode(&result), IsNil)
 	c.Assert(result.Project.Name, Equals, "test")
 }
 
-func (s *suite) Test_GetProjectHandler_fails_if_GetProject_fails(c *C) {
-	provider := &projectHandlerProvider{
-		GetProject: func(project string) (*model.ProjectPayload, error) {
+func (s *suite) Test_GetNamespaceHandler_fails_if_GetNamespace_fails(c *C) {
+	provider := &namespaceHandlerProvider{
+		GetNamespace: func(namespace string) (*model.ProjectPayload, error) {
 			return nil, types.NotFound
 		},
 	}
-	resp := s.testGET(c, s.getProjectMuxWithProvider(provider), getProjectTestURL)
+	resp := s.testGET(c, s.getNamespaceMuxWithProvider(provider), getNamespaceTestURL)
 	c.Assert(resp.StatusCode, Equals, 404)
 	body, err := ioutil.ReadAll(resp.Body)
 	c.Assert(err, IsNil)
@@ -137,43 +137,43 @@ func (s *suite) Test_GetProjectHandler_fails_if_GetProject_fails(c *C) {
 }
 
 /*
-	GetProjectHooksHandler
+	GetNamespaceHooksHandler
 
 */
 
-func (s *suite) getProjectHooksMuxWithProvider(provider *projectHandlerProvider) *mux.Router {
+func (s *suite) getNamespaceHooksHandlerMuxWithProvider(provider *namespaceHandlerProvider) *mux.Router {
 	r := mux.NewRouter()
 	router := r.Methods("GET").Subrouter()
-	router.Handle(GetProjectHooksURL, http.HandlerFunc(provider.GetProjectHooksHandler))
+	router.Handle(GetNamespaceHooksURL, http.HandlerFunc(provider.GetNamespaceHooksHandler))
 	return r
 }
 
-func (s *suite) Test_GetProjectHooksHandler_happy_path(c *C) {
-	var capturedProject string
-	provider := &projectHandlerProvider{
-		GetProjectHooks: func(project string) (types.Hooks, error) {
-			capturedProject = project
+func (s *suite) Test_GetNamespaceHooksHandler_happy_path(c *C) {
+	var capturedNamespace string
+	provider := &namespaceHandlerProvider{
+		GetNamespaceHooks: func(namespace string) (types.Hooks, error) {
+			capturedNamespace = namespace
 			return types.Hooks{
 				"test": map[string]string{},
 			}, nil
 		},
 	}
-	resp := s.testGET(c, s.getProjectHooksMuxWithProvider(provider), getProjectHooksTestURL)
+	resp := s.testGET(c, s.getNamespaceHooksHandlerMuxWithProvider(provider), getNamespaceHooksTestURL)
 	c.Assert(resp.StatusCode, Equals, 200)
-	c.Assert(capturedProject, Equals, "project")
+	c.Assert(capturedNamespace, Equals, "namespace")
 	c.Assert(resp.Header.Get("Content-Type"), Equals, "application/json")
 	result := types.Hooks{}
 	c.Assert(json.NewDecoder(resp.Body).Decode(&result), IsNil)
 	c.Assert(result, HasLen, 1)
 }
 
-func (s *suite) Test_GetProjectHooksHandler_fails_if_GetProject_fails(c *C) {
-	provider := &projectHandlerProvider{
-		GetProjectHooks: func(project string) (types.Hooks, error) {
+func (s *suite) Test_GetNamespaceHooksHandler_fails_if_GetNamespaceHooks_fails(c *C) {
+	provider := &namespaceHandlerProvider{
+		GetNamespaceHooks: func(namespace string) (types.Hooks, error) {
 			return nil, types.NotFound
 		},
 	}
-	resp := s.testGET(c, s.getProjectHooksMuxWithProvider(provider), getProjectHooksTestURL)
+	resp := s.testGET(c, s.getNamespaceHooksHandlerMuxWithProvider(provider), getNamespaceHooksTestURL)
 	c.Assert(resp.StatusCode, Equals, 404)
 	body, err := ioutil.ReadAll(resp.Body)
 	c.Assert(err, IsNil)
@@ -181,48 +181,48 @@ func (s *suite) Test_GetProjectHooksHandler_fails_if_GetProject_fails(c *C) {
 }
 
 /*
-	AddProjectHandler
+	AddNamespaceHandler
 
 */
 
-func (s *suite) addProjectMuxWithProvider(provider *projectHandlerProvider) *mux.Router {
+func (s *suite) addNamespaceMuxWithProvider(provider *namespaceHandlerProvider) *mux.Router {
 	r := mux.NewRouter()
 	router := r.Methods("POST").Subrouter()
-	router.Handle(AddProjectURL, http.HandlerFunc(provider.AddProjectHandler))
+	router.Handle(AddNamespaceURL, http.HandlerFunc(provider.AddNamespaceHandler))
 	return r
 }
 
-func (s *suite) Test_AddProjectHandler_happy_path(c *C) {
-	provider := &projectHandlerProvider{
-		AddProject: func(project *types.Project, username string) error {
+func (s *suite) Test_AddNamespaceHandler_happy_path(c *C) {
+	provider := &namespaceHandlerProvider{
+		AddNamespace: func(namespace *types.Project, username string) error {
 			return nil
 		},
 	}
 	data := types.NewProject("test")
-	resp := s.testPOST(c, s.addProjectMuxWithProvider(provider), addProjectTestURL, data)
+	resp := s.testPOST(c, s.addNamespaceMuxWithProvider(provider), addNamespaceTestURL, data)
 	c.Assert(resp.StatusCode, Equals, 200)
 	body, err := ioutil.ReadAll(resp.Body)
 	c.Assert(err, IsNil)
 	c.Assert(string(body), Equals, "")
 }
 
-func (s *suite) Test_AddProjectHandler_fails_if_invalid_json(c *C) {
-	provider := &projectHandlerProvider{}
-	resp := s.testPOST(c, s.addProjectMuxWithProvider(provider), addProjectTestURL, nil)
+func (s *suite) Test_AddNamespaceHandler_fails_if_invalid_json(c *C) {
+	provider := &namespaceHandlerProvider{}
+	resp := s.testPOST(c, s.addNamespaceMuxWithProvider(provider), addNamespaceTestURL, nil)
 	c.Assert(resp.StatusCode, Equals, 400)
 	body, err := ioutil.ReadAll(resp.Body)
 	c.Assert(err, IsNil)
 	c.Assert(string(body), Equals, "Invalid JSON")
 }
 
-func (s *suite) Test_AddProjectHandler_fails_if_AddProject_fails(c *C) {
-	provider := &projectHandlerProvider{
-		AddProject: func(project *types.Project, username string) error {
+func (s *suite) Test_AddNamespaceHandler_fails_if_AddNamespace_fails(c *C) {
+	provider := &namespaceHandlerProvider{
+		AddNamespace: func(namespace *types.Project, username string) error {
 			return types.AlreadyExists
 		},
 	}
 	data := types.NewProject("test")
-	resp := s.testPOST(c, s.addProjectMuxWithProvider(provider), addProjectTestURL, data)
+	resp := s.testPOST(c, s.addNamespaceMuxWithProvider(provider), addNamespaceTestURL, data)
 	c.Assert(resp.StatusCode, Equals, 409)
 	body, err := ioutil.ReadAll(resp.Body)
 	c.Assert(err, IsNil)
@@ -230,62 +230,62 @@ func (s *suite) Test_AddProjectHandler_fails_if_AddProject_fails(c *C) {
 }
 
 /*
-	UpdateProjectHandler
+	UpdateNamespaceHandler
 
 */
 
-func (s *suite) updateProjectMuxWithProvider(provider *projectHandlerProvider) *mux.Router {
+func (s *suite) updateNamespaceMuxWithProvider(provider *namespaceHandlerProvider) *mux.Router {
 	r := mux.NewRouter()
 	router := r.Methods("PUT").Subrouter()
-	router.Handle(UpdateProjectURL, http.HandlerFunc(provider.UpdateProjectHandler))
+	router.Handle(UpdateNamespaceURL, http.HandlerFunc(provider.UpdateNamespaceHandler))
 	return r
 }
 
-func (s *suite) Test_UpdateProjectHandler_happy_path(c *C) {
-	provider := &projectHandlerProvider{
-		UpdateProject: func(project *types.Project) error {
+func (s *suite) Test_UpdateNamespaceHandler_happy_path(c *C) {
+	provider := &namespaceHandlerProvider{
+		UpdateNamespace: func(namespace *types.Project) error {
 			return nil
 		},
 	}
-	data := types.NewProject("project")
-	resp := s.testPUT(c, s.updateProjectMuxWithProvider(provider), updateProjectTestURL, data)
+	data := types.NewProject("namespace")
+	resp := s.testPUT(c, s.updateNamespaceMuxWithProvider(provider), updateNamespaceTestURL, data)
 	c.Assert(resp.StatusCode, Equals, 201)
 	body, err := ioutil.ReadAll(resp.Body)
 	c.Assert(err, IsNil)
 	c.Assert(string(body), Equals, "")
 }
 
-func (s *suite) Test_UpdateProjectHandler_fails_if_invalid_json(c *C) {
-	provider := &projectHandlerProvider{}
-	resp := s.testPUT(c, s.updateProjectMuxWithProvider(provider), updateProjectTestURL, nil)
+func (s *suite) Test_UpdateNamespaceHandler_fails_if_invalid_json(c *C) {
+	provider := &namespaceHandlerProvider{}
+	resp := s.testPUT(c, s.updateNamespaceMuxWithProvider(provider), updateNamespaceTestURL, nil)
 	c.Assert(resp.StatusCode, Equals, 400)
 	body, err := ioutil.ReadAll(resp.Body)
 	c.Assert(err, IsNil)
 	c.Assert(string(body), Equals, "Invalid JSON")
 }
 
-func (s *suite) Test_UpdateProjectHandler_fails_if_mux_name_doesnt_match_payload_name(c *C) {
-	provider := &projectHandlerProvider{
-		UpdateProject: func(project *types.Project) error {
+func (s *suite) Test_UpdateNamespaceHandler_fails_if_mux_name_doesnt_match_payload_name(c *C) {
+	provider := &namespaceHandlerProvider{
+		UpdateNamespace: func(namespace *types.Project) error {
 			return types.AlreadyExists
 		},
 	}
 	data := types.NewProject("wrong-name")
-	resp := s.testPUT(c, s.updateProjectMuxWithProvider(provider), updateProjectTestURL, data)
+	resp := s.testPUT(c, s.updateNamespaceMuxWithProvider(provider), updateNamespaceTestURL, data)
 	c.Assert(resp.StatusCode, Equals, 400)
 	body, err := ioutil.ReadAll(resp.Body)
 	c.Assert(err, IsNil)
-	c.Assert(string(body), Equals, "Project 'name' field doesn't correspond with URL")
+	c.Assert(string(body), Equals, "Namespace 'name' field doesn't correspond with URL")
 }
 
-func (s *suite) Test_UpdateProjectHandler_fails_if_UpdateProject_fails(c *C) {
-	provider := &projectHandlerProvider{
-		UpdateProject: func(project *types.Project) error {
+func (s *suite) Test_UpdateNamespaceHandler_fails_if_UpdateNamespace_fails(c *C) {
+	provider := &namespaceHandlerProvider{
+		UpdateNamespace: func(namespace *types.Project) error {
 			return types.AlreadyExists
 		},
 	}
-	data := types.NewProject("project")
-	resp := s.testPUT(c, s.updateProjectMuxWithProvider(provider), updateProjectTestURL, data)
+	data := types.NewProject("namespace")
+	resp := s.testPUT(c, s.updateNamespaceMuxWithProvider(provider), updateNamespaceTestURL, data)
 	c.Assert(resp.StatusCode, Equals, 409)
 	body, err := ioutil.ReadAll(resp.Body)
 	c.Assert(err, IsNil)
@@ -293,48 +293,48 @@ func (s *suite) Test_UpdateProjectHandler_fails_if_UpdateProject_fails(c *C) {
 }
 
 /*
-	UpdateProjectHooksHandler
+	UpdateNamespaceHooksHandler
 
 */
 
-func (s *suite) updateProjectHooksMuxWithProvider(provider *projectHandlerProvider) *mux.Router {
+func (s *suite) updateNamespaceHooksHandlerMuxWithProvider(provider *namespaceHandlerProvider) *mux.Router {
 	r := mux.NewRouter()
 	router := r.Methods("PUT").Subrouter()
-	router.Handle(UpdateProjectHooksURL, http.HandlerFunc(provider.UpdateProjectHooksHandler))
+	router.Handle(UpdateNamespaceHooksURL, http.HandlerFunc(provider.UpdateNamespaceHooksHandler))
 	return r
 }
 
-func (s *suite) Test_UpdateProjectHooksHandler_happy_path(c *C) {
-	provider := &projectHandlerProvider{
-		UpdateProjectHooks: func(project string, hooks types.Hooks) error {
+func (s *suite) Test_UpdateNamespaceHooksHandler_happy_path(c *C) {
+	provider := &namespaceHandlerProvider{
+		UpdateNamespaceHooks: func(namespace string, hooks types.Hooks) error {
 			return nil
 		},
 	}
 	data := types.Hooks{}
-	resp := s.testPUT(c, s.updateProjectHooksMuxWithProvider(provider), updateProjectHooksTestURL, data)
+	resp := s.testPUT(c, s.updateNamespaceHooksHandlerMuxWithProvider(provider), updateNamespaceHooksTestURL, data)
 	c.Assert(resp.StatusCode, Equals, 201)
 	body, err := ioutil.ReadAll(resp.Body)
 	c.Assert(err, IsNil)
 	c.Assert(string(body), Equals, "")
 }
 
-func (s *suite) Test_UpdateProjectHooksHandler_fails_if_invalid_json(c *C) {
-	provider := &projectHandlerProvider{}
-	resp := s.testPUT(c, s.updateProjectHooksMuxWithProvider(provider), updateProjectHooksTestURL, nil)
+func (s *suite) Test_UpdateNamespaceHooksHandler_fails_if_invalid_json(c *C) {
+	provider := &namespaceHandlerProvider{}
+	resp := s.testPUT(c, s.updateNamespaceHooksHandlerMuxWithProvider(provider), updateNamespaceHooksTestURL, nil)
 	c.Assert(resp.StatusCode, Equals, 400)
 	body, err := ioutil.ReadAll(resp.Body)
 	c.Assert(err, IsNil)
 	c.Assert(string(body), Equals, "Invalid JSON")
 }
 
-func (s *suite) Test_UpdateProjectHooksHandler_fails_if_UpdateProjectHooks_fails(c *C) {
-	provider := &projectHandlerProvider{
-		UpdateProjectHooks: func(project string, hooks types.Hooks) error {
+func (s *suite) Test_UpdateNamespaceHooksHandler_fails_if_UpdateNamespaceHooks_fails(c *C) {
+	provider := &namespaceHandlerProvider{
+		UpdateNamespaceHooks: func(namespace string, hooks types.Hooks) error {
 			return types.NotFound
 		},
 	}
 	data := types.Hooks{}
-	resp := s.testPUT(c, s.updateProjectHooksMuxWithProvider(provider), updateProjectHooksTestURL, data)
+	resp := s.testPUT(c, s.updateNamespaceHooksHandlerMuxWithProvider(provider), updateNamespaceHooksTestURL, data)
 	c.Assert(resp.StatusCode, Equals, 404)
 	body, err := ioutil.ReadAll(resp.Body)
 	c.Assert(err, IsNil)
@@ -342,32 +342,32 @@ func (s *suite) Test_UpdateProjectHooksHandler_fails_if_UpdateProjectHooks_fails
 }
 
 /*
-	HardDeleteProjectHandler
+	HardDeleteNamespaceHandler
 */
 
-func (s *suite) hardDeleteProjectMuxWithProvider(provider *projectHandlerProvider) *mux.Router {
-	return s.GetMuxForHandler("DELETE", HardDeleteProjectHooksURL, provider.HardDeleteProjectHandler)
+func (s *suite) hardDeleteNamespaceHandlerMuxWithProvider(provider *namespaceHandlerProvider) *mux.Router {
+	return s.GetMuxForHandler("DELETE", HardDeleteNamespaceHooksURL, provider.HardDeleteNamespaceHandler)
 }
 
-func (s *suite) Test_HardDeleteProjectHandler_happy_path(c *C) {
-	var capturedProject string
-	provider := &projectHandlerProvider{
-		HardDeleteProject: func(project string) error {
-			capturedProject = project
+func (s *suite) Test_HardDeleteNamespaceHandler_happy_path(c *C) {
+	var capturedNamespace string
+	provider := &namespaceHandlerProvider{
+		HardDeleteNamespace: func(namespace string) error {
+			capturedNamespace = namespace
 			return nil
 		},
 	}
-	resp := s.testDELETE(c, s.hardDeleteProjectMuxWithProvider(provider), hardDeleteProjectHooksTestURL)
+	resp := s.testDELETE(c, s.hardDeleteNamespaceHandlerMuxWithProvider(provider), hardDeleteNamespaceHooksTestURL)
 	s.ExpectSuccessResponse(c, resp, "")
-	c.Assert(capturedProject, Equals, "project")
+	c.Assert(capturedNamespace, Equals, "namespace")
 }
 
-func (s *suite) Test_HardDeleteProjectHandler_fails_if_HardDeleteProject_fails(c *C) {
-	provider := &projectHandlerProvider{
-		HardDeleteProject: func(project string) error {
+func (s *suite) Test_HardDeleteNamespaceHandler_fails_if_HardDeleteNamespace_fails(c *C) {
+	provider := &namespaceHandlerProvider{
+		HardDeleteNamespace: func(namespace string) error {
 			return types.NotFound
 		},
 	}
-	resp := s.testDELETE(c, s.hardDeleteProjectMuxWithProvider(provider), hardDeleteProjectHooksTestURL)
+	resp := s.testDELETE(c, s.hardDeleteNamespaceHandlerMuxWithProvider(provider), hardDeleteNamespaceHooksTestURL)
 	s.ExpectErrorResponse(c, resp, 404, "")
 }

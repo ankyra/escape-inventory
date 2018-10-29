@@ -28,24 +28,24 @@ paths:
 
   /api/v1/inventory/:
     get:
-      summary: "Get Inventory projects."
-      operationId: getProjects
+      summary: "Get Inventory namespaces."
+      operationId: getNamespaces
       responses:
         default:
           "$ref": "#/components/schemas/Projects"
 
-  /api/v1/inventory/{project}/:
+  /api/v1/inventory/{namespace}/:
     get:
-      summary: "Get Inventory project."
-      operationId: getProject
+      summary: "Get Inventory namespace."
+      operationId: getNamespace
       responses:
         "404":
-          description: "Project not found."
+          description: "Namespace not found."
         default:
           "$ref": "#/components/schemas/ProjectWithUnits"
     put:
-      summary: "Update Inventory project metadata."
-      operationId: updateProject
+      summary: "Update Inventory namespace metadata."
+      operationId: updateNamespace
       requestBody:
         content:
           application/json:
@@ -53,16 +53,16 @@ paths:
               "$ref": "#/components/schemas/Project"
       responses:
         "404":
-          description: "Project not found."
+          description: "Namespace not found."
         "400":
           description: "Invalid JSON body."
         "201":
-          description: "Project updated"
+          description: "Namespace updated"
 
-  /api/v1/inventory/{project}/add-project:
+  /api/v1/inventory/{namespace}/add-namespace:
     post:
-      summary: "Add a project."
-      operationId: addProject
+      summary: "Add a namespace."
+      operationId: addNamespace
       requestBody:
         content:
           application/json:
@@ -72,40 +72,40 @@ paths:
         "400":
           description: "Invalid JSON body."
         "200":
-          description: "Project added."
+          description: "Namespace added."
 
-  /api/v1/inventory/{project}/units/:
+  /api/v1/inventory/{namespace}/units/:
     get:
       summary: "Get units."
       operationId: getApplications
       responses:
         "404":
-          description: "Project not found."
+          description: "Namespace not found."
         default:
           "$ref": "#/components/schemas/Units"
 
 
-  /api/v1/inventory/{project}/units/{name}/:
+  /api/v1/inventory/{namespace}/units/{name}/:
     get:
       summary: "Get unit."
       operationId: getApplication
       responses:
         "404":
-          description: "Project or unit not found."
+          description: "Namespace or unit not found."
         default:
           "$ref": "#/components/schemas/UnitWithVersions"
 
-  /api/v1/inventory/{project}/units/{name}/versions/:
+  /api/v1/inventory/{namespace}/units/{name}/versions/:
     get:
       summary: "Get unit versions."
       operationId: getApplicationVersions
       responses:
         "404":
-          description: "Project or unit not found."
+          description: "Namespace or unit not found."
         default:
           "$ref": "#/components/schemas/Versions"
 
-  /api/v1/inventory/{project}/units/{name}/hooks/:
+  /api/v1/inventory/{namespace}/units/{name}/hooks/:
     get:
       summary: "Get unit hooks."
       operationId: getApplicationHooks
@@ -116,87 +116,87 @@ paths:
       operationId: updateApplicationHooks
       responses:
         "200": {}
-  /api/v1/inventory/{project}/units/{name}/versions/{version}/:
+  /api/v1/inventory/{namespace}/units/{name}/versions/{version}/:
     get:
       summary: "Get unit version."
       operationId: getVersion
       responses:
         "200": {}
-  /api/v1/inventory/{project}/units/{name}/versions/{version}/downstream:
+  /api/v1/inventory/{namespace}/units/{name}/versions/{version}/downstream:
     get:
       summary: "Get downstream releases."
       operationId: downstream
       responses:
         "200": {}
-  /api/v1/inventory/{project}/units/{name}/versions/{version}/dependency-graph:
+  /api/v1/inventory/{namespace}/units/{name}/versions/{version}/dependency-graph:
     get:
       summary: "Get dependency graph."
       operationId: dependencyGraph
       responses:
         "200": {}
-  /api/v1/inventory/{project}/units/{name}/versions/{version}/diff/:
+  /api/v1/inventory/{namespace}/units/{name}/versions/{version}/diff/:
     get:
       summary: "Diff this version with latest."
       operationId: diff
       responses:
         "200": {}
-  /api/v1/inventory/{project}/units/{name}/versions/{version}/diff/{diffWith}/:
+  /api/v1/inventory/{namespace}/units/{name}/versions/{version}/diff/{diffWith}/:
     get:
       summary: "Diff this version with another version."
       operationId: diff
       responses:
         "200": {}
-  /api/v1/inventory/{project}/units/{name}/versions/{version}/download:
+  /api/v1/inventory/{namespace}/units/{name}/versions/{version}/download:
     get:
       summary: "Download this version"
       operationId: download
       responses:
         "200": {}
-  /api/v1/inventory/{project}/units/{name}/versions/{version}/upload:
+  /api/v1/inventory/{namespace}/units/{name}/versions/{version}/upload:
     post:
       summary: "Upload a package."
       operationId: upload
       responses:
         "200": {}
-  /api/v1/inventory/{project}/units/{name}/versions/{version}/previous/:
+  /api/v1/inventory/{namespace}/units/{name}/versions/{version}/previous/:
     get:
       summary: "Get the previous release."
       operationId: previousVersion
       responses:
         "200": {}
-  /api/v1/inventory/{project}/units/{name}/next-version:
+  /api/v1/inventory/{namespace}/units/{name}/next-version:
     get:
       summary: "Get the next version."
       operationId: nextVersion
       responses:
         "200": {}
-  /api/v1/inventory/{project}/feed:
+  /api/v1/inventory/{namespace}/feed:
     get:
-      summary: "Get project feed."
+      summary: "Get namespace feed."
       operationId: projectFeed
       responses:
         "200": {}
-  /api/v1/inventory/{project}/register:
+  /api/v1/inventory/{namespace}/register:
     post:
       summary: "Register a new version"
       operationId: register
       responses:
         "200": {}
-  /api/v1/inventory/{project}/hard-delete:
+  /api/v1/inventory/{namespace}/hard-delete:
     delete:
-      summary: "Hard delete a project and everything under it."
-      operationId: hardDeleteProject
+      summary: "Hard delete a namespace and everything under it."
+      operationId: hardDeleteNamespace
       responses:
         "200": {}
-  /api/v1/inventory/{project}/hooks/:
+  /api/v1/inventory/{namespace}/hooks/:
     get:
-      summary: "Get project hooks."
-      operationId: getProjectHooks
+      summary: "Get namespace hooks."
+      operationId: getNamespaceHooks
       responses:
         "200": {}
     put:
-      summary: "Update Inventory project hooks."
-      operationId: updateProjectHooks
+      summary: "Update Inventory namespace hooks."
+      operationId: updateNamespaceHooks
       responses:
         "200": {}
 

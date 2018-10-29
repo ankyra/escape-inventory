@@ -27,115 +27,115 @@ import (
 	"github.com/gorilla/mux"
 )
 
-type projectHandlerProvider struct {
-	GetProjects   func() (map[string]*types.Project, error)
-	GetProject    func(project string) (*model.ProjectPayload, error)
-	AddProject    func(project *types.Project, username string) error
-	UpdateProject func(project *types.Project) error
+type namespaceHandlerProvider struct {
+	GetNamespaces   func() (map[string]*types.Project, error)
+	GetNamespace    func(namespace string) (*model.ProjectPayload, error)
+	AddNamespace    func(namespace *types.Project, username string) error
+	UpdateNamespace func(namespace *types.Project) error
 
-	GetProjectHooks    func(project string) (types.Hooks, error)
-	UpdateProjectHooks func(project string, hooks types.Hooks) error
+	GetNamespaceHooks    func(namespace string) (types.Hooks, error)
+	UpdateNamespaceHooks func(namespace string, hooks types.Hooks) error
 
-	HardDeleteProject func(project string) error
+	HardDeleteNamespace func(namespace string) error
 }
 
-func newProjectHandlerProvider() *projectHandlerProvider {
-	return &projectHandlerProvider{
-		GetProjects:        dao.GetProjects,
-		GetProject:         model.GetProject,
-		AddProject:         model.AddProject,
-		UpdateProject:      model.UpdateProject,
-		GetProjectHooks:    model.GetProjectHooks,
-		UpdateProjectHooks: model.UpdateProjectHooks,
-		HardDeleteProject:  dao.HardDeleteProject,
+func newNamespaceHandlerProvider() *namespaceHandlerProvider {
+	return &namespaceHandlerProvider{
+		GetNamespaces:        dao.GetProjects,
+		GetNamespace:         model.GetProject,
+		AddNamespace:         model.AddProject,
+		UpdateNamespace:      model.UpdateProject,
+		GetNamespaceHooks:    model.GetProjectHooks,
+		UpdateNamespaceHooks: model.UpdateProjectHooks,
+		HardDeleteNamespace:  dao.HardDeleteProject,
 	}
 }
 
-func GetProjectsHandler(w http.ResponseWriter, r *http.Request) {
-	newProjectHandlerProvider().GetProjectsHandler(w, r)
+func GetNamespacesHandler(w http.ResponseWriter, r *http.Request) {
+	newNamespaceHandlerProvider().GetNamespacesHandler(w, r)
 }
-func GetProjectHandler(w http.ResponseWriter, r *http.Request) {
-	newProjectHandlerProvider().GetProjectHandler(w, r)
+func GetNamespaceHandler(w http.ResponseWriter, r *http.Request) {
+	newNamespaceHandlerProvider().GetNamespaceHandler(w, r)
 }
-func AddProjectHandler(w http.ResponseWriter, r *http.Request) {
-	newProjectHandlerProvider().AddProjectHandler(w, r)
+func AddNamespaceHandler(w http.ResponseWriter, r *http.Request) {
+	newNamespaceHandlerProvider().AddNamespaceHandler(w, r)
 }
-func UpdateProjectHandler(w http.ResponseWriter, r *http.Request) {
-	newProjectHandlerProvider().UpdateProjectHandler(w, r)
+func UpdateNamespaceHandler(w http.ResponseWriter, r *http.Request) {
+	newNamespaceHandlerProvider().UpdateNamespaceHandler(w, r)
 }
-func GetProjectHooksHandler(w http.ResponseWriter, r *http.Request) {
-	newProjectHandlerProvider().GetProjectHooksHandler(w, r)
+func GetNamespaceHooksHandler(w http.ResponseWriter, r *http.Request) {
+	newNamespaceHandlerProvider().GetNamespaceHooksHandler(w, r)
 }
-func UpdateProjectHooksHandler(w http.ResponseWriter, r *http.Request) {
-	newProjectHandlerProvider().UpdateProjectHooksHandler(w, r)
+func UpdateNamespaceHooksHandler(w http.ResponseWriter, r *http.Request) {
+	newNamespaceHandlerProvider().UpdateNamespaceHooksHandler(w, r)
 }
-func HardDeleteProjectHandler(w http.ResponseWriter, r *http.Request) {
-	newProjectHandlerProvider().HardDeleteProjectHandler(w, r)
+func HardDeleteNamespaceHandler(w http.ResponseWriter, r *http.Request) {
+	newNamespaceHandlerProvider().HardDeleteNamespaceHandler(w, r)
 }
 
-func (h *projectHandlerProvider) GetProjectsHandler(w http.ResponseWriter, r *http.Request) {
-	result, err := h.GetProjects()
+func (h *namespaceHandlerProvider) GetNamespacesHandler(w http.ResponseWriter, r *http.Request) {
+	result, err := h.GetNamespaces()
 	ErrorOrJsonSuccess(w, r, result, err)
 }
 
-func (h *projectHandlerProvider) GetProjectHandler(w http.ResponseWriter, r *http.Request) {
-	project := mux.Vars(r)["project"]
-	proj, err := h.GetProject(project)
+func (h *namespaceHandlerProvider) GetNamespaceHandler(w http.ResponseWriter, r *http.Request) {
+	namespace := mux.Vars(r)["namespace"]
+	proj, err := h.GetNamespace(namespace)
 	ErrorOrJsonSuccess(w, r, proj, err)
 }
 
-func (h *projectHandlerProvider) AddProjectHandler(w http.ResponseWriter, r *http.Request) {
+func (h *namespaceHandlerProvider) AddNamespaceHandler(w http.ResponseWriter, r *http.Request) {
 	result := types.Project{}
 	if err := json.NewDecoder(r.Body).Decode(&result); err != nil {
 		HandleError(w, r, model.NewUserError(fmt.Errorf("Invalid JSON")))
 		return
 	}
-	if err := h.AddProject(&result, ""); err != nil {
+	if err := h.AddNamespace(&result, ""); err != nil {
 		HandleError(w, r, err)
 		return
 	}
 	w.WriteHeader(200)
 }
 
-func (h *projectHandlerProvider) UpdateProjectHandler(w http.ResponseWriter, r *http.Request) {
-	project := mux.Vars(r)["project"]
+func (h *namespaceHandlerProvider) UpdateNamespaceHandler(w http.ResponseWriter, r *http.Request) {
+	namespace := mux.Vars(r)["namespace"]
 	result := types.Project{}
 	if err := json.NewDecoder(r.Body).Decode(&result); err != nil {
 		HandleError(w, r, model.NewUserError(fmt.Errorf("Invalid JSON")))
 		return
 	}
-	if result.Name != project {
-		HandleError(w, r, model.NewUserError(fmt.Errorf("Project 'name' field doesn't correspond with URL")))
+	if result.Name != namespace {
+		HandleError(w, r, model.NewUserError(fmt.Errorf("Namespace 'name' field doesn't correspond with URL")))
 		return
 	}
-	if err := h.UpdateProject(&result); err != nil {
+	if err := h.UpdateNamespace(&result); err != nil {
 		HandleError(w, r, err)
 		return
 	}
 	w.WriteHeader(201)
 }
 
-func (h *projectHandlerProvider) GetProjectHooksHandler(w http.ResponseWriter, r *http.Request) {
-	project := mux.Vars(r)["project"]
-	hooks, err := h.GetProjectHooks(project)
+func (h *namespaceHandlerProvider) GetNamespaceHooksHandler(w http.ResponseWriter, r *http.Request) {
+	namespace := mux.Vars(r)["namespace"]
+	hooks, err := h.GetNamespaceHooks(namespace)
 	ErrorOrJsonSuccess(w, r, hooks, err)
 }
 
-func (h *projectHandlerProvider) UpdateProjectHooksHandler(w http.ResponseWriter, r *http.Request) {
-	project := mux.Vars(r)["project"]
+func (h *namespaceHandlerProvider) UpdateNamespaceHooksHandler(w http.ResponseWriter, r *http.Request) {
+	namespace := mux.Vars(r)["namespace"]
 	result := types.Hooks{}
 	if err := json.NewDecoder(r.Body).Decode(&result); err != nil {
 		HandleError(w, r, model.NewUserError(fmt.Errorf("Invalid JSON")))
 		return
 	}
-	if err := h.UpdateProjectHooks(project, result); err != nil {
+	if err := h.UpdateNamespaceHooks(namespace, result); err != nil {
 		HandleError(w, r, err)
 		return
 	}
 	w.WriteHeader(201)
 }
 
-func (h *projectHandlerProvider) HardDeleteProjectHandler(w http.ResponseWriter, r *http.Request) {
-	project := mux.Vars(r)["project"]
-	ErrorOrSuccess(w, r, h.HardDeleteProject(project))
+func (h *namespaceHandlerProvider) HardDeleteNamespaceHandler(w http.ResponseWriter, r *http.Request) {
+	namespace := mux.Vars(r)["namespace"]
+	ErrorOrSuccess(w, r, h.HardDeleteNamespace(namespace))
 }

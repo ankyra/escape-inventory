@@ -27,11 +27,11 @@ import (
 )
 
 type applicationHandlerProvider struct {
-	GetApplications        func(project string) (map[string]*types.Application, error)
-	GetApplication         func(project, name string) (*model.ApplicationPayload, error)
-	GetApplicationVersions func(project, name string) ([]string, error)
-	GetApplicationHooks    func(project, name string) (types.Hooks, error)
-	UpdateApplicationHooks func(project, name string, hooks types.Hooks) error
+	GetApplications        func(namespace string) (map[string]*types.Application, error)
+	GetApplication         func(namespace, name string) (*model.ApplicationPayload, error)
+	GetApplicationVersions func(namespace, name string) ([]string, error)
+	GetApplicationHooks    func(namespace, name string) (types.Hooks, error)
+	UpdateApplicationHooks func(namespace, name string, hooks types.Hooks) error
 }
 
 func newApplicationHandlerProvider() *applicationHandlerProvider {
@@ -61,41 +61,41 @@ func UpdateApplicationHooksHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *applicationHandlerProvider) GetApplicationsHandler(w http.ResponseWriter, r *http.Request) {
-	project := mux.Vars(r)["project"]
-	apps, err := h.GetApplications(project)
+	namespace := mux.Vars(r)["namespace"]
+	apps, err := h.GetApplications(namespace)
 	ErrorOrJsonSuccess(w, r, apps, err)
 }
 
 func (h *applicationHandlerProvider) GetApplicationHandler(w http.ResponseWriter, r *http.Request) {
-	project := mux.Vars(r)["project"]
+	namespace := mux.Vars(r)["namespace"]
 	name := mux.Vars(r)["name"]
-	app, err := h.GetApplication(project, name)
+	app, err := h.GetApplication(namespace, name)
 	ErrorOrJsonSuccess(w, r, app, err)
 }
 
 func (h *applicationHandlerProvider) GetApplicationVersionsHandler(w http.ResponseWriter, r *http.Request) {
-	project := mux.Vars(r)["project"]
+	namespace := mux.Vars(r)["namespace"]
 	name := mux.Vars(r)["name"]
-	versions, err := h.GetApplicationVersions(project, name)
+	versions, err := h.GetApplicationVersions(namespace, name)
 	ErrorOrJsonSuccess(w, r, versions, err)
 }
 
 func (h *applicationHandlerProvider) GetApplicationHooksHandler(w http.ResponseWriter, r *http.Request) {
-	project := mux.Vars(r)["project"]
+	namespace := mux.Vars(r)["namespace"]
 	name := mux.Vars(r)["name"]
-	hooks, err := h.GetApplicationHooks(project, name)
+	hooks, err := h.GetApplicationHooks(namespace, name)
 	ErrorOrJsonSuccess(w, r, hooks, err)
 }
 
 func (h *applicationHandlerProvider) UpdateApplicationHooksHandler(w http.ResponseWriter, r *http.Request) {
-	project := mux.Vars(r)["project"]
+	namespace := mux.Vars(r)["namespace"]
 	name := mux.Vars(r)["name"]
 	result := types.Hooks{}
 	if err := json.NewDecoder(r.Body).Decode(&result); err != nil {
 		HandleError(w, r, model.NewUserError(fmt.Errorf("Invalid JSON")))
 		return
 	}
-	if err := h.UpdateApplicationHooks(project, name, result); err != nil {
+	if err := h.UpdateApplicationHooks(namespace, name, result); err != nil {
 		HandleError(w, r, err)
 		return
 	}

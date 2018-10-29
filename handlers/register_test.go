@@ -29,8 +29,8 @@ import (
 )
 
 const (
-	RegisterURL     = "/api/v1/inventory/{project}/register"
-	registerTestURL = "/api/v1/inventory/project/register"
+	RegisterURL     = "/api/v1/inventory/{namespace}/register"
+	registerTestURL = "/api/v1/inventory/namespace/register"
 )
 
 /*
@@ -45,10 +45,10 @@ func (s *suite) registerMuxWithProvider(provider *registerHandlerProvider) *mux.
 }
 
 func (s *suite) Test_RegisterHandler_happy_path(c *C) {
-	var capturedProject, capturedMetadata, capturedUsername string
+	var capturedNamespace, capturedMetadata, capturedUsername string
 	provider := &registerHandlerProvider{
-		AddReleaseByUser: func(project, metadata, username string) (*core.ReleaseMetadata, error) {
-			capturedProject = project
+		AddReleaseByUser: func(namespace, metadata, username string) (*core.ReleaseMetadata, error) {
+			capturedNamespace = namespace
 			capturedMetadata = metadata
 			capturedUsername = username
 			return core.NewReleaseMetadata("name", "1.0"), nil
@@ -62,14 +62,14 @@ func (s *suite) Test_RegisterHandler_happy_path(c *C) {
 	body, err := ioutil.ReadAll(resp.Body)
 	c.Assert(err, IsNil)
 	c.Assert(string(body), Equals, "")
-	c.Assert(capturedProject, Equals, "project")
+	c.Assert(capturedNamespace, Equals, "namespace")
 	c.Assert(capturedMetadata, Equals, "metadata")
 	c.Assert(capturedUsername, Equals, "")
 }
 
 func (s *suite) Test_RegisterHandler_fails_if_add_release_fails(c *C) {
 	provider := &registerHandlerProvider{
-		AddReleaseByUser: func(project, metadata, username string) (*core.ReleaseMetadata, error) {
+		AddReleaseByUser: func(namespace, metadata, username string) (*core.ReleaseMetadata, error) {
 			return nil, types.AlreadyExists
 		},
 		ReadRequestBody: func(body io.Reader) ([]byte, error) {
