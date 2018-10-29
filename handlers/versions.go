@@ -25,11 +25,11 @@ import (
 )
 
 type versionHandlerProvider struct {
-	GetReleaseMetadata func(project, name, version string) (*core.ReleaseMetadata, error)
-	GetRelease         func(project, name, version string) (*model.ReleasePayload, error)
-	GetNextVersion     func(project, name, prefix string) (string, error)
-	GetPreviousVersion func(project, name, version string) (*core.ReleaseMetadata, error)
-	Diff               func(project, name, version, diffWithVersion string) (map[string]map[string]core.Changes, error)
+	GetReleaseMetadata func(namespace, name, version string) (*core.ReleaseMetadata, error)
+	GetRelease         func(namespace, name, version string) (*model.ReleasePayload, error)
+	GetNextVersion     func(namespace, name, prefix string) (string, error)
+	GetPreviousVersion func(namespace, name, version string) (*core.ReleaseMetadata, error)
+	Diff               func(namespace, name, version, diffWithVersion string) (map[string]map[string]core.Changes, error)
 }
 
 func newVersionHandlerProvider() *versionHandlerProvider {
@@ -56,25 +56,25 @@ func DiffHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *versionHandlerProvider) GetVersionHandler(w http.ResponseWriter, r *http.Request) {
-	project := mux.Vars(r)["project"]
+	namespace := mux.Vars(r)["namespace"]
 	name := mux.Vars(r)["name"]
 	version := mux.Vars(r)["version"]
 	full := r.URL.Query().Get("full")
 	var result interface{}
 	var err error
 	if full != "" {
-		result, err = h.GetRelease(project, name, version)
+		result, err = h.GetRelease(namespace, name, version)
 	} else {
-		result, err = h.GetReleaseMetadata(project, name, version)
+		result, err = h.GetReleaseMetadata(namespace, name, version)
 	}
 	ErrorOrJsonSuccess(w, r, result, err)
 }
 
 func (h *versionHandlerProvider) NextVersionHandler(w http.ResponseWriter, r *http.Request) {
-	project := mux.Vars(r)["project"]
+	namespace := mux.Vars(r)["namespace"]
 	name := mux.Vars(r)["name"]
 	prefix := r.URL.Query().Get("prefix")
-	version, err := h.GetNextVersion(project, name, prefix)
+	version, err := h.GetNextVersion(namespace, name, prefix)
 	if err != nil {
 		HandleError(w, r, err)
 		return
@@ -83,20 +83,20 @@ func (h *versionHandlerProvider) NextVersionHandler(w http.ResponseWriter, r *ht
 }
 
 func (h *versionHandlerProvider) PreviousVersionHandler(w http.ResponseWriter, r *http.Request) {
-	project := mux.Vars(r)["project"]
+	namespace := mux.Vars(r)["namespace"]
 	name := mux.Vars(r)["name"]
 	version := mux.Vars(r)["version"]
-	metadata, err := h.GetPreviousVersion(project, name, version)
+	metadata, err := h.GetPreviousVersion(namespace, name, version)
 	ErrorOrJsonSuccess(w, r, metadata, err)
 }
 
 func (h *versionHandlerProvider) DiffHandler(w http.ResponseWriter, r *http.Request) {
-	project := mux.Vars(r)["project"]
+	namespace := mux.Vars(r)["namespace"]
 	name := mux.Vars(r)["name"]
 	version := mux.Vars(r)["version"]
 	diffWith := mux.Vars(r)["diffWith"]
 
-	changes, err := h.Diff(project, name, version, diffWith)
+	changes, err := h.Diff(namespace, name, version, diffWith)
 	if err != nil {
 		HandleError(w, r, err)
 		return

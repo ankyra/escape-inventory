@@ -27,7 +27,7 @@ import (
 )
 
 type registerHandlerProvider struct {
-	AddReleaseByUser func(project, metadata, username string) (*core.ReleaseMetadata, error)
+	AddReleaseByUser func(namespace, metadata, username string) (*core.ReleaseMetadata, error)
 	ReadRequestBody  func(body io.Reader) ([]byte, error)
 }
 
@@ -43,14 +43,14 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *registerHandlerProvider) RegisterHandler(w http.ResponseWriter, r *http.Request) {
-	project := mux.Vars(r)["project"]
+	namespace := mux.Vars(r)["namespace"]
 	metadata, err := h.ReadRequestBody(r.Body)
 	if err != nil {
 		HandleError(w, r, err)
 		return
 	}
 	username := ReadUsernameFromContext(r)
-	if _, err := h.AddReleaseByUser(project, string(metadata), username); err != nil {
+	if _, err := h.AddReleaseByUser(namespace, string(metadata), username); err != nil {
 		HandleError(w, r, err)
 		return
 	}

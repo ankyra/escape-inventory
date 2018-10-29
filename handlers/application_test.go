@@ -29,20 +29,20 @@ import (
 )
 
 const (
-	GetApplicationsURL     = "/api/v1/inventory/{project}/units/"
-	getApplicationsTestURL = "/api/v1/inventory/project/units/"
+	GetApplicationsURL     = "/api/v1/inventory/{namespace}/units/"
+	getApplicationsTestURL = "/api/v1/inventory/namespace/units/"
 
-	GetApplicationURL     = "/api/v1/inventory/{project}/units/{name}/"
-	getApplicationTestURL = "/api/v1/inventory/project/units/name/"
+	GetApplicationURL     = "/api/v1/inventory/{namespace}/units/{name}/"
+	getApplicationTestURL = "/api/v1/inventory/namespace/units/name/"
 
-	GetApplicationVersionsURL     = "/api/v1/inventory/{project}/units/{name}/versions/"
-	getApplicationVersionsTestURL = "/api/v1/inventory/project/units/name/versions/"
+	GetApplicationVersionsURL     = "/api/v1/inventory/{namespace}/units/{name}/versions/"
+	getApplicationVersionsTestURL = "/api/v1/inventory/namespace/units/name/versions/"
 
-	GetApplicationHooksURL     = "/api/v1/inventory/{project}/units/{name}/hooks/"
-	getApplicationHooksTestURL = "/api/v1/inventory/project/units/name/hooks/"
+	GetApplicationHooksURL     = "/api/v1/inventory/{namespace}/units/{name}/hooks/"
+	getApplicationHooksTestURL = "/api/v1/inventory/namespace/units/name/hooks/"
 
-	UpdateApplicationHooksURL     = "/api/v1/inventory/{project}/units/{name}/hooks/"
-	updateApplicationHooksTestURL = "/api/v1/inventory/project/units/name/hooks/"
+	UpdateApplicationHooksURL     = "/api/v1/inventory/{namespace}/units/{name}/hooks/"
+	updateApplicationHooksTestURL = "/api/v1/inventory/namespace/units/name/hooks/"
 )
 
 /*
@@ -57,18 +57,18 @@ func (s *suite) getApplicationsMuxWithProvider(provider *applicationHandlerProvi
 }
 
 func (s *suite) Test_GetApplicationsHandler_happy_path(c *C) {
-	var capturedProject string
+	var capturedNamespace string
 	provider := &applicationHandlerProvider{
-		GetApplications: func(project string) (map[string]*types.Application, error) {
-			capturedProject = project
+		GetApplications: func(namespace string) (map[string]*types.Application, error) {
+			capturedNamespace = namespace
 			return map[string]*types.Application{
-				"my-app": types.NewApplication("project", "my-app"),
+				"my-app": types.NewApplication("namespace", "my-app"),
 			}, nil
 		},
 	}
 	resp := s.testGET(c, s.getApplicationsMuxWithProvider(provider), getApplicationsTestURL)
 	c.Assert(resp.StatusCode, Equals, 200)
-	c.Assert(capturedProject, Equals, "project")
+	c.Assert(capturedNamespace, Equals, "namespace")
 	c.Assert(resp.Header.Get("Content-Type"), Equals, "application/json")
 	result := map[string]*types.Application{}
 	c.Assert(json.NewDecoder(resp.Body).Decode(&result), IsNil)
@@ -76,16 +76,16 @@ func (s *suite) Test_GetApplicationsHandler_happy_path(c *C) {
 }
 
 func (s *suite) Test_GetApplicationsHandler_fails_if_get_applications_fails(c *C) {
-	var capturedProject string
+	var capturedNamespace string
 	provider := &applicationHandlerProvider{
-		GetApplications: func(project string) (map[string]*types.Application, error) {
-			capturedProject = project
+		GetApplications: func(namespace string) (map[string]*types.Application, error) {
+			capturedNamespace = namespace
 			return nil, types.NotFound
 		},
 	}
 	resp := s.testGET(c, s.getApplicationsMuxWithProvider(provider), getApplicationsTestURL)
 	c.Assert(resp.StatusCode, Equals, 404)
-	c.Assert(capturedProject, Equals, "project")
+	c.Assert(capturedNamespace, Equals, "namespace")
 	body, err := ioutil.ReadAll(resp.Body)
 	c.Assert(err, IsNil)
 	c.Assert(string(body), Equals, "")
@@ -104,13 +104,13 @@ func (s *suite) getApplicationMuxWithProvider(provider *applicationHandlerProvid
 }
 
 func (s *suite) Test_GetApplicationHandler_happy_path(c *C) {
-	var capturedProject, capturedName string
+	var capturedNamespace, capturedName string
 	provider := &applicationHandlerProvider{
-		GetApplication: func(project, name string) (*model.ApplicationPayload, error) {
-			capturedProject = project
+		GetApplication: func(namespace, name string) (*model.ApplicationPayload, error) {
+			capturedNamespace = namespace
 			capturedName = name
 			result := model.ApplicationPayload{
-				Application: types.NewApplication("project", "name"),
+				Application: types.NewApplication("namespace", "name"),
 				Versions:    []string{"1.0", "1.1"},
 			}
 			return &result, nil
@@ -118,7 +118,7 @@ func (s *suite) Test_GetApplicationHandler_happy_path(c *C) {
 	}
 	resp := s.testGET(c, s.getApplicationMuxWithProvider(provider), getApplicationTestURL)
 	c.Assert(resp.StatusCode, Equals, 200)
-	c.Assert(capturedProject, Equals, "project")
+	c.Assert(capturedNamespace, Equals, "namespace")
 	c.Assert(capturedName, Equals, "name")
 	c.Assert(resp.Header.Get("Content-Type"), Equals, "application/json")
 	result := model.ApplicationPayload{}
@@ -128,16 +128,16 @@ func (s *suite) Test_GetApplicationHandler_happy_path(c *C) {
 }
 
 func (s *suite) Test_GetApplicationHandler_fails_if_get_application_fails(c *C) {
-	var capturedProject string
+	var capturedNamespace string
 	provider := &applicationHandlerProvider{
-		GetApplication: func(project, name string) (*model.ApplicationPayload, error) {
-			capturedProject = project
+		GetApplication: func(namespace, name string) (*model.ApplicationPayload, error) {
+			capturedNamespace = namespace
 			return nil, types.NotFound
 		},
 	}
 	resp := s.testGET(c, s.getApplicationMuxWithProvider(provider), getApplicationTestURL)
 	c.Assert(resp.StatusCode, Equals, 404)
-	c.Assert(capturedProject, Equals, "project")
+	c.Assert(capturedNamespace, Equals, "namespace")
 	body, err := ioutil.ReadAll(resp.Body)
 	c.Assert(err, IsNil)
 	c.Assert(string(body), Equals, "")
@@ -156,17 +156,17 @@ func (s *suite) getApplicationVersionsMuxWithProvider(provider *applicationHandl
 }
 
 func (s *suite) Test_GetApplicationVersionsHandler_happy_path(c *C) {
-	var capturedProject, capturedName string
+	var capturedNamespace, capturedName string
 	provider := &applicationHandlerProvider{
-		GetApplicationVersions: func(project, name string) ([]string, error) {
-			capturedProject = project
+		GetApplicationVersions: func(namespace, name string) ([]string, error) {
+			capturedNamespace = namespace
 			capturedName = name
 			return []string{"1.0", "1.1"}, nil
 		},
 	}
 	resp := s.testGET(c, s.getApplicationVersionsMuxWithProvider(provider), getApplicationVersionsTestURL)
 	c.Assert(resp.StatusCode, Equals, 200)
-	c.Assert(capturedProject, Equals, "project")
+	c.Assert(capturedNamespace, Equals, "namespace")
 	c.Assert(capturedName, Equals, "name")
 	result := []string{}
 	c.Assert(json.NewDecoder(resp.Body).Decode(&result), IsNil)
@@ -175,7 +175,7 @@ func (s *suite) Test_GetApplicationVersionsHandler_happy_path(c *C) {
 
 func (s *suite) Test_GetApplicationVersionsHandler_fails_if_GetApplicationVersions_fails(c *C) {
 	provider := &applicationHandlerProvider{
-		GetApplicationVersions: func(project, name string) ([]string, error) {
+		GetApplicationVersions: func(namespace, name string) ([]string, error) {
 			return nil, types.NotFound
 		},
 	}
@@ -199,10 +199,10 @@ func (s *suite) getApplicationHooksMuxWithProvider(provider *applicationHandlerP
 }
 
 func (s *suite) Test_GetApplicationHooksHandler_happy_path(c *C) {
-	var capturedProject, capturedName string
+	var capturedNamespace, capturedName string
 	provider := &applicationHandlerProvider{
-		GetApplicationHooks: func(project, name string) (types.Hooks, error) {
-			capturedProject = project
+		GetApplicationHooks: func(namespace, name string) (types.Hooks, error) {
+			capturedNamespace = namespace
 			capturedName = name
 			hooks := types.NewHooks()
 			hooks["test"] = map[string]string{
@@ -213,7 +213,7 @@ func (s *suite) Test_GetApplicationHooksHandler_happy_path(c *C) {
 	}
 	resp := s.testGET(c, s.getApplicationHooksMuxWithProvider(provider), getApplicationHooksTestURL)
 	c.Assert(resp.StatusCode, Equals, 200)
-	c.Assert(capturedProject, Equals, "project")
+	c.Assert(capturedNamespace, Equals, "namespace")
 	c.Assert(capturedName, Equals, "name")
 	c.Assert(resp.Header.Get("Content-Type"), Equals, "application/json")
 	result := types.NewHooks()
@@ -222,17 +222,17 @@ func (s *suite) Test_GetApplicationHooksHandler_happy_path(c *C) {
 }
 
 func (s *suite) Test_GetApplicationHooksHandler_fails_if_GetApplicationHooks_fails(c *C) {
-	var capturedProject, capturedName string
+	var capturedNamespace, capturedName string
 	provider := &applicationHandlerProvider{
-		GetApplicationHooks: func(project, name string) (types.Hooks, error) {
-			capturedProject = project
+		GetApplicationHooks: func(namespace, name string) (types.Hooks, error) {
+			capturedNamespace = namespace
 			capturedName = name
 			return nil, types.NotFound
 		},
 	}
 	resp := s.testGET(c, s.getApplicationHooksMuxWithProvider(provider), getApplicationHooksTestURL)
 	c.Assert(resp.StatusCode, Equals, 404)
-	c.Assert(capturedProject, Equals, "project")
+	c.Assert(capturedNamespace, Equals, "namespace")
 	c.Assert(capturedName, Equals, "name")
 	body, err := ioutil.ReadAll(resp.Body)
 	c.Assert(err, IsNil)
@@ -253,7 +253,7 @@ func (s *suite) updateApplicationHooksMuxWithProvider(provider *applicationHandl
 
 func (s *suite) Test_UpdateApplicationHooksHandler_happy_path(c *C) {
 	provider := &applicationHandlerProvider{
-		UpdateApplicationHooks: func(project, name string, hooks types.Hooks) error {
+		UpdateApplicationHooks: func(namespace, name string, hooks types.Hooks) error {
 			return nil
 		},
 	}
@@ -272,7 +272,7 @@ func (s *suite) Test_UpdateApplicationHooksHandler_happy_path(c *C) {
 func (s *suite) Test_UpdateApplicationHooksHandler_fails_if_invalid_json(c *C) {
 	serviceCalled := false
 	provider := &applicationHandlerProvider{
-		UpdateApplicationHooks: func(project, name string, hooks types.Hooks) error {
+		UpdateApplicationHooks: func(namespace, name string, hooks types.Hooks) error {
 			serviceCalled = true
 			return types.NotFound
 		},
@@ -287,7 +287,7 @@ func (s *suite) Test_UpdateApplicationHooksHandler_fails_if_invalid_json(c *C) {
 
 func (s *suite) Test_UpdateApplicationHooksHandler_fails_if_UpdateApplicationHooks_fails(c *C) {
 	provider := &applicationHandlerProvider{
-		UpdateApplicationHooks: func(project, name string, hooks types.Hooks) error {
+		UpdateApplicationHooks: func(namespace, name string, hooks types.Hooks) error {
 			return types.NotFound
 		},
 	}

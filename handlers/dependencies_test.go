@@ -28,10 +28,10 @@ import (
 )
 
 const (
-	DownstreamURL          = "/api/v1/inventory/{project}/units/{name}/versions/{version}/downstream"
-	downstreamTestURL      = "/api/v1/inventory/project/units/name/versions/v1.0.0/downstream"
-	DependencyGraphURL     = "/api/v1/inventory/{project}/units/{name}/versions/{version}/dependency-graph"
-	dependencyGraphTestURL = "/api/v1/inventory/project/units/name/versions/v1.0.0/dependency-graph"
+	DownstreamURL          = "/api/v1/inventory/{namespace}/units/{name}/versions/{version}/downstream"
+	downstreamTestURL      = "/api/v1/inventory/namespace/units/name/versions/v1.0.0/downstream"
+	DependencyGraphURL     = "/api/v1/inventory/{namespace}/units/{name}/versions/{version}/dependency-graph"
+	dependencyGraphTestURL = "/api/v1/inventory/namespace/units/name/versions/v1.0.0/dependency-graph"
 )
 
 /*
@@ -47,7 +47,7 @@ func (s *suite) downstreamMuxWithProvider(provider *dependencyHandlerProvider) *
 
 func (s *suite) Test_DownstreamHandler_happy_path(c *C) {
 	provider := &dependencyHandlerProvider{
-		GetDownstreamDependencies: func(project, name, version string) ([]*types.Dependency, error) {
+		GetDownstreamDependencies: func(namespace, name, version string) ([]*types.Dependency, error) {
 			deps := []*types.Dependency{types.NewDependency("prj", "dep", "1.0")}
 			return deps, nil
 		},
@@ -63,7 +63,7 @@ func (s *suite) Test_DownstreamHandler_happy_path(c *C) {
 
 func (s *suite) Test_DownstreamHandler_fails_if_GetDownStreamDependencies_fails(c *C) {
 	provider := &dependencyHandlerProvider{
-		GetDownstreamDependencies: func(project, name, version string) ([]*types.Dependency, error) {
+		GetDownstreamDependencies: func(namespace, name, version string) ([]*types.Dependency, error) {
 			return nil, types.NotFound
 		},
 	}
@@ -87,7 +87,7 @@ func (s *suite) dependencyGraphMuxWithProvider(provider *dependencyHandlerProvid
 
 func (s *suite) Test_DependencyGraphHandler_happy_path(c *C) {
 	provider := &dependencyHandlerProvider{
-		GetDependencyGraph: func(project, name, version string, downstreamFunc model.DownstreamDependenciesResolver) (*model.DependencyGraph, error) {
+		GetDependencyGraph: func(namespace, name, version string, downstreamFunc model.DownstreamDependenciesResolver) (*model.DependencyGraph, error) {
 			return nil, nil
 		},
 	}
@@ -102,7 +102,7 @@ func (s *suite) Test_DependencyGraphHandler_happy_path(c *C) {
 
 func (s *suite) Test_DependencyGraphHandler_fails_if_GetDependencyGraph_fails(c *C) {
 	provider := &dependencyHandlerProvider{
-		GetDependencyGraph: func(project, name, version string, downstreamFunc model.DownstreamDependenciesResolver) (*model.DependencyGraph, error) {
+		GetDependencyGraph: func(namespace, name, version string, downstreamFunc model.DownstreamDependenciesResolver) (*model.DependencyGraph, error) {
 			return nil, types.NotFound
 		},
 	}

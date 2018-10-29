@@ -27,7 +27,7 @@ import (
 )
 
 type uploadHandlerProvider struct {
-	UploadPackage func(project, releaseId string, pkg io.ReadSeeker) error
+	UploadPackage func(namespace, releaseId string, pkg io.ReadSeeker) error
 }
 
 func newUploadHandlerProvider() *uploadHandlerProvider {
@@ -41,7 +41,7 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *uploadHandlerProvider) UploadHandler(w http.ResponseWriter, r *http.Request) {
-	project := mux.Vars(r)["project"]
+	namespace := mux.Vars(r)["namespace"]
 	name := mux.Vars(r)["name"]
 	version := mux.Vars(r)["version"]
 	releaseId := name + "-" + version
@@ -50,7 +50,7 @@ func (h *uploadHandlerProvider) UploadHandler(w http.ResponseWriter, r *http.Req
 		HandleError(w, r, model.NewUserError(err))
 		return
 	}
-	if err := h.UploadPackage(project, releaseId, f); err != nil {
+	if err := h.UploadPackage(namespace, releaseId, f); err != nil {
 		HandleError(w, r, err)
 		return
 	}
@@ -60,6 +60,6 @@ func (h *uploadHandlerProvider) UploadHandler(w http.ResponseWriter, r *http.Req
 	if cmd.Config != nil && cmd.Config.WebHook != "" {
 		url = cmd.Config.WebHook
 	}
-	go model.CallWebHook(project, name, version, releaseId, username, url)
+	go model.CallWebHook(namespace, name, version, releaseId, username, url)
 	w.WriteHeader(200)
 }

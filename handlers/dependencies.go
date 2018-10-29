@@ -25,8 +25,8 @@ import (
 )
 
 type dependencyHandlerProvider struct {
-	GetDownstreamDependencies func(project, name, version string) ([]*types.Dependency, error)
-	GetDependencyGraph        func(project, name, version string, downstreamFunc model.DownstreamDependenciesResolver) (*model.DependencyGraph, error)
+	GetDownstreamDependencies func(namespace, name, version string) ([]*types.Dependency, error)
+	GetDependencyGraph        func(namespace, name, version string, downstreamFunc model.DownstreamDependenciesResolver) (*model.DependencyGraph, error)
 }
 
 func newDependencyHandlerProvider() *dependencyHandlerProvider {
@@ -44,17 +44,17 @@ func DependencyGraphHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *dependencyHandlerProvider) DownstreamHandler(w http.ResponseWriter, r *http.Request) {
-	project := mux.Vars(r)["project"]
+	namespace := mux.Vars(r)["namespace"]
 	name := mux.Vars(r)["name"]
 	version := mux.Vars(r)["version"]
-	deps, err := h.GetDownstreamDependencies(project, name, version)
+	deps, err := h.GetDownstreamDependencies(namespace, name, version)
 	ErrorOrJsonSuccess(w, r, deps, err)
 }
 
 func (h *dependencyHandlerProvider) DependencyGraphHandler(w http.ResponseWriter, r *http.Request) {
-	project := mux.Vars(r)["project"]
+	namespace := mux.Vars(r)["namespace"]
 	name := mux.Vars(r)["name"]
 	version := mux.Vars(r)["version"]
-	graph, err := h.GetDependencyGraph(project, name, version, nil)
+	graph, err := h.GetDependencyGraph(namespace, name, version, nil)
 	ErrorOrJsonSuccess(w, r, graph, err)
 }

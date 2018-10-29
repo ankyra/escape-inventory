@@ -28,8 +28,8 @@ import (
 )
 
 const (
-	UploadURL     = "/api/v1/inventory/{project}/units/{name}/versions/{version}/upload"
-	uploadTestURL = "/api/v1/inventory/project/units/name/versions/v1.0.0/upload"
+	UploadURL     = "/api/v1/inventory/{namespace}/units/{name}/versions/{version}/upload"
+	uploadTestURL = "/api/v1/inventory/namespace/units/name/versions/v1.0.0/upload"
 )
 
 func (s *suite) uploadMux() *mux.Router {
@@ -55,7 +55,7 @@ func (s *suite) Test_UploadHandler(c *C) {
 	c.Assert(err, IsNil)
 
 	provider := &uploadHandlerProvider{
-		UploadPackage: func(project, releaseId string, pkg io.ReadSeeker) error {
+		UploadPackage: func(namespace, releaseId string, pkg io.ReadSeeker) error {
 			return nil
 		},
 	}
@@ -77,7 +77,7 @@ func (s *suite) Test_UploadHandler_fails_if_upload_fails(c *C) {
 	c.Assert(err, IsNil)
 
 	provider := &uploadHandlerProvider{
-		UploadPackage: func(project, releaseId string, pkg io.ReadSeeker) error {
+		UploadPackage: func(namespace, releaseId string, pkg io.ReadSeeker) error {
 			return types.AlreadyExists
 		},
 	}
@@ -91,7 +91,7 @@ func (s *suite) Test_UploadHandler_fails_if_upload_fails(c *C) {
 	os.RemoveAll(file)
 }
 
-func (s *suite) Test_UploadHandler_fails_if_project_does_not_exist(c *C) {
+func (s *suite) Test_UploadHandler_fails_if_namespace_does_not_exist(c *C) {
 	content := "package content"
 	file := "my-package.tgz"
 	os.RemoveAll(file)

@@ -29,14 +29,14 @@ import (
 )
 
 const (
-	GetVersionURL          = "/api/v1/inventory/{project}/units/{name}/versions/{version}/"
-	getVersionTestURL      = "/api/v1/inventory/project/units/name/versions/v1.0/"
-	NextVersionURL         = "/api/v1/inventory/{project}/units/{name}/next-version"
-	nextVersionTestURL     = "/api/v1/inventory/project/units/name/next-version?prefix=0.1"
-	PreviousVersionURL     = "/api/v1/inventory/{project}/units/{name}/versions/{version}/previous/"
-	previousVersionTestURL = "/api/v1/inventory/project/units/name/versions/v1.0/previous/"
-	DiffURL                = "/api/v1/inventory/{project}/units/{name}/versions/{version}/diff/{diffWith}/"
-	diffTestURL            = "/api/v1/inventory/project/units/name/versions/v1.0/diff/v1.1/"
+	GetVersionURL          = "/api/v1/inventory/{namespace}/units/{name}/versions/{version}/"
+	getVersionTestURL      = "/api/v1/inventory/namespace/units/name/versions/v1.0/"
+	NextVersionURL         = "/api/v1/inventory/{namespace}/units/{name}/next-version"
+	nextVersionTestURL     = "/api/v1/inventory/namespace/units/name/next-version?prefix=0.1"
+	PreviousVersionURL     = "/api/v1/inventory/{namespace}/units/{name}/versions/{version}/previous/"
+	previousVersionTestURL = "/api/v1/inventory/namespace/units/name/versions/v1.0/previous/"
+	DiffURL                = "/api/v1/inventory/{namespace}/units/{name}/versions/{version}/diff/{diffWith}/"
+	diffTestURL            = "/api/v1/inventory/namespace/units/name/versions/v1.0/diff/v1.1/"
 )
 
 /*
@@ -52,10 +52,10 @@ func (s *suite) getVersionMuxWithProvider(provider *versionHandlerProvider) *mux
 }
 
 func (s *suite) Test_GetVersionHandler_happy_path(c *C) {
-	var capturedProject, capturedName, capturedVersion string
+	var capturedNamespace, capturedName, capturedVersion string
 	provider := &versionHandlerProvider{
-		GetReleaseMetadata: func(project, name, version string) (*core.ReleaseMetadata, error) {
-			capturedProject = project
+		GetReleaseMetadata: func(namespace, name, version string) (*core.ReleaseMetadata, error) {
+			capturedNamespace = namespace
 			capturedName = name
 			capturedVersion = version
 			return core.NewReleaseMetadata("name", "v10.0"), nil
@@ -64,7 +64,7 @@ func (s *suite) Test_GetVersionHandler_happy_path(c *C) {
 	resp := s.testGET(c, s.getVersionMuxWithProvider(provider), getVersionTestURL)
 	c.Assert(resp.StatusCode, Equals, 200)
 	c.Assert(resp.Header.Get("Content-Type"), Equals, "application/json")
-	c.Assert(capturedProject, Equals, "project")
+	c.Assert(capturedNamespace, Equals, "namespace")
 	c.Assert(capturedName, Equals, "name")
 	c.Assert(capturedVersion, Equals, "v1.0")
 
@@ -75,10 +75,10 @@ func (s *suite) Test_GetVersionHandler_happy_path(c *C) {
 }
 
 func (s *suite) Test_GetVersionHandler_happy_path_full(c *C) {
-	var capturedProject, capturedName, capturedVersion string
+	var capturedNamespace, capturedName, capturedVersion string
 	provider := &versionHandlerProvider{
-		GetRelease: func(project, name, version string) (*model.ReleasePayload, error) {
-			capturedProject = project
+		GetRelease: func(namespace, name, version string) (*model.ReleasePayload, error) {
+			capturedNamespace = namespace
 			capturedName = name
 			capturedVersion = version
 			return &model.ReleasePayload{Downloads: 2000}, nil
@@ -87,7 +87,7 @@ func (s *suite) Test_GetVersionHandler_happy_path_full(c *C) {
 	resp := s.testGET(c, s.getVersionMuxWithProvider(provider), getVersionTestURL+"?full=true")
 	c.Assert(resp.StatusCode, Equals, 200)
 	c.Assert(resp.Header.Get("Content-Type"), Equals, "application/json")
-	c.Assert(capturedProject, Equals, "project")
+	c.Assert(capturedNamespace, Equals, "namespace")
 	c.Assert(capturedName, Equals, "name")
 	c.Assert(capturedVersion, Equals, "v1.0")
 
@@ -98,7 +98,7 @@ func (s *suite) Test_GetVersionHandler_happy_path_full(c *C) {
 
 func (s *suite) Test_GetVersionHandler_fails_if_full_and_GetRelease_fails(c *C) {
 	provider := &versionHandlerProvider{
-		GetRelease: func(project, name, version string) (*model.ReleasePayload, error) {
+		GetRelease: func(namespace, name, version string) (*model.ReleasePayload, error) {
 			return nil, types.NotFound
 		},
 	}
@@ -111,7 +111,7 @@ func (s *suite) Test_GetVersionHandler_fails_if_full_and_GetRelease_fails(c *C) 
 
 func (s *suite) Test_GetVersionHandler_fails_if_not_full_and_GetReleaseMetadata_fails(c *C) {
 	provider := &versionHandlerProvider{
-		GetReleaseMetadata: func(project, name, version string) (*core.ReleaseMetadata, error) {
+		GetReleaseMetadata: func(namespace, name, version string) (*core.ReleaseMetadata, error) {
 			return nil, types.NotFound
 		},
 	}
@@ -135,10 +135,10 @@ func (s *suite) nextVersionMuxWithProvider(provider *versionHandlerProvider) *mu
 }
 
 func (s *suite) Test_NextVersionHandler_happy_path(c *C) {
-	var capturedProject, capturedName, capturedPrefix string
+	var capturedNamespace, capturedName, capturedPrefix string
 	provider := &versionHandlerProvider{
-		GetNextVersion: func(project, name, prefix string) (string, error) {
-			capturedProject = project
+		GetNextVersion: func(namespace, name, prefix string) (string, error) {
+			capturedNamespace = namespace
 			capturedName = name
 			capturedPrefix = prefix
 			return "0.9", nil
@@ -148,7 +148,7 @@ func (s *suite) Test_NextVersionHandler_happy_path(c *C) {
 	c.Assert(resp.StatusCode, Equals, 200)
 	body, err := ioutil.ReadAll(resp.Body)
 	c.Assert(err, IsNil)
-	c.Assert(capturedProject, Equals, "project")
+	c.Assert(capturedNamespace, Equals, "namespace")
 	c.Assert(capturedName, Equals, "name")
 	c.Assert(capturedPrefix, Equals, "0.1")
 	c.Assert(string(body), Equals, "0.9")
@@ -156,7 +156,7 @@ func (s *suite) Test_NextVersionHandler_happy_path(c *C) {
 
 func (s *suite) Test_NextVersionHandler_fails_if_GetNextVersion_fails(c *C) {
 	provider := &versionHandlerProvider{
-		GetNextVersion: func(project, name, prefix string) (string, error) {
+		GetNextVersion: func(namespace, name, prefix string) (string, error) {
 			return "", types.NotFound
 		},
 	}
@@ -179,10 +179,10 @@ func (s *suite) previousVersionMuxWithProvider(provider *versionHandlerProvider)
 }
 
 func (s *suite) Test_PreviousVersionHandler_happy_path(c *C) {
-	var capturedProject, capturedName, capturedVersion string
+	var capturedNamespace, capturedName, capturedVersion string
 	provider := &versionHandlerProvider{
-		GetPreviousVersion: func(project, name, version string) (*core.ReleaseMetadata, error) {
-			capturedProject = project
+		GetPreviousVersion: func(namespace, name, version string) (*core.ReleaseMetadata, error) {
+			capturedNamespace = namespace
 			capturedName = name
 			capturedVersion = version
 			return core.NewReleaseMetadata("name", "v0.9"), nil
@@ -191,7 +191,7 @@ func (s *suite) Test_PreviousVersionHandler_happy_path(c *C) {
 	resp := s.testGET(c, s.previousVersionMuxWithProvider(provider), previousVersionTestURL)
 	c.Assert(resp.StatusCode, Equals, 200)
 	c.Assert(resp.Header.Get("Content-Type"), Equals, "application/json")
-	c.Assert(capturedProject, Equals, "project")
+	c.Assert(capturedNamespace, Equals, "namespace")
 	c.Assert(capturedName, Equals, "name")
 	c.Assert(capturedVersion, Equals, "v1.0")
 
@@ -203,7 +203,7 @@ func (s *suite) Test_PreviousVersionHandler_happy_path(c *C) {
 
 func (s *suite) Test_PreviousVersionHandler_fails_if_GetNextVersion_fails(c *C) {
 	provider := &versionHandlerProvider{
-		GetPreviousVersion: func(project, name, prefix string) (*core.ReleaseMetadata, error) {
+		GetPreviousVersion: func(namespace, name, prefix string) (*core.ReleaseMetadata, error) {
 			return nil, types.NotFound
 		},
 	}
@@ -226,10 +226,10 @@ func (s *suite) diffMuxWithProvider(provider *versionHandlerProvider) *mux.Route
 }
 
 func (s *suite) Test_DiffHandler_happy_path(c *C) {
-	var capturedProject, capturedName, capturedVersion, capturedDiffWithVersion string
+	var capturedNamespace, capturedName, capturedVersion, capturedDiffWithVersion string
 	provider := &versionHandlerProvider{
-		Diff: func(project, name, version, diffWithVersion string) (map[string]map[string]core.Changes, error) {
-			capturedProject = project
+		Diff: func(namespace, name, version, diffWithVersion string) (map[string]map[string]core.Changes, error) {
+			capturedNamespace = namespace
 			capturedName = name
 			capturedVersion = version
 			capturedDiffWithVersion = diffWithVersion
@@ -241,7 +241,7 @@ func (s *suite) Test_DiffHandler_happy_path(c *C) {
 	}
 	resp := s.testGET(c, s.diffMuxWithProvider(provider), diffTestURL)
 	c.Assert(resp.StatusCode, Equals, 200)
-	c.Assert(capturedProject, Equals, "project")
+	c.Assert(capturedNamespace, Equals, "namespace")
 	c.Assert(capturedName, Equals, "name")
 	c.Assert(capturedVersion, Equals, "v1.0")
 	c.Assert(capturedDiffWithVersion, Equals, "v1.1")
@@ -253,7 +253,7 @@ func (s *suite) Test_DiffHandler_happy_path(c *C) {
 
 func (s *suite) Test_DiffHandler_fails_if_Diff_fails(c *C) {
 	provider := &versionHandlerProvider{
-		Diff: func(project, name, version, diffWithVersion string) (map[string]map[string]core.Changes, error) {
+		Diff: func(namespace, name, version, diffWithVersion string) (map[string]map[string]core.Changes, error) {
 			return nil, types.NotFound
 		},
 	}
