@@ -23,8 +23,8 @@ import (
 	"github.com/ankyra/escape-inventory/dao"
 )
 
-func GetNextVersion(project, app, prefix string) (string, error) {
-	latest, err := getLastVersionForPrefix(project, app, prefix)
+func GetNextVersion(namespace, app, prefix string) (string, error) {
+	latest, err := getLastVersionForPrefix(namespace, app, prefix)
 	if err != nil {
 		if dao.IsNotFound(err) {
 			return prefix + "0", nil
@@ -39,8 +39,8 @@ func GetNextVersion(project, app, prefix string) (string, error) {
 
 }
 
-func getLastVersionForPrefix(project, appName, prefix string) (*core.SemanticVersion, error) {
-	app, err := dao.GetApplication(project, appName)
+func getLastVersionForPrefix(namespace, appName, prefix string) (*core.SemanticVersion, error) {
+	app, err := dao.GetApplication(namespace, appName)
 	if err != nil {
 		return nil, NewUserError(err)
 	}

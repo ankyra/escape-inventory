@@ -24,35 +24,35 @@ import (
 	"github.com/ankyra/escape-inventory/dao/types"
 )
 
-type ProjectPayload struct {
+type NamespacePayload struct {
 	*types.Project
 	Units map[string]*types.Application `json:"units"`
 }
 
-func GetProject(project string) (*ProjectPayload, error) {
-	prj, err := dao.GetProject(project)
+func GetNamespace(namespace string) (*NamespacePayload, error) {
+	prj, err := dao.GetProject(namespace)
 	if err != nil {
 		return nil, err
 	}
-	units, err := dao.GetApplications(project)
+	units, err := dao.GetApplications(namespace)
 	if err != nil && !dao.IsNotFound(err) {
 		return nil, err
 	}
-	return &ProjectPayload{
+	return &NamespacePayload{
 		prj,
 		units,
 	}, nil
 }
 
-func GetProjectHooks(project string) (types.Hooks, error) {
-	prj, err := dao.GetProject(project)
+func GetNamespaceHooks(namespace string) (types.Hooks, error) {
+	prj, err := dao.GetProject(namespace)
 	if err != nil {
 		return nil, err
 	}
 	return dao.GetProjectHooks(prj)
 }
 
-func AddProject(p *types.Project, username string) error {
+func AddNamespace(p *types.Project, username string) error {
 	if p.Name == "" {
 		return NewUserError(fmt.Errorf("Missing name"))
 	}
@@ -62,15 +62,15 @@ func AddProject(p *types.Project, username string) error {
 	return dao.AddProject(p)
 }
 
-func UpdateProject(p *types.Project) error {
+func UpdateNamespace(p *types.Project) error {
 	if p.Name == "" {
 		return NewUserError(fmt.Errorf("Missing name"))
 	}
 	return dao.UpdateProject(p)
 }
 
-func UpdateProjectHooks(project string, hooks types.Hooks) error {
-	prj, err := dao.GetProject(project)
+func UpdateNamespaceHooks(namespace string, hooks types.Hooks) error {
+	prj, err := dao.GetProject(namespace)
 	if err != nil {
 		return err
 	}

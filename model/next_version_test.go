@@ -83,12 +83,12 @@ func (s *appSuite) Test_GetNextVersion_With_Prefix(c *C) {
 	c.Assert(semver, Equals, "0.2")
 }
 
-func (s *appSuite) Test_GetNextVersion_ignores_other_projects(c *C) {
+func (s *appSuite) Test_GetNextVersion_ignores_other_namespaces(c *C) {
 	semver, err := GetNextVersion("_", "semver3-test", "")
 	c.Assert(err, IsNil)
 	c.Assert(semver, Equals, "0")
 
-	_, err = AddRelease("other-project", `{"name": "semver3-test", "version": "1"}`)
+	_, err = AddRelease("other-namespace", `{"name": "semver3-test", "version": "1"}`)
 	c.Assert(err, IsNil)
 	semver, err = GetNextVersion("_", "semver3-test", "")
 	c.Assert(err, IsNil)

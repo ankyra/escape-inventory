@@ -28,12 +28,12 @@ type ApplicationPayload struct {
 	Versions []string `json:"versions",omitempty`
 }
 
-func GetApplication(project, name string) (*ApplicationPayload, error) {
-	_, err := dao.GetProject(project)
+func GetApplication(namespace, name string) (*ApplicationPayload, error) {
+	_, err := dao.GetProject(namespace)
 	if err != nil {
 		return nil, err
 	}
-	app, err := dao.GetApplication(project, name)
+	app, err := dao.GetApplication(namespace, name)
 	if err != nil {
 		return nil, err
 	}
@@ -47,16 +47,16 @@ func GetApplication(project, name string) (*ApplicationPayload, error) {
 	}, nil
 }
 
-func GetApplications(project string) (map[string]*types.Application, error) {
-	_, err := dao.GetProject(project)
+func GetApplications(namespace string) (map[string]*types.Application, error) {
+	_, err := dao.GetProject(namespace)
 	if err != nil {
 		return nil, err
 	}
-	return dao.GetApplications(project)
+	return dao.GetApplications(namespace)
 }
 
-func GetApplicationVersions(project, name string) ([]string, error) {
-	app, err := dao.GetApplication(project, name)
+func GetApplicationVersions(namespace, name string) ([]string, error) {
+	app, err := dao.GetApplication(namespace, name)
 	if err != nil {
 		return nil, err
 	}
@@ -70,16 +70,16 @@ func GetApplicationVersions(project, name string) ([]string, error) {
 	return result, nil
 }
 
-func GetApplicationHooks(project, name string) (types.Hooks, error) {
-	app, err := dao.GetApplication(project, name)
+func GetApplicationHooks(namespace, name string) (types.Hooks, error) {
+	app, err := dao.GetApplication(namespace, name)
 	if err != nil {
 		return nil, err
 	}
 	return dao.GetApplicationHooks(app)
 }
 
-func UpdateApplicationHooks(project, name string, hooks types.Hooks) error {
-	app, err := dao.GetApplication(project, name)
+func UpdateApplicationHooks(namespace, name string, hooks types.Hooks) error {
+	app, err := dao.GetApplication(namespace, name)
 	if err != nil {
 		return err
 	}

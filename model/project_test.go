@@ -32,12 +32,12 @@ func (s *suite) SetUpTest(c *C) {
 	dao.TestSetup()
 }
 
-func (s *suite) Test_AddProject_fails_if_no_project_name(c *C) {
+func (s *suite) Test_AddNamespace_fails_if_no_namespacet_name(c *C) {
 	p := types.NewProject("")
-	c.Assert(AddProject(p, "username"), DeepEquals, NewUserError(fmt.Errorf("Missing name")))
+	c.Assert(AddNamespace(p, "username"), DeepEquals, NewUserError(fmt.Errorf("Missing name")))
 }
 
-func (s *suite) Test_AddProject_fails_with_invalid_project_name(c *C) {
+func (s *suite) Test_AddNamespace_fails_with_invalid_namespace_name(c *C) {
 	cases := []string{
 		"a$",
 		"a'",
@@ -50,6 +50,6 @@ func (s *suite) Test_AddProject_fails_with_invalid_project_name(c *C) {
 	}
 	for _, name := range cases {
 		p := types.NewProject(name)
-		c.Assert(AddProject(p, "username"), DeepEquals, NewUserError(fmt.Errorf("Invalid name '%s'", name)))
+		c.Assert(AddNamespace(p, "username"), DeepEquals, NewUserError(fmt.Errorf("Invalid name '%s'", name)))
 	}
 }

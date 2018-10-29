@@ -22,20 +22,20 @@ import (
 	"github.com/ankyra/escape-inventory/dao/types"
 )
 
-func GetPreviousReleaseMetadata(project, name, version string) (*core.ReleaseMetadata, error) {
-	metadata, err := GetReleaseMetadata(project, name, version)
+func GetPreviousReleaseMetadata(namespace, name, version string) (*core.ReleaseMetadata, error) {
+	metadata, err := GetReleaseMetadata(namespace, name, version)
 	if err != nil {
 		return nil, err
 	}
-	prev, err := GetPreviousVersion(project, name, metadata.Version)
+	prev, err := GetPreviousVersion(namespace, name, metadata.Version)
 	if err != nil {
 		return nil, err
 	}
-	return GetReleaseMetadata(project, name, prev)
+	return GetReleaseMetadata(namespace, name, prev)
 }
 
-func GetPreviousVersion(project, app, version string) (string, error) {
-	prev, err := getPreviousVersion(project, app, version)
+func GetPreviousVersion(namespace, app, version string) (string, error) {
+	prev, err := getPreviousVersion(namespace, app, version)
 	if err != nil {
 		return "", NewUserError(err)
 	}
@@ -46,8 +46,8 @@ func GetPreviousVersion(project, app, version string) (string, error) {
 
 }
 
-func getPreviousVersion(project, appName, version string) (*core.SemanticVersion, error) {
-	app, err := dao.GetApplication(project, appName)
+func getPreviousVersion(namespace, appName, version string) (*core.SemanticVersion, error) {
+	app, err := dao.GetApplication(namespace, appName)
 	if err != nil {
 		return nil, NewUserError(err)
 	}

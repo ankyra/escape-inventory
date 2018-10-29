@@ -107,9 +107,9 @@ func (s *suite) getNamespaceMuxWithProvider(provider *namespaceHandlerProvider) 
 func (s *suite) Test_GetNamespaceHandler_happy_path(c *C) {
 	var capturedNamespace string
 	provider := &namespaceHandlerProvider{
-		GetNamespace: func(namespace string) (*model.ProjectPayload, error) {
+		GetNamespace: func(namespace string) (*model.NamespacePayload, error) {
 			capturedNamespace = namespace
-			return &model.ProjectPayload{
+			return &model.NamespacePayload{
 				Project: types.NewProject("test"),
 			}, nil
 		},
@@ -118,14 +118,14 @@ func (s *suite) Test_GetNamespaceHandler_happy_path(c *C) {
 	c.Assert(resp.StatusCode, Equals, 200)
 	c.Assert(capturedNamespace, Equals, "namespace")
 	c.Assert(resp.Header.Get("Content-Type"), Equals, "application/json")
-	result := model.ProjectPayload{}
+	result := model.NamespacePayload{}
 	c.Assert(json.NewDecoder(resp.Body).Decode(&result), IsNil)
 	c.Assert(result.Project.Name, Equals, "test")
 }
 
 func (s *suite) Test_GetNamespaceHandler_fails_if_GetNamespace_fails(c *C) {
 	provider := &namespaceHandlerProvider{
-		GetNamespace: func(namespace string) (*model.ProjectPayload, error) {
+		GetNamespace: func(namespace string) (*model.NamespacePayload, error) {
 			return nil, types.NotFound
 		},
 	}
