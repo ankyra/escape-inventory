@@ -154,7 +154,7 @@ func (s *suite) Test_GetProject(c *C) {
 	req, _ := http.NewRequest("GET", getProjectEndpoint, nil)
 	testRequest(c, req, http.StatusOK)
 
-	result := model.ProjectPayload{}
+	result := model.NamespacePayload{}
 	err := json.Unmarshal([]byte(rr.Body.String()), &result)
 	c.Assert(err, IsNil)
 	c.Assert(result.Name, Equals, applicationsTestProject)

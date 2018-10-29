@@ -27,18 +27,18 @@ import (
 	. "github.com/ankyra/escape-inventory/dao/types"
 )
 
-func ensureProjectExists(project, username string) error {
-	prj, err := dao.GetProject(project)
+func ensureNamespaceExists(namespace, username string) error {
+	prj, err := dao.GetProject(namespace)
 	if err == nil {
 		return nil
 	}
 	if err != NotFound {
 		return err
 	}
-	if err := core.ValidateProjectName(project); err != nil {
+	if err := core.ValidateProjectName(namespace); err != nil {
 		return NewUserError(err)
 	}
-	prj = NewProject(project)
+	prj = NewProject(namespace)
 	return dao.AddProject(prj)
 }
 
@@ -54,25 +54,25 @@ func updateApp(app *Application, metadata *core.ReleaseMetadata, byUser string, 
 	}
 }
 
-func ensureApplicationExists(project, byUser string, metadata *core.ReleaseMetadata, uploadAt time.Time) error {
+func ensureApplicationExists(namespace, byUser string, metadata *core.ReleaseMetadata, uploadAt time.Time) error {
 	name := metadata.Name
-	app, err := dao.GetApplication(project, name)
+	app, err := dao.GetApplication(namespace, name)
 	if err != nil && err != NotFound {
 		return err
 	} else if err == nil {
 		updateApp(app, metadata, byUser, uploadAt)
 		return dao.UpdateApplication(app)
 	}
-	app = NewApplication(project, name)
+	app = NewApplication(namespace, name)
 	updateApp(app, metadata, byUser, uploadAt)
 	return dao.AddApplication(app)
 }
 
-func AddRelease(project, metadataJson string) (*core.ReleaseMetadata, error) {
-	return AddReleaseByUser(project, metadataJson, "")
+func AddRelease(namespace, metadataJson string) (*core.ReleaseMetadata, error) {
+	return AddReleaseByUser(namespace, metadataJson, "")
 }
 
-func AddReleaseByUser(project, metadataJson, uploadUser string) (*core.ReleaseMetadata, error) {
+func AddReleaseByUser(namespace, metadataJson, uploadUser string) (*core.ReleaseMetadata, error) {
 	metadata, err := core.NewReleaseMetadataFromJsonString(metadataJson)
 	if err != nil {
 		return nil, NewUserError(err)
@@ -88,20 +88,20 @@ func AddReleaseByUser(project, metadataJson, uploadUser string) (*core.ReleaseMe
 	if metadata.ApiVersion > core.CurrentApiVersion {
 		return nil, NewUserError(fmt.Errorf("Release format version v%d is not supported (this Inventory supports up to v%d)", metadata.ApiVersion, core.CurrentApiVersion))
 	}
-	release, err := dao.GetRelease(project, parsed.Name, releaseId)
+	release, err := dao.GetRelease(namespace, parsed.Name, releaseId)
 	if err != nil && !dao.IsNotFound(err) {
 		return nil, err
 	}
 	if release != nil {
 		return nil, NewUserError(fmt.Errorf("Release %s already exists", releaseId))
 	}
-	if err := ensureProjectExists(project, uploadUser); err != nil {
+	if err := ensureNamespaceExists(namespace, uploadUser); err != nil {
 		return nil, err
 	}
-	result := NewRelease(NewApplication(project, metadata.Name), metadata)
+	result := NewRelease(NewApplication(namespace, metadata.Name), metadata)
 	result.UploadedBy = uploadUser
 	result.UploadedAt = time.Now()
-	if err := ensureApplicationExists(project, result.UploadedBy, metadata, result.UploadedAt); err != nil {
+	if err := ensureApplicationExists(namespace, result.UploadedBy, metadata, result.UploadedAt); err != nil {
 		return nil, err
 	}
 	if err := dao.AddRelease(result); err != nil {
@@ -180,13 +180,13 @@ type ReleasePayload struct {
 	UploadedAt time.Time             `json:"uploaded_at"`
 }
 
-func GetRelease(project, name, version string) (*ReleasePayload, error) {
+func GetRelease(namespace, name, version string) (*ReleasePayload, error) {
 	releaseIdString := name + "-" + version
-	release, err := ResolveReleaseId(project, releaseIdString)
+	release, err := ResolveReleaseId(namespace, releaseIdString)
 	if err != nil {
 		return nil, err
 	}
-	versions, err := GetApplicationVersions(project, release.Application.Name)
+	versions, err := GetApplicationVersions(namespace, release.Application.Name)
 	if err != nil {
 		return nil, err
 	}
@@ -202,36 +202,36 @@ func GetRelease(project, name, version string) (*ReleasePayload, error) {
 	}, nil
 }
 
-func GetReleaseMetadata(project, name, version string) (*core.ReleaseMetadata, error) {
+func GetReleaseMetadata(namespace, name, version string) (*core.ReleaseMetadata, error) {
 	releaseIdString := name + "-v" + version
 	if strings.HasPrefix(version, "v") || version == "latest" {
 		releaseIdString = name + "-" + version
 	}
-	release, err := ResolveReleaseId(project, releaseIdString)
+	release, err := ResolveReleaseId(namespace, releaseIdString)
 	if err != nil {
 		return nil, err
 	}
 	return release.Metadata, nil
 }
 
-func ResolveReleaseId(project, releaseIdString string) (*Release, error) {
+func ResolveReleaseId(namespace, releaseIdString string) (*Release, error) {
 	releaseId, err := parsers.ParseReleaseId(releaseIdString)
 	if err != nil {
 		return nil, NewUserError(err)
 	}
 	if releaseId.Version == "latest" {
-		version, err := getLastVersionForPrefix(project, releaseId.Name, "")
+		version, err := getLastVersionForPrefix(namespace, releaseId.Name, "")
 		if err != nil {
 			return nil, NewUserError(err)
 		}
 		releaseId.Version = version.ToString()
 	} else if strings.HasSuffix(releaseId.Version, ".@") {
 		prefix := releaseId.Version[:len(releaseId.Version)-1]
-		version, err := getLastVersionForPrefix(project, releaseId.Name, prefix)
+		version, err := getLastVersionForPrefix(namespace, releaseId.Name, prefix)
 		if err != nil {
 			return nil, NewUserError(err)
 		}
 		releaseId.Version = prefix + version.ToString()
 	}
-	return dao.GetRelease(project, releaseId.Name, releaseId.ToString())
+	return dao.GetRelease(namespace, releaseId.Name, releaseId.ToString())
 }

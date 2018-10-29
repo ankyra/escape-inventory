@@ -4,19 +4,19 @@ import (
 	core "github.com/ankyra/escape-core"
 )
 
-func Diff(project, name, version, diffWith string) (map[string]map[string]core.Changes, error) {
-	metadata, err := GetReleaseMetadata(project, name, version)
+func Diff(namespace, name, version, diffWith string) (map[string]map[string]core.Changes, error) {
+	metadata, err := GetReleaseMetadata(namespace, name, version)
 	if err != nil {
 		return nil, err
 	}
 	if diffWith == "" {
-		prev, err := GetPreviousVersion(project, name, metadata.Version)
+		prev, err := GetPreviousVersion(namespace, name, metadata.Version)
 		if err != nil {
 			return nil, err
 		}
 		diffWith = prev
 	}
-	previousMetadata, err := GetReleaseMetadata(project, name, diffWith)
+	previousMetadata, err := GetReleaseMetadata(namespace, name, diffWith)
 	if err != nil {
 		return nil, err
 	}

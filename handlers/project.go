@@ -29,7 +29,7 @@ import (
 
 type namespaceHandlerProvider struct {
 	GetNamespaces   func() (map[string]*types.Project, error)
-	GetNamespace    func(namespace string) (*model.ProjectPayload, error)
+	GetNamespace    func(namespace string) (*model.NamespacePayload, error)
 	AddNamespace    func(namespace *types.Project, username string) error
 	UpdateNamespace func(namespace *types.Project) error
 
@@ -42,11 +42,11 @@ type namespaceHandlerProvider struct {
 func newNamespaceHandlerProvider() *namespaceHandlerProvider {
 	return &namespaceHandlerProvider{
 		GetNamespaces:        dao.GetProjects,
-		GetNamespace:         model.GetProject,
-		AddNamespace:         model.AddProject,
-		UpdateNamespace:      model.UpdateProject,
-		GetNamespaceHooks:    model.GetProjectHooks,
-		UpdateNamespaceHooks: model.UpdateProjectHooks,
+		GetNamespace:         model.GetNamespace,
+		AddNamespace:         model.AddNamespace,
+		UpdateNamespace:      model.UpdateNamespace,
+		GetNamespaceHooks:    model.GetNamespaceHooks,
+		UpdateNamespaceHooks: model.UpdateNamespaceHooks,
 		HardDeleteNamespace:  dao.HardDeleteProject,
 	}
 }

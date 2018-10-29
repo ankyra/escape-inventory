@@ -11,12 +11,12 @@ import (
 	"github.com/ankyra/escape-inventory/dao/types"
 )
 
-func CallWebHook(project, unit, version, releaseId, username, url string) {
+func CallWebHook(namespace, unit, version, releaseId, username, url string) {
 	if url == "" {
 		return
 	}
-	prj := types.NewProject(project)
-	app := types.NewApplication(project, unit)
+	prj := types.NewProject(namespace)
+	app := types.NewApplication(namespace, unit)
 	prjHooks, err := dao.GetProjectHooks(prj)
 	if err != nil {
 		log.Println("ERROR: Failed to get Inventory Project Hooks from database:", err)
@@ -39,13 +39,13 @@ func CallWebHook(project, unit, version, releaseId, username, url string) {
 	}
 	data := map[string]interface{}{
 		"event":            "NEW_UPLOAD",
-		"project":          project,
+		"project":          namespace,
 		"project_hooks":    prjHooks,
 		"unit":             unit,
 		"unit_hooks":       unitHooks,
 		"downstream_hooks": downstreamHooks,
 		"version":          version,
-		"release":          project + "/" + releaseId,
+		"release":          namespace + "/" + releaseId,
 		"username":         username,
 	}
 	body, err := json.Marshal(data)

@@ -55,7 +55,7 @@ func (s *releaseSuite) Test_GetMetadataNotFound(c *C) {
 	c.Assert(dao.IsNotFound(err), Equals, true)
 }
 
-func (s *releaseSuite) Test_AddRelease_Creates_Project_Metadata(c *C) {
+func (s *releaseSuite) Test_AddRelease_Creates_Namespace_Metadata(c *C) {
 	_, err := dao.GetProject("test")
 	c.Assert(err, Equals, types.NotFound)
 
@@ -67,7 +67,7 @@ func (s *releaseSuite) Test_AddRelease_Creates_Project_Metadata(c *C) {
 	c.Assert(prj.Name, Equals, "test")
 }
 
-func (s *releaseSuite) Test_AddRelease_Creates_Project_Metadata_fails_if_invalid_project_name(c *C) {
+func (s *releaseSuite) Test_AddRelease_Creates_Project_Metadata_fails_if_invalid_namespace_name(c *C) {
 	_, err := dao.GetProject("invalid$")
 	c.Assert(err, Equals, types.NotFound)
 

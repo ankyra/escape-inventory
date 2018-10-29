@@ -28,8 +28,8 @@ import (
 )
 
 type storageProvider struct {
-	Upload   func(project, releaseId string, pkg io.ReadSeeker) (string, error)
-	Download func(project, uri string) (io.Reader, error)
+	Upload   func(namespace, releaseId string, pkg io.ReadSeeker) (string, error)
+	Download func(namespace, uri string) (io.Reader, error)
 }
 
 func newStorageProvider() *storageProvider {
@@ -39,35 +39,35 @@ func newStorageProvider() *storageProvider {
 	}
 }
 
-func UploadPackage(project, releaseId string, pkg io.ReadSeeker) error {
-	return newStorageProvider().UploadPackage(project, releaseId, pkg)
+func UploadPackage(namespace, releaseId string, pkg io.ReadSeeker) error {
+	return newStorageProvider().UploadPackage(namespace, releaseId, pkg)
 }
 
-func GetDownloadReadSeeker(project, releaseId string) (io.Reader, error) {
-	return newStorageProvider().GetDownloadReadSeeker(project, releaseId)
+func GetDownloadReadSeeker(namespace, releaseId string) (io.Reader, error) {
+	return newStorageProvider().GetDownloadReadSeeker(namespace, releaseId)
 }
 
-func (s *storageProvider) UploadPackage(project, releaseId string, pkg io.ReadSeeker) error {
+func (s *storageProvider) UploadPackage(namespace, releaseId string, pkg io.ReadSeeker) error {
 	parsed, err := parsers.ParseReleaseId(releaseId)
 	if err != nil {
 		return NewUserError(err)
 	}
 	if parsed.NeedsResolving() {
-		return NewUserError(fmt.Errorf("Can't upload package against unresolved version '%s/%s'", project, releaseId))
+		return NewUserError(fmt.Errorf("Can't upload package against unresolved version '%s/%s'", namespace, releaseId))
 	}
-	release, err := dao.GetRelease(project, parsed.Name, releaseId)
+	release, err := dao.GetRelease(namespace, parsed.Name, releaseId)
 	if err != nil {
 		return NewUserError(err)
 	}
-	uri, err := s.Upload(project, releaseId, pkg)
+	uri, err := s.Upload(namespace, releaseId, pkg)
 	if err != nil {
 		return err
 	}
 	return dao.AddPackageURI(release, uri)
 }
 
-func (s *storageProvider) GetDownloadReadSeeker(project, releaseId string) (io.Reader, error) {
-	release, err := ResolveReleaseId(project, releaseId)
+func (s *storageProvider) GetDownloadReadSeeker(namespace, releaseId string) (io.Reader, error) {
+	release, err := ResolveReleaseId(namespace, releaseId)
 	if err != nil {
 		return nil, err
 	}
@@ -77,7 +77,7 @@ func (s *storageProvider) GetDownloadReadSeeker(project, releaseId string) (io.R
 	}
 	lastError := types.NotFound
 	for _, uri := range uris {
-		reader, err := s.Download(project, uri)
+		reader, err := s.Download(namespace, uri)
 		if err == nil {
 			release.Downloads += 1
 			return reader, dao.UpdateRelease(release)

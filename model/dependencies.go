@@ -5,18 +5,18 @@ import (
 	"github.com/ankyra/escape-inventory/dao/types"
 )
 
-func GetDownstreamDependencies(project, name, version string) ([]*types.Dependency, error) {
+func GetDownstreamDependencies(namespace, name, version string) ([]*types.Dependency, error) {
 	releaseId := name + "-" + version
-	release, err := ResolveReleaseId(project, releaseId)
+	release, err := ResolveReleaseId(namespace, releaseId)
 	if err != nil {
 		return nil, err
 	}
 	return dao.GetDownstreamDependencies(release)
 }
 
-func GetDownstreamDependenciesByGroups(project, name, version string, readGroups []string) ([]*types.Dependency, error) {
+func GetDownstreamDependenciesByGroups(namespace, name, version string, readGroups []string) ([]*types.Dependency, error) {
 	releaseId := name + "-" + version
-	release, err := ResolveReleaseId(project, releaseId)
+	release, err := ResolveReleaseId(namespace, releaseId)
 	if err != nil {
 		return nil, err
 	}
@@ -56,13 +56,13 @@ func (d *DependencyGraph) AddEdge(from, to, typ string) {
 
 type DownstreamDependenciesResolver func(*types.Release) ([]*types.Dependency, error)
 
-func GetDependencyGraph(project, name, version string, downstreamFunc DownstreamDependenciesResolver) (*DependencyGraph, error) {
+func GetDependencyGraph(namespace, name, version string, downstreamFunc DownstreamDependenciesResolver) (*DependencyGraph, error) {
 	result := &DependencyGraph{
 		Nodes: []*DependencyGraphNode{},
 		Edges: []*DependencyGraphEdge{},
 	}
 	releaseId := name + "-" + version
-	release, err := ResolveReleaseId(project, releaseId)
+	release, err := ResolveReleaseId(namespace, releaseId)
 	if err != nil {
 		return nil, err
 	}
@@ -116,9 +116,9 @@ func GetDependencyGraph(project, name, version string, downstreamFunc Downstream
 	return result, nil
 }
 
-func GetDependencyGraphByGroups(project, name, version string, groups []string) (*DependencyGraph, error) {
+func GetDependencyGraphByGroups(namespace, name, version string, groups []string) (*DependencyGraph, error) {
 	resolver := func(release *types.Release) ([]*types.Dependency, error) {
 		return dao.GetDownstreamDependenciesByGroups(release, groups)
 	}
-	return GetDependencyGraph(project, name, version, resolver)
+	return GetDependencyGraph(namespace, name, version, resolver)
 }
