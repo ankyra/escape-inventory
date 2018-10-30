@@ -76,6 +76,9 @@ func GetNamespaces() (map[string]*Project, error) {
 func GetNamespacesByGroups(readGroups []string) (map[string]*Project, error) {
 	return GlobalDAO.GetNamespacesByGroups(readGroups)
 }
+func GetNamespacesByNames(namespaces []string) (map[string]*Project, error) {
+	return GlobalDAO.GetNamespacesByNames(namespaces)
+}
 
 func GetNamespaceHooks(namespace *Project) (Hooks, error) {
 	return GlobalDAO.GetNamespaceHooks(namespace)
