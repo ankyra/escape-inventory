@@ -68,6 +68,52 @@ func (s *SQLHelper) GetNamespaces() (map[string]*Project, error) {
 	return s.scanNamespaces(rows)
 }
 
+func (s *SQLHelper) GetNamespacesByNames(namespaces []string) (map[string]*Project, error) {
+	insertMarks := []string{}
+	for i, _ := range namespaces {
+		if s.UseNumericInsertMarks {
+			insertMarks = append(insertMarks, "$"+strconv.Itoa(i+1))
+		} else {
+			insertMarks = append(insertMarks, "?")
+		}
+	}
+	query := s.GetNamespacesByNamesQuery
+	if len(namespaces) == 1 {
+		query += " = " + insertMarks[0]
+	} else {
+		query += " IN (" + strings.Join(insertMarks, ", ") + ")"
+	}
+	interfaceNamespaces := []interface{}{}
+	for _, n := range namespaces {
+		interfaceNamespaces = append(interfaceNamespaces, n)
+	}
+	rows, err := s.PrepareAndQuery(query, interfaceNamespaces...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	result := map[string]*Project{}
+	for rows.Next() {
+		var name, description, orgURL, logo string
+		if err := rows.Scan(&name, &description, &orgURL, &logo); err != nil {
+			return nil, err
+		}
+		prj, ok := result[name]
+		if !ok {
+			prj = &Project{
+				Name:        name,
+				Description: description,
+				OrgURL:      orgURL,
+				Logo:        logo,
+				Permission:  "admin", // default permission for open source
+			}
+		}
+		result[prj.Name] = prj
+	}
+	return result, nil
+	return nil, nil
+}
+
 func (s *SQLHelper) GetNamespacesByGroups(readGroups []string) (map[string]*Project, error) {
 	starFound := false
 	for _, g := range readGroups {

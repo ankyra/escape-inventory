@@ -222,6 +222,7 @@ type DAO interface {
 	HardDeleteNamespace(namespace string) error
 	UpdateNamespace(*Project) error
 	GetNamespaces() (map[string]*Project, error)
+	GetNamespacesByNames(namespaces []string) (map[string]*Project, error)
 	GetNamespacesByGroups(readGroups []string) (map[string]*Project, error)
 	GetNamespaceHooks(*Project) (Hooks, error)
 	SetNamespaceHooks(*Project, Hooks) error
