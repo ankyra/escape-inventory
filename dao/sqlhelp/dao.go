@@ -12,13 +12,14 @@ type SQLHelper struct {
 	WipeDatabaseFunc        func(*SQLHelper) error
 	IsUniqueConstraintError func(error) bool
 
-	GetProjectQuery          string
-	AddProjectQuery          string
-	UpdateProjectQuery       string
-	GetProjectsQuery         string
-	GetProjectsByGroupsQuery string
-	GetProjectHooksQuery     string
-	SetProjectHooksQuery     string
+	GetProjectQuery           string
+	AddProjectQuery           string
+	UpdateProjectQuery        string
+	GetProjectsQuery          string
+	GetProjectsByGroupsQuery  string
+	GetNamespacesByNamesQuery string
+	GetProjectHooksQuery      string
+	SetProjectHooksQuery      string
 
 	AddApplicationQuery      string
 	UpdateApplicationQuery   string

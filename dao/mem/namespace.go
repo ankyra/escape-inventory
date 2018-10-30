@@ -45,6 +45,17 @@ func (a *dao) GetNamespacesByGroups(readGroups []string) (map[string]*Project, e
 	return result, nil
 }
 
+func (a *dao) GetNamespacesByNames(namespaces []string) (map[string]*Project, error) {
+	namespacesFound := map[string]*Project{}
+	for _, name := range namespaces {
+		namespace, ok := a.namespaceMetadata[name]
+		if ok {
+			namespacesFound[name] = namespace
+		}
+	}
+	return namespacesFound, nil
+}
+
 func (a *dao) GetNamespace(namespace string) (*Project, error) {
 	prj, ok := a.namespaceMetadata[namespace]
 	if !ok {

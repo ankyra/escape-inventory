@@ -33,6 +33,7 @@ func ValidateDAO(dao func() DAO, c *C) {
 	Validate_GetNamespaces(dao(), c)
 	Validate_ProjectMetadata(dao(), c)
 	Validate_GetProjectsByGroups(dao(), c)
+	Validate_GetNamespacesByNames(dao(), c)
 	Validate_ApplicationMetadata(dao(), c)
 	Validate_GetDownstreamHooks(dao(), c)
 	Validate_GetApplications(dao(), c)
@@ -416,6 +417,39 @@ func Validate_GetProjectsByGroups(dao DAO, c *C) {
 	c.Assert(projects["_"].Permission, Equals, "admin")
 	c.Assert(projects["project1"].Permission, Equals, "admin")
 	c.Assert(projects["project2"].Permission, Equals, "admin")
+}
+
+func Validate_GetNamespacesByNames(dao DAO, c *C) {
+	projects, err := dao.GetNamespacesByNames([]string{"test-project-1"})
+	c.Assert(err, IsNil)
+	c.Assert(projects, HasLen, 0)
+
+	c.Assert(dao.AddNamespace(NewProject("_")), Equals, nil)
+
+	projects, err = dao.GetNamespacesByNames([]string{"test-project-1"})
+	c.Assert(err, IsNil)
+	c.Assert(projects, HasLen, 0)
+
+	c.Assert(dao.AddNamespace(NewProject("test-project-1")), Equals, nil)
+
+	projects, err = dao.GetNamespacesByNames([]string{"test-project-1"})
+	c.Assert(err, IsNil)
+	c.Assert(projects, HasLen, 1)
+	c.Assert(projects["test-project-1"], NotNil)
+
+	c.Assert(dao.AddNamespace(NewProject("test-project-2")), Equals, nil)
+
+	projects, err = dao.GetNamespacesByNames([]string{"test-project-1"})
+	c.Assert(err, IsNil)
+	c.Assert(projects, HasLen, 1)
+	c.Assert(projects["test-project-1"], NotNil)
+
+	projects, err = dao.GetNamespacesByNames([]string{"test-project-1", "test-project-2"})
+	c.Assert(err, IsNil)
+	c.Assert(projects, HasLen, 2)
+	c.Assert(projects["test-project-1"], NotNil)
+	c.Assert(projects["test-project-2"], NotNil)
+
 }
 
 func Validate_ApplicationMetadata(dao DAO, c *C) {

@@ -71,8 +71,9 @@ func NewQLDAO(path string) (DAO, error) {
 								     FROM project, acl
 									 WHERE acl.project = project.name
 									 AND acl.group_name `,
-		GetProjectHooksQuery: `SELECT hooks FROM project WHERE name = $1`,
-		SetProjectHooksQuery: `UPDATE project SET hooks = $1 WHERE name = $2`,
+		GetNamespacesByNamesQuery: `SELECT name, description, orgURL, logo FROM project WHERE name`,
+		GetProjectHooksQuery:      `SELECT hooks FROM project WHERE name = $1`,
+		SetProjectHooksQuery:      `UPDATE project SET hooks = $1 WHERE name = $2`,
 
 		GetApplicationQuery: `SELECT name, project, description, latest_version, logo, uploaded_by, uploaded_at 
 								  FROM application WHERE project = $1 AND name = $2`,

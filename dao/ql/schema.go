@@ -92,7 +92,7 @@ func _1_initial_schemaDownSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "1_initial_schema.down.sql", size: 156, mode: os.FileMode(436), modTime: time.Unix(1511172530, 0)}
+	info := bindataFileInfo{name: "1_initial_schema.down.sql", size: 156, mode: os.FileMode(420), modTime: time.Unix(1511516577, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -112,7 +112,7 @@ func _1_initial_schemaUpSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "1_initial_schema.up.sql", size: 2050, mode: os.FileMode(436), modTime: time.Unix(1511174326, 0)}
+	info := bindataFileInfo{name: "1_initial_schema.up.sql", size: 2050, mode: os.FileMode(420), modTime: time.Unix(1511516577, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -132,7 +132,7 @@ func _2_metricsDownSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "2_metrics.down.sql", size: 43, mode: os.FileMode(436), modTime: time.Unix(1513361884, 0)}
+	info := bindataFileInfo{name: "2_metrics.down.sql", size: 43, mode: os.FileMode(420), modTime: time.Unix(1515079328, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -152,7 +152,7 @@ func _2_metricsUpSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "2_metrics.up.sql", size: 149, mode: os.FileMode(436), modTime: time.Unix(1513361866, 0)}
+	info := bindataFileInfo{name: "2_metrics.up.sql", size: 149, mode: os.FileMode(420), modTime: time.Unix(1515079328, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -172,7 +172,7 @@ func _3_metrics_user_idDownSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "3_metrics_user_id.down.sql", size: 193, mode: os.FileMode(436), modTime: time.Unix(1515082092, 0)}
+	info := bindataFileInfo{name: "3_metrics_user_id.down.sql", size: 193, mode: os.FileMode(420), modTime: time.Unix(1515081776, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -192,7 +192,7 @@ func _3_metrics_user_idUpSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "3_metrics_user_id.up.sql", size: 191, mode: os.FileMode(436), modTime: time.Unix(1515082092, 0)}
+	info := bindataFileInfo{name: "3_metrics_user_id.up.sql", size: 191, mode: os.FileMode(420), modTime: time.Unix(1515081776, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -212,7 +212,7 @@ func _4_feedsUpSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "4_feeds.up.sql", size: 247, mode: os.FileMode(436), modTime: time.Unix(1517441980, 0)}
+	info := bindataFileInfo{name: "4_feeds.up.sql", size: 247, mode: os.FileMode(420), modTime: time.Unix(1515506470, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -232,7 +232,7 @@ func _5_feeds_application_fieldUpSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "5_feeds_application_field.up.sql", size: 1101, mode: os.FileMode(436), modTime: time.Unix(1517443069, 0)}
+	info := bindataFileInfo{name: "5_feeds_application_field.up.sql", size: 1101, mode: os.FileMode(420), modTime: time.Unix(1519986076, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -252,7 +252,7 @@ func _6_providersUpSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "6_providers.up.sql", size: 231, mode: os.FileMode(436), modTime: time.Unix(1519703747, 0)}
+	info := bindataFileInfo{name: "6_providers.up.sql", size: 231, mode: os.FileMode(420), modTime: time.Unix(1519986076, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -272,7 +272,7 @@ func _7_remove_feedsSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "7_remove_feeds.sql", size: 23, mode: os.FileMode(436), modTime: time.Unix(1523274619, 0)}
+	info := bindataFileInfo{name: "7_remove_feeds.sql", size: 23, mode: os.FileMode(420), modTime: time.Unix(1523264617, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
