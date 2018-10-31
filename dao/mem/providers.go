@@ -33,32 +33,6 @@ func (a *dao) GetProviders(providerName string) (map[string]*MinimalReleaseMetad
 	return result, nil
 }
 
-func (a *dao) GetProvidersByGroups(providerName string, groups []string) (map[string]*MinimalReleaseMetadata, error) {
-	providers, err := a.GetProviders(providerName)
-	if err != nil {
-		return nil, err
-	}
-	result := map[string]*MinimalReleaseMetadata{}
-	for name, provider := range providers {
-		allowedGroups, found := a.acls[provider.Project]
-		if !found {
-			continue
-		}
-		for group, _ := range allowedGroups {
-			found := group == "*"
-			for _, g := range groups {
-				if g == group {
-					found = true
-				}
-			}
-			if found {
-				result[name] = provider
-			}
-		}
-	}
-	return result, nil
-}
-
 func (a *dao) RegisterProviders(release *core.ReleaseMetadata) error {
 	for _, provider := range release.Provides {
 		name := provider.Name

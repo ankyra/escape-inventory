@@ -73,9 +73,6 @@ func GetNamespaces() (map[string]*Project, error) {
 	return GlobalDAO.GetNamespaces()
 }
 
-func GetNamespacesByGroups(readGroups []string) (map[string]*Project, error) {
-	return GlobalDAO.GetNamespacesByGroups(readGroups)
-}
 func GetNamespacesByNames(namespaces []string) (map[string]*Project, error) {
 	return GlobalDAO.GetNamespacesByNames(namespaces)
 }
@@ -137,31 +134,12 @@ func GetRelease(namespace, name, releaseId string) (*Release, error) {
 func GetProviders(providerName string) (map[string]*MinimalReleaseMetadata, error) {
 	return GlobalDAO.GetProviders(providerName)
 }
-func GetProvidersByGroups(providerName string, groups []string) (map[string]*MinimalReleaseMetadata, error) {
-	return GlobalDAO.GetProvidersByGroups(providerName, groups)
-}
 func RegisterProviders(release *core.ReleaseMetadata) error {
 	return GlobalDAO.RegisterProviders(release)
 }
 
 func FindAllVersions(app *Application) ([]string, error) {
 	return GlobalDAO.FindAllVersions(app)
-}
-
-func GetPermittedGroups(namespace string, perm Permission) ([]string, error) {
-	return GlobalDAO.GetPermittedGroups(namespace, perm)
-}
-
-func SetACL(namespace, group string, perm Permission) error {
-	return GlobalDAO.SetACL(namespace, group, perm)
-}
-
-func GetACL(namespace string) (map[string]Permission, error) {
-	return GlobalDAO.GetACL(namespace)
-}
-
-func DeleteACL(namespace, group string) error {
-	return GlobalDAO.DeleteACL(namespace, group)
 }
 
 func GetPackageURIs(r *Release) ([]string, error) {
@@ -182,10 +160,6 @@ func GetDependencies(r *Release) ([]*Dependency, error) {
 
 func GetDownstreamDependencies(r *Release) ([]*Dependency, error) {
 	return GlobalDAO.GetDownstreamDependencies(r)
-}
-
-func GetDownstreamDependenciesByGroups(r *Release, readGroups []string) ([]*Dependency, error) {
-	return GlobalDAO.GetDownstreamDependenciesByGroups(r, readGroups)
 }
 
 func GetAllReleases() ([]*Release, error) {

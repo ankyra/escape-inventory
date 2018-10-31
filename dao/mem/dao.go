@@ -39,7 +39,6 @@ type dao struct {
 	applicationHooks  map[*Application]Hooks
 	subscriptions     map[*Application][]*Application
 	releases          map[*Release]*release
-	acls              map[string]map[string]Permission
 	metrics           map[string]*Metrics
 	providers         map[string]map[string]*MinimalReleaseMetadata
 }
@@ -53,7 +52,6 @@ func NewInMemoryDAO() DAO {
 		applicationHooks:  map[*Application]Hooks{},
 		subscriptions:     map[*Application][]*Application{},
 		releases:          map[*Release]*release{},
-		acls:              map[string]map[string]Permission{},
 		metrics:           map[string]*Metrics{},
 		providers:         map[string]map[string]*MinimalReleaseMetadata{},
 	}
@@ -67,7 +65,5 @@ func (a *dao) WipeDatabase() error {
 	a.applicationHooks = map[*Application]Hooks{}
 	a.subscriptions = map[*Application][]*Application{}
 	a.releases = map[*Release]*release{}
-	a.acls = map[string]map[string]Permission{}
-
 	return nil
 }

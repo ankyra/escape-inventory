@@ -32,7 +32,6 @@ func ValidateDAO(dao func() DAO, c *C) {
 	Validate_GetRelease_NotFound(dao(), c)
 	Validate_GetNamespaces(dao(), c)
 	Validate_ProjectMetadata(dao(), c)
-	Validate_GetProjectsByGroups(dao(), c)
 	Validate_GetNamespacesByNames(dao(), c)
 	Validate_ApplicationMetadata(dao(), c)
 	Validate_GetDownstreamHooks(dao(), c)
@@ -42,10 +41,8 @@ func ValidateDAO(dao func() DAO, c *C) {
 	Validate_GetPackageURIs(dao(), c)
 	Validate_AddPackageURI_Unique(dao(), c)
 	Validate_GetAllReleases(dao(), c)
-	Validate_ACL(dao(), c)
 	Validate_GetReleasesWithoutProcessedDependencies(dao(), c)
 	Validate_Dependencies(dao(), c)
-	Validate_DependenciesByGroups(dao(), c)
 	Validate_Metrics(dao(), c)
 	Validate_Providers(dao(), c)
 	Validate_HardDeleteNamespace(dao(), c)
@@ -202,7 +199,6 @@ func Validate_HardDeleteNamespace(dao DAO, c *C) {
 	}
 	c.Assert(dao.SetDependencies(release, deps), IsNil)
 	addRelease(dao, c, "dao-val", "2")
-	dao.SetACL("_", "group1", ReadPermission)
 	hooks := NewHooks()
 	hooks["test"] = map[string]string{
 		"wut": "wat",
@@ -253,9 +249,6 @@ func Validate_HardDeleteNamespace(dao DAO, c *C) {
 	deps, err = dao.GetDependencies(release)
 	c.Assert(err, IsNil)
 	c.Assert(deps, HasLen, 2)
-	perm, err := dao.GetACL("_")
-	c.Assert(err, IsNil)
-	c.Assert(perm["group1"], Equals, ReadPermission)
 	c.Assert(dao.AddNamespace(prj), Equals, AlreadyExists)
 
 	// Delete
@@ -294,10 +287,6 @@ func Validate_HardDeleteNamespace(dao DAO, c *C) {
 	down, err = dao.GetDownstreamHooks(otherApp)
 	c.Assert(err, IsNil)
 	c.Assert(down, HasLen, 0)
-	perm, err = dao.GetACL("_")
-	c.Assert(err, IsNil)
-	c.Assert(perm, HasLen, 0)
-	c.Assert(err, IsNil)
 
 	// Re-adding
 	c.Assert(dao.AddNamespace(prj), IsNil)
@@ -329,94 +318,6 @@ func Validate_HardDeleteNamespace(dao DAO, c *C) {
 	down, err = dao.GetDownstreamHooks(otherApp)
 	c.Assert(err, IsNil)
 	c.Assert(down, HasLen, 0)
-}
-
-func Validate_GetProjectsByGroups(dao DAO, c *C) {
-	anon := []string{}
-	oneGroup := []string{"project1"}
-	allGroups := []string{"project1", "project2"}
-	cases := [][]string{anon, oneGroup, allGroups}
-
-	for _, testCase := range cases {
-		empty, err := dao.GetNamespacesByGroups(testCase)
-		c.Assert(err, IsNil)
-		c.Assert(empty, HasLen, 0)
-	}
-
-	c.Assert(dao.AddNamespace(NewProject("_")), Equals, nil)
-	c.Assert(dao.AddNamespace(NewProject("project1")), Equals, nil)
-	c.Assert(dao.AddNamespace(NewProject("project2")), Equals, nil)
-
-	c.Assert(dao.SetACL("_", "*", ReadPermission), IsNil)
-
-	for _, testCase := range cases {
-		projects, err := dao.GetNamespacesByGroups(testCase)
-		c.Assert(err, IsNil)
-		c.Assert(projects, HasLen, 1, Commentf("%s should have one group, got %v", testCase, projects))
-		c.Assert(projects["_"].Name, Equals, "_")
-		c.Assert(projects["_"].Permission, Equals, "admin")
-		c.Assert(projects["_"].MatchingGroups, DeepEquals, []string{"*"})
-	}
-
-	c.Assert(dao.SetACL("project1", "project1", ReadPermission), IsNil)
-	c.Assert(dao.SetACL("_", "project1", WritePermission), IsNil)
-
-	projects, err := dao.GetNamespacesByGroups(anon)
-	c.Assert(err, IsNil)
-	c.Assert(projects, HasLen, 1)
-
-	projects, err = dao.GetNamespacesByGroups(oneGroup)
-	c.Assert(err, IsNil)
-	c.Assert(projects, HasLen, 2)
-	c.Assert(projects["_"].Name, Equals, "_")
-	c.Assert(projects["_"].MatchingGroups, HasLen, 2)
-	c.Assert(projects["_"].MatchingGroups, HasItem, "project1")
-	c.Assert(projects["_"].MatchingGroups, HasItem, "*")
-	c.Assert(projects["project1"].Name, Equals, "project1")
-	c.Assert(projects["project1"].MatchingGroups, DeepEquals, []string{"project1"})
-	c.Assert(projects["_"].Permission, Equals, "admin")
-	c.Assert(projects["project1"].Permission, Equals, "admin")
-
-	projects, err = dao.GetNamespacesByGroups(allGroups)
-	c.Assert(err, IsNil)
-	c.Assert(projects, HasLen, 2)
-	c.Assert(projects["_"].Name, Equals, "_")
-	c.Assert(projects["_"].MatchingGroups, HasLen, 2)
-	c.Assert(projects["_"].MatchingGroups, HasItem, "project1")
-	c.Assert(projects["_"].MatchingGroups, HasItem, "*")
-	c.Assert(projects["project1"].Name, Equals, "project1")
-	c.Assert(projects["project1"].MatchingGroups, DeepEquals, []string{"project1"})
-	c.Assert(projects["_"].Permission, Equals, "admin")
-	c.Assert(projects["project1"].Permission, Equals, "admin")
-
-	c.Assert(dao.SetACL("project1", "project2", WritePermission), IsNil)
-	c.Assert(dao.SetACL("project1", "project2", ReadPermission), IsNil)
-	c.Assert(dao.SetACL("project2", "project2", ReadPermission), IsNil)
-
-	projects, err = dao.GetNamespacesByGroups(anon)
-	c.Assert(err, IsNil)
-	c.Assert(projects, HasLen, 1)
-
-	projects, err = dao.GetNamespacesByGroups(oneGroup)
-	c.Assert(err, IsNil)
-	c.Assert(projects, HasLen, 2)
-
-	projects, err = dao.GetNamespacesByGroups(allGroups)
-	c.Assert(err, IsNil)
-	c.Assert(projects, HasLen, 3)
-	c.Assert(projects["_"].Name, Equals, "_")
-	c.Assert(projects["project1"].Name, Equals, "project1")
-	c.Assert(projects["project2"].Name, Equals, "project2")
-	c.Assert(projects["_"].MatchingGroups, HasLen, 2)
-	c.Assert(projects["_"].MatchingGroups, HasItem, "project1")
-	c.Assert(projects["_"].MatchingGroups, HasItem, "*")
-	c.Assert(projects["project1"].MatchingGroups, HasLen, 2)
-	c.Assert(projects["project1"].MatchingGroups, HasItem, "project1")
-	c.Assert(projects["project1"].MatchingGroups, HasItem, "project2")
-	c.Assert(projects["project2"].MatchingGroups, DeepEquals, []string{"project2"})
-	c.Assert(projects["_"].Permission, Equals, "admin")
-	c.Assert(projects["project1"].Permission, Equals, "admin")
-	c.Assert(projects["project2"].Permission, Equals, "admin")
 }
 
 func Validate_GetNamespacesByNames(dao DAO, c *C) {
@@ -627,50 +528,6 @@ func Validate_GetAllReleases(dao DAO, c *C) {
 	c.Assert(releases, HasLen, 2)
 }
 
-func Validate_ACL(dao DAO, c *C) {
-	err := dao.SetACL("_", "*", ReadPermission)
-	c.Assert(err, IsNil)
-	err = dao.SetACL("_", "writer", WritePermission)
-	c.Assert(err, IsNil)
-	err = dao.SetACL("_", "admin", AdminPermission)
-	c.Assert(err, IsNil)
-
-	groups, err := dao.GetPermittedGroups("_", ReadPermission)
-	c.Assert(err, IsNil)
-	c.Assert(groups, HasLen, 3)
-	c.Assert(groups, HasItem, "*")
-	c.Assert(groups, HasItem, "writer")
-	c.Assert(groups, HasItem, "admin")
-
-	groups, err = dao.GetPermittedGroups("_", WritePermission)
-	c.Assert(err, IsNil)
-	c.Assert(groups, HasLen, 2)
-	c.Assert(groups, HasItem, "writer")
-	c.Assert(groups, HasItem, "admin")
-
-	members, err := dao.GetACL("_")
-	c.Assert(err, IsNil)
-	c.Assert(members["*"], Equals, ReadPermission)
-	c.Assert(members["writer"], Equals, WritePermission)
-	c.Assert(members["admin"], Equals, AdminPermission)
-
-	err = dao.DeleteACL("_", "*")
-	c.Assert(err, IsNil)
-
-	err = dao.DeleteACL("doesnt-exist", "*")
-	c.Assert(err, IsNil)
-
-	groups, err = dao.GetPermittedGroups("_", ReadPermission)
-	c.Assert(err, IsNil)
-	c.Assert(groups, HasLen, 2)
-	c.Assert(groups, HasItem, "writer")
-	c.Assert(groups, HasItem, "admin")
-
-	groups, err = dao.GetPermittedGroups("doesnt-exist", ReadPermission)
-	c.Assert(err, IsNil)
-	c.Assert(groups, DeepEquals, []string{})
-}
-
 func Validate_GetReleasesWithoutProcessedDependencies(dao DAO, c *C) {
 	releases, err := dao.GetAllReleasesWithoutProcessedDependencies()
 	c.Assert(err, IsNil)
@@ -736,40 +593,6 @@ func Validate_Dependencies(dao DAO, c *C) {
 	c.Assert(ds[0], DeepEquals, downstream[0])
 }
 
-func Validate_DependenciesByGroups(dao DAO, c *C) {
-	c.Assert(dao.SetACL("_", "cheeky-group", ReadPermission), IsNil)
-
-	release := addRelease(dao, c, "dao-val", "1")
-	deps, err := dao.GetDependencies(release)
-	c.Assert(err, IsNil)
-	c.Assert(deps, HasLen, 0)
-
-	app := NewApplication("_", "dao-parent")
-	dao.AddApplication(app)
-	metadataJson := `{"name": "dao-parent", "version": "1", "depends": [{"release_id": "_/dao-val-v1", "scopes": ["build"]}]}`
-	metadata, err := core.NewReleaseMetadataFromJsonString(metadataJson)
-	c.Assert(err, IsNil)
-	releaseParent := NewRelease(app, metadata)
-	c.Assert(dao.AddRelease(releaseParent), IsNil)
-	dependencies := []*Dependency{
-		&Dependency{
-			Project:     "_",
-			Application: "dao-val",
-			Version:     "1",
-			BuildScope:  true,
-			DeployScope: false,
-		},
-	}
-	c.Assert(dao.SetDependencies(releaseParent, dependencies), IsNil)
-	ds, err := dao.GetDownstreamDependenciesByGroups(release, []string{})
-	c.Assert(err, IsNil)
-	c.Assert(ds, HasLen, 0)
-
-	ds, err = dao.GetDownstreamDependenciesByGroups(release, []string{"cheeky-group"})
-	c.Assert(err, IsNil)
-	c.Assert(ds, HasLen, 1)
-}
-
 func Validate_Metrics(dao DAO, c *C) {
 	metrics, err := dao.GetUserMetrics("test-user")
 	c.Assert(err, IsNil)
@@ -825,14 +648,6 @@ func Validate_Providers(dao DAO, c *C) {
 	c.Assert(providers, HasLen, 1)
 	c.Assert(providers["_/application-v1.1"], Not(IsNil))
 
-	providers, err = dao.GetProvidersByGroups("provider", []string{"group"})
-	c.Assert(err, IsNil)
-	c.Assert(providers, HasLen, 0)
-	c.Assert(dao.SetACL("_", "group", ReadPermission), IsNil)
-	providers, err = dao.GetProvidersByGroups("provider", []string{"group"})
-	c.Assert(err, IsNil)
-	c.Assert(providers, HasLen, 1)
-	c.Assert(providers["_/application-v1.1"], Not(IsNil))
 }
 
 func Validate_WipeDatabase(dao DAO, c *C) {

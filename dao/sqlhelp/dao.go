@@ -16,7 +16,6 @@ type SQLHelper struct {
 	AddProjectQuery           string
 	UpdateProjectQuery        string
 	GetProjectsQuery          string
-	GetProjectsByGroupsQuery  string
 	GetNamespacesByNamesQuery string
 	GetProjectHooksQuery      string
 	SetProjectHooksQuery      string
@@ -39,35 +38,26 @@ type SQLHelper struct {
 	GetAllReleasesWithoutProcessedDependenciesQuery string
 	FindAllVersionsQuery                            string
 
-	InsertDependencyQuery                  string
-	GetDependenciesQuery                   string
-	GetDownstreamDependenciesQuery         string
-	GetDownstreamDependenciesByGroupsQuery string
+	InsertDependencyQuery          string
+	GetDependenciesQuery           string
+	GetDownstreamDependenciesQuery string
 
 	GetPackageURIsQuery string
 	AddPackageURIQuery  string
-
-	GetACLQuery             string
-	InsertACLQuery          string
-	UpdateACLQuery          string
-	DeleteACLQuery          string
-	GetPermittedGroupsQuery string
 
 	CreateUserIDMetricsQuery     string
 	GetMetricsByUserIDQuery      string
 	SetProjectCountMetricForUser string
 
-	GetProviderReleasesQuery         string
-	GetProviderReleasesByGroupsQuery string
-	GetProvidersForReleaseQuery      string
-	SetProviderQuery                 string
-	UpdateProviderQuery              string
+	GetProviderReleasesQuery    string
+	GetProvidersForReleaseQuery string
+	SetProviderQuery            string
+	UpdateProviderQuery         string
 
 	HardDeleteProjectPackageURIsQuery         string
 	HardDeleteProjectUnitSubscriptions        string
 	HardDeleteProjectReleaseDependenciesQuery string
 	HardDeleteProjectReleasesQuery            string
-	HardDeleteProjectACLQuery                 string
 	HardDeleteProjectApplicationsQuery        string
 	HardDeleteProjectQuery                    string
 }

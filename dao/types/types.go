@@ -223,7 +223,6 @@ type DAO interface {
 	UpdateNamespace(*Project) error
 	GetNamespaces() (map[string]*Project, error)
 	GetNamespacesByNames(namespaces []string) (map[string]*Project, error)
-	GetNamespacesByGroups(readGroups []string) (map[string]*Project, error)
 	GetNamespaceHooks(*Project) (Hooks, error)
 	SetNamespaceHooks(*Project, Hooks) error
 
@@ -246,19 +245,12 @@ type DAO interface {
 	SetDependencies(*Release, []*Dependency) error
 	GetDependencies(*Release) ([]*Dependency, error)
 	GetDownstreamDependencies(*Release) ([]*Dependency, error)
-	GetDownstreamDependenciesByGroups(rel *Release, readGroups []string) ([]*Dependency, error)
 
 	GetProviders(providerName string) (map[string]*MinimalReleaseMetadata, error)
-	GetProvidersByGroups(providerName string, groups []string) (map[string]*MinimalReleaseMetadata, error)
 	RegisterProviders(release *core.ReleaseMetadata) error
 
 	GetPackageURIs(release *Release) ([]string, error)
 	AddPackageURI(release *Release, uri string) error
-
-	SetACL(namespace, group string, perm Permission) error
-	GetACL(namespace string) (map[string]Permission, error)
-	DeleteACL(namespace, group string) error
-	GetPermittedGroups(namespace string, perm Permission) ([]string, error)
 
 	GetUserMetrics(username string) (*Metrics, error)
 	SetUserMetrics(username string, previous, new *Metrics) error

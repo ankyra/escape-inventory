@@ -14,15 +14,6 @@ func GetDownstreamDependencies(namespace, name, version string) ([]*types.Depend
 	return dao.GetDownstreamDependencies(release)
 }
 
-func GetDownstreamDependenciesByGroups(namespace, name, version string, readGroups []string) ([]*types.Dependency, error) {
-	releaseId := name + "-" + version
-	release, err := ResolveReleaseId(namespace, releaseId)
-	if err != nil {
-		return nil, err
-	}
-	return dao.GetDownstreamDependenciesByGroups(release, readGroups)
-}
-
 type DependencyGraphNode struct {
 	Id    string `json:"id"`
 	Label string `json:"label"`
@@ -114,11 +105,4 @@ func GetDependencyGraph(namespace, name, version string, downstreamFunc Downstre
 		result.AddEdge(typ+id, mainId, label)
 	}
 	return result, nil
-}
-
-func GetDependencyGraphByGroups(namespace, name, version string, groups []string) (*DependencyGraph, error) {
-	resolver := func(release *types.Release) ([]*types.Dependency, error) {
-		return dao.GetDownstreamDependenciesByGroups(release, groups)
-	}
-	return GetDependencyGraph(namespace, name, version, resolver)
 }

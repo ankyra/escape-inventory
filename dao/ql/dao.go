@@ -62,15 +62,11 @@ func NewQLDAO(path string) (DAO, error) {
 
 	return &sqlhelp.SQLHelper{
 		DB: db,
-		UseNumericInsertMarks: true,
-		GetProjectQuery:       `SELECT name, description, orgURL, logo FROM project WHERE name = $1`,
-		AddProjectQuery:       `INSERT INTO project(name, description, orgURL, logo) VALUES ($1, $2, $3, $4)`,
-		UpdateProjectQuery:    `UPDATE project SET name = $1, description = $2, orgURL = $3, logo = $4 WHERE name = $5`,
-		GetProjectsQuery:      `SELECT name, description, orgURL, logo FROM project`,
-		GetProjectsByGroupsQuery: `SELECT project.name, project.description, project.orgURL, project.logo, acl.group_name 
-								     FROM project, acl
-									 WHERE acl.project = project.name
-									 AND acl.group_name `,
+		UseNumericInsertMarks:     true,
+		GetProjectQuery:           `SELECT name, description, orgURL, logo FROM project WHERE name = $1`,
+		AddProjectQuery:           `INSERT INTO project(name, description, orgURL, logo) VALUES ($1, $2, $3, $4)`,
+		UpdateProjectQuery:        `UPDATE project SET name = $1, description = $2, orgURL = $3, logo = $4 WHERE name = $5`,
+		GetProjectsQuery:          `SELECT name, description, orgURL, logo FROM project`,
 		GetNamespacesByNamesQuery: `SELECT name, description, orgURL, logo FROM project WHERE name`,
 		GetProjectHooksQuery:      `SELECT hooks FROM project WHERE name = $1`,
 		SetProjectHooksQuery:      `UPDATE project SET hooks = $1 WHERE name = $2`,
@@ -118,27 +114,13 @@ func NewQLDAO(path string) (DAO, error) {
 									  build_scope, deploy_scope, is_extension
 							   FROM release_dependency 
 							   WHERE dep_project = $1 AND dep_name = $2 AND dep_version = $3`,
-		GetDownstreamDependenciesByGroupsQuery: `SELECT release_dependency.project, release_dependency.name, release_dependency.version, 
-													release_dependency.build_scope, release_dependency.deploy_scope, release_dependency.is_extension
-							   						FROM release_dependency, acl
-													WHERE release_dependency.project = acl.project
-													AND release_dependency.dep_project = $1 
-													AND release_dependency.dep_name = $2 AND release_dependency.dep_version = $3
-													AND acl.group_name `,
-		GetACLQuery:                               "SELECT group_name, permission FROM acl WHERE project = $1",
-		InsertACLQuery:                            "INSERT INTO acl(project, group_name, permission) VALUES($1, $2, $3)",
-		UpdateACLQuery:                            "UPDATE acl SET permission = $1 WHERE project = $2 AND group_name = $3",
-		DeleteACLQuery:                            "DELETE FROM acl WHERE project = $1 AND group_name = $2",
-		GetPermittedGroupsQuery:                   "SELECT group_name FROM acl WHERE project = $1 AND (permission >= $2)",
 		CreateUserIDMetricsQuery:                  `INSERT INTO metrics(user_id) VALUES($1)`,
 		GetMetricsByUserIDQuery:                   `SELECT project_count FROM metrics WHERE user_id = $1`,
 		SetProjectCountMetricForUser:              `UPDATE metrics SET project_count = $3 WHERE user_id = $1 AND project_count = $2`,
 		GetProviderReleasesQuery:                  `SELECT project, application, version, description FROM providers WHERE provider = $1`,
-		GetProviderReleasesByGroupsQuery:          `SELECT p.project, p.application, p.version, p.description FROM providers AS p, acl WHERE p.provider = $1 AND p.project = acl.project AND acl.group_name `,
 		GetProvidersForReleaseQuery:               `SELECT provider, version FROM providers WHERE project = $1 AND application = $2`,
 		SetProviderQuery:                          `INSERT INTO providers(project, application, version, description, provider) VALUES ($1, $2, $3, $4, $5)`,
 		UpdateProviderQuery:                       `UPDATE providers SET version = $3, description = $4 WHERE project = $1 AND application = $2 AND provider = $5`,
-		HardDeleteProjectACLQuery:                 `DELETE FROM acl WHERE project = $1`,
 		HardDeleteProjectPackageURIsQuery:         `DELETE FROM package WHERE project = $1`,
 		HardDeleteProjectUnitSubscriptions:        `DELETE FROM subscriptions WHERE project = $1`,
 		HardDeleteProjectReleaseDependenciesQuery: `DELETE FROM release_dependency WHERE project = $1`,

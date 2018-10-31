@@ -17,34 +17,6 @@ func (a *dao) GetNamespaces() (map[string]*Project, error) {
 	return a.namespaceMetadata, nil
 }
 
-func (a *dao) GetNamespacesByGroups(readGroups []string) (map[string]*Project, error) {
-	result := map[string]*Project{}
-	for name, namespaceMetadata := range a.namespaceMetadata {
-		allowedGroups, found := a.acls[name]
-		if found {
-			namespaceMetadata.MatchingGroups = []string{}
-			matchedGroups := map[string]bool{}
-			for _, g := range readGroups {
-				_, found := allowedGroups[g]
-				if found {
-					matchedGroups[g] = true
-				}
-			}
-			_, found := allowedGroups["*"]
-			if found {
-				matchedGroups["*"] = true
-			}
-			if len(matchedGroups) > 0 {
-				for key, _ := range matchedGroups {
-					namespaceMetadata.MatchingGroups = append(namespaceMetadata.MatchingGroups, key)
-				}
-				result[name] = namespaceMetadata
-			}
-		}
-	}
-	return result, nil
-}
-
 func (a *dao) GetNamespacesByNames(namespaces []string) (map[string]*Project, error) {
 	namespacesFound := map[string]*Project{}
 	for _, name := range namespaces {
@@ -120,7 +92,6 @@ func (a *dao) HardDeleteNamespace(namespace string) error {
 	delete(a.namespaceMetadata, namespace)
 	delete(a.namespaceHooks, namespaceMetadata)
 	delete(a.namespaces, namespace)
-	delete(a.acls, namespace)
 
 	return nil
 }
