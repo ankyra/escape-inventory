@@ -126,7 +126,7 @@ func (s *SQLHelper) GetNamespacesFilteredBy(f *NamespacesFilter) (map[string]*Pr
 		}
 	}
 	query := s.GetNamespacesByNamesQuery
-	if len(namespaces) == 0 {
+	if len(f.Namespaces) == 0 {
 		return map[string]*Project{}, nil
 	} else if len(f.Namespaces) == 1 {
 		query += " = " + insertMarks[0]
