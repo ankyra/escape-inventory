@@ -46,6 +46,8 @@ type Config struct {
 	StorageSettings   StorageSettings  `json:"storage_settings" yaml:"storage_settings"`
 	EventServiceURL   string           `json:"event_service_url" yaml:"event_service_url"`
 	UserServiceURL    string           `json:"user_service_url" yaml:"user_service_url"`
+	StateServiceURL   string           `json:"state_service_url" yaml:"state_service_url"`
+	ApiDocsLocation   string           `json:"api_docs" yaml:"api_docs"`
 	WebHook           string           `json:"web_hook" yaml:"web_hook"`
 	Dev               bool             `json:"dev" yaml:"dev"`
 	BasicAuthUsername string           `json:"basic_auth_username" yaml:"basic_auth_username"`
@@ -133,6 +135,10 @@ func processEnvironmentOverrides(config *Config, env []string) *Config {
 			config.WebHook = value
 		} else if key == "USER_SERVICE_URL" {
 			config.UserServiceURL = value
+		} else if key == "STATE_SERVICE_URL" {
+			config.StateServiceURL = value
+		} else if key == "API_DOCS" {
+			config.ApiDocsLocation = value
 		} else if key == "EVENT_SERVICE_URL" {
 			config.EventServiceURL = value
 		} else if key == "BASIC_AUTH_USERNAME" {
