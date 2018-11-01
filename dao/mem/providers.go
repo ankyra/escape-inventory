@@ -34,7 +34,24 @@ func (a *dao) GetProviders(providerName string) (map[string]*MinimalReleaseMetad
 }
 
 func (a *dao) GetProvidersFilteredBy(providerName string, query *ProvidersFilter) (map[string]*MinimalReleaseMetadata, error) {
-	return nil, nil
+	providers, ok := a.providers[providerName]
+	if !ok {
+		return nil, NotFound
+	}
+	result := map[string]*MinimalReleaseMetadata{}
+	for _, release := range providers {
+		found := false
+		for _, namespace := range query.Namespaces {
+			if namespace == release.Project {
+				found = true
+				break
+			}
+		}
+		if found {
+			result[release.GetReleaseId()] = release
+		}
+	}
+	return result, nil
 }
 
 func (a *dao) RegisterProviders(release *core.ReleaseMetadata) error {

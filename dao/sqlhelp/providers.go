@@ -2,6 +2,8 @@ package sqlhelp
 
 import (
 	"database/sql"
+	"strconv"
+	"strings"
 
 	core "github.com/ankyra/escape-core"
 	. "github.com/ankyra/escape-inventory/dao/types"
@@ -16,7 +18,33 @@ func (s *SQLHelper) GetProviders(providerName string) (map[string]*MinimalReleas
 }
 
 func (s *SQLHelper) GetProvidersFilteredBy(providerName string, f *ProvidersFilter) (map[string]*MinimalReleaseMetadata, error) {
-	return nil, nil
+	insertMarks := []string{}
+	for i, _ := range f.Namespaces {
+		if s.UseNumericInsertMarks {
+			insertMarks = append(insertMarks, "$"+strconv.Itoa(i+2))
+		} else {
+			insertMarks = append(insertMarks, "?")
+		}
+	}
+	query := s.GetProviderReleasesQuery + " AND project "
+	if len(f.Namespaces) == 0 {
+		return map[string]*MinimalReleaseMetadata{}, nil
+	} else if len(f.Namespaces) == 1 {
+		query += " = " + insertMarks[0]
+	} else {
+		query += " IN (" + strings.Join(insertMarks, ", ") + ")"
+	}
+	interfaceNamespaces := []interface{}{
+		providerName,
+	}
+	for _, n := range f.Namespaces {
+		interfaceNamespaces = append(interfaceNamespaces, n)
+	}
+	rows, err := s.PrepareAndQuery(query, interfaceNamespaces...)
+	if err != nil {
+		return nil, err
+	}
+	return s.scanMinimalReleaseMetadata(rows)
 }
 
 func (s *SQLHelper) scanMinimalReleaseMetadata(rows *sql.Rows) (map[string]*MinimalReleaseMetadata, error) {

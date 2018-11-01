@@ -2,6 +2,8 @@ package sqlhelp
 
 import (
 	"database/sql"
+	"strconv"
+	"strings"
 
 	. "github.com/ankyra/escape-inventory/dao/types"
 )
@@ -41,15 +43,47 @@ func (s *SQLHelper) GetDependencies(release *Release) ([]*Dependency, error) {
 }
 
 func (s *SQLHelper) GetDownstreamDependencies(release *Release) ([]*Dependency, error) {
-	rows, err := s.PrepareAndQuery(s.GetDownstreamDependenciesQuery, release.Application.Project, release.Application.Name, release.Version)
+	rows, err := s.PrepareAndQuery(s.GetDownstreamDependenciesQuery,
+		release.Application.Project,
+		release.Application.Name,
+		release.Version,
+	)
 	if err != nil {
 		return nil, err
 	}
 	return s.scanDependencies(rows)
 }
 
-func (s *SQLHelper) GetDownstreamDependenciesFilteredBy(release *Release, query *DownstreamDependenciesFilter) ([]*Dependency, error) {
-	return nil, nil
+func (s *SQLHelper) GetDownstreamDependenciesFilteredBy(release *Release, f *DownstreamDependenciesFilter) ([]*Dependency, error) {
+	insertMarks := []string{}
+	for i, _ := range f.Namespaces {
+		if s.UseNumericInsertMarks {
+			insertMarks = append(insertMarks, "$"+strconv.Itoa(i+4))
+		} else {
+			insertMarks = append(insertMarks, "?")
+		}
+	}
+	query := s.GetDownstreamDependenciesQuery + " AND project "
+	if len(f.Namespaces) == 0 {
+		return []*Dependency{}, nil
+	} else if len(f.Namespaces) == 1 {
+		query += " = " + insertMarks[0]
+	} else {
+		query += " IN (" + strings.Join(insertMarks, ", ") + ")"
+	}
+	interfaceNamespaces := []interface{}{
+		release.Application.Project,
+		release.Application.Name,
+		release.Version,
+	}
+	for _, n := range f.Namespaces {
+		interfaceNamespaces = append(interfaceNamespaces, n)
+	}
+	rows, err := s.PrepareAndQuery(query, interfaceNamespaces...)
+	if err != nil {
+		return nil, err
+	}
+	return s.scanDependencies(rows)
 }
 
 func (s *SQLHelper) scanDependencies(rows *sql.Rows) ([]*Dependency, error) {

@@ -59,5 +59,18 @@ func (a *dao) GetDownstreamDependencies(release *Release) ([]*Dependency, error)
 }
 
 func (a *dao) GetDownstreamDependenciesFilteredBy(release *Release, query *DownstreamDependenciesFilter) ([]*Dependency, error) {
-	return nil, nil
+	deps, err := a.GetDownstreamDependencies(release)
+	if err != nil {
+		return nil, err
+	}
+	result := []*Dependency{}
+	for _, dep := range deps {
+		for _, namespace := range query.Namespaces {
+			if namespace == dep.Project {
+				result = append(result, dep)
+				break
+			}
+		}
+	}
+	return result, nil
 }

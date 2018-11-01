@@ -33,6 +33,7 @@ func ValidateDAO(dao func() DAO, c *C) {
 	Validate_GetNamespaces(dao(), c)
 	Validate_ProjectMetadata(dao(), c)
 	Validate_GetNamespacesByNames(dao(), c)
+	Validate_GetNamespacesFilteredBy(dao(), c)
 	Validate_ApplicationMetadata(dao(), c)
 	Validate_GetDownstreamHooks(dao(), c)
 	Validate_GetApplications(dao(), c)
@@ -45,6 +46,7 @@ func ValidateDAO(dao func() DAO, c *C) {
 	Validate_Dependencies(dao(), c)
 	Validate_Metrics(dao(), c)
 	Validate_Providers(dao(), c)
+	Validate_ProvidersFilteredBy(dao(), c)
 	Validate_HardDeleteNamespace(dao(), c)
 	Validate_WipeDatabase(dao(), c)
 }
@@ -354,7 +356,42 @@ func Validate_GetNamespacesByNames(dao DAO, c *C) {
 	c.Assert(projects, HasLen, 2)
 	c.Assert(projects["test-project-1"], NotNil)
 	c.Assert(projects["test-project-2"], NotNil)
+}
 
+func Validate_GetNamespacesFilteredBy(dao DAO, c *C) {
+	projects, err := dao.GetNamespacesFilteredBy(NewNamespacesFilter([]string{}))
+	c.Assert(err, IsNil)
+	c.Assert(projects, HasLen, 0)
+
+	projects, err = dao.GetNamespacesFilteredBy(NewNamespacesFilter([]string{"test-project-1"}))
+	c.Assert(err, IsNil)
+	c.Assert(projects, HasLen, 0)
+
+	c.Assert(dao.AddNamespace(NewProject("_")), Equals, nil)
+
+	projects, err = dao.GetNamespacesFilteredBy(NewNamespacesFilter([]string{"test-project-1"}))
+	c.Assert(err, IsNil)
+	c.Assert(projects, HasLen, 0)
+
+	c.Assert(dao.AddNamespace(NewProject("test-project-1")), Equals, nil)
+
+	projects, err = dao.GetNamespacesFilteredBy(NewNamespacesFilter([]string{"test-project-1"}))
+	c.Assert(err, IsNil)
+	c.Assert(projects, HasLen, 1)
+	c.Assert(projects["test-project-1"], NotNil)
+
+	c.Assert(dao.AddNamespace(NewProject("test-project-2")), Equals, nil)
+
+	projects, err = dao.GetNamespacesFilteredBy(NewNamespacesFilter([]string{"test-project-1"}))
+	c.Assert(err, IsNil)
+	c.Assert(projects, HasLen, 1)
+	c.Assert(projects["test-project-1"], NotNil)
+
+	projects, err = dao.GetNamespacesFilteredBy(NewNamespacesFilter([]string{"test-project-1", "test-project-2"}))
+	c.Assert(err, IsNil)
+	c.Assert(projects, HasLen, 2)
+	c.Assert(projects["test-project-1"], NotNil)
+	c.Assert(projects["test-project-2"], NotNil)
 }
 
 func Validate_ApplicationMetadata(dao DAO, c *C) {
@@ -595,6 +632,19 @@ func Validate_Dependencies(dao DAO, c *C) {
 	c.Assert(err, IsNil)
 	c.Assert(ds, HasLen, 1)
 	c.Assert(ds[0], DeepEquals, downstream[0])
+
+	ds, err = dao.GetDownstreamDependenciesFilteredBy(release, NewDownstreamDependenciesFilter([]string{}))
+	c.Assert(err, IsNil)
+	c.Assert(ds, HasLen, 0)
+
+	ds, err = dao.GetDownstreamDependenciesFilteredBy(release, NewDownstreamDependenciesFilter([]string{"some-projecT"}))
+	c.Assert(err, IsNil)
+	c.Assert(ds, HasLen, 0)
+
+	ds, err = dao.GetDownstreamDependenciesFilteredBy(release, NewDownstreamDependenciesFilter([]string{"_"}))
+	c.Assert(err, IsNil)
+	c.Assert(ds, HasLen, 1)
+	c.Assert(ds[0], DeepEquals, downstream[0])
 }
 
 func Validate_Metrics(dao DAO, c *C) {
@@ -648,6 +698,48 @@ func Validate_Providers(dao DAO, c *C) {
 	newerRelease.AddProvides("provider")
 	c.Assert(dao.RegisterProviders(newerRelease), IsNil)
 	providers, err = dao.GetProviders("provider")
+	c.Assert(err, IsNil)
+	c.Assert(providers, HasLen, 1)
+	c.Assert(providers["_/application-v1.1"], Not(IsNil))
+}
+
+func Validate_ProvidersFilteredBy(dao DAO, c *C) {
+	release := core.NewReleaseMetadata("application", "1.0")
+	release.Description = "desc"
+	release.AddProvides("provider")
+	release.AddProvides("provider2")
+	c.Assert(dao.RegisterProviders(release), IsNil)
+	providers, err := dao.GetProvidersFilteredBy("provider", NewProvidersFilter([]string{}))
+	c.Assert(err, IsNil)
+	c.Assert(providers, HasLen, 0)
+	providers, err = dao.GetProvidersFilteredBy("provider", NewProvidersFilter([]string{"some-project"}))
+	c.Assert(err, IsNil)
+	c.Assert(providers, HasLen, 0)
+	providers, err = dao.GetProvidersFilteredBy("provider", NewProvidersFilter([]string{"_"}))
+	c.Assert(err, IsNil)
+	c.Assert(providers, HasLen, 1)
+	c.Assert(providers["_/application-v1.0"], Not(IsNil))
+	c.Assert(providers["_/application-v1.0"].Application, Equals, "application")
+	c.Assert(providers["_/application-v1.0"].Version, Equals, "1.0")
+	c.Assert(providers["_/application-v1.0"].Project, Equals, "_")
+	c.Assert(providers["_/application-v1.0"].Description, Equals, "desc")
+	providers, err = dao.GetProviders("provider2")
+	c.Assert(err, IsNil)
+	c.Assert(providers, HasLen, 1)
+	c.Assert(providers["_/application-v1.0"], Not(IsNil))
+
+	olderRelease := core.NewReleaseMetadata("application", "0.9")
+	olderRelease.AddProvides("provider")
+	c.Assert(dao.RegisterProviders(olderRelease), IsNil)
+	providers, err = dao.GetProvidersFilteredBy("provider", NewProvidersFilter([]string{"_"}))
+	c.Assert(err, IsNil)
+	c.Assert(providers, HasLen, 1)
+	c.Assert(providers["_/application-v1.0"], Not(IsNil))
+
+	newerRelease := core.NewReleaseMetadata("application", "1.1")
+	newerRelease.AddProvides("provider")
+	c.Assert(dao.RegisterProviders(newerRelease), IsNil)
+	providers, err = dao.GetProvidersFilteredBy("provider", NewProvidersFilter([]string{"_"}))
 	c.Assert(err, IsNil)
 	c.Assert(providers, HasLen, 1)
 	c.Assert(providers["_/application-v1.1"], Not(IsNil))
