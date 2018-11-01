@@ -321,7 +321,11 @@ func Validate_HardDeleteNamespace(dao DAO, c *C) {
 }
 
 func Validate_GetNamespacesByNames(dao DAO, c *C) {
-	projects, err := dao.GetNamespacesByNames([]string{"test-project-1"})
+	projects, err := dao.GetNamespacesByNames([]string{})
+	c.Assert(err, IsNil)
+	c.Assert(projects, HasLen, 0)
+
+	projects, err = dao.GetNamespacesByNames([]string{"test-project-1"})
 	c.Assert(err, IsNil)
 	c.Assert(projects, HasLen, 0)
 

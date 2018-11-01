@@ -78,7 +78,9 @@ func (s *SQLHelper) GetNamespacesByNames(namespaces []string) (map[string]*Proje
 		}
 	}
 	query := s.GetNamespacesByNamesQuery
-	if len(namespaces) == 1 {
+	if len(namespaces) == 0 {
+		return map[string]*Project{}, nil
+	} else if len(namespaces) == 1 {
 		query += " = " + insertMarks[0]
 	} else {
 		query += " IN (" + strings.Join(insertMarks, ", ") + ")"
@@ -124,7 +126,9 @@ func (s *SQLHelper) GetNamespacesFilteredBy(f *NamespacesFilter) (map[string]*Pr
 		}
 	}
 	query := s.GetNamespacesByNamesQuery
-	if len(f.Namespaces) == 1 {
+	if len(namespaces) == 0 {
+		return map[string]*Project{}, nil
+	} else if len(f.Namespaces) == 1 {
 		query += " = " + insertMarks[0]
 	} else {
 		query += " IN (" + strings.Join(insertMarks, ", ") + ")"
