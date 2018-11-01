@@ -14,6 +14,15 @@ func GetDownstreamDependencies(namespace, name, version string) ([]*types.Depend
 	return dao.GetDownstreamDependencies(release)
 }
 
+func GetDownstreamDependenciesFilteredBy(namespace, name, version string, f *types.DownstreamDependenciesFilter) ([]*types.Dependency, error) {
+	releaseId := name + "-" + version
+	release, err := ResolveReleaseId(namespace, releaseId)
+	if err != nil {
+		return nil, err
+	}
+	return dao.GetDownstreamDependenciesFilteredBy(release, f)
+}
+
 type DependencyGraphNode struct {
 	Id    string `json:"id"`
 	Label string `json:"label"`
