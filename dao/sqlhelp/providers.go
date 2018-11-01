@@ -15,6 +15,10 @@ func (s *SQLHelper) GetProviders(providerName string) (map[string]*MinimalReleas
 	return s.scanMinimalReleaseMetadata(rows)
 }
 
+func (s *SQLHelper) GetProvidersFilteredBy(providerName string, f *ProvidersFilter) (map[string]*MinimalReleaseMetadata, error) {
+	return nil, nil
+}
+
 func (s *SQLHelper) scanMinimalReleaseMetadata(rows *sql.Rows) (map[string]*MinimalReleaseMetadata, error) {
 	result := map[string]*MinimalReleaseMetadata{}
 	defer rows.Close()

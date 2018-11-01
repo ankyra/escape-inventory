@@ -33,6 +33,10 @@ func (a *dao) GetProviders(providerName string) (map[string]*MinimalReleaseMetad
 	return result, nil
 }
 
+func (a *dao) GetProvidersFilteredBy(providerName string, query *ProvidersFilter) (map[string]*MinimalReleaseMetadata, error) {
+	return nil, nil
+}
+
 func (a *dao) RegisterProviders(release *core.ReleaseMetadata) error {
 	for _, provider := range release.Provides {
 		name := provider.Name

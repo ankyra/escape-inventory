@@ -77,6 +77,10 @@ func GetNamespacesByNames(namespaces []string) (map[string]*Project, error) {
 	return GlobalDAO.GetNamespacesByNames(namespaces)
 }
 
+func GetNamespacesFilteredBy(f *NamespacesFilter) (map[string]*Project, error) {
+	return GlobalDAO.GetNamespacesFilteredBy(f)
+}
+
 func GetNamespaceHooks(namespace *Project) (Hooks, error) {
 	return GlobalDAO.GetNamespaceHooks(namespace)
 }
@@ -134,6 +138,11 @@ func GetRelease(namespace, name, releaseId string) (*Release, error) {
 func GetProviders(providerName string) (map[string]*MinimalReleaseMetadata, error) {
 	return GlobalDAO.GetProviders(providerName)
 }
+
+func GetProvidersFilteredBy(providerName string, f *ProvidersFilter) (map[string]*MinimalReleaseMetadata, error) {
+	return GlobalDAO.GetProvidersFilteredBy(providerName, f)
+}
+
 func RegisterProviders(release *core.ReleaseMetadata) error {
 	return GlobalDAO.RegisterProviders(release)
 }
@@ -160,6 +169,10 @@ func GetDependencies(r *Release) ([]*Dependency, error) {
 
 func GetDownstreamDependencies(r *Release) ([]*Dependency, error) {
 	return GlobalDAO.GetDownstreamDependencies(r)
+}
+
+func GetDownstreamDependenciesFilteredBy(r *Release, f *DownstreamDependenciesFilter) ([]*Dependency, error) {
+	return GlobalDAO.GetDownstreamDependenciesFilteredBy(r, f)
 }
 
 func GetAllReleases() ([]*Release, error) {

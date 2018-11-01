@@ -48,6 +48,10 @@ func (s *SQLHelper) GetDownstreamDependencies(release *Release) ([]*Dependency, 
 	return s.scanDependencies(rows)
 }
 
+func (s *SQLHelper) GetDownstreamDependenciesFilteredBy(release *Release, query *DownstreamDependenciesFilter) ([]*Dependency, error) {
+	return nil, nil
+}
+
 func (s *SQLHelper) scanDependencies(rows *sql.Rows) ([]*Dependency, error) {
 	defer rows.Close()
 	result := []*Dependency{}

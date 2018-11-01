@@ -57,3 +57,7 @@ func (a *dao) GetDownstreamDependencies(release *Release) ([]*Dependency, error)
 	}
 	return result, nil
 }
+
+func (a *dao) GetDownstreamDependenciesFilteredBy(release *Release, query *DownstreamDependenciesFilter) ([]*Dependency, error) {
+	return nil, nil
+}

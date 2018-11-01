@@ -1,7 +1,7 @@
 ---
 title: "Escape Standard Library Reference"
 slug: scripting-language-stdlib 
-type: "docs"
+type: "reference"
 toc: true
 ---
 
@@ -17,25 +17,7 @@ h2 {
 Standard library functions for the [Escape Scripting Language](../scripting-language/)
 
 
-# Functions acting on integers
-
-## add(y :: integer)
-
-Add two integers
-
-
-# Unary functions
-
-## timestamp()
-
-Returns a UNIX timestamp
-
-
 # Functions acting on bool
-
-## or(b2 :: bool)
-
-Logical OR operation
 
 ## not()
 
@@ -44,6 +26,10 @@ Logical NOT operation
 ## and(b2 :: bool)
 
 Logical AND operation
+
+## or(b2 :: bool)
+
+Logical OR operation
 
 
 # Functions acting on integer
@@ -67,13 +53,13 @@ Returns true if first argument is greater than or equal to second argument
 
 # Functions acting on everything
 
-## id(parameter :: *)
-
-Returns its argument
-
 ## equals(parameter :: *)
 
 Returns true if the arguments are of the same type and have the same value
+
+## id(parameter :: *)
+
+Returns its argument
 
 
 # Functions acting on lists
@@ -101,50 +87,6 @@ Slice a list. Usually accessed implicitly using slice syntax (eg. `list[0:5]`)
 
 # Functions acting on strings
 
-## base64_decode()
-
-Decode string from base64
-
-## read_file()
-
-Read the contents of a file
-
-## concat(v1 :: string, v2 :: string, ...)
-
-Concatate stringable arguments
-
-## lower(v :: string)
-
-Returns a copy of the string v with all Unicode characters mapped to their lower case
-
-## path_exists()
-
-Returns true if the path exists, false if not
-
-## dir_exists()
-
-Returns true if the path exists and if it is a directory, false otherwise
-
-## base64_encode()
-
-Encode string to base64
-
-## upper(v :: string)
-
-Returns a copy of the string v with all Unicode characters mapped to their upper case
-
-## split(sep :: string)
-
-Split slices s into all substrings separated by sep and returns a slice of the substrings between those separators. If sep is empty, Split splits after each UTF-8 sequence.
-
-## file_exists()
-
-Returns true if the path exists and if it's not a directory, false otherwise
-
-## track_major_version()
-
-Track major version
-
 ## track_minor_version()
 
 Track minor version
@@ -153,19 +95,77 @@ Track minor version
 
 Track version
 
-## title(v :: string)
+## lower(v :: string)
 
-Returns a copy of the string v with all Unicode characters mapped to their title case
+Returns a copy of the string v with all Unicode characters mapped to their lower case
 
 ## replace(old :: string, new :: string, n :: integer)
 
 Replace returns a copy of the string s with the first n non-overlapping instances of old replaced by new. If old is empty, it matches at the beginning of the string and after each UTF-8 sequence, yielding up to k+1 replacements for a k-rune string. If n < 0, there is no limit on the number of replacements.
 
-## trim()
+## track_major_version()
 
-Returns a slice of the string s, with all leading and trailing white space removed, as defined by Unicode. 
+Track major version
+
+## base64_decode()
+
+Decode string from base64
+
+## read_file()
+
+Read the contents of a file
 
 ## track_patch_version()
 
 Track patch version
+
+## split(sep :: string)
+
+Split slices s into all substrings separated by sep and returns a slice of the substrings between those separators. If sep is empty, Split splits after each UTF-8 sequence.
+
+## path_exists()
+
+Returns true if the path exists, false if not
+
+## base64_encode()
+
+Encode string to base64
+
+## trim()
+
+Returns a slice of the string s, with all leading and trailing white space removed, as defined by Unicode. 
+
+## concat(v1 :: string, v2 :: string, ...)
+
+Concatate stringable arguments
+
+## title(v :: string)
+
+Returns a copy of the string v with all Unicode characters mapped to their title case
+
+## dir_exists()
+
+Returns true if the path exists and if it is a directory, false otherwise
+
+## upper(v :: string)
+
+Returns a copy of the string v with all Unicode characters mapped to their upper case
+
+## file_exists()
+
+Returns true if the path exists and if it's not a directory, false otherwise
+
+
+# Functions acting on integers
+
+## add(y :: integer)
+
+Add two integers
+
+
+# Unary functions
+
+## timestamp()
+
+Returns a UNIX timestamp
 

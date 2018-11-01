@@ -216,6 +216,36 @@ func (f *FeedEvent) Equals(other *FeedEvent) bool {
 		reflect.DeepEqual(f.Data, other.Data)
 }
 
+type NamespacesFilter struct {
+	Namespaces []string
+}
+
+func NewNamespacesFilter(namespaces []string) *NamespacesFilter {
+	return &NamespacesFilter{
+		Namespaces: namespaces,
+	}
+}
+
+type DownstreamDependenciesFilter struct {
+	Namespaces []string
+}
+
+func NewDownstreamDependenciesFilter(namespaces []string) *DownstreamDependenciesFilter {
+	return &DownstreamDependenciesFilter{
+		Namespaces: namespaces,
+	}
+}
+
+type ProvidersFilter struct {
+	Namespaces []string
+}
+
+func NewProvidersFilter(namespaces []string) *ProvidersFilter {
+	return &ProvidersFilter{
+		Namespaces: namespaces,
+	}
+}
+
 type DAO interface {
 	GetNamespace(namespace string) (*Project, error)
 	AddNamespace(*Project) error
@@ -223,6 +253,7 @@ type DAO interface {
 	UpdateNamespace(*Project) error
 	GetNamespaces() (map[string]*Project, error)
 	GetNamespacesByNames(namespaces []string) (map[string]*Project, error)
+	GetNamespacesFilteredBy(*NamespacesFilter) (map[string]*Project, error)
 	GetNamespaceHooks(*Project) (Hooks, error)
 	SetNamespaceHooks(*Project, Hooks) error
 
@@ -245,8 +276,10 @@ type DAO interface {
 	SetDependencies(*Release, []*Dependency) error
 	GetDependencies(*Release) ([]*Dependency, error)
 	GetDownstreamDependencies(*Release) ([]*Dependency, error)
+	GetDownstreamDependenciesFilteredBy(*Release, *DownstreamDependenciesFilter) ([]*Dependency, error)
 
 	GetProviders(providerName string) (map[string]*MinimalReleaseMetadata, error)
+	GetProvidersFilteredBy(providerName string, q *ProvidersFilter) (map[string]*MinimalReleaseMetadata, error)
 	RegisterProviders(release *core.ReleaseMetadata) error
 
 	GetPackageURIs(release *Release) ([]string, error)

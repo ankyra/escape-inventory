@@ -114,6 +114,51 @@ func (s *SQLHelper) GetNamespacesByNames(namespaces []string) (map[string]*Proje
 	return nil, nil
 }
 
+func (s *SQLHelper) GetNamespacesFilteredBy(f *NamespacesFilter) (map[string]*Project, error) {
+	insertMarks := []string{}
+	for i, _ := range f.Namespaces {
+		if s.UseNumericInsertMarks {
+			insertMarks = append(insertMarks, "$"+strconv.Itoa(i+1))
+		} else {
+			insertMarks = append(insertMarks, "?")
+		}
+	}
+	query := s.GetNamespacesByNamesQuery
+	if len(f.Namespaces) == 1 {
+		query += " = " + insertMarks[0]
+	} else {
+		query += " IN (" + strings.Join(insertMarks, ", ") + ")"
+	}
+	interfaceNamespaces := []interface{}{}
+	for _, n := range f.Namespaces {
+		interfaceNamespaces = append(interfaceNamespaces, n)
+	}
+	rows, err := s.PrepareAndQuery(query, interfaceNamespaces...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	result := map[string]*Project{}
+	for rows.Next() {
+		var name, description, orgURL, logo string
+		if err := rows.Scan(&name, &description, &orgURL, &logo); err != nil {
+			return nil, err
+		}
+		prj, ok := result[name]
+		if !ok {
+			prj = &Project{
+				Name:        name,
+				Description: description,
+				OrgURL:      orgURL,
+				Logo:        logo,
+				Permission:  "admin", // default permission for open source
+			}
+		}
+		result[prj.Name] = prj
+	}
+	return result, nil
+}
+
 func (s *SQLHelper) HardDeleteNamespace(namespace string) error {
 	if err := s.PrepareAndExec(s.HardDeleteProjectUnitSubscriptions, namespace); err != nil {
 		return err
