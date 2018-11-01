@@ -16,7 +16,6 @@ includes:
 - cmd/
 - config/
 - dao/
-- deps/
 - docs/
 - handlers/
 - metrics/
