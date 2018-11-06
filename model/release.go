@@ -230,7 +230,7 @@ func ResolveReleaseId(namespace, application, versionQuery string) (*Release, er
 	} else if vq.SpecificTag != "" {
 		return dao.GetReleaseByTag(namespace, application, vq.SpecificTag)
 	} else {
-		return nil, NewUserError("Unsupported version query")
+		return nil, NewUserError(fmt.Errorf("Unsupported version query"))
 	}
 	return dao.GetRelease(namespace, application, application+"-v"+versionQuery)
 }
