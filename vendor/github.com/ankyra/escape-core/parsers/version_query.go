@@ -48,6 +48,15 @@ func maybeParseVersionQuery(versionQuery string) *VersionQuery {
 			VersionPrefix: versionQuery[:len(versionQuery)-1],
 		}
 	}
+	if isSemanticVersion(parts) {
+		return &VersionQuery{
+			SpecificVersion: versionQuery,
+		}
+	}
+	return nil
+}
+
+func isSemanticVersion(parts []string) bool {
 	legitVersion := true
 	for _, part := range parts {
 		i, err := strconv.Atoi(part)
@@ -56,10 +65,5 @@ func maybeParseVersionQuery(versionQuery string) *VersionQuery {
 			break
 		}
 	}
-	if legitVersion {
-		return &VersionQuery{
-			SpecificVersion: versionQuery,
-		}
-	}
-	return nil
+	return legitVersion
 }
