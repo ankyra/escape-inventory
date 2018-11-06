@@ -20,7 +20,7 @@ func (a *dao) GetRelease(namespace, name, releaseId string) (*Release, error) {
 	return release.Release, nil
 }
 
-func (a *dao) GetReleaseByTag(namespaces, name, tag string) (*Release, error) {
+func (a *dao) GetReleaseByTag(namespace, name, tag string) (*Release, error) {
 	prj, ok := a.namespaces[namespace]
 	if !ok {
 		return nil, NotFound

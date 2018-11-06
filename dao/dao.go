@@ -134,6 +134,12 @@ func UpdateRelease(release *Release) error {
 func GetRelease(namespace, name, releaseId string) (*Release, error) {
 	return GlobalDAO.GetRelease(namespace, name, releaseId)
 }
+func GetReleaseByTag(namespace, name, tag string) (*Release, error) {
+	return GlobalDAO.GetReleaseByTag(namespace, name, tag)
+}
+func TagRelease(release *Release, tag string) error {
+	return GlobalDAO.TagRelease(release, tag)
+}
 
 func GetProviders(providerName string) (map[string]*MinimalReleaseMetadata, error) {
 	return GlobalDAO.GetProviders(providerName)

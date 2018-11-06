@@ -98,6 +98,14 @@ func NewQLDAO(path string) (DAO, error) {
 		GetAllReleasesQuery:                             "SELECT project, metadata, processed_dependencies, downloads, uploaded_by, uploaded_at FROM release",
 		GetAllReleasesWithoutProcessedDependenciesQuery: `SELECT project, metadata, processed_dependencies, downloads, uploaded_by, uploaded_at FROM release WHERE processed_dependencies = false`,
 		FindAllVersionsQuery:                            "SELECT version FROM release WHERE project = $1 AND name = $2",
+		GetReleaseByTagQuery: `SELECT r.metadata, r.processed_dependencies, r.downloads, r.uploaded_by, r.uploaded_at 
+							    FROM release AS r, release_tags AS rt 
+								WHERE rt.project = $1 AND rt.application = $2 AND rt.tag = $3 
+								  AND rt.version = r.version 
+								  AND rt.project = r.project 
+								  AND rt.application = r.name`,
+		AddReleaseTagQuery:    `INSERT INTO release_tags(project, application, tag, version) VALUES ($1, $2, $3, $4)`,
+		UpdateReleaseTagQuery: `UPDATE release_tags SET version = $4 WHERE project = $1 AND application = $2 AND tag = $3`,
 
 		GetPackageURIsQuery: "SELECT uri FROM package WHERE project = $1 AND release_id = $2",
 		AddPackageURIQuery:  "INSERT INTO package (project, release_id, uri) VALUES ($1, $2, $3)",

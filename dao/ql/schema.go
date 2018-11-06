@@ -10,6 +10,7 @@
 // dao/ql/schemas/5_feeds_application_field.up.sql
 // dao/ql/schemas/6_providers.up.sql
 // dao/ql/schemas/7_remove_feeds.sql
+// dao/ql/schemas/8_release_tags.up.sql
 // DO NOT EDIT!
 
 package ql
@@ -277,6 +278,26 @@ func _7_remove_feedsSql() (*asset, error) {
 	return a, nil
 }
 
+var __8_release_tagsUpSql = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x54\x8e\x41\x0a\x83\x30\x14\x44\xf7\x39\xc5\x2c\x15\x72\x83\xae\x6c\xfb\x0b\x81\x12\x69\x8d\xe0\x4e\x82\x84\x90\x56\x34\x24\x9f\x9e\xbf\x54\x2c\x98\xed\x9b\x81\xf7\x2e\x4f\x6a\x0c\xc1\x34\xe7\x3b\x21\xb9\xd9\xd9\xec\x46\xb6\x3e\xa3\x12\x00\x10\xd3\xfa\x72\x13\x23\x73\x0a\x8b\x97\x1b\xb3\x31\xce\x61\xb2\x1c\xd6\xe5\xcf\xb1\x0d\x6c\x7d\x71\xfc\xb8\x94\x0f\x27\x51\x9f\x84\xd8\x85\xbd\x56\x8f\x9e\xa0\xf4\x95\x06\xa8\x1b\x74\x6b\x40\x83\xea\x4c\x57\x54\x8c\xf1\x8d\x56\x17\xa8\xda\x93\xe4\xb1\x43\xfe\xdc\xb5\xf8\x06\x00\x00\xff\xff\xb1\x73\xb8\x40\xce\x00\x00\x00")
+
+func _8_release_tagsUpSqlBytes() ([]byte, error) {
+	return bindataRead(
+		__8_release_tagsUpSql,
+		"8_release_tags.up.sql",
+	)
+}
+
+func _8_release_tagsUpSql() (*asset, error) {
+	bytes, err := _8_release_tagsUpSqlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "8_release_tags.up.sql", size: 206, mode: os.FileMode(436), modTime: time.Unix(1541517857, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
 // Asset loads and returns the asset for the given name.
 // It returns an error if the asset could not be found or
 // could not be loaded.
@@ -339,6 +360,7 @@ var _bindata = map[string]func() (*asset, error){
 	"5_feeds_application_field.up.sql": _5_feeds_application_fieldUpSql,
 	"6_providers.up.sql": _6_providersUpSql,
 	"7_remove_feeds.sql": _7_remove_feedsSql,
+	"8_release_tags.up.sql": _8_release_tagsUpSql,
 }
 
 // AssetDir returns the file names below a certain
@@ -391,6 +413,7 @@ var _bintree = &bintree{nil, map[string]*bintree{
 	"5_feeds_application_field.up.sql": &bintree{_5_feeds_application_fieldUpSql, map[string]*bintree{}},
 	"6_providers.up.sql": &bintree{_6_providersUpSql, map[string]*bintree{}},
 	"7_remove_feeds.sql": &bintree{_7_remove_feedsSql, map[string]*bintree{}},
+	"8_release_tags.up.sql": &bintree{_8_release_tagsUpSql, map[string]*bintree{}},
 }}
 
 // RestoreAsset restores an asset under the given directory
