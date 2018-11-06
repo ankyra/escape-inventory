@@ -26,7 +26,7 @@ import (
 )
 
 type downloadHandlerProvider struct {
-	GetDownloadReadSeeker func(namespace, releaseId string) (io.Reader, error)
+	GetDownloadReadSeeker func(namespace, name, version string) (io.Reader, error)
 }
 
 func newDownloadHandlerProvider() *downloadHandlerProvider {
@@ -43,9 +43,8 @@ func (h *downloadHandlerProvider) DownloadHandler(w http.ResponseWriter, r *http
 	namespace := mux.Vars(r)["namespace"]
 	name := mux.Vars(r)["name"]
 	version := mux.Vars(r)["version"]
-	releaseId := name + "-" + version
-	filename := releaseId + ".tgz"
-	reader, err := h.GetDownloadReadSeeker(namespace, releaseId)
+	filename := name + "-" + version + ".tgz"
+	reader, err := h.GetDownloadReadSeeker(namespace, name, version)
 	if err != nil {
 		HandleError(w, r, err)
 		return

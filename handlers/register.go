@@ -17,6 +17,8 @@ limitations under the License.
 package handlers
 
 import (
+	"encoding/json"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -29,17 +31,22 @@ import (
 type registerHandlerProvider struct {
 	AddReleaseByUser func(namespace, metadata, username string) (*core.ReleaseMetadata, error)
 	ReadRequestBody  func(body io.Reader) ([]byte, error)
+	TagRelease       func(namespace, application, releaseId, tag string) error
 }
 
 func newRegisterHandlerProvider() *registerHandlerProvider {
 	return &registerHandlerProvider{
 		AddReleaseByUser: model.AddReleaseByUser,
 		ReadRequestBody:  ioutil.ReadAll,
+		TagRelease:       model.TagRelease,
 	}
 }
 
 func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	newRegisterHandlerProvider().RegisterHandler(w, r)
+}
+func TagReleaseHandler(w http.ResponseWriter, r *http.Request) {
+	newRegisterHandlerProvider().TagReleaseHandler(w, r)
 }
 
 func (h *registerHandlerProvider) RegisterHandler(w http.ResponseWriter, r *http.Request) {
@@ -55,4 +62,21 @@ func (h *registerHandlerProvider) RegisterHandler(w http.ResponseWriter, r *http
 		return
 	}
 	w.WriteHeader(200)
+}
+
+type TagReleaseRequest struct {
+	Tag       string `json:"tag"`
+	ReleaseID string `json:"release_id"`
+}
+
+func (h *registerHandlerProvider) TagReleaseHandler(w http.ResponseWriter, r *http.Request) {
+	namespace := mux.Vars(r)["namespace"]
+	name := mux.Vars(r)["name"]
+	req := TagReleaseRequest{}
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		HandleError(w, r, model.NewUserError(fmt.Errorf("Invalid JSON")))
+		return
+	}
+	err := h.TagRelease(namespace, name, req.ReleaseID, req.Tag)
+	ErrorOrSuccess(w, r, err)
 }

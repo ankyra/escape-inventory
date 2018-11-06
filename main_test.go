@@ -89,6 +89,7 @@ const (
 )
 
 func testRequest(c *C, req *http.Request, expectedStatus int) {
+	rr = httptest.NewRecorder()
 	handler.ServeHTTP(rr, req)
 	c.Assert(rr.Code, DeepEquals, expectedStatus, Commentf("%s Responded with body '%s'", req.URL, rr.Body.String()))
 }
@@ -98,7 +99,6 @@ func (s *suite) addRelease(c *C, project, version string) {
 	body := bytes.NewReader([]byte(`{"name": "my-app", "version": "` + version + `", "project": "` + project + `"}`))
 	req, _ := http.NewRequest("POST", "/api/v1/inventory/"+project+"/register", body)
 	testRequest(c, req, 200)
-	rr = httptest.NewRecorder()
 }
 
 func (s *suite) Test_Register_fails_with_invalid_json(c *C) {
@@ -120,7 +120,6 @@ func (s *suite) Test_Register_fails_if_required_fields_are_missing(c *C) {
 		body := bytes.NewReader([]byte(testCase))
 		req, _ := http.NewRequest("POST", registerEndpoint, body)
 		testRequest(c, req, 400)
-		rr = httptest.NewRecorder()
 	}
 }
 
@@ -244,9 +243,39 @@ func (s *suite) Test_GetVersions_fails_if_app_not_found(c *C) {
 	s.addRelease(c, applicationVersionsTestProject, "2")
 	req, _ := http.NewRequest("GET", applicationVersionsNoApp, nil)
 	testRequest(c, req, 404)
-	rr = httptest.NewRecorder()
 	req, _ = http.NewRequest("GET", applicationVersionsNoProject, nil)
 	testRequest(c, req, 404)
+}
+
+func (s *suite) Test_TagRelease(c *C) {
+	s.addRelease(c, "some-project", "1.0")
+	s.addRelease(c, "some-project", "1.1")
+	testCase := `{ "release_id": "some-project/my-app-v1.0", "tag": "production" }`
+	body := bytes.NewReader([]byte(testCase))
+
+	req, _ := http.NewRequest("GET", "/api/v1/inventory/some-project/units/my-app/versions/production/", body)
+	testRequest(c, req, 404)
+
+	req, _ = http.NewRequest("POST", "/api/v1/inventory/some-project/units/my-app/tags/", body)
+	testRequest(c, req, 200)
+
+	body = bytes.NewReader([]byte(testCase))
+	req, _ = http.NewRequest("POST", "/api/v1/inventory/some-project/units/my-app/tags/", body)
+	testRequest(c, req, 200)
+
+	req, _ = http.NewRequest("GET", "/api/v1/inventory/some-project/units/my-app/versions/production/", body)
+	testRequest(c, req, 200)
+}
+
+func (s *suite) Test_TagRelease_requires_parameters_to_be_set(c *C) {
+	s.addRelease(c, "some-project", "1.0")
+	s.addRelease(c, "some-project", "1.1")
+	testCases := []string{`{}`, `{"release_id": "test"}`, `{"tag": "test"}`}
+	for _, testCase := range testCases {
+		body := bytes.NewReader([]byte(testCase))
+		req, _ := http.NewRequest("POST", "/api/v1/inventory/some-project/units/my-app/tags/", body)
+		testRequest(c, req, 400)
+	}
 }
 
 func (s *suite) Test_NextVersion(c *C) {
@@ -324,11 +353,9 @@ func (s *suite) Test_GetPreviousVersion(c *C) {
 	c.Assert(result["version"], Equals, "0.0.1")
 
 	req, _ = http.NewRequest("GET", getPreviousEndpoint2, nil)
-	rr = httptest.NewRecorder()
 	testRequest(c, req, http.StatusNotFound)
 
 	req, _ = http.NewRequest("GET", getPreviousEndpoint3, nil)
-	rr = httptest.NewRecorder()
 	testRequest(c, req, http.StatusOK)
 	err = json.Unmarshal([]byte(rr.Body.String()), &result)
 	c.Assert(err, IsNil)
@@ -350,7 +377,6 @@ func (s *suite) Test_Diff(c *C) {
 	c.Assert(result["Version"]["change"][0]["NewValue"], Equals, "0.0.2")
 
 	req, _ = http.NewRequest("GET", getDiffWithEndpoint, nil)
-	rr = httptest.NewRecorder()
 	testRequest(c, req, http.StatusOK)
 	err = json.Unmarshal([]byte(rr.Body.String()), &result)
 	c.Assert(err, IsNil)
@@ -377,21 +403,6 @@ func (s *suite) Test_GetVersion_fails_if_version_doesnt_exist(c *C) {
 	for _, v := range versions {
 		req, _ := http.NewRequest("GET", "/api/v1/inventory/"+getVersionProject+"/units/my-app/versions/"+v+"/", nil)
 		testRequest(c, req, 404)
-		rr = httptest.NewRecorder()
-	}
-}
-
-func (s *suite) Test_GetVersion_fails_if_version_format_invalid(c *C) {
-	versions := []string{
-		"asd1@",
-		"v12asdpokasdk",
-		"null",
-		"1.-",
-	}
-	for _, v := range versions {
-		req, _ := http.NewRequest("GET", "/api/v1/inventory/"+getVersionProject+"/units/my-app/versions/"+v+"/", nil)
-		testRequest(c, req, 400)
-		rr = httptest.NewRecorder()
 	}
 }
 
@@ -409,7 +420,6 @@ func (s *suite) Test_HardDeleteProject(c *C) {
 	s.addRelease(c, "project1", "1")
 	s.addRelease(c, "project2", "2")
 	req, _ := http.NewRequest("GET", getProjectsEndpoints, nil)
-	rr = httptest.NewRecorder()
 	testRequest(c, req, http.StatusOK)
 	result := map[string]map[string]string{}
 	err := json.Unmarshal([]byte(rr.Body.String()), &result)
@@ -417,11 +427,9 @@ func (s *suite) Test_HardDeleteProject(c *C) {
 	c.Assert(result, HasLen, 2)
 
 	req, _ = http.NewRequest("DELETE", "/api/v1/inventory/project1/hard-delete", nil)
-	rr = httptest.NewRecorder()
 	testRequest(c, req, 200)
 
 	req, _ = http.NewRequest("GET", getProjectsEndpoints, nil)
-	rr = httptest.NewRecorder()
 	testRequest(c, req, http.StatusOK)
 	result = map[string]map[string]string{}
 	err = json.Unmarshal([]byte(rr.Body.String()), &result)

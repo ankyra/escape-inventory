@@ -6,8 +6,7 @@ import (
 )
 
 func GetDownstreamDependencies(namespace, name, version string) ([]*types.Dependency, error) {
-	releaseId := name + "-" + version
-	release, err := ResolveReleaseId(namespace, releaseId)
+	release, err := ResolveReleaseId(namespace, name, version)
 	if err != nil {
 		return nil, err
 	}
@@ -15,8 +14,7 @@ func GetDownstreamDependencies(namespace, name, version string) ([]*types.Depend
 }
 
 func GetDownstreamDependenciesFilteredBy(namespace, name, version string, f *types.DownstreamDependenciesFilter) ([]*types.Dependency, error) {
-	releaseId := name + "-" + version
-	release, err := ResolveReleaseId(namespace, releaseId)
+	release, err := ResolveReleaseId(namespace, name, version)
 	if err != nil {
 		return nil, err
 	}
@@ -61,8 +59,7 @@ func GetDependencyGraph(namespace, name, version string, downstreamFunc Downstre
 		Nodes: []*DependencyGraphNode{},
 		Edges: []*DependencyGraphEdge{},
 	}
-	releaseId := name + "-" + version
-	release, err := ResolveReleaseId(namespace, releaseId)
+	release, err := ResolveReleaseId(namespace, name, version)
 	if err != nil {
 		return nil, err
 	}

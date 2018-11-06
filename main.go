@@ -56,6 +56,7 @@ var DeleteRoutes = map[string]http.HandlerFunc{
 var WriteRoutes = map[string]http.HandlerFunc{
 	"/api/v1/inventory/{namespace}/add-namespace":                          handlers.AddNamespaceHandler,
 	"/api/v1/inventory/{namespace}/register":                               handlers.RegisterHandler,
+	"/api/v1/inventory/{namespace}/units/{name}/tags/":                     handlers.TagReleaseHandler,
 	"/api/v1/inventory/{namespace}/units/{name}/versions/{version}/upload": handlers.UploadHandler,
 }
 

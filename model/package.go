@@ -43,8 +43,8 @@ func UploadPackage(namespace, releaseId string, pkg io.ReadSeeker) error {
 	return newStorageProvider().UploadPackage(namespace, releaseId, pkg)
 }
 
-func GetDownloadReadSeeker(namespace, releaseId string) (io.Reader, error) {
-	return newStorageProvider().GetDownloadReadSeeker(namespace, releaseId)
+func GetDownloadReadSeeker(namespace, application, versionQuery string) (io.Reader, error) {
+	return newStorageProvider().GetDownloadReadSeeker(namespace, application, versionQuery)
 }
 
 func (s *storageProvider) UploadPackage(namespace, releaseId string, pkg io.ReadSeeker) error {
@@ -66,8 +66,8 @@ func (s *storageProvider) UploadPackage(namespace, releaseId string, pkg io.Read
 	return dao.AddPackageURI(release, uri)
 }
 
-func (s *storageProvider) GetDownloadReadSeeker(namespace, releaseId string) (io.Reader, error) {
-	release, err := ResolveReleaseId(namespace, releaseId)
+func (s *storageProvider) GetDownloadReadSeeker(namespace, application, versionQuery string) (io.Reader, error) {
+	release, err := ResolveReleaseId(namespace, application, versionQuery)
 	if err != nil {
 		return nil, err
 	}

@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"strings"
 	"time"
+	"unicode"
 
 	"github.com/ankyra/escape-core"
 	"github.com/ankyra/escape-core/parsers"
@@ -181,8 +182,7 @@ type ReleasePayload struct {
 }
 
 func GetRelease(namespace, name, version string) (*ReleasePayload, error) {
-	releaseIdString := name + "-" + version
-	release, err := ResolveReleaseId(namespace, releaseIdString)
+	release, err := ResolveReleaseId(namespace, name, version)
 	if err != nil {
 		return nil, err
 	}
@@ -203,35 +203,55 @@ func GetRelease(namespace, name, version string) (*ReleasePayload, error) {
 }
 
 func GetReleaseMetadata(namespace, name, version string) (*core.ReleaseMetadata, error) {
-	releaseIdString := name + "-v" + version
-	if strings.HasPrefix(version, "v") || version == "latest" {
-		releaseIdString = name + "-" + version
-	}
-	release, err := ResolveReleaseId(namespace, releaseIdString)
+	release, err := ResolveReleaseId(namespace, name, version)
 	if err != nil {
 		return nil, err
 	}
 	return release.Metadata, nil
 }
 
-func ResolveReleaseId(namespace, releaseIdString string) (*Release, error) {
-	releaseId, err := parsers.ParseReleaseId(releaseIdString)
+func ResolveReleaseId(namespace, application, versionQuery string) (*Release, error) {
+	if strings.HasPrefix(versionQuery, "v") {
+		versionQuery = versionQuery[1:]
+	}
+	if versionQuery == "" {
+		return nil, NewUserError(fmt.Errorf("Missing version query"))
+	}
+	if versionQuery == "latest" {
+		version, err := getLastVersionForPrefix(namespace, application, "")
+		if err != nil {
+			return nil, NewUserError(err)
+		}
+		versionQuery = version.ToString()
+	} else if strings.HasSuffix(versionQuery, ".@") {
+		prefix := versionQuery[:len(versionQuery)-1]
+		version, err := getLastVersionForPrefix(namespace, application, prefix)
+		if err != nil {
+			return nil, NewUserError(err)
+		}
+		versionQuery = prefix + version.ToString()
+	} else if !unicode.IsDigit(rune(versionQuery[0])) {
+		fmt.Println("getting by tag", namespace, application, versionQuery)
+		return dao.GetReleaseByTag(namespace, application, versionQuery)
+	}
+	fmt.Println("looking for", namespace, application, versionQuery)
+	return dao.GetRelease(namespace, application, application+"-v"+versionQuery)
+}
+
+func TagRelease(namespace, application, releaseId, tag string) error {
+	parsed, err := parsers.ParseQualifiedReleaseId(releaseId)
 	if err != nil {
-		return nil, NewUserError(err)
+		return NewUserError(err)
 	}
-	if releaseId.Version == "latest" {
-		version, err := getLastVersionForPrefix(namespace, releaseId.Name, "")
-		if err != nil {
-			return nil, NewUserError(err)
-		}
-		releaseId.Version = version.ToString()
-	} else if strings.HasSuffix(releaseId.Version, ".@") {
-		prefix := releaseId.Version[:len(releaseId.Version)-1]
-		version, err := getLastVersionForPrefix(namespace, releaseId.Name, prefix)
-		if err != nil {
-			return nil, NewUserError(err)
-		}
-		releaseId.Version = prefix + version.ToString()
+	if parsed.Project != namespace {
+		return NewUserError(fmt.Errorf("Mismatch between namespace from URL and namespace from release_id."))
 	}
-	return dao.GetRelease(namespace, releaseId.Name, releaseId.ToString())
+	if parsed.Name != application {
+		return NewUserError(fmt.Errorf("Mismatch between application from URL and application from release_id."))
+	}
+	release, err := ResolveReleaseId(namespace, application, parsed.Version)
+	if err != nil {
+		return err
+	}
+	return dao.TagRelease(release, tag)
 }
