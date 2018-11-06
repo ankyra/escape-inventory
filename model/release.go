@@ -24,7 +24,6 @@ import (
 	"github.com/ankyra/escape-core/parsers"
 	"github.com/ankyra/escape-inventory/dao"
 	. "github.com/ankyra/escape-inventory/dao/types"
-	"github.com/ankyra/escape-middleware/errors"
 )
 
 func ensureNamespaceExists(namespace, username string) error {
@@ -231,7 +230,7 @@ func ResolveReleaseId(namespace, application, versionQuery string) (*Release, er
 	} else if vq.SpecificTag != "" {
 		return dao.GetReleaseByTag(namespace, application, vq.SpecificTag)
 	} else {
-		return nil, errors.NewUserError("Unsupported version query")
+		return nil, NewUserError("Unsupported version query")
 	}
 	return dao.GetRelease(namespace, application, application+"-v"+versionQuery)
 }
