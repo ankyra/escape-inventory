@@ -170,12 +170,6 @@ paths:
       operationId: nextVersion
       responses:
         "200": {}
-  /api/v1/inventory/{namespace}/feed:
-    get:
-      summary: "Get namespace feed."
-      operationId: projectFeed
-      responses:
-        "200": {}
   /api/v1/inventory/{namespace}/register:
     post:
       summary: "Register a new version"
@@ -197,13 +191,6 @@ paths:
     put:
       summary: "Update Inventory namespace hooks."
       operationId: updateNamespaceHooks
-      responses:
-        "200": {}
-
-  /api/v1/inventory/__feed:
-    get:
-      summary: "Get the event feed."
-      operationId: feed
       responses:
         "200": {}
   /api/v1/inventory/__providers:
