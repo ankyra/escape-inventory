@@ -85,6 +85,7 @@ func (s *memSuite) Test_DAO_migrate(c *C) {
 		db, err := sql.Open("postgres", url)
 		c.Assert(err, IsNil)
 		_, err = db.Exec(`DROP TABLE release CASCADE`)
+		_, err = db.Exec(`DROP TABLE release_tags CASCADE`)
 		_, err = db.Exec(`DROP TABLE package CASCADE`)
 		_, err = db.Exec(`DROP TABLE acl CASCADE`)
 		_, err = db.Exec(`DROP TABLE application CASCADE`)

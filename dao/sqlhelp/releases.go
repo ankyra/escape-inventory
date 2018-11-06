@@ -57,6 +57,26 @@ func (s *SQLHelper) GetRelease(namespace, name, releaseId string) (*Release, err
 	return nil, NotFound
 }
 
+func (s *SQLHelper) GetReleaseByTag(namespace, name, tag string) (*Release, error) {
+	rows, err := s.PrepareAndQuery(s.GetReleaseByTagQuery, namespace, name, tag)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		return s.scanRelease(namespace, name, rows)
+	}
+	return nil, NotFound
+}
+
+func (s *SQLHelper) TagRelease(rel *Release, tag string) error {
+	err := s.PrepareAndExecUpdate(s.UpdateReleaseTagQuery, rel.Application.Project, rel.Application.Name, tag, rel.Version)
+	if err == NotFound {
+		err = s.PrepareAndExecInsert(s.AddReleaseTagQuery, rel.Application.Project, rel.Application.Name, tag, rel.Version)
+	}
+	return err
+}
+
 func (s *SQLHelper) GetAllReleases() ([]*Release, error) {
 	rows, err := s.PrepareAndQuery(s.GetAllReleasesQuery)
 	if err != nil {

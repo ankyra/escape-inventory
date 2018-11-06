@@ -153,6 +153,12 @@ func Validate_TagRelease(dao DAO, c *C) {
 
 	_, err = dao.GetReleaseByTag("notfound", "my-application", "latest")
 	c.Assert(err, DeepEquals, NotFound)
+
+	c.Assert(dao.TagRelease(r1, "updated-tag"), IsNil)
+	c.Assert(dao.TagRelease(r2, "updated-tag"), IsNil)
+	updated, err := dao.GetReleaseByTag("_", "my-application", "latest")
+	c.Assert(err, IsNil)
+	c.Assert(updated, DeepEquals, r2)
 }
 
 func Validate_GetNamespaces(dao DAO, c *C) {

@@ -95,6 +95,15 @@ func NewPostgresDAO(url string) (DAO, error) {
 		GetAllReleasesWithoutProcessedDependenciesQuery: `SELECT project, metadata, processed_dependencies, downloads, uploaded_by, uploaded_at FROM release WHERE processed_dependencies = 'false'`,
 		FindAllVersionsQuery:                            "SELECT version FROM release WHERE project = $1 AND name = $2",
 
+		GetReleaseByTagQuery: `SELECT metadata, processed_dependencies, downloads, uploaded_by, uploaded_at 
+							    FROM release, release_tags AS rt 
+								WHERE rt.project = $1 AND rt.application = $2 AND rt.tag = $3 
+								  AND rt.version = release.version 
+								  AND rt.project = release.project 
+								  AND rt.application = release.name`,
+		AddReleaseTagQuery:    `INSERT INTO release_tags(project, application, tag, version) VALUES ($1, $2, $3, $4)`,
+		UpdateReleaseTagQuery: `UPDATE release_tags SET version = $4 WHERE project = $1 AND application = $2 AND tag = $3`,
+
 		InsertDependencyQuery: `INSERT INTO release_dependency(project, name, version,
 										dep_project, dep_name, dep_version,
 										build_scope, deploy_scope, is_extension)
