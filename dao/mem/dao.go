@@ -23,6 +23,7 @@ import (
 type application struct {
 	App      *Application
 	Releases map[string]*release
+	Tags     map[string]*release
 }
 
 type release struct {

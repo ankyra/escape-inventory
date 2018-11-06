@@ -20,6 +20,39 @@ func (a *dao) GetRelease(project, name, releaseId string) (*Release, error) {
 	return release.Release, nil
 }
 
+func (a *dao) GetReleaseByTag(project, name, tag string) (*Release, error) {
+	prj, ok := a.namespaces[project]
+	if !ok {
+		return nil, NotFound
+	}
+	app, ok := prj[name]
+	if !ok {
+		return nil, NotFound
+	}
+	release, ok := app.Tags[tag]
+	if !ok {
+		return nil, NotFound
+	}
+	return release.Release, nil
+}
+
+func (a *dao) TagRelease(rel *Release, tag string) error {
+	prj, ok := a.namespaces[rel.Application.Project]
+	if !ok {
+		return NotFound
+	}
+	app, ok := prj[rel.Application.Name]
+	if !ok {
+		return NotFound
+	}
+	release, ok := app.Releases[rel.ReleaseId]
+	if !ok {
+		return NotFound
+	}
+	app.Tags[tag] = release
+	return nil
+}
+
 func (a *dao) AddRelease(rel *Release) error {
 	apps, ok := a.namespaces[rel.Application.Project]
 	if !ok {

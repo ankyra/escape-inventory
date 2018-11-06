@@ -28,6 +28,7 @@ func ValidateDAO(dao func() DAO, c *C) {
 	Validate_AddRelease_Unique(dao(), c)
 	Validate_AddRelease_Unique_per_project(dao(), c)
 	Validate_AddRelease_Big_Metadata(dao(), c)
+	Validate_TagRelease(dao(), c)
 	Validate_GetRelease(dao(), c)
 	Validate_GetRelease_NotFound(dao(), c)
 	Validate_GetNamespaces(dao(), c)
@@ -122,6 +123,36 @@ func Validate_GetRelease(dao DAO, c *C) {
 func Validate_GetRelease_NotFound(dao DAO, c *C) {
 	_, err := dao.GetRelease("_", "archive-dao-val", "archive-dao-val-v1")
 	c.Assert(err, Equals, NotFound)
+}
+
+func Validate_TagRelease(dao DAO, c *C) {
+	r1 := addRelease(dao, c, "my-application", "1.0")
+	r2 := addRelease(dao, c, "my-application", "1.1")
+	c.Assert(dao.TagRelease(r1, "production"), IsNil)
+	c.Assert(dao.TagRelease(r2, "latest"), IsNil)
+	c.Assert(dao.TagRelease(r2, "ci"), IsNil)
+	c.Assert(dao.TagRelease(r2, "ci"), IsNil)
+
+	production, err := dao.GetReleaseByTag("_", "my-application", "production")
+	c.Assert(err, IsNil)
+	c.Assert(production, DeepEquals, r1)
+
+	latest, err := dao.GetReleaseByTag("_", "my-application", "latest")
+	c.Assert(err, IsNil)
+	c.Assert(latest, DeepEquals, r2)
+
+	ci, err := dao.GetReleaseByTag("_", "my-application", "ci")
+	c.Assert(err, IsNil)
+	c.Assert(ci, DeepEquals, r2)
+
+	_, err = dao.GetReleaseByTag("_", "my-application", "not_found")
+	c.Assert(err, DeepEquals, NotFound)
+
+	_, err = dao.GetReleaseByTag("_", "not_found", "latest")
+	c.Assert(err, DeepEquals, NotFound)
+
+	_, err = dao.GetReleaseByTag("notfound", "my-application", "latest")
+	c.Assert(err, DeepEquals, NotFound)
 }
 
 func Validate_GetNamespaces(dao DAO, c *C) {

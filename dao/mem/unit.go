@@ -45,7 +45,7 @@ func (a *dao) AddApplication(app *Application) error {
 	if ok {
 		return AlreadyExists
 	}
-	apps[app.Name] = &application{app, map[string]*release{}}
+	apps[app.Name] = &application{app, map[string]*release{}, map[string]*release{}}
 	a.apps[app] = apps[app.Name]
 	a.applicationHooks[app] = NewHooks()
 	return nil
@@ -59,7 +59,7 @@ func (a *dao) UpdateApplication(app *Application) error {
 	if !ok {
 		return NotFound
 	}
-	apps[app.Name] = &application{app, proj.Releases}
+	apps[app.Name] = &application{app, proj.Releases, proj.Tags}
 	a.apps[app] = apps[app.Name]
 	return nil
 }

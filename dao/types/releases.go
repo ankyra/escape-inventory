@@ -24,6 +24,8 @@ import (
 
 type ReleasesDAO interface {
 	GetRelease(namespace, name, releaseId string) (*Release, error)
+	GetReleaseByTag(namespace, name, tag string) (*Release, error)
+	TagRelease(release *Release, tag string) error
 	AddRelease(*Release) error
 	UpdateRelease(*Release) error
 	GetAllReleases() ([]*Release, error)
