@@ -102,7 +102,7 @@ func (s *appSuite) Test_DownloadPackage_happy_path(c *C) {
 	c.Assert(err, IsNil)
 	err = dao.AddPackageURI(release, "mem://namespace/name-v1.0.0.tar.gz")
 	c.Assert(err, IsNil)
-	reader, err := storage.GetDownloadReadSeeker("namespace", "name-v1.0.0")
+	reader, err := storage.GetDownloadReadSeeker("namespace", "name", "v1.0.0")
 	c.Assert(err, IsNil)
 	data, err := ioutil.ReadAll(reader)
 	c.Assert(err, IsNil)
@@ -111,7 +111,7 @@ func (s *appSuite) Test_DownloadPackage_happy_path(c *C) {
 
 func (s *appSuite) Test_DownloadPackage_fails_if_release_not_found(c *C) {
 	dao.TestSetup()
-	_, err := GetDownloadReadSeeker("namespace", "name-v1.0.0")
+	_, err := GetDownloadReadSeeker("namespace", "name", "1.0.0")
 	c.Assert(err, Not(IsNil))
 	c.Assert(err.Error(), Equals, "Not found")
 }
@@ -120,7 +120,7 @@ func (s *appSuite) Test_DownloadPackage_fails_if_uri_not_found(c *C) {
 	dao.TestSetup()
 	_, err := AddRelease("namespace", `{"name": "name", "version": "1.0.0"}`)
 	c.Assert(err, IsNil)
-	_, err = GetDownloadReadSeeker("namespace", "name-v1.0.0")
+	_, err = GetDownloadReadSeeker("namespace", "name", "1.0.0")
 	c.Assert(err, Not(IsNil))
 	c.Assert(err.Error(), Equals, "Not found")
 }
@@ -138,7 +138,7 @@ func (s *appSuite) Test_DownloadPackage_fails_if_download_fails(c *C) {
 	c.Assert(err, IsNil)
 	err = dao.AddPackageURI(release, "mem://namespace/name-v1.0.0.tar.gz")
 	c.Assert(err, IsNil)
-	_, err = storage.GetDownloadReadSeeker("namespace", "name-v1.0.0")
+	_, err = storage.GetDownloadReadSeeker("namespace", "name", "1.0.0")
 	c.Assert(err, Not(IsNil))
 	c.Assert(err.Error(), Equals, "Download error")
 }

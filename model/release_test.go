@@ -126,7 +126,7 @@ func (s *releaseSuite) Test_AddRelease_Updates_Application_Metadata(c *C) {
 func (s *releaseSuite) Test_AddRelease_Processes_Dependencies(c *C) {
 	_, err := AddRelease("test", `{"name": "up-test", "version": "1", "project": "test"}`)
 	c.Assert(err, IsNil)
-	release, err := ResolveReleaseId("test", "up-test-v1")
+	release, err := ResolveReleaseId("test", "up-test", "v1")
 	c.Assert(err, IsNil)
 	c.Assert(release.ProcessedDependencies, Equals, true)
 }
@@ -144,7 +144,7 @@ func (s *releaseSuite) Test_AddRelease_Processes_Dependencies_2(c *C) {
 									 }]
 								 }`)
 	c.Assert(err, IsNil)
-	release, err := ResolveReleaseId("test", "up-test-v1")
+	release, err := ResolveReleaseId("test", "up-test", "v1")
 	c.Assert(err, IsNil)
 	c.Assert(release.ProcessedDependencies, Equals, true)
 	deps, err := dao.GetDependencies(release)

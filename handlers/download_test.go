@@ -46,7 +46,7 @@ func (s *suite) downloadMuxWithProvider(provider *downloadHandlerProvider) *mux.
 func (s *suite) Test_DownloadHandler_happy_path(c *C) {
 
 	provider := &downloadHandlerProvider{
-		GetDownloadReadSeeker: func(namespace, releaseId string) (io.Reader, error) {
+		GetDownloadReadSeeker: func(namespace, name, version string) (io.Reader, error) {
 			return bytes.NewReader([]byte("package data")), nil
 		},
 	}
@@ -61,7 +61,7 @@ func (s *suite) Test_DownloadHandler_happy_path(c *C) {
 
 func (s *suite) Test_DownloadHandler_fails_if_download_fails(c *C) {
 	provider := &downloadHandlerProvider{
-		GetDownloadReadSeeker: func(namespace, releaseId string) (io.Reader, error) {
+		GetDownloadReadSeeker: func(namespace, name, version string) (io.Reader, error) {
 			return nil, types.NotFound
 		},
 	}
