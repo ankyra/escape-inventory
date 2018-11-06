@@ -42,6 +42,13 @@ func (s *SQLHelper) GetDependencies(release *Release) ([]*Dependency, error) {
 	return s.scanDependencies(rows)
 }
 
+func (s *SQLHelper) SetDependencyTree(release *Release, depends []*DependencyTree) error {
+	return nil
+}
+func (s *SQLHelper) GetDependencyTree(release *Release) ([]*DependencyTree, error) {
+	return nil, nil
+}
+
 func (s *SQLHelper) GetDownstreamDependencies(release *Release) ([]*Dependency, error) {
 	rows, err := s.PrepareAndQuery(s.GetDownstreamDependenciesQuery,
 		release.Application.Project,

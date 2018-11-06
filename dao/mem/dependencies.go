@@ -28,6 +28,13 @@ func (a *dao) GetDependencies(release *Release) ([]*Dependency, error) {
 	return r.Dependencies, nil
 }
 
+func (a *dao) SetDependencyTree(release *Release, depends []*DependencyTree) error {
+	return nil
+}
+func (a *dao) GetDependencyTree(release *Release) ([]*DependencyTree, error) {
+	return nil, nil
+}
+
 func (a *dao) GetDownstreamDependencies(release *Release) ([]*Dependency, error) {
 	project := release.Application.Project
 	app := release.Application.Name

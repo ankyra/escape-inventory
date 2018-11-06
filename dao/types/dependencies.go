@@ -22,6 +22,8 @@ type DependenciesDAO interface {
 	GetDependencies(*Release) ([]*Dependency, error)
 	GetDownstreamDependencies(*Release) ([]*Dependency, error)
 	GetDownstreamDependenciesFilteredBy(*Release, *DownstreamDependenciesFilter) ([]*Dependency, error)
+	SetDependencyTree(*Release, []*DependencyTree) error
+	GetDependencyTree(*Release) ([]*DependencyTree, error)
 }
 
 type Dependency struct {
@@ -48,5 +50,17 @@ type DownstreamDependenciesFilter struct {
 func NewDownstreamDependenciesFilter(namespaces []string) *DownstreamDependenciesFilter {
 	return &DownstreamDependenciesFilter{
 		Namespaces: namespaces,
+	}
+}
+
+type DependencyTree struct {
+	Dependency *Dependency       `json:"dependency"`
+	Children   []*DependencyTree `json:"children"`
+}
+
+func NewDependencyTree(d *Dependency) *DependencyTree {
+	return &DependencyTree{
+		Dependency: d,
+		Children:   []*DependencyTree{},
 	}
 }
