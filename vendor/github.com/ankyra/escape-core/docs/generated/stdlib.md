@@ -17,11 +17,21 @@ h2 {
 Standard library functions for the [Escape Scripting Language](../scripting-language/)
 
 
+# Functions acting on integers
+
+## add(y :: integer)
+
+Add two integers
+
+
+# Unary functions
+
+## timestamp()
+
+Returns a UNIX timestamp
+
+
 # Functions acting on bool
-
-## not()
-
-Logical NOT operation
 
 ## and(b2 :: bool)
 
@@ -30,6 +40,10 @@ Logical AND operation
 ## or(b2 :: bool)
 
 Logical OR operation
+
+## not()
+
+Logical NOT operation
 
 
 # Functions acting on integer
@@ -53,13 +67,13 @@ Returns true if first argument is greater than or equal to second argument
 
 # Functions acting on everything
 
-## equals(parameter :: *)
-
-Returns true if the arguments are of the same type and have the same value
-
 ## id(parameter :: *)
 
 Returns its argument
+
+## equals(parameter :: *)
+
+Returns true if the arguments are of the same type and have the same value
 
 
 # Functions acting on lists
@@ -87,85 +101,71 @@ Slice a list. Usually accessed implicitly using slice syntax (eg. `list[0:5]`)
 
 # Functions acting on strings
 
-## track_minor_version()
+## file_exists()
 
-Track minor version
-
-## track_version()
-
-Track version
-
-## lower(v :: string)
-
-Returns a copy of the string v with all Unicode characters mapped to their lower case
-
-## replace(old :: string, new :: string, n :: integer)
-
-Replace returns a copy of the string s with the first n non-overlapping instances of old replaced by new. If old is empty, it matches at the beginning of the string and after each UTF-8 sequence, yielding up to k+1 replacements for a k-rune string. If n < 0, there is no limit on the number of replacements.
-
-## track_major_version()
-
-Track major version
-
-## base64_decode()
-
-Decode string from base64
-
-## read_file()
-
-Read the contents of a file
-
-## track_patch_version()
-
-Track patch version
-
-## split(sep :: string)
-
-Split slices s into all substrings separated by sep and returns a slice of the substrings between those separators. If sep is empty, Split splits after each UTF-8 sequence.
-
-## path_exists()
-
-Returns true if the path exists, false if not
-
-## base64_encode()
-
-Encode string to base64
-
-## trim()
-
-Returns a slice of the string s, with all leading and trailing white space removed, as defined by Unicode. 
-
-## concat(v1 :: string, v2 :: string, ...)
-
-Concatate stringable arguments
-
-## title(v :: string)
-
-Returns a copy of the string v with all Unicode characters mapped to their title case
+Returns true if the path exists and if it's not a directory, false otherwise
 
 ## dir_exists()
 
 Returns true if the path exists and if it is a directory, false otherwise
 
+## track_major_version()
+
+Track major version
+
 ## upper(v :: string)
 
 Returns a copy of the string v with all Unicode characters mapped to their upper case
 
-## file_exists()
+## track_minor_version()
 
-Returns true if the path exists and if it's not a directory, false otherwise
+Track minor version
 
+## track_patch_version()
 
-# Functions acting on integers
+Track patch version
 
-## add(y :: integer)
+## concat(v1 :: string, v2 :: string, ...)
 
-Add two integers
+Concatate stringable arguments
 
+## lower(v :: string)
 
-# Unary functions
+Returns a copy of the string v with all Unicode characters mapped to their lower case
 
-## timestamp()
+## title(v :: string)
 
-Returns a UNIX timestamp
+Returns a copy of the string v with all Unicode characters mapped to their title case
+
+## path_exists()
+
+Returns true if the path exists, false if not
+
+## read_file()
+
+Read the contents of a file
+
+## track_version()
+
+Track version
+
+## split(sep :: string)
+
+Split slices s into all substrings separated by sep and returns a slice of the substrings between those separators. If sep is empty, Split splits after each UTF-8 sequence.
+
+## replace(old :: string, new :: string, n :: integer)
+
+Replace returns a copy of the string s with the first n non-overlapping instances of old replaced by new. If old is empty, it matches at the beginning of the string and after each UTF-8 sequence, yielding up to k+1 replacements for a k-rune string. If n < 0, there is no limit on the number of replacements.
+
+## base64_encode()
+
+Encode string to base64
+
+## base64_decode()
+
+Decode string from base64
+
+## trim()
+
+Returns a slice of the string s, with all leading and trailing white space removed, as defined by Unicode. 
 

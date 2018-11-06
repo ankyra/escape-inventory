@@ -18,9 +18,7 @@ package model
 
 import (
 	"fmt"
-	"strings"
 	"time"
-	"unicode"
 
 	"github.com/ankyra/escape-core"
 	"github.com/ankyra/escape-core/parsers"
@@ -211,30 +209,27 @@ func GetReleaseMetadata(namespace, name, version string) (*core.ReleaseMetadata,
 }
 
 func ResolveReleaseId(namespace, application, versionQuery string) (*Release, error) {
-	if strings.HasPrefix(versionQuery, "v") {
-		versionQuery = versionQuery[1:]
+	vq, err := parsers.ParseVersionQuery(versionQuery)
+	if err != nil {
+		return nil, NewUserError(err)
 	}
-	if versionQuery == "" {
-		return nil, NewUserError(fmt.Errorf("Missing version query"))
-	}
-	if versionQuery == "latest" {
+	if vq.LatestVersion {
 		version, err := getLastVersionForPrefix(namespace, application, "")
 		if err != nil {
 			return nil, NewUserError(err)
 		}
 		versionQuery = version.ToString()
-	} else if strings.HasSuffix(versionQuery, ".@") {
-		prefix := versionQuery[:len(versionQuery)-1]
-		version, err := getLastVersionForPrefix(namespace, application, prefix)
+	} else if vq.VersionPrefix != "" {
+		version, err := getLastVersionForPrefix(namespace, application, vq.VersionPrefix)
 		if err != nil {
 			return nil, NewUserError(err)
 		}
-		versionQuery = prefix + version.ToString()
-	} else if !unicode.IsDigit(rune(versionQuery[0])) {
-		fmt.Println("getting by tag", namespace, application, versionQuery)
-		return dao.GetReleaseByTag(namespace, application, versionQuery)
+		versionQuery = vq.VersionPrefix + version.ToString()
+	} else if vq.SpecificVersion != "" {
+		versionQuery = vq.SpecificVersion
+	} else if vq.SpecificTag != "" {
+		return dao.GetReleaseByTag(namespace, application, vq.SpecificTag)
 	}
-	fmt.Println("looking for", namespace, application, versionQuery)
 	return dao.GetRelease(namespace, application, application+"-v"+versionQuery)
 }
 
