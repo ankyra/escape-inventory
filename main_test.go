@@ -405,15 +405,6 @@ func (s *suite) Test_HealthCheck(c *C) {
 	testRequest(c, req, 200)
 }
 
-func (s *suite) feed(c *C) []*types.FeedEvent {
-	req, _ := http.NewRequest("GET", "/api/v1/inventory/__feed", nil)
-	rr = httptest.NewRecorder()
-	testRequest(c, req, 200)
-	result := []*types.FeedEvent{}
-	c.Assert(json.Unmarshal([]byte(rr.Body.String()), &result), IsNil)
-	return result
-}
-
 func (s *suite) Test_HardDeleteProject(c *C) {
 	s.addRelease(c, "project1", "1")
 	s.addRelease(c, "project2", "2")
