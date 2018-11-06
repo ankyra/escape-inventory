@@ -20,26 +20,6 @@ import (
 	"fmt"
 )
 
-type Permission int
-
-const ReadPermission = Permission(1)
-const WritePermission = Permission(2)
-const OwnerPermission = Permission(3)
-const AdminPermission = Permission(4)
-
-func (p Permission) String() string {
-	if p == ReadPermission {
-		return "read"
-	} else if p == WritePermission {
-		return "write"
-	} else if p == OwnerPermission {
-		return "owner"
-	} else if p == AdminPermission {
-		return "admin"
-	}
-	return "???"
-}
-
 type Hooks map[string]map[string]string
 
 func NewHooks() Hooks {
