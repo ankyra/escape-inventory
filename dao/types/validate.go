@@ -49,6 +49,7 @@ func ValidateDAO(dao func() DAO, c *C) {
 	Validate_Providers(dao(), c)
 	Validate_ProvidersFilteredBy(dao(), c)
 	Validate_HardDeleteNamespace(dao(), c)
+	Validate_PublicNamespace(dao(), c)
 	Validate_WipeDatabase(dao(), c)
 }
 
@@ -780,7 +781,20 @@ func Validate_ProvidersFilteredBy(dao DAO, c *C) {
 	c.Assert(err, IsNil)
 	c.Assert(providers, HasLen, 1)
 	c.Assert(providers["_/application-v1.1"], Not(IsNil))
+}
 
+func Validate_PublicNamespace(dao DAO, c *C) {
+	project := NewProject("_")
+	project.IsPublic = true
+	c.Assert(dao.AddNamespace(project), IsNil)
+	daoNamespace, err := dao.GetNamespace("_")
+	c.Assert(err, IsNil)
+	c.Assert(daoNamespace.IsPublic, Equals, true)
+	project.IsPublic = false
+	c.Assert(dao.UpdateNamespace(project), IsNil)
+	daoNamespace, err = dao.GetNamespace("_")
+	c.Assert(err, IsNil)
+	c.Assert(daoNamespace.IsPublic, Equals, false)
 }
 
 func Validate_WipeDatabase(dao DAO, c *C) {

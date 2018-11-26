@@ -14,7 +14,8 @@ func (s *SQLHelper) AddNamespace(namespace *Project) error {
 		namespace.Name,
 		namespace.Description,
 		namespace.OrgURL,
-		namespace.Logo)
+		namespace.Logo,
+		namespace.IsPublic)
 }
 
 func (s *SQLHelper) UpdateNamespace(namespace *Project) error {
@@ -23,7 +24,8 @@ func (s *SQLHelper) UpdateNamespace(namespace *Project) error {
 		namespace.Description,
 		namespace.OrgURL,
 		namespace.Logo,
-		namespace.Name)
+		namespace.Name,
+		namespace.IsPublic)
 }
 
 func (s *SQLHelper) GetNamespaceHooks(namespace *Project) (Hooks, error) {
@@ -97,7 +99,8 @@ func (s *SQLHelper) GetNamespacesByNames(namespaces []string) (map[string]*Proje
 	result := map[string]*Project{}
 	for rows.Next() {
 		var name, description, orgURL, logo string
-		if err := rows.Scan(&name, &description, &orgURL, &logo); err != nil {
+		var isPublic bool
+		if err := rows.Scan(&name, &description, &orgURL, &logo, &isPublic); err != nil {
 			return nil, err
 		}
 		prj, ok := result[name]
@@ -108,6 +111,7 @@ func (s *SQLHelper) GetNamespacesByNames(namespaces []string) (map[string]*Proje
 				OrgURL:      orgURL,
 				Logo:        logo,
 				Permission:  "admin", // default permission for open source
+				IsPublic:    isPublic,
 			}
 		}
 		result[prj.Name] = prj
@@ -145,7 +149,8 @@ func (s *SQLHelper) GetNamespacesFilteredBy(f *NamespacesFilter) (map[string]*Pr
 	result := map[string]*Project{}
 	for rows.Next() {
 		var name, description, orgURL, logo string
-		if err := rows.Scan(&name, &description, &orgURL, &logo); err != nil {
+		var isPublic bool
+		if err := rows.Scan(&name, &description, &orgURL, &logo, &isPublic); err != nil {
 			return nil, err
 		}
 		prj, ok := result[name]
@@ -155,6 +160,7 @@ func (s *SQLHelper) GetNamespacesFilteredBy(f *NamespacesFilter) (map[string]*Pr
 				Description: description,
 				OrgURL:      orgURL,
 				Logo:        logo,
+				IsPublic:    isPublic,
 				Permission:  "admin", // default permission for open source
 			}
 		}
@@ -187,7 +193,8 @@ func (s *SQLHelper) HardDeleteNamespace(namespace string) error {
 
 func (s *SQLHelper) scanNamespace(rows *sql.Rows) (*Project, error) {
 	var name, description, orgURL, logo string
-	if err := rows.Scan(&name, &description, &orgURL, &logo); err != nil {
+	var isPublic bool
+	if err := rows.Scan(&name, &description, &orgURL, &logo, &isPublic); err != nil {
 		return nil, err
 	}
 	return &Project{
@@ -196,6 +203,7 @@ func (s *SQLHelper) scanNamespace(rows *sql.Rows) (*Project, error) {
 		OrgURL:      orgURL,
 		Logo:        logo,
 		Permission:  "admin", // default permission for open source
+		IsPublic:    isPublic,
 	}, nil
 }
 

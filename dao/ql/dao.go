@@ -63,11 +63,11 @@ func NewQLDAO(path string) (DAO, error) {
 	return &sqlhelp.SQLHelper{
 		DB: db,
 		UseNumericInsertMarks:     true,
-		GetProjectQuery:           `SELECT name, description, orgURL, logo FROM project WHERE name = $1`,
-		AddProjectQuery:           `INSERT INTO project(name, description, orgURL, logo) VALUES ($1, $2, $3, $4)`,
-		UpdateProjectQuery:        `UPDATE project SET name = $1, description = $2, orgURL = $3, logo = $4 WHERE name = $5`,
-		GetProjectsQuery:          `SELECT name, description, orgURL, logo FROM project`,
-		GetNamespacesByNamesQuery: `SELECT name, description, orgURL, logo FROM project WHERE name`,
+		GetProjectQuery:           `SELECT name, description, orgURL, logo, is_public FROM project WHERE name = $1`,
+		AddProjectQuery:           `INSERT INTO project(name, description, orgURL, logo, is_public) VALUES ($1, $2, $3, $4, $5)`,
+		UpdateProjectQuery:        `UPDATE project SET name = $1, description = $2, orgURL = $3, logo = $4, is_public = $6 WHERE name = $5`,
+		GetProjectsQuery:          `SELECT name, description, orgURL, logo, is_public FROM project`,
+		GetNamespacesByNamesQuery: `SELECT name, description, orgURL, logo, is_public FROM project WHERE name`,
 		GetProjectHooksQuery:      `SELECT hooks FROM project WHERE name = $1`,
 		SetProjectHooksQuery:      `UPDATE project SET hooks = $1 WHERE name = $2`,
 

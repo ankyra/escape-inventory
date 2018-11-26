@@ -140,7 +140,7 @@ func (s *suite) Test_GetProjects(c *C) {
 	req, _ := http.NewRequest("GET", getProjectsEndpoints, nil)
 	testRequest(c, req, http.StatusOK)
 
-	result := map[string]map[string]string{}
+	result := map[string]map[string]interface{}{}
 	err := json.Unmarshal([]byte(rr.Body.String()), &result)
 	c.Assert(err, IsNil)
 	c.Assert(result["project1"]["name"], Equals, "project1")
@@ -439,7 +439,7 @@ func (s *suite) Test_HardDeleteProject(c *C) {
 	s.addRelease(c, "project2", "2")
 	req, _ := http.NewRequest("GET", getProjectsEndpoints, nil)
 	testRequest(c, req, http.StatusOK)
-	result := map[string]map[string]string{}
+	result := map[string]map[string]interface{}{}
 	err := json.Unmarshal([]byte(rr.Body.String()), &result)
 	c.Assert(err, IsNil)
 	c.Assert(result, HasLen, 2)
@@ -449,7 +449,7 @@ func (s *suite) Test_HardDeleteProject(c *C) {
 
 	req, _ = http.NewRequest("GET", getProjectsEndpoints, nil)
 	testRequest(c, req, http.StatusOK)
-	result = map[string]map[string]string{}
+	result = map[string]map[string]interface{}{}
 	err = json.Unmarshal([]byte(rr.Body.String()), &result)
 	c.Assert(err, IsNil)
 	c.Assert(result, HasLen, 1)

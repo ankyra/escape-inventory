@@ -11,6 +11,7 @@
 // dao/ql/schemas/6_providers.up.sql
 // dao/ql/schemas/7_remove_feeds.sql
 // dao/ql/schemas/8_release_tags.up.sql
+// dao/ql/schemas/9_project_is_public.up.sql
 // DO NOT EDIT!
 
 package ql
@@ -93,7 +94,7 @@ func _1_initial_schemaDownSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "1_initial_schema.down.sql", size: 156, mode: os.FileMode(436), modTime: time.Unix(1511172530, 0)}
+	info := bindataFileInfo{name: "1_initial_schema.down.sql", size: 156, mode: os.FileMode(420), modTime: time.Unix(1511516577, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -113,7 +114,7 @@ func _1_initial_schemaUpSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "1_initial_schema.up.sql", size: 2050, mode: os.FileMode(436), modTime: time.Unix(1511174326, 0)}
+	info := bindataFileInfo{name: "1_initial_schema.up.sql", size: 2050, mode: os.FileMode(420), modTime: time.Unix(1511516577, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -133,7 +134,7 @@ func _2_metricsDownSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "2_metrics.down.sql", size: 43, mode: os.FileMode(436), modTime: time.Unix(1513361884, 0)}
+	info := bindataFileInfo{name: "2_metrics.down.sql", size: 43, mode: os.FileMode(420), modTime: time.Unix(1515079328, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -153,7 +154,7 @@ func _2_metricsUpSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "2_metrics.up.sql", size: 149, mode: os.FileMode(436), modTime: time.Unix(1513361866, 0)}
+	info := bindataFileInfo{name: "2_metrics.up.sql", size: 149, mode: os.FileMode(420), modTime: time.Unix(1515079328, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -173,7 +174,7 @@ func _3_metrics_user_idDownSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "3_metrics_user_id.down.sql", size: 193, mode: os.FileMode(436), modTime: time.Unix(1515082092, 0)}
+	info := bindataFileInfo{name: "3_metrics_user_id.down.sql", size: 193, mode: os.FileMode(420), modTime: time.Unix(1515081776, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -193,7 +194,7 @@ func _3_metrics_user_idUpSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "3_metrics_user_id.up.sql", size: 191, mode: os.FileMode(436), modTime: time.Unix(1515082092, 0)}
+	info := bindataFileInfo{name: "3_metrics_user_id.up.sql", size: 191, mode: os.FileMode(420), modTime: time.Unix(1515081776, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -213,7 +214,7 @@ func _4_feedsUpSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "4_feeds.up.sql", size: 247, mode: os.FileMode(436), modTime: time.Unix(1517441980, 0)}
+	info := bindataFileInfo{name: "4_feeds.up.sql", size: 247, mode: os.FileMode(420), modTime: time.Unix(1515506470, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -233,7 +234,7 @@ func _5_feeds_application_fieldUpSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "5_feeds_application_field.up.sql", size: 1101, mode: os.FileMode(436), modTime: time.Unix(1517443069, 0)}
+	info := bindataFileInfo{name: "5_feeds_application_field.up.sql", size: 1101, mode: os.FileMode(420), modTime: time.Unix(1519986076, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -253,7 +254,7 @@ func _6_providersUpSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "6_providers.up.sql", size: 231, mode: os.FileMode(436), modTime: time.Unix(1519703747, 0)}
+	info := bindataFileInfo{name: "6_providers.up.sql", size: 231, mode: os.FileMode(420), modTime: time.Unix(1519986076, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -273,7 +274,7 @@ func _7_remove_feedsSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "7_remove_feeds.sql", size: 23, mode: os.FileMode(436), modTime: time.Unix(1523274619, 0)}
+	info := bindataFileInfo{name: "7_remove_feeds.sql", size: 23, mode: os.FileMode(420), modTime: time.Unix(1523264617, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -293,7 +294,27 @@ func _8_release_tagsUpSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "8_release_tags.up.sql", size: 206, mode: os.FileMode(436), modTime: time.Unix(1541517857, 0)}
+	info := bindataFileInfo{name: "8_release_tags.up.sql", size: 206, mode: os.FileMode(436), modTime: time.Unix(1543240430, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var __9_project_is_publicUpSql = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\xcc\x92\xb1\x6e\xc2\x30\x10\x86\x67\xfb\x29\x7e\x31\x81\x94\x37\xc8\x64\x12\x53\x59\x0a\x76\xeb\x5c\x24\xb6\x08\x68\x4a\x53\x02\x8e\x92\x74\xaa\xfa\xee\x95\x0b\xa1\x46\x42\xa8\x53\xd5\xd1\x77\xd1\xfd\xdf\x7d\x97\xb9\x7c\x50\x1a\x64\x85\xce\x45\x42\xca\xe8\x98\x33\x91\x91\xb4\x20\x31\xcf\x24\xda\xce\xbd\x55\xdb\x01\x22\x4d\x51\xf7\x65\xfb\xbe\x69\xea\x2d\x36\xce\x35\x48\xe5\x42\x14\x19\xe1\x65\xdd\xf4\x55\xcc\x13\xb3\x5c\x2a\x8a\x39\xbf\x31\x12\x60\xa9\x35\x8f\x50\x3a\x95\xab\x71\x66\xd9\xee\x63\xce\x59\x62\xa5\x20\x79\x8e\x53\x0b\x68\x43\x90\x2b\x95\x53\x8e\xe1\xd0\x96\x23\xc0\x94\x33\x76\x5c\x1f\x2a\xf4\x43\x57\x1f\x77\x11\x67\xec\xb9\xea\xb7\x5d\xdd\x0e\xb5\x3b\x06\x55\xd7\xed\x0a\x9b\x05\x85\xc6\xed\x5c\xf0\x7c\x75\x6e\xdf\x9f\xdf\x97\x1d\x26\x1f\x9f\x13\xdf\xbc\xb7\x62\xc4\xd9\x2c\xe6\x7e\x17\xa5\x73\x69\x09\x4a\x93\x09\x19\xa7\x9e\x2f\x42\x80\x15\xe1\x44\x13\xc1\x43\x44\xf8\xce\x9e\x21\x97\x99\x4c\x08\xbf\xfb\x1c\x0b\x6b\x96\xa3\x33\x9f\x7f\x52\x79\x75\x9e\xfb\xf6\xef\x29\xfe\xef\x7a\xff\x40\x6d\x70\xc1\x53\x7e\xe0\xf7\xba\x37\x8a\x2c\xb4\x7a\x2a\xe4\xf9\x6f\xbe\xe9\xb3\x6c\xf7\x30\xfa\xc7\xae\xe7\x99\x5d\xae\xf4\x15\x00\x00\xff\xff\xfc\x8d\x98\x1e\x75\x03\x00\x00")
+
+func _9_project_is_publicUpSqlBytes() ([]byte, error) {
+	return bindataRead(
+		__9_project_is_publicUpSql,
+		"9_project_is_public.up.sql",
+	)
+}
+
+func _9_project_is_publicUpSql() (*asset, error) {
+	bytes, err := _9_project_is_publicUpSqlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "9_project_is_public.up.sql", size: 885, mode: os.FileMode(436), modTime: time.Unix(1543244855, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -361,6 +382,7 @@ var _bindata = map[string]func() (*asset, error){
 	"6_providers.up.sql": _6_providersUpSql,
 	"7_remove_feeds.sql": _7_remove_feedsSql,
 	"8_release_tags.up.sql": _8_release_tagsUpSql,
+	"9_project_is_public.up.sql": _9_project_is_publicUpSql,
 }
 
 // AssetDir returns the file names below a certain
@@ -414,6 +436,7 @@ var _bintree = &bintree{nil, map[string]*bintree{
 	"6_providers.up.sql": &bintree{_6_providersUpSql, map[string]*bintree{}},
 	"7_remove_feeds.sql": &bintree{_7_remove_feedsSql, map[string]*bintree{}},
 	"8_release_tags.up.sql": &bintree{_8_release_tagsUpSql, map[string]*bintree{}},
+	"9_project_is_public.up.sql": &bintree{_9_project_is_publicUpSql, map[string]*bintree{}},
 }}
 
 // RestoreAsset restores an asset under the given directory

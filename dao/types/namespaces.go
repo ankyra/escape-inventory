@@ -36,6 +36,7 @@ type Project struct {
 	Hooks          Hooks    `json:"hooks,omitempty"` // only used for view purposes
 	Permission     string   `json:"permission"`      // only used for view purposes
 	MatchingGroups []string `json:"-"`               // used to work out highest permission in model
+	IsPublic       bool     `json:"is_public"`
 }
 
 func NewProject(project string) *Project {

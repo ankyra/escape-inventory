@@ -14,6 +14,7 @@
 // dao/postgres/schemas/1_initial_schema.down.sql
 // dao/postgres/schemas/1_initial_schema.up.sql
 // dao/postgres/schemas/20_release_tags.up.sql
+// dao/postgres/schemas/21_project_is_public.up.sql
 // dao/postgres/schemas/2_project_metadata.down.sql
 // dao/postgres/schemas/2_project_metadata.up.sql
 // dao/postgres/schemas/3_migrate_existing_projects.up.sql
@@ -107,7 +108,7 @@ func _10_project_hooksUpSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "10_project_hooks.up.sql", size: 56, mode: os.FileMode(436), modTime: time.Unix(1505018451, 0)}
+	info := bindataFileInfo{name: "10_project_hooks.up.sql", size: 56, mode: os.FileMode(420), modTime: time.Unix(1511516577, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -127,7 +128,7 @@ func _11_application_hooksUpSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "11_application_hooks.up.sql", size: 60, mode: os.FileMode(436), modTime: time.Unix(1505024902, 0)}
+	info := bindataFileInfo{name: "11_application_hooks.up.sql", size: 60, mode: os.FileMode(420), modTime: time.Unix(1511516577, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -147,7 +148,7 @@ func _12_application_subscriptionsUpSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "12_application_subscriptions.up.sql", size: 225, mode: os.FileMode(436), modTime: time.Unix(1505640835, 0)}
+	info := bindataFileInfo{name: "12_application_subscriptions.up.sql", size: 225, mode: os.FileMode(420), modTime: time.Unix(1511516577, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -167,7 +168,7 @@ func _13_release_metadata_blobUpSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "13_release_metadata_blob.up.sql", size: 10, mode: os.FileMode(436), modTime: time.Unix(1516291993, 0)}
+	info := bindataFileInfo{name: "13_release_metadata_blob.up.sql", size: 10, mode: os.FileMode(420), modTime: time.Unix(1519986076, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -187,7 +188,7 @@ func _14_metricsUpSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "14_metrics.up.sql", size: 96, mode: os.FileMode(436), modTime: time.Unix(1513362760, 0)}
+	info := bindataFileInfo{name: "14_metrics.up.sql", size: 96, mode: os.FileMode(420), modTime: time.Unix(1515079328, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -207,7 +208,7 @@ func _15_metrics_user_idDownSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "15_metrics_user_id.down.sql", size: 127, mode: os.FileMode(436), modTime: time.Unix(1515082092, 0)}
+	info := bindataFileInfo{name: "15_metrics_user_id.down.sql", size: 127, mode: os.FileMode(420), modTime: time.Unix(1515081776, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -227,7 +228,7 @@ func _15_metrics_user_idUpSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "15_metrics_user_id.up.sql", size: 125, mode: os.FileMode(436), modTime: time.Unix(1515082092, 0)}
+	info := bindataFileInfo{name: "15_metrics_user_id.up.sql", size: 125, mode: os.FileMode(420), modTime: time.Unix(1515081776, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -247,7 +248,7 @@ func _16_feedsUpSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "16_feeds.up.sql", size: 186, mode: os.FileMode(436), modTime: time.Unix(1515498904, 0)}
+	info := bindataFileInfo{name: "16_feeds.up.sql", size: 186, mode: os.FileMode(420), modTime: time.Unix(1515506470, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -267,7 +268,7 @@ func _17_feed_applicationUpSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "17_feed_application.up.sql", size: 72, mode: os.FileMode(436), modTime: time.Unix(1517440541, 0)}
+	info := bindataFileInfo{name: "17_feed_application.up.sql", size: 72, mode: os.FileMode(420), modTime: time.Unix(1519986076, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -287,7 +288,7 @@ func _18_providersUpSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "18_providers.up.sql", size: 217, mode: os.FileMode(436), modTime: time.Unix(1519704425, 0)}
+	info := bindataFileInfo{name: "18_providers.up.sql", size: 217, mode: os.FileMode(420), modTime: time.Unix(1519986076, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -307,7 +308,7 @@ func _19_remove_feedsSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "19_remove_feeds.sql", size: 23, mode: os.FileMode(436), modTime: time.Unix(1523274619, 0)}
+	info := bindataFileInfo{name: "19_remove_feeds.sql", size: 23, mode: os.FileMode(420), modTime: time.Unix(1523264617, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -327,7 +328,7 @@ func _1_initial_schemaDownSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "1_initial_schema.down.sql", size: 56, mode: os.FileMode(436), modTime: time.Unix(1502613619, 0)}
+	info := bindataFileInfo{name: "1_initial_schema.down.sql", size: 56, mode: os.FileMode(420), modTime: time.Unix(1511516577, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -347,7 +348,7 @@ func _1_initial_schemaUpSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "1_initial_schema.up.sql", size: 512, mode: os.FileMode(436), modTime: time.Unix(1502613606, 0)}
+	info := bindataFileInfo{name: "1_initial_schema.up.sql", size: 512, mode: os.FileMode(420), modTime: time.Unix(1511516577, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -367,7 +368,27 @@ func _20_release_tagsUpSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "20_release_tags.up.sql", size: 176, mode: os.FileMode(436), modTime: time.Unix(1541517623, 0)}
+	info := bindataFileInfo{name: "20_release_tags.up.sql", size: 176, mode: os.FileMode(436), modTime: time.Unix(1543240430, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var __21_project_is_publicUpSql = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x72\xf4\x09\x71\x0d\x52\x08\x71\x74\xf2\x71\x55\x28\x28\xca\xcf\x4a\x4d\x2e\x51\x70\x74\x71\x51\x70\xf6\xf7\x09\xf5\xf5\x53\xc8\x2c\x8e\x2f\x28\x4d\xca\xc9\x4c\x56\x70\xf2\xf7\xf7\x71\x75\xf4\x53\x70\x71\x75\x73\x0c\xf5\x09\x51\x70\x73\xf4\x09\x76\xb5\xe6\x02\x04\x00\x00\xff\xff\xc5\x6d\x42\x7d\x40\x00\x00\x00")
+
+func _21_project_is_publicUpSqlBytes() ([]byte, error) {
+	return bindataRead(
+		__21_project_is_publicUpSql,
+		"21_project_is_public.up.sql",
+	)
+}
+
+func _21_project_is_publicUpSql() (*asset, error) {
+	bytes, err := _21_project_is_publicUpSqlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "21_project_is_public.up.sql", size: 64, mode: os.FileMode(420), modTime: time.Unix(1543247517, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -387,7 +408,7 @@ func _2_project_metadataDownSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "2_project_metadata.down.sql", size: 20, mode: os.FileMode(436), modTime: time.Unix(1502797856, 0)}
+	info := bindataFileInfo{name: "2_project_metadata.down.sql", size: 20, mode: os.FileMode(420), modTime: time.Unix(1511516577, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -407,7 +428,7 @@ func _2_project_metadataUpSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "2_project_metadata.up.sql", size: 132, mode: os.FileMode(436), modTime: time.Unix(1502815779, 0)}
+	info := bindataFileInfo{name: "2_project_metadata.up.sql", size: 132, mode: os.FileMode(420), modTime: time.Unix(1511516577, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -427,7 +448,7 @@ func _3_migrate_existing_projectsUpSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "3_migrate_existing_projects.up.sql", size: 104, mode: os.FileMode(436), modTime: time.Unix(1502806903, 0)}
+	info := bindataFileInfo{name: "3_migrate_existing_projects.up.sql", size: 104, mode: os.FileMode(420), modTime: time.Unix(1511516577, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -447,7 +468,7 @@ func _4_application_metadataDownSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "4_application_metadata.down.sql", size: 24, mode: os.FileMode(436), modTime: time.Unix(1502815842, 0)}
+	info := bindataFileInfo{name: "4_application_metadata.down.sql", size: 24, mode: os.FileMode(420), modTime: time.Unix(1511516577, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -467,7 +488,7 @@ func _4_application_metadataUpSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "4_application_metadata.up.sql", size: 313, mode: os.FileMode(436), modTime: time.Unix(1502825603, 0)}
+	info := bindataFileInfo{name: "4_application_metadata.up.sql", size: 313, mode: os.FileMode(420), modTime: time.Unix(1511516577, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -487,7 +508,7 @@ func _5_build_dependenciesDownSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "5_build_dependencies.down.sql", size: 41, mode: os.FileMode(436), modTime: time.Unix(1503531283, 0)}
+	info := bindataFileInfo{name: "5_build_dependencies.down.sql", size: 41, mode: os.FileMode(420), modTime: time.Unix(1511516577, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -507,7 +528,7 @@ func _5_build_dependenciesUpSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "5_build_dependencies.up.sql", size: 346, mode: os.FileMode(436), modTime: time.Unix(1503531268, 0)}
+	info := bindataFileInfo{name: "5_build_dependencies.up.sql", size: 346, mode: os.FileMode(420), modTime: time.Unix(1511516577, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -527,7 +548,7 @@ func _6_release_changesUpSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "6_release_changes.up.sql", size: 606, mode: os.FileMode(436), modTime: time.Unix(1504062920, 0)}
+	info := bindataFileInfo{name: "6_release_changes.up.sql", size: 606, mode: os.FileMode(420), modTime: time.Unix(1511516577, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -547,7 +568,7 @@ func _7_reset_dependenciesUpSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "7_reset_dependencies.up.sql", size: 85, mode: os.FileMode(436), modTime: time.Unix(1504045907, 0)}
+	info := bindataFileInfo{name: "7_reset_dependencies.up.sql", size: 85, mode: os.FileMode(420), modTime: time.Unix(1511516577, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -567,7 +588,7 @@ func _8_is_extension_on_dependenciesUpSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "8_is_extension_on_dependencies.up.sql", size: 165, mode: os.FileMode(436), modTime: time.Unix(1504046895, 0)}
+	info := bindataFileInfo{name: "8_is_extension_on_dependencies.up.sql", size: 165, mode: os.FileMode(420), modTime: time.Unix(1511516577, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -587,7 +608,7 @@ func _9_change_integer_precisionUpSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "9_change_integer_precision.up.sql", size: 290, mode: os.FileMode(436), modTime: time.Unix(1504063180, 0)}
+	info := bindataFileInfo{name: "9_change_integer_precision.up.sql", size: 290, mode: os.FileMode(420), modTime: time.Unix(1511516577, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -658,6 +679,7 @@ var _bindata = map[string]func() (*asset, error){
 	"1_initial_schema.down.sql": _1_initial_schemaDownSql,
 	"1_initial_schema.up.sql": _1_initial_schemaUpSql,
 	"20_release_tags.up.sql": _20_release_tagsUpSql,
+	"21_project_is_public.up.sql": _21_project_is_publicUpSql,
 	"2_project_metadata.down.sql": _2_project_metadataDownSql,
 	"2_project_metadata.up.sql": _2_project_metadataUpSql,
 	"3_migrate_existing_projects.up.sql": _3_migrate_existing_projectsUpSql,
@@ -725,6 +747,7 @@ var _bintree = &bintree{nil, map[string]*bintree{
 	"1_initial_schema.down.sql": &bintree{_1_initial_schemaDownSql, map[string]*bintree{}},
 	"1_initial_schema.up.sql": &bintree{_1_initial_schemaUpSql, map[string]*bintree{}},
 	"20_release_tags.up.sql": &bintree{_20_release_tagsUpSql, map[string]*bintree{}},
+	"21_project_is_public.up.sql": &bintree{_21_project_is_publicUpSql, map[string]*bintree{}},
 	"2_project_metadata.down.sql": &bintree{_2_project_metadataDownSql, map[string]*bintree{}},
 	"2_project_metadata.up.sql": &bintree{_2_project_metadataUpSql, map[string]*bintree{}},
 	"3_migrate_existing_projects.up.sql": &bintree{_3_migrate_existing_projectsUpSql, map[string]*bintree{}},
