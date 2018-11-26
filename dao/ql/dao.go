@@ -68,6 +68,7 @@ func NewQLDAO(path string) (DAO, error) {
 		UpdateProjectQuery:        `UPDATE project SET name = $1, description = $2, orgURL = $3, logo = $4, is_public = $6 WHERE name = $5`,
 		GetProjectsQuery:          `SELECT name, description, orgURL, logo, is_public FROM project`,
 		GetNamespacesByNamesQuery: `SELECT name, description, orgURL, logo, is_public FROM project WHERE name`,
+		GetNamespacesForUserQuery: `SELECT name, description, orgURL, logo, is_public FROM project WHERE is_public = true OR name`,
 		GetProjectHooksQuery:      `SELECT hooks FROM project WHERE name = $1`,
 		SetProjectHooksQuery:      `UPDATE project SET hooks = $1 WHERE name = $2`,
 

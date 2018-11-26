@@ -120,6 +120,56 @@ func (s *SQLHelper) GetNamespacesByNames(namespaces []string) (map[string]*Proje
 	return nil, nil
 }
 
+func (s *SQLHelper) GetNamespacesForUser(namespaces []string) (map[string]*Project, error) {
+	insertMarks := []string{}
+	for i, _ := range namespaces {
+		if s.UseNumericInsertMarks {
+			insertMarks = append(insertMarks, "$"+strconv.Itoa(i+1))
+		} else {
+			insertMarks = append(insertMarks, "?")
+		}
+	}
+	query := s.GetNamespacesForUserQuery
+	if len(namespaces) == 0 {
+		return map[string]*Project{}, nil
+	} else if len(namespaces) == 1 {
+		query += " = " + insertMarks[0]
+	} else {
+		query += " IN (" + strings.Join(insertMarks, ", ") + ")"
+	}
+	interfaceNamespaces := []interface{}{}
+	for _, n := range namespaces {
+		interfaceNamespaces = append(interfaceNamespaces, n)
+	}
+	rows, err := s.PrepareAndQuery(query, interfaceNamespaces...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	result := map[string]*Project{}
+	for rows.Next() {
+		var name, description, orgURL, logo string
+		var isPublic bool
+		if err := rows.Scan(&name, &description, &orgURL, &logo, &isPublic); err != nil {
+			return nil, err
+		}
+		prj, ok := result[name]
+		if !ok {
+			prj = &Project{
+				Name:        name,
+				Description: description,
+				OrgURL:      orgURL,
+				Logo:        logo,
+				Permission:  "admin", // default permission for open source
+				IsPublic:    isPublic,
+			}
+		}
+		result[prj.Name] = prj
+	}
+	return result, nil
+	return nil, nil
+}
+
 func (s *SQLHelper) GetNamespacesFilteredBy(f *NamespacesFilter) (map[string]*Project, error) {
 	insertMarks := []string{}
 	for i, _ := range f.Namespaces {

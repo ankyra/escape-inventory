@@ -34,6 +34,7 @@ func ValidateDAO(dao func() DAO, c *C) {
 	Validate_GetNamespaces(dao(), c)
 	Validate_ProjectMetadata(dao(), c)
 	Validate_GetNamespacesByNames(dao(), c)
+	Validate_GetNamespacesForUser(dao(), c)
 	Validate_GetNamespacesFilteredBy(dao(), c)
 	Validate_ApplicationMetadata(dao(), c)
 	Validate_GetDownstreamHooks(dao(), c)
@@ -394,6 +395,65 @@ func Validate_GetNamespacesByNames(dao DAO, c *C) {
 	c.Assert(projects, HasLen, 2)
 	c.Assert(projects["test-project-1"], NotNil)
 	c.Assert(projects["test-project-2"], NotNil)
+
+	c.Assert(dao.AddNamespace(NewProject("test-project-3")), Equals, nil)
+	publicProject := NewProject("public")
+	publicProject.IsPublic = true
+	c.Assert(dao.AddNamespace(publicProject), Equals, nil)
+
+	projects, err = dao.GetNamespacesByNames([]string{"test-project-1", "test-project-2"})
+	c.Assert(err, IsNil)
+	c.Assert(projects, HasLen, 2)
+	c.Assert(projects["test-project-1"], NotNil)
+	c.Assert(projects["test-project-2"], NotNil)
+}
+
+func Validate_GetNamespacesForUser(dao DAO, c *C) {
+	projects, err := dao.GetNamespacesForUser([]string{})
+	c.Assert(err, IsNil)
+	c.Assert(projects, HasLen, 0)
+
+	projects, err = dao.GetNamespacesForUser([]string{"test-project-1"})
+	c.Assert(err, IsNil)
+	c.Assert(projects, HasLen, 0)
+
+	c.Assert(dao.AddNamespace(NewProject("_")), Equals, nil)
+
+	projects, err = dao.GetNamespacesForUser([]string{"test-project-1"})
+	c.Assert(err, IsNil)
+	c.Assert(projects, HasLen, 0)
+
+	c.Assert(dao.AddNamespace(NewProject("test-project-1")), Equals, nil)
+
+	projects, err = dao.GetNamespacesForUser([]string{"test-project-1"})
+	c.Assert(err, IsNil)
+	c.Assert(projects, HasLen, 1)
+	c.Assert(projects["test-project-1"], NotNil)
+
+	c.Assert(dao.AddNamespace(NewProject("test-project-2")), Equals, nil)
+
+	projects, err = dao.GetNamespacesForUser([]string{"test-project-1"})
+	c.Assert(err, IsNil)
+	c.Assert(projects, HasLen, 1)
+	c.Assert(projects["test-project-1"], NotNil)
+
+	projects, err = dao.GetNamespacesForUser([]string{"test-project-1", "test-project-2"})
+	c.Assert(err, IsNil)
+	c.Assert(projects, HasLen, 2)
+	c.Assert(projects["test-project-1"], NotNil)
+	c.Assert(projects["test-project-2"], NotNil)
+
+	c.Assert(dao.AddNamespace(NewProject("test-project-3")), Equals, nil)
+	publicProject := NewProject("public")
+	publicProject.IsPublic = true
+	c.Assert(dao.AddNamespace(publicProject), Equals, nil)
+
+	projects, err = dao.GetNamespacesForUser([]string{"test-project-1", "test-project-2"})
+	c.Assert(err, IsNil)
+	c.Assert(projects, HasLen, 3)
+	c.Assert(projects["test-project-1"], NotNil)
+	c.Assert(projects["test-project-2"], NotNil)
+	c.Assert(projects["public"], NotNil)
 }
 
 func Validate_GetNamespacesFilteredBy(dao DAO, c *C) {

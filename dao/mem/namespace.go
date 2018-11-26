@@ -28,6 +28,19 @@ func (a *dao) GetNamespacesByNames(namespaces []string) (map[string]*Project, er
 	return namespacesFound, nil
 }
 
+func (a *dao) GetNamespacesForUser(namespaces []string) (map[string]*Project, error) {
+	namespacesFound := map[string]*Project{}
+	for _, name := range namespaces {
+		for namespaceName, namespace := range a.namespaceMetadata {
+			if namespaceName == name || namespace.IsPublic {
+				namespacesFound[namespaceName] = namespace
+			}
+		}
+
+	}
+	return namespacesFound, nil
+}
+
 func (a *dao) GetNamespacesFilteredBy(query *NamespacesFilter) (map[string]*Project, error) {
 	namespacesFound := map[string]*Project{}
 	for _, name := range query.Namespaces {

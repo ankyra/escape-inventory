@@ -17,6 +17,7 @@ type SQLHelper struct {
 	UpdateProjectQuery        string
 	GetProjectsQuery          string
 	GetNamespacesByNamesQuery string
+	GetNamespacesForUserQuery string
 	GetProjectHooksQuery      string
 	SetProjectHooksQuery      string
 

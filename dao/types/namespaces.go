@@ -23,6 +23,7 @@ type NamespacesDAO interface {
 	UpdateNamespace(*Project) error
 	GetNamespaces() (map[string]*Project, error)
 	GetNamespacesByNames(namespaces []string) (map[string]*Project, error)
+	GetNamespacesForUser(namespaces []string) (map[string]*Project, error)
 	GetNamespacesFilteredBy(*NamespacesFilter) (map[string]*Project, error)
 	GetNamespaceHooks(*Project) (Hooks, error)
 	SetNamespaceHooks(*Project, Hooks) error
