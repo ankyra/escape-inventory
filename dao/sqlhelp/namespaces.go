@@ -131,11 +131,10 @@ func (s *SQLHelper) GetNamespacesForUser(namespaces []string) (map[string]*Proje
 	}
 	query := s.GetNamespacesForUserQuery
 	if len(namespaces) == 0 {
-		return map[string]*Project{}, nil
 	} else if len(namespaces) == 1 {
-		query += " = " + insertMarks[0]
+		query += " OR name = " + insertMarks[0]
 	} else {
-		query += " IN (" + strings.Join(insertMarks, ", ") + ")"
+		query += " OR name IN (" + strings.Join(insertMarks, ", ") + ")"
 	}
 	interfaceNamespaces := []interface{}{}
 	for _, n := range namespaces {

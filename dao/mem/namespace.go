@@ -30,11 +30,14 @@ func (a *dao) GetNamespacesByNames(namespaces []string) (map[string]*Project, er
 
 func (a *dao) GetNamespacesForUser(namespaces []string) (map[string]*Project, error) {
 	namespacesFound := map[string]*Project{}
-	for _, name := range namespaces {
-		for namespaceName, namespace := range a.namespaceMetadata {
-			if namespaceName == name || namespace.IsPublic {
+	for namespaceName, namespace := range a.namespaceMetadata {
+		for _, name := range namespaces {
+			if namespaceName == name {
 				namespacesFound[namespaceName] = namespace
 			}
+		}
+		if namespace.IsPublic {
+			namespacesFound[namespaceName] = namespace
 		}
 
 	}

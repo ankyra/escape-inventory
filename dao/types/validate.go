@@ -454,6 +454,16 @@ func Validate_GetNamespacesForUser(dao DAO, c *C) {
 	c.Assert(projects["test-project-1"], NotNil)
 	c.Assert(projects["test-project-2"], NotNil)
 	c.Assert(projects["public"], NotNil)
+
+	projects, err = dao.GetNamespacesForUser([]string{""})
+	c.Assert(err, IsNil)
+	c.Assert(projects, HasLen, 1)
+	c.Assert(projects["public"], NotNil)
+
+	projects, err = dao.GetNamespacesForUser([]string{})
+	c.Assert(err, IsNil)
+	c.Assert(projects, HasLen, 1)
+	c.Assert(projects["public"], NotNil)
 }
 
 func Validate_GetNamespacesFilteredBy(dao DAO, c *C) {
