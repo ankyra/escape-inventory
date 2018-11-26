@@ -267,6 +267,24 @@ func (s *suite) Test_TagRelease(c *C) {
 	testRequest(c, req, 200)
 }
 
+func (s *suite) Test_TagRelease_by_tag(c *C) {
+	s.addRelease(c, "some-project", "1.0")
+	s.addRelease(c, "some-project", "1.1")
+	testCase := `{ "release_id": "some-project/my-app-v1.0", "tag": "production" }`
+	body := bytes.NewReader([]byte(testCase))
+
+	req, _ := http.NewRequest("POST", "/api/v1/inventory/some-project/units/my-app/tags/", body)
+	testRequest(c, req, 200)
+
+	testCase = `{ "release_id": "some-project/my-app:production", "tag": "stage" }`
+	body = bytes.NewReader([]byte(testCase))
+	req, _ = http.NewRequest("POST", "/api/v1/inventory/some-project/units/my-app/tags/", body)
+	testRequest(c, req, 200)
+
+	req, _ = http.NewRequest("GET", "/api/v1/inventory/some-project/units/my-app/versions/stage/", body)
+	testRequest(c, req, 200)
+}
+
 func (s *suite) Test_TagRelease_requires_parameters_to_be_set(c *C) {
 	s.addRelease(c, "some-project", "1.0")
 	s.addRelease(c, "some-project", "1.1")

@@ -67,3 +67,15 @@ func (s *versionSuite) Test_ParseVersionQuery_with_prefix(c *C) {
 		c.Assert(vq.SpecificTag, Equals, "")
 	}
 }
+
+func (s *versionSuite) Test_ParseVersionQuery_tag(c *C) {
+	testCases := []string{"production", "ci"}
+	for _, testCase := range testCases {
+		vq, err := ParseVersionQuery(testCase)
+		c.Assert(err, IsNil)
+		c.Assert(vq.LatestVersion, Equals, false)
+		c.Assert(vq.VersionPrefix, Equals, "")
+		c.Assert(vq.SpecificVersion, Equals, "")
+		c.Assert(vq.SpecificTag, Equals, testCase)
+	}
+}

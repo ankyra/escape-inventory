@@ -249,7 +249,11 @@ func TagRelease(namespace, application, releaseId, tag string) error {
 	if parsed.Name != application {
 		return NewUserError(fmt.Errorf("Mismatch between application from URL and application from release_id."))
 	}
-	release, err := ResolveReleaseId(namespace, application, parsed.Version)
+	versionQuery := parsed.Version
+	if parsed.Tag != "" {
+		versionQuery = parsed.Tag
+	}
+	release, err := ResolveReleaseId(namespace, application, versionQuery)
 	if err != nil {
 		return err
 	}

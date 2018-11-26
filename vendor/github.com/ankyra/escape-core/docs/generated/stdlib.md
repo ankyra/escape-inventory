@@ -17,7 +17,33 @@ h2 {
 Standard library functions for the [Escape Scripting Language](../scripting-language/)
 
 
+# Unary functions
+
+## timestamp()
+
+Returns a UNIX timestamp
+
+
+# Functions acting on bool
+
+## not()
+
+Logical NOT operation
+
+## and(b2 :: bool)
+
+Logical AND operation
+
+## or(b2 :: bool)
+
+Logical OR operation
+
+
 # Functions acting on integer
+
+## lt(i2 :: integer)
+
+Returns true if first argument is less than the second argument
 
 ## lte(i2 :: integer)
 
@@ -30,10 +56,6 @@ Returns true if first argument is greater than second argument
 ## gte(i2 :: integer)
 
 Returns true if first argument is greater than or equal to second argument
-
-## lt(i2 :: integer)
-
-Returns true if first argument is less than the second argument
 
 
 # Functions acting on everything
@@ -48,6 +70,10 @@ Returns true if the arguments are of the same type and have the same value
 
 
 # Functions acting on lists
+
+## env_lookup(key :: string)
+
+Lookup key in environment. Usually called implicitly when using '$'
 
 ## join(sep :: string)
 
@@ -65,28 +91,12 @@ Returns the length of the list
 
 Slice a list. Usually accessed implicitly using slice syntax (eg. `list[0:5]`)
 
-## env_lookup(key :: string)
-
-Lookup key in environment. Usually called implicitly when using '$'
-
 
 # Functions acting on strings
 
-## dir_exists()
+## track_version()
 
-Returns true if the path exists and if it is a directory, false otherwise
-
-## replace(old :: string, new :: string, n :: integer)
-
-Replace returns a copy of the string s with the first n non-overlapping instances of old replaced by new. If old is empty, it matches at the beginning of the string and after each UTF-8 sequence, yielding up to k+1 replacements for a k-rune string. If n < 0, there is no limit on the number of replacements.
-
-## read_file()
-
-Read the contents of a file
-
-## concat(v1 :: string, v2 :: string, ...)
-
-Concatate stringable arguments
+Track version
 
 ## lower(v :: string)
 
@@ -96,13 +106,13 @@ Returns a copy of the string v with all Unicode characters mapped to their lower
 
 Returns true if the path exists, false if not
 
-## file_exists()
+## track_major_version()
 
-Returns true if the path exists and if it's not a directory, false otherwise
+Track major version
 
-## base64_decode()
+## track_patch_version()
 
-Decode string from base64
+Track patch version
 
 ## track_minor_version()
 
@@ -116,9 +126,33 @@ Returns a copy of the string v with all Unicode characters mapped to their upper
 
 Returns a copy of the string v with all Unicode characters mapped to their title case
 
+## dir_exists()
+
+Returns true if the path exists and if it is a directory, false otherwise
+
+## read_file()
+
+Read the contents of a file
+
+## concat(v1 :: string, v2 :: string, ...)
+
+Concatate stringable arguments
+
 ## split(sep :: string)
 
 Split slices s into all substrings separated by sep and returns a slice of the substrings between those separators. If sep is empty, Split splits after each UTF-8 sequence.
+
+## file_exists()
+
+Returns true if the path exists and if it's not a directory, false otherwise
+
+## base64_decode()
+
+Decode string from base64
+
+## replace(old :: string, new :: string, n :: integer)
+
+Replace returns a copy of the string s with the first n non-overlapping instances of old replaced by new. If old is empty, it matches at the beginning of the string and after each UTF-8 sequence, yielding up to k+1 replacements for a k-rune string. If n < 0, there is no limit on the number of replacements.
 
 ## base64_encode()
 
@@ -128,44 +162,10 @@ Encode string to base64
 
 Returns a slice of the string s, with all leading and trailing white space removed, as defined by Unicode. 
 
-## track_major_version()
-
-Track major version
-
-## track_patch_version()
-
-Track patch version
-
-## track_version()
-
-Track version
-
 
 # Functions acting on integers
 
 ## add(y :: integer)
 
 Add two integers
-
-
-# Unary functions
-
-## timestamp()
-
-Returns a UNIX timestamp
-
-
-# Functions acting on bool
-
-## and(b2 :: bool)
-
-Logical AND operation
-
-## or(b2 :: bool)
-
-Logical OR operation
-
-## not()
-
-Logical NOT operation
 
