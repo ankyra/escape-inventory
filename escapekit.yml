@@ -1,0 +1,4 @@
+escapekit_version: 1
+build:
+  steps:
+  - escape_plan_location: escape.yml
